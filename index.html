@@ -1,75 +1,239 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071b30">
+  <meta name="description" content="LAYAN - ليان للتنازلات العقارية في أسيوط">
   <title>LAYAN | ليان للتنازلات العقارية</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="#" aria-label="LAYAN الصفحة الرئيسية">
-      <!-- ضع ملف الشعار الأصلي هنا عند توفره، ولا تستبدله بتصميم جديد -->
-      <img src="file_000000004bbc821184c084bfa178e416.jpg" alt="شعار LAYAN" class="brand-logo">
-      <span><strong>LAYAN</strong><small>ليان للتنازلات العقارية</small></span>
+      <img src="file_000000004bbc821184c084bfa178e416.jpg"
+           alt="شعار LAYAN" class="brand-logo">
+      <span>
+        <strong>LAYAN</strong>
+        <small>ليان للتنازلات العقارية</small>
+      </span>
     </a>
-    <nav><a class="active" href="#offers">الرئيسية</a><a href="#offers">العروض</a><a href="#how">كيف تعمل المنصة؟</a></nav>
-    <div class="top-actions"><button class="btn btn-outline" id="loginBtn">تسجيل الدخول</button><button class="btn btn-gold" id="addOfferTop">أضف عرضك</button></div>
+
+    <nav aria-label="القائمة الرئيسية">
+      <a class="active" href="#">الرئيسية</a>
+      <a href="#offers">العروض</a>
+      <a href="#how">كيف تعمل المنصة؟</a>
+    </nav>
+
+    <div class="top-actions">
+      <button class="btn btn-outline" id="loginBtn" type="button">
+        تسجيل الدخول
+      </button>
+      <button class="btn btn-gold" id="addOfferTop" type="button">
+        أضف عرضك
+      </button>
+    </div>
   </header>
 
   <main>
     <section class="hero">
       <div class="hero-content">
         <p class="eyebrow">فرص عقارية أوضح وأسهل</p>
-        <h1>فرصتك لامتلاك وحدة عقارية<br><span>في أسيوط تبدأ من هنا</span></h1>
-        <p>منصة تربط أصحاب الوحدات الراغبين في التنازل بالمشترين، مع توضيح المبالغ وشروط التنازل.</p>
+        <h1>فرصتك لامتلاك وحدة عقارية<br>
+          <span>في أسيوط تبدأ من هنا</span>
+        </h1>
+        <p>
+          منصة تربط أصحاب الوحدات الراغبين في التنازل بالمشترين،
+          مع توضيح المبالغ وشروط التنازل.
+        </p>
+        <a class="btn btn-gold" href="#offers">استكشف العروض</a>
       </div>
     </section>
 
     <section class="search-panel" aria-label="البحث عن العروض">
-      <label class="search-field"><span>ابحث عن مشروع أو منطقة</span><input id="searchInput" placeholder="مثال: أسيوط الجديدة"></label>
-      <label><span>نوع العقار</span><select id="typeFilter"><option value="">كل الأنواع</option><option>شقة</option><option>فيلا</option><option>محل</option><option>أرض</option></select></label>
-      <label><span>المنطقة</span><select id="areaFilter"><option value="">كل المناطق</option><option>أسيوط</option><option>أسيوط الجديدة</option><option>ديروط</option><option>القوصية</option><option>منفلوط</option></select></label>
-      <button class="btn btn-gold" id="searchBtn">بحث عن العروض</button>
+      <label class="search-field">
+        <span>ابحث عن مشروع أو منطقة</span>
+        <input id="searchInput" type="search"
+               placeholder="مثال: أسيوط الجديدة">
+      </label>
+
+      <label>
+        <span>نوع العقار</span>
+        <select id="typeFilter">
+          <option value="">كل الأنواع</option>
+          <option>شقة</option>
+          <option>فيلا</option>
+          <option>محل</option>
+          <option>أرض</option>
+        </select>
+      </label>
+
+      <label>
+        <span>المنطقة</span>
+        <select id="areaFilter">
+          <option value="">كل المناطق</option>
+          <option>أسيوط</option>
+          <option>أسيوط الجديدة</option>
+          <option>ديروط</option>
+          <option>القوصية</option>
+          <option>منفلوط</option>
+          <option>مدينة ناصر</option>
+        </select>
+      </label>
+
+      <button class="btn btn-gold" id="searchBtn" type="button">
+        بحث عن العروض
+      </button>
     </section>
 
     <section class="section" id="offers">
-      <div class="section-heading"><div><p class="eyebrow">اكتشف الفرص المتاحة</p><h2>قائمة العروض العقارية</h2></div><button class="btn btn-dark" id="addOfferBtn">＋ إضافة عرض</button></div>
-      <div class="category-row" id="categoryRow">
-        <button class="category active" data-kind="">جميع العروض</button><button class="category" data-kind="شقة">شقق</button><button class="category" data-kind="فيلا">فلل</button><button class="category" data-kind="محل">محلات</button><button class="category" data-kind="أرض">أراضي</button>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">اكتشف الفرص المتاحة</p>
+          <h2>قائمة العروض العقارية</h2>
+        </div>
+        <button class="btn btn-dark" id="addOfferBtn" type="button">
+          ＋ إضافة عرض
+        </button>
       </div>
-      <p id="statusMessage" class="status-message" role="status">يتم عرض أمثلة توضيحية. اربط إعدادات Supabase لتحميل العروض الحقيقية.</p>
+
+      <div class="category-row" id="categoryRow">
+        <button class="category active" data-kind="" type="button">
+          جميع العروض
+        </button>
+        <button class="category" data-kind="شقة" type="button">شقق</button>
+        <button class="category" data-kind="فيلا" type="button">فلل</button>
+        <button class="category" data-kind="محل" type="button">محلات</button>
+        <button class="category" data-kind="أرض" type="button">أراضي</button>
+      </div>
+
+      <p id="statusMessage" class="status-message" role="status">
+        جارٍ تحميل العروض...
+      </p>
       <div class="offers-grid" id="offersGrid"></div>
     </section>
 
-    <section class="how-section" id="how"><h2>خطوات واضحة نحو التنازل</h2><div class="steps"><article><b>01</b><h3>اعثر على العرض</h3><p>ابحث حسب المنطقة ونوع الوحدة والميزانية.</p></article><article><b>02</b><h3>راجع التفاصيل</h3><p>اطّلع على المقدم والمدفوع والمتبقي ورسوم التنازل المعلنة.</p></article><article><b>03</b><h3>تواصل واستكمل الإجراءات</h3><p>تأكد من موافقة المطور واستكمل التنازل رسميًا.</p></article></div></section>
+    <section class="how-section" id="how">
+      <h2>خطوات واضحة نحو التنازل</h2>
+      <div class="steps">
+        <article>
+          <b>01</b>
+          <h3>اعثر على العرض</h3>
+          <p>ابحث حسب المنطقة ونوع الوحدة والميزانية.</p>
+        </article>
+        <article>
+          <b>02</b>
+          <h3>راجع التفاصيل</h3>
+          <p>اطّلع على المقدم والمدفوع والمتبقي ورسوم التنازل.</p>
+        </article>
+        <article>
+          <b>03</b>
+          <h3>استكمل الإجراءات</h3>
+          <p>تحقق من المستندات وموافقة المطور قبل إتمام التنازل رسميًا.</p>
+        </article>
+      </div>
+    </section>
   </main>
 
-  <footer><div class="brand"><span class="brand-mark">L</span><span><strong>LAYAN</strong><small>ليان للتنازلات العقارية</small></span></div><p>البيانات المعروضة تحتاج إلى التحقق قبل إتمام أي معاملة.</p></footer>
+  <footer>
+    <div class="brand">
+      <span class="brand-mark">L</span>
+      <span>
+        <strong>LAYAN</strong>
+        <small>ليان للتنازلات العقارية</small>
+      </span>
+    </div>
+    <p>تحقق من البيانات وشروط المطور قبل إتمام أي معاملة.</p>
+  </footer>
 
   <dialog id="offerDialog">
     <form id="offerForm" method="dialog">
-      <div class="dialog-head"><h2>إضافة عرض عقاري</h2><button type="button" class="close-btn" id="closeDialog" aria-label="إغلاق">×</button></div>
-      <label>عنوان العرض<input name="title" required placeholder="مثال: شقة في أسيوط الجديدة"></label>
-      <div class="form-grid">
-        <label>نوع الوحدة<select name="property_type" required><option value="شقة">شقة</option><option value="فيلا">فيلا</option><option value="محل">محل</option><option value="أرض">أرض</option></select></label>
-        <label>المنطقة<input name="area" placeholder="المنطقة أو المشروع"></label>
-        <label>السعر الإجمالي (ج.م)<input name="total_price" type="number" min="0" required></label>
-        <label>المقدم المطلوب (ج.م)<input name="down_payment" type="number" min="0" required></label>
-        <label>المبلغ المدفوع (ج.م)<input name="paid_amount" type="number" min="0" required></label>
-        <label>الأقساط المتبقية (ج.م)<input name="remaining_installments" type="number" min="0" required></label>
-        <label>رسوم التنازل (ج.م)<input name="transfer_fee" type="number" min="0" value="0"></label>
-        <label>نسبة الخصم (%)<input name="discount_percent" type="number" min="0" max="100" value="0"></label>
+      <div class="dialog-head">
+        <h2>إضافة عرض عقاري</h2>
+        <button type="button" class="close-btn" id="closeDialog"
+                aria-label="إغلاق">×</button>
       </div>
-      <label>وصف العرض<textarea name="description" rows="3" placeholder="تفاصيل الوحدة وشروط التنازل"></textarea></label>
-      <label>صور الوحدة<input name="photos" id="photosInput" type="file" accept="image/*" multiple></label>
-      <p class="form-note">النموذج الحالي واجهة أولية. لن تُرفع الصور أو تُحفظ البيانات على الإنترنت حتى يتم ضبط Supabase.</p>
-      <button class="btn btn-gold full-width" type="submit">حفظ العرض محليًا للمعاينة</button>
+
+      <label>
+        عنوان العرض
+        <input name="title" required
+               placeholder="مثال: شقة في أسيوط الجديدة">
+      </label>
+
+      <div class="form-grid">
+        <label>
+          نوع الوحدة
+          <select name="property_type" required>
+            <option value="شقة">شقة</option>
+            <option value="فيلا">فيلا</option>
+            <option value="محل">محل</option>
+            <option value="أرض">أرض</option>
+          </select>
+        </label>
+
+        <label>
+          المنطقة
+          <input name="area" placeholder="المنطقة أو المشروع">
+        </label>
+
+        <label>
+          السعر الإجمالي (ج.م)
+          <input name="total_price" type="number" min="0" required>
+        </label>
+
+        <label>
+          المقدم المطلوب (ج.م)
+          <input name="down_payment" type="number" min="0" required>
+        </label>
+
+        <label>
+          المبلغ المدفوع (ج.م)
+          <input name="paid_amount" type="number" min="0" required>
+        </label>
+
+        <label>
+          الأقساط المتبقية (ج.م)
+          <input name="remaining_installments" type="number"
+                 min="0" required>
+        </label>
+
+        <label>
+          رسوم التنازل (ج.م)
+          <input name="transfer_fee" type="number" min="0" value="0">
+        </label>
+
+        <label>
+          نسبة الخصم (%)
+          <input name="discount_percent" type="number"
+                 min="0" max="100" value="0">
+        </label>
+      </div>
+
+      <label>
+        وصف العرض
+        <textarea name="description" rows="3"
+                  placeholder="تفاصيل الوحدة وشروط التنازل"></textarea>
+      </label>
+
+      <label>
+        صور الوحدة
+        <input name="photos" id="photosInput" type="file"
+               accept="image/*" multiple>
+      </label>
+
+      <p class="form-note">
+        يلزم استكمال ربط قاعدة البيانات ورفع الصور لحفظ البيانات على الإنترنت.
+      </p>
+
+      <button class="btn btn-gold full-width" type="submit">
+        حفظ العرض
+      </button>
     </form>
   </dialog>
+
   <script src="config.js"></script>
-  <script src="supabase.js"></script>
+  <script src="gubabase.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
