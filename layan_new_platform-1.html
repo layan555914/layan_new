@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LAYAN | ليان للتنازلات العقارية</title>
+<style>
+:root{--navy:#14283f;--gold:#c6a15b;--cream:#f7f5f0;--ink:#202a35;--muted:#6d7782;--line:#e5e8ec;--white:#fff;--green:#247a57}
+*{box-sizing:border-box}body{margin:0;background:#f5f6f8;color:var(--ink);font-family:Tahoma,Arial,sans-serif;line-height:1.7}
+header{background:var(--navy);color:white;padding:15px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:3px solid var(--gold)}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;border:1px solid var(--gold);border-radius:12px;display:grid;place-items:center;color:var(--gold);font-weight:bold;font-size:22px}.brand h1{font-size:22px;margin:0;letter-spacing:1px}.brand p{margin:0;color:#d6dce3;font-size:12px}
+nav{display:flex;gap:18px;align-items:center;flex-wrap:wrap}nav a{color:#fff;text-decoration:none;font-size:14px}nav a:hover{color:#e3c27f}
+.btn{border:0;border-radius:9px;padding:11px 17px;font-weight:bold;cursor:pointer;font-family:inherit}.btn-gold{background:var(--gold);color:#172538}.btn-outline{background:transparent;border:1px solid #c9d0d8;color:white}
+.hero{background:linear-gradient(120deg,#14283f,#223f5b);color:white;padding:40px 5% 34px}.hero-inner{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:25px;flex-wrap:wrap}.hero h2{font-size:clamp(25px,4vw,38px);margin:0 0 8px}.hero p{margin:0;color:#e0e6ed;max-width:620px}.hero-tag{border:1px solid #6f8397;border-radius:14px;padding:13px 18px;color:#f0d69e}
+main{max-width:1200px;margin:26px auto;padding:0 18px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:17px}.section-head h2{margin:0;font-size:24px;color:var(--navy)}.section-head p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.filters{background:white;border:1px solid var(--line);border-radius:15px;padding:16px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:20px;box-shadow:0 5px 18px #13283f08}
+label{display:block;font-size:12px;font-weight:bold;color:#4d5864;margin-bottom:5px}input,select,textarea{width:100%;font:inherit;border:1px solid #d8dde3;border-radius:8px;padding:10px;background:#fff;color:var(--ink);min-width:0}input:focus,select:focus,textarea:focus{outline:2px solid #d8bd83;border-color:var(--gold)}
+.results{display:flex;justify-content:space-between;align-items:center;margin:14px 0;color:var(--muted);font-size:13px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.card{background:white;border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:0 5px 18px #13283f08;display:flex;flex-direction:column}
+.photo{height:190px;background:linear-gradient(135deg,#d9e1e7,#aebdca);position:relative;display:grid;place-items:center;color:#46596a;overflow:hidden}.photo img{width:100%;height:100%;object-fit:cover}.photo .placeholder{font-size:44px}.pill{position:absolute;top:12px;right:12px;background:#fff;color:var(--green);padding:4px 9px;border-radius:20px;font-size:11px;font-weight:bold}.card-body{padding:15px;display:flex;flex-direction:column;gap:9px;flex:1}.card h3{margin:0;font-size:18px;color:var(--navy)}.location{color:var(--muted);font-size:12px}.price-line{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:10px}.price-line strong{color:var(--navy);font-size:18px}.price-line span{font-size:11px;color:var(--muted)}.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{background:#f7f8fa;padding:8px 10px;border-radius:8px}.stat small{display:block;color:var(--muted);font-size:11px}.stat b{font-size:13px}.fees{font-size:12px;color:#5d6670}.fees strong{color:#8a6524}.card-actions{display:flex;gap:8px;margin-top:auto;padding-top:4px}.card-actions button{flex:1}.btn-dark{background:var(--navy);color:white}.btn-light{background:#f0f2f5;color:var(--navy)}
+.empty{display:none;text-align:center;padding:35px;background:white;border-radius:12px;color:var(--muted)}
+.panel{margin:32px 0;background:white;border:1px solid var(--line);border-radius:15px;padding:20px}.panel h2{margin:0 0 4px;color:var(--navy)}.panel p{margin:0 0 16px;color:var(--muted);font-size:13px}.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.wide{grid-column:1/-1}.upload{border:1px dashed #b9c3cd;border-radius:10px;padding:15px;background:#fafbfc}.hint{font-size:11px;color:var(--muted);margin-top:5px}.form-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:15px}.note{background:#fff8e9;border-right:3px solid var(--gold);padding:12px 14px;border-radius:7px;font-size:12px;color:#66512a;margin-top:15px}
+footer{background:var(--navy);color:#d9e0e7;padding:22px 5%;margin-top:35px;font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}footer strong{color:var(--gold)}
+@media(max-width:900px){.filters{grid-template-columns:repeat(3,minmax(0,1fr))}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){header{padding:12px 4%}nav{gap:10px}nav a{font-size:12px}.hero{padding:28px 5%}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.cards{grid-template-columns:1fr}.photo{height:205px}.form-grid{grid-template-columns:1fr}.wide{grid-column:auto}.section-head h2{font-size:21px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo" aria-label="شعار مؤقت لحين إدراج الشعار الأصلي">L</div><div><h1>LAYAN <span style="color:var(--gold)">ليان</span></h1><p>منصة التنازلات العقارية</p></div></div>
+  <nav><a href="#offers">قائمة العروض</a><a href="#add-offer">أضف عرضك</a><a href="#steps">خطوات التنازل</a><button class="btn btn-outline" onclick="alert('سيتم تفعيل الحسابات في مرحلة الربط الخلفي.')">دخول / حساب جديد</button></nav>
+</header>
+<section class="hero"><div class="hero-inner"><div><h2>وحدتك لها فرصة جديدة</h2><p>اكتشف عروض التنازل عن الوحدات العقارية في أسيوط، واطّلع بوضوح على المبلغ المطلوب والأقساط المتبقية ورسوم التنازل المعلنة.</p></div><div class="hero-tag">وضوح في البيانات • خطوات منظمة • قرار بثقة</div></div></section>
+<main>
+  <section id="offers">
+    <div class="section-head"><div><h2>قائمة العروض العقارية</h2><p>عروض تجريبية لتوضيح شكل المنصة — ستُستبدل ببيانات حقيقية بعد ربط قاعدة البيانات.</p></div><button class="btn btn-gold" onclick="document.getElementById('add-offer').scrollIntoView({behavior:'smooth'})">＋ أضف عرضك</button></div>
+    <div class="filters">
+      <div><label for="search">بحث بكلمة</label><input id="search" placeholder="اسم المنطقة أو المشروع..." oninput="filterOffers()"></div>
+      <div><label for="area">المنطقة</label><select id="area" onchange="filterOffers()"><option value="">كل المناطق</option><option>مدينة أسيوط</option><option>أسيوط الجديدة</option><option>منفلوط</option><option>ديروط</option><option>أبنوب</option></select></div>
+      <div><label for="type">نوع الوحدة</label><select id="type" onchange="filterOffers()"><option value="">كل الأنواع</option><option>شقة</option><option>محل تجاري</option><option>عيادة</option><option>فيلا</option></select></div>
+      <div><label for="maxCash">المقدم المطلوب حتى</label><select id="maxCash" onchange="filterOffers()"><option value="">أي مبلغ</option><option value="300000">300,000 جنيه</option><option value="500000">500,000 جنيه</option><option value="800000">800,000 جنيه</option></select></div>
+      <div><label for="developer">الشركة / المطور</label><select id="developer" onchange="filterOffers()"><option value="">كل الشركات</option><option>شركة النخبة العقارية</option><option>مطور محلي</option><option>شركة المستقبل</option></select></div>
+    </div>
+    <div class="results"><span id="resultCount">3 عروض</span><span>الأسعار بالجنيه المصري</span></div>
+    <div class="cards" id="cards">
+      <article class="card" data-area="أسيوط الجديدة" data-type="شقة" data-cash="350000" data-dev="شركة النخبة العقارية" data-search="شقة سكنية أسيوط الجديدة النخبة الحي الأول">
+        <div class="photo"><span class="placeholder">⌂</span><span class="pill">عرض تجريبي</span></div>
+        <div class="card-body"><h3>شقة سكنية — الحي الأول</h3><div class="location">📍 أسيوط الجديدة · شركة النخبة العقارية</div><div class="price-line"><div><span>المبلغ المطلوب للتنازل</span><br><strong>350,000 ج.م</strong></div><div style="text-align:left"><span>سعر العقد الأصلي</span><br><b>1,200,000 ج.م</b></div></div><div class="stats"><div class="stat"><small>المبلغ المدفوع</small><b>300,000 ج.م</b></div><div class="stat"><small>المتبقي للشركة</small><b>900,000 ج.م</b></div><div class="stat"><small>القسط الشهري</small><b>12,500 ج.م</b></div><div class="stat"><small>رسوم التنازل</small><b>حسب إفادة الشركة</b></div></div><div class="fees">الخصم أو الزيادة: <strong>غير مؤكد — يلزم التحقق</strong></div><div class="card-actions"><button class="btn btn-dark" onclick="details('شقة سكنية — الحي الأول','أسيوط الجديدة','350,000','1,200,000','300,000','900,000','12,500','حسب إفادة الشركة')">تفاصيل العرض</button><button class="btn btn-light" onclick="contact('شقة سكنية — الحي الأول')">طلب تواصل</button></div></div>
+      </article>
+      <article class="card" data-area="مدينة أسيوط" data-type="محل تجاري" data-cash="500000" data-dev="مطور محلي" data-search="محل تجاري شارع الجمهورية مدينة أسيوط">
+        <div class="photo"><span class="placeholder">▦</span><span class="pill">عرض تجريبي</span></div>
+        <div class="card-body"><h3>محل تجاري — شارع رئيسي</h3><div class="location">📍 مدينة أسيوط · مطور محلي</div><div class="price-line"><div><span>المبلغ المطلوب للتنازل</span><br><strong>500,000 ج.م</strong></div><div style="text-align:left"><span>سعر العقد الأصلي</span><br><b>1,650,000 ج.م</b></div></div><div class="stats"><div class="stat"><small>المبلغ المدفوع</small><b>450,000 ج.م</b></div><div class="stat"><small>المتبقي للشركة</small><b>1,200,000 ج.م</b></div><div class="stat"><small>القسط الشهري</small><b>18,000 ج.م</b></div><div class="stat"><small>رسوم التنازل</small><b>تحتاج تأكيدًا</b></div></div><div class="fees">الخصم أو الزيادة: <strong>يُحدد بعد مراجعة المستندات</strong></div><div class="card-actions"><button class="btn btn-dark" onclick="details('محل تجاري — شارع رئيسي','مدينة أسيوط','500,000','1,650,000','450,000','1,200,000','18,000','تحتاج تأكيدًا')">تفاصيل العرض</button><button class="btn btn-light" onclick="contact('محل تجاري — شارع رئيسي')">طلب تواصل</button></div></div>
+      </article>
+      <article class="card" data-area="منفلوط" data-type="شقة" data-cash="250000" data-dev="شركة المستقبل" data-search="شقة عائلية منفلوط شركة المستقبل">
+        <div class="photo"><span class="placeholder">⌂</span><span class="pill">عرض تجريبي</span></div>
+        <div class="card-body"><h3>شقة عائلية — مساحة متوسطة</h3><div class="location">📍 منفلوط · شركة المستقبل</div><div class="price-line"><div><span>المبلغ المطلوب للتنازل</span><br><strong>250,000 ج.م</strong></div><div style="text-align:left"><span>سعر العقد الأصلي</span><br><b>850,000 ج.م</b></div></div><div class="stats"><div class="stat"><small>المبلغ المدفوع</small><b>220,000 ج.م</b></div><div class="stat"><small>المتبقي للشركة</small><b>630,000 ج.م</b></div><div class="stat"><small>القسط الشهري</small><b>8,000 ج.م</b></div><div class="stat"><small>رسوم التنازل</small><b>لم تُعلن</b></div></div><div class="fees">الخصم أو الزيادة: <strong>غير معلن</strong></div><div class="card-actions"><button class="btn btn-dark" onclick="details('شقة عائلية — مساحة متوسطة','منفلوط','250,000','850,000','220,000','630,000','8,000','لم تُعلن')">تفاصيل العرض</button><button class="btn btn-light" onclick="contact('شقة عائلية — مساحة متوسطة')">طلب تواصل</button></div></div>
+      </article>
+    </div>
+    <div class="empty" id="empty">لا توجد عروض مطابقة للبحث. جرّب تغيير الفلاتر.</div>
+  </section>
+  <section class="panel" id="add-offer">
+    <h2>أضف عرض تنازل جديد</h2><p>هذا نموذج واجهة أولي. حفظ البيانات ورفع الصور فعليًا سيُفعّلان بعد ربط قاعدة البيانات والتخزين.</p>
+    <form id="offerForm">
+      <div class="form-grid">
+        <div><label for="title">عنوان العرض *</label><input id="title" required placeholder="مثال: شقة في أسيوط الجديدة"></div>
+        <div><label for="newArea">المنطقة داخل المحافظة *</label><input id="newArea" required placeholder="المدينة / المركز / الحي"></div>
+        <div><label for="newType">نوع الوحدة *</label><select id="newType" required><option value="">اختر النوع</option><option>شقة</option><option>محل تجاري</option><option>عيادة</option><option>فيلا</option><option>أرض</option><option>أخرى</option></select></div>
+        <div><label for="newDev">اسم الشركة / المطور</label><input id="newDev" placeholder="اسم الشركة كما بالعقد"></div>
+        <div><label for="contractPrice">سعر العقد الأصلي (جنيه) *</label><input id="contractPrice" type="number" min="0" required placeholder="0"></div>
+        <div><label for="paid">إجمالي المدفوع للشركة (جنيه) *</label><input id="paid" type="number" min="0" required placeholder="0"></div>
+        <div><label for="cash">المبلغ المطلوب من المشتري (جنيه) *</label><input id="cash" type="number" min="0" required placeholder="0"></div>
+        <div><label for="installment">قيمة القسط (جنيه)</label><input id="installment" type="number" min="0" placeholder="0"></div>
+        <div><label for="remaining">الأقساط / الرصيد المتبقي (جنيه)</label><input id="remaining" type="number" min="0" placeholder="0"></div>
+        <div><label for="fee">رسوم التنازل</label><select id="fee"><option>غير معروف بعد</option><option>مبلغ ثابت</option><option>نسبة مئوية</option><option>لا توجد حسب إفادة الشركة</option></select></div>
+        <div><label for="discount">الخصم / الزيادة من المبلغ المدفوع</label><select id="discount"><option>غير معروف بعد</option><option>يوجد خصم</option><option>لا يوجد خصم</option><option>توجد زيادة</option></select></div>
+        <div><label for="feeValue">قيمة الرسوم أو النسبة (إن عُرفت)</label><input id="feeValue" placeholder="مثال: 25,000 جنيه أو 5%"></div>
+        <div class="wide"><label for="description">وصف الوحدة ومعلومات مهمة</label><textarea id="description" rows="3" placeholder="المساحة، الدور، التشطيب، موعد الاستلام، تفاصيل الأقساط..."></textarea></div>
+        <div class="wide upload"><label for="photos">صور الوحدة العقارية</label><input id="photos" type="file" accept="image/*" multiple><div class="hint">يمكن اختيار أكثر من صورة للمعاينة في هذه الصفحة. لن تُرفع إلى الإنترنت قبل ربط خدمة التخزين.</div><div id="preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div></div>
+      </div>
+      <div class="form-actions"><button class="btn btn-gold" type="submit">معاينة بيانات العرض</button><button class="btn btn-light" type="reset" id="resetForm">مسح البيانات</button><span class="hint">لا تدخل بيانات شخصية أو مستندات حساسة في هذه النسخة التجريبية.</span></div>
+    </form>
+    <div id="formMessage" class="note" style="display:none"></div>
+  </section>
+  <section class="panel" id="steps"><h2>خطوات التنازل بشكل منظم</h2><p>هذه هي الخطوات المقترحة، ولا تُعد موافقة قانونية أو تأكيدًا من المطور.</p><div class="form-grid"><div class="stat"><b>١. إضافة العرض</b><small>إدخال البيانات الأساسية والصور</small></div><div class="stat"><b>٢. مراجعة المستندات</b><small>مطابقة العقد وإيصالات السداد بعد موافقة صاحبها</small></div><div class="stat"><b>٣. تأكيد الشركة</b><small>التحقق من الرصيد ورسوم التنازل وشروطه</small></div><div class="stat"><b>٤. التواصل</b><small>تنظيم التواصل بين الأطراف</small></div><div class="stat"><b>٥. إتمام الإجراءات</b><small>وفق عقد الشركة ومراجعة المختص القانوني</small></div></div><div class="note">تنبيه: كل الأسعار والبيانات الظاهرة في العروض الحالية أمثلة توضيحية فقط وليست عروضًا حقيقية. يجب تأكيد رسوم التنازل وشروط المطور رسميًا قبل أي اتفاق.</div></section>
+</main>
+<footer><div><strong>LAYAN | ليان</strong><br>منصة لتنظيم عروض التنازل العقاري في أسيوط</div><div>نسخة واجهة أولية — قاعدة البيانات وتسجيل الدخول ورفع الصور الفعلي لم تُربط بعد.</div></footer>
+<script>
+function filterOffers(){
+ const q=document.getElementById('search').value.trim().toLowerCase(),area=document.getElementById('area').value,type=document.getElementById('type').value,max=Number(document.getElementById('maxCash').value||Infinity),dev=document.getElementById('developer').value;
+ let count=0;document.querySelectorAll('.card').forEach(c=>{const ok=(!q||(c.dataset.search+' '+c.innerText).toLowerCase().includes(q))&&(!area||c.dataset.area===area)&&(!type||c.dataset.type===type)&&Number(c.dataset.cash)<=max&&(!dev||c.dataset.dev===dev);c.style.display=ok?'flex':'none';if(ok)count++});
+ document.getElementById('resultCount').textContent=count+' عروض';document.getElementById('empty').style.display=count?'none':'block';
+}
+function details(title,area,cash,price,paid,remaining,installment,fee){alert('تفاصيل: '+title+'\\nالمنطقة: '+area+'\\nالمطلوب للتنازل: '+cash+' جنيه\\nسعر العقد الأصلي: '+price+' جنيه\\nالمدفوع: '+paid+' جنيه\\nالمتبقي: '+remaining+' جنيه\\nالقسط الشهري: '+installment+' جنيه\\nرسوم التنازل: '+fee+'\\n\\nبيانات تجريبية — يجب التحقق منها.');}
+function contact(title){alert('طلب التواصل بخصوص: '+title+'\\nسيتم تفعيل نظام التواصل والحسابات بعد ربط المنصة بالخلفية.');}
+document.getElementById('photos').addEventListener('change',function(){const p=document.getElementById('preview');p.innerHTML='';[...this.files].slice(0,8).forEach(file=>{const img=document.createElement('img');img.alt=file.name;img.style.cssText='width:82px;height:68px;object-fit:cover;border-radius:7px;border:1px solid #ddd';img.src=URL.createObjectURL(file);p.appendChild(img)});});
+document.getElementById('offerForm').addEventListener('submit',function(e){e.preventDefault();const m=document.getElementById('formMessage');m.style.display='block';m.textContent='تمت معاينة بيانات العرض محليًا فقط. لم يتم حفظها على الإنترنت. العنوان: '+document.getElementById('title').value+' — المنطقة: '+document.getElementById('newArea').value+' — المبلغ المطلوب: '+document.getElementById('cash').value+' جنيه. الخطوة التالية هي ربط النموذج بقاعدة البيانات والتخزين.';m.scrollIntoView({behavior:'smooth',block:'center'});});
+document.getElementById('resetForm').addEventListener('click',()=>{document.getElementById('preview').innerHTML='';document.getElementById('formMessage').style.display='none'});
+</script>
+</body></html>
