@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let offers = [];
   let activeKind = "";
-  let connected = false;
 
   const demoOffers = [
     {
@@ -115,8 +114,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const area = $("areaFilter")?.value || "";
 
     const filtered = offers.filter((o) => {
-      const text = [o.title, o.area, o.property_type, o.description]
-        .join(" ").toLowerCase();
+      const text = [
+        o.title, o.area, o.property_type, o.description
+      ].join(" ").toLowerCase();
 
       return (!search || text.includes(search)) &&
         (!type || o.property_type === type) &&
@@ -171,28 +171,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       const api = window.LAYAN_SUPABASE;
 
       if (!api || typeof api.getOffers !== "function") {
-        throw new Error("واجهة الاتصال بقاعدة البيانات غير جاهزة.");
+        throw new Error("إعداد الاتصال بقاعدة البيانات غير جاهز.");
       }
 
       const rows = await api.getOffers();
-      if (!Array.isArray(rows)) throw new Error("بيانات غير متوقعة.");
+
+      if (!Array.isArray(rows)) {
+        throw new Error("استجابة قاعدة البيانات غير متوقعة.");
+      }
 
       offers = rows.map(normalize);
-      connected = true;
       render();
 
       setStatus(offers.length
         ? `تم تحميل ${offers.length} عرض من قاعدة البيانات.`
-        : "لا توجد عروض محفوظة في قاعدة البيانات حتى الآن.");
+        : "لا توجد عروض في قاعدة البيانات حتى الآن.");
       return;
     } catch (error) {
-      console.error("خطأ تحميل العروض:", error);
+      console.error("خطأ تحميل Supabase:", error);
     }
 
-    connected = false;
-
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      const saved = JSON.parse(
+        localStorage.getItem(STORAGE_KEY) || "[]"
+      );
+
       offers = Array.isArray(saved) && saved.length
         ? saved.map(normalize)
         : demoOffers.map(normalize);
@@ -248,11 +251,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const files = $("photosInput")?.files;
 
     if (files?.length) {
-      setStatus("لم يتم رفع الصور إلى الإنترنت بعد؛ نحتاج إعداد التخزين.");
+      setStatus("تنبيه: رفع الصور إلى الإنترنت لم يُفعّل بعد.");
     }
 
     const offer = normalize({
-      id: "local-" + Date.now(),
       title: String(data.get("title") || "").trim(),
       governorate: "أسيوط",
       area: String(data.get("area") || "").trim(),
@@ -268,21 +270,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     if (!offer.title) {
-      setStatus("اكتب عنوان العرض.");
+      setStatus("اكتب عنوان العرض أولًا.");
       return;
     }
 
-    // هذه النسخة تحفظ الإضافة محليًا فقط.
-    // إضافة البيانات إلى Supabase تحتاج دالة إدخال وسياسات صلاحيات مناسبة.
-    offers.unshift(offer);
-    saveLocal();
-    render();
-    closeDialog();
-    form.reset();
+    const submitButton = form.querySelector('[type="submit"]');
 
-    setStatus(connected
-      ? "أُضيف العرض على هذا الجهاز فقط، ولم يُحفظ في قاعدة البيانات."
-      : "تم حفظ العرض على هذا الجهاز فقط، ولم يُنشر على الإنترنت.");
+    if (submitButton) submitButton.disabled = true;
+    setStatus("جارٍ حفظ العرض في قاعدة البيانات...");
+
+    try {
+      const api = window.LAYAN_SUPABASE;
+
+      if (!api || typeof api.createOffer !== "function") {
+        throw new Error("وظيفة حفظ العروض غير متاحة.");
+      }
+
+      const savedOffer = await api.createOffer(offer);
+
+      if (!savedOffer) {
+        throw new Error("لم تُرجع قاعدة البيانات العرض المحفوظ.");
+      }
+
+      offers.unshift(normalize(savedOffer));
+      closeDialog();
+      form.reset();
+      render();
+
+      setStatus("تم حفظ العرض في قاعدة البيانات بنجاح.");
+    } catch (error) {
+      console.error("فشل حفظ العرض:", error);
+
+      setStatus(
+        "فشل حفظ العرض في قاعدة البيانات. لم يتم نشره. " +
+        "راجع صلاحيات INSERT وRLS وأعمدة الجدول."
+      );
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
   });
 
   $("loginBtn")?.addEventListener("click", () => {
