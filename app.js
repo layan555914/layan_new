@@ -2,9 +2,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
   "use strict";
 
-  const STORAGE_KEY = "layan_property_offers_v1";
   const $ = (id) => document.getElementById(id);
-
   const grid = $("offersGrid");
   const form = $("offerForm");
   const dialog = $("offerDialog");
@@ -13,97 +11,51 @@ document.addEventListener("DOMContentLoaded", async () => {
   let offers = [];
   let activeKind = "";
 
-  const demoOffers = [
-    {
-      id: "demo-1",
-      title: "شقة سكنية في أسيوط الجديدة",
-      area: "أسيوط الجديدة",
-      property_type: "شقة",
-      total_price: 850000,
-      down_payment: 200000,
-      paid_amount: 180000,
-      remaining_installments: 500000,
-      transfer_fee: 0,
-      discount_percent: 0,
-      description: "عرض تجريبي للتوضيح فقط.",
-      photos: []
-    },
-    {
-      id: "demo-2",
-      title: "شقة للتنازل في حي غرب",
-      area: "حي غرب",
-      property_type: "شقة",
-      total_price: 650000,
-      down_payment: 150000,
-      paid_amount: 120000,
-      remaining_installments: 400000,
-      transfer_fee: 5000,
-      discount_percent: 5,
-      description: "عرض تجريبي للتوضيح فقط.",
-      photos: []
-    },
-    {
-      id: "demo-3",
-      title: "وحدة سكنية في مدينة ناصر",
-      area: "مدينة ناصر",
-      property_type: "وحدة سكنية",
-      total_price: 950000,
-      down_payment: 250000,
-      paid_amount: 220000,
-      remaining_installments: 600000,
-      transfer_fee: 0,
-      discount_percent: 0,
-      description: "عرض تجريبي للتوضيح فقط.",
-      photos: []
-    }
-  ];
-
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, (c) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[c]);
-  }
-
-  function number(value) {
+  const num = (value) => {
     const n = Number(value);
     return Number.isFinite(n) && n >= 0 ? n : 0;
-  }
+  };
 
-  function money(value) {
-    return number(value).toLocaleString("ar-EG") + " ج.م";
-  }
+  const money = (value) => num(value).toLocaleString("ar-EG") + " ج.م";
+
+  const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  })[c]);
 
   function normalize(row) {
+    let images = row.image_urls ?? row.photos ?? [];
+    if (typeof images === "string") {
+      try { images = JSON.parse(images); } catch { images = []; }
+    }
+    if (!Array.isArray(images)) images = [];
+
     return {
       ...row,
       title: row.title || "عرض عقاري",
-      area: row.area || "",
+      area: row.area || row.city || "",
       property_type: row.property_type || "شقة",
-      total_price: number(row.total_price),
-      down_payment: number(row.down_payment),
-      paid_amount: number(row.paid_amount),
-      remaining_installments: number(row.remaining_installments),
-      transfer_fee: number(row.transfer_fee),
-      discount_percent: number(row.discount_percent),
+      total_price: num(row.total_price),
+      paid_amount: num(row.paid_amount),
+      remaining_amount: num(row.remaining_amount ?? row.remaining_installments),
+      assignment_fee: num(row.assignment_fee ?? row.transfer_fee),
+      assignment_fee_percentage: num(row.assignment_fee_percentage),
+      discount_amount: num(row.discount_amount),
+      bedrooms: num(row.bedrooms),
+      bathrooms: num(row.bathrooms),
+      area_m2: num(row.area_m2),
+      monthly_installment: num(row.monthly_installment),
       description: row.description || "",
-      photos: Array.isArray(row.photos) ? row.photos : []
+      image_urls: images,
+      developer_name: row.developer_name || "",
+      contact_name: row.contact_name || "",
+      contact_phone: row.contact_phone || "",
+      status: row.status || "available"
     };
   }
 
   function setStatus(message) {
     if (status) status.textContent = message;
-  }
-
-  function saveLocal() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(offers));
-    } catch (error) {
-      console.error("تعذر الحفظ المحلي:", error);
-    }
   }
 
   function render() {
@@ -115,7 +67,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const filtered = offers.filter((o) => {
       const text = [
-        o.title, o.area, o.property_type, o.description
+        o.title, o.area, o.property_type, o.description,
+        o.developer_name
       ].join(" ").toLowerCase();
 
       return (!search || text.includes(search)) &&
@@ -134,30 +87,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     grid.innerHTML = filtered.map((o) => {
-      const image = o.photos.find(
+      const image = o.image_urls.find(
         (p) => typeof p === "string" && /^https?:\/\//i.test(p)
       );
 
       return `
         <article class="offer-card">
           ${image
-            ? `<img class="offer-image" src="${escapeHTML(image)}" alt="${escapeHTML(o.title)}" loading="lazy">`
+            ? `<img class="offer-image" src="${esc(image)}" alt="${esc(o.title)}" loading="lazy">`
             : `<div class="offer-image offer-image-placeholder">LAYAN</div>`}
           <div class="offer-card-content">
-            <span class="offer-type">${escapeHTML(o.property_type)}</span>
-            <h3>${escapeHTML(o.title)}</h3>
-            <p>${escapeHTML(o.area || "أسيوط")}</p>
+            <span class="offer-type">${esc(o.property_type)}</span>
+            <h3>${esc(o.title)}</h3>
+            <p>${esc(o.area || "أسيوط")}</p>
             <div class="offer-details">
               <div><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></div>
-              <div><span>المقدم المطلوب</span><strong>${money(o.down_payment)}</strong></div>
               <div><span>المبلغ المدفوع</span><strong>${money(o.paid_amount)}</strong></div>
-              <div><span>الأقساط المتبقية</span><strong>${money(o.remaining_installments)}</strong></div>
-              <div><span>رسوم التنازل</span><strong>${money(o.transfer_fee)}</strong></div>
-              <div><span>نسبة الخصم</span><strong>${number(o.discount_percent)}٪</strong></div>
+              <div><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></div>
+              <div><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></div>
+              <div><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></div>
+              <div><span>نسبة رسوم التنازل</span><strong>${o.assignment_fee_percentage}٪</strong></div>
+              <div><span>قيمة الخصم</span><strong>${money(o.discount_amount)}</strong></div>
+              ${o.area_m2 ? `<div><span>المساحة</span><strong>${o.area_m2} م²</strong></div>` : ""}
+              ${o.bedrooms ? `<div><span>غرف النوم</span><strong>${o.bedrooms}</strong></div>` : ""}
+              ${o.bathrooms ? `<div><span>الحمامات</span><strong>${o.bathrooms}</strong></div>` : ""}
             </div>
-            ${o.description
-              ? `<p class="offer-description">${escapeHTML(o.description)}</p>`
-              : ""}
+            ${o.developer_name ? `<p>المطور: ${esc(o.developer_name)}</p>` : ""}
+            ${o.description ? `<p class="offer-description">${esc(o.description)}</p>` : ""}
             <p class="form-note">تحقق من شروط المطور قبل إتمام التنازل.</p>
           </div>
         </article>`;
@@ -168,49 +124,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     setStatus("جارٍ تحميل العروض...");
 
     try {
-      const api = window.LAYAN_SUPABASE;
-
-      if (!api || typeof api.getOffers !== "function") {
-        throw new Error("إعداد الاتصال بقاعدة البيانات غير جاهز.");
+      if (!window.LAYAN_SUPABASE?.getOffers) {
+        throw new Error("اتصال Supabase غير جاهز.");
       }
 
-      const rows = await api.getOffers();
-
-      if (!Array.isArray(rows)) {
-        throw new Error("استجابة قاعدة البيانات غير متوقعة.");
-      }
+      const rows = await window.LAYAN_SUPABASE.getOffers();
+      if (!Array.isArray(rows)) throw new Error("استجابة غير متوقعة.");
 
       offers = rows.map(normalize);
       render();
-
       setStatus(offers.length
         ? `تم تحميل ${offers.length} عرض من قاعدة البيانات.`
         : "لا توجد عروض في قاعدة البيانات حتى الآن.");
-      return;
     } catch (error) {
-      console.error("خطأ تحميل Supabase:", error);
+      console.error("خطأ تحميل العروض:", error);
+      offers = [];
+      render();
+      setStatus("تعذر تحميل العروض. راجع إعدادات الاتصال وصلاحيات القراءة في Supabase.");
     }
-
-    try {
-      const saved = JSON.parse(
-        localStorage.getItem(STORAGE_KEY) || "[]"
-      );
-
-      offers = Array.isArray(saved) && saved.length
-        ? saved.map(normalize)
-        : demoOffers.map(normalize);
-    } catch {
-      offers = demoOffers.map(normalize);
-    }
-
-    render();
-    setStatus("تعذر تحميل قاعدة البيانات؛ المعروض بيانات محلية أو تجريبية.");
   }
 
   function openDialog() {
-    if (dialog && typeof dialog.showModal === "function") {
-      dialog.showModal();
-    }
+    if (dialog && !dialog.open && dialog.showModal) dialog.showModal();
   }
 
   function closeDialog() {
@@ -233,80 +168,69 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll("[data-kind]").forEach((button) => {
     button.addEventListener("click", () => {
       activeKind = button.dataset.kind || "";
-
       document.querySelectorAll("[data-kind]").forEach((item) => {
         item.classList.toggle("active", item === button);
       });
-
       render();
     });
   });
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
-
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
-    const files = $("photosInput")?.files;
+    const get = (name) => data.get(name);
+    const text = (name) => String(get(name) || "").trim();
 
-    if (files?.length) {
-      setStatus("تنبيه: رفع الصور إلى الإنترنت لم يُفعّل بعد.");
-    }
-
-    const offer = normalize({
-      title: String(data.get("title") || "").trim(),
-      governorate: "أسيوط",
-      area: String(data.get("area") || "").trim(),
-      property_type: String(data.get("property_type") || "شقة"),
-      total_price: data.get("total_price"),
-      down_payment: data.get("down_payment"),
-      paid_amount: data.get("paid_amount"),
-      remaining_installments: data.get("remaining_installments"),
-      transfer_fee: data.get("transfer_fee"),
-      discount_percent: data.get("discount_percent"),
-      description: String(data.get("description") || "").trim(),
-      photos: []
-    });
+    const offer = {
+      title: text("title"),
+      area: text("area"),
+      property_type: text("property_type") || "شقة",
+      total_price: num(get("total_price")),
+      paid_amount: num(get("paid_amount")),
+      remaining_amount: num(get("remaining_amount") ?? get("remaining_installments")),
+      assignment_fee: num(get("assignment_fee") ?? get("transfer_fee")),
+      assignment_fee_percentage: num(get("assignment_fee_percentage")),
+      discount_amount: num(get("discount_amount")),
+      bedrooms: num(get("bedrooms")),
+      bathrooms: num(get("bathrooms")),
+      area_m2: num(get("area_m2")),
+      monthly_installment: num(get("monthly_installment")),
+      description: text("description"),
+      developer_name: text("developer_name"),
+      contact_name: text("contact_name"),
+      contact_phone: text("contact_phone"),
+      image_urls: []
+    };
 
     if (!offer.title) {
       setStatus("اكتب عنوان العرض أولًا.");
       return;
     }
 
-    const submitButton = form.querySelector('[type="submit"]');
-
-    if (submitButton) submitButton.disabled = true;
-    setStatus("جارٍ حفظ العرض في قاعدة البيانات...");
+    const button = form.querySelector('[type="submit"]');
+    if (button) button.disabled = true;
+    setStatus("جارٍ حفظ العرض...");
 
     try {
-      const api = window.LAYAN_SUPABASE;
-
-      if (!api || typeof api.createOffer !== "function") {
-        throw new Error("وظيفة حفظ العروض غير متاحة.");
+      if (!window.LAYAN_SUPABASE?.createOffer) {
+        throw new Error("وظيفة حفظ العروض غير جاهزة.");
       }
 
-      const savedOffer = await api.createOffer(offer);
+      const saved = await window.LAYAN_SUPABASE.createOffer(offer);
+      if (!saved) throw new Error("لم يتم إرجاع العرض المحفوظ.");
 
-      if (!savedOffer) {
-        throw new Error("لم تُرجع قاعدة البيانات العرض المحفوظ.");
-      }
-
-      offers.unshift(normalize(savedOffer));
-      closeDialog();
+      offers.unshift(normalize(saved));
       form.reset();
+      closeDialog();
       render();
-
-      setStatus("تم حفظ العرض في قاعدة البيانات بنجاح.");
+      setStatus("تم حفظ العرض بنجاح.");
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
-
-      setStatus(
-        "فشل حفظ العرض في قاعدة البيانات. لم يتم نشره. " +
-        "راجع صلاحيات INSERT وRLS وأعمدة الجدول."
-      );
+      setStatus("فشل حفظ العرض. راجع أعمدة النموذج وصلاحيات INSERT في Supabase.");
     } finally {
-      if (submitButton) submitButton.disabled = false;
+      if (button) button.disabled = false;
     }
   });
 
