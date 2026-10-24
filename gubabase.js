@@ -111,6 +111,8 @@
         remaining_amount: Number(offer.remaining_amount || 0),
         assignment_fee: Number(offer.assignment_fee || 0),
         discount_percent: Number(offer.discount_percent || 0),
+        contact_name: offer.contact_name || null,
+        contact_phone: offer.contact_phone || null,
         description: offer.description || null,
         image_urls: Array.isArray(offer.image_urls)
           ? offer.image_urls
