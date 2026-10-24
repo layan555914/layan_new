@@ -34,6 +34,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (status) status.textContent = message;
   }
 
+  function normalizePhone(value) {
+    return String(value || "").trim().replace(/[^\d+]/g, "");
+  }
+
+  function whatsappPhone(value) {
+    let phone = normalizePhone(value).replace(/\+/g, "");
+
+    // تحويل أرقام المحمول المصرية المحلية إلى صيغة دولية.
+    if (phone.startsWith("01") && phone.length === 11) {
+      phone = "2" + phone;
+    } else if (phone.startsWith("1") && phone.length === 10) {
+      phone = "20" + phone;
+    }
+
+    return phone;
+  }
+
   function normalize(row) {
     let images = row.image_urls ?? row.photos ?? [];
 
@@ -83,7 +100,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
-  /* إنشاء نافذة التفاصيل تلقائيًا */
   function createDetailsDialog() {
     let detailsDialog = $("detailsDialog");
 
@@ -106,7 +122,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
 
     document.body.appendChild(detailsDialog);
-
     return detailsDialog;
   }
 
@@ -177,6 +192,41 @@ document.addEventListener("DOMContentLoaded", async () => {
       fields.push(["المطور العقاري", offer.developer_name]);
     }
 
+    const phone = normalizePhone(offer.contact_phone);
+    const waPhone = whatsappPhone(offer.contact_phone);
+
+    const contact = phone
+      ? `
+        <section class="details-contact">
+          <h3>التواصل مع صاحب العرض</h3>
+          ${offer.contact_name
+            ? `<p class="contact-name">${esc(offer.contact_name)}</p>`
+            : ""
+          }
+          <p class="contact-phone" dir="ltr">${esc(phone)}</p>
+          <div class="contact-actions">
+            <a class="contact-button call-button"
+               href="tel:${esc(phone)}">
+              ☎ اتصال مباشر
+            </a>
+            <a class="contact-button whatsapp-button"
+               href="https://wa.me/${encodeURIComponent(waPhone)}?text=${encodeURIComponent(
+                 "مرحبًا، أنا مهتم بعرض العقار: " + offer.title
+               )}"
+               target="_blank"
+               rel="noopener noreferrer">
+              واتساب
+            </a>
+          </div>
+        </section>
+      `
+      : `
+        <section class="details-contact">
+          <h3>التواصل مع صاحب العرض</h3>
+          <p>لم يضف صاحب العرض رقم هاتف للتواصل.</p>
+        </section>
+      `;
+
     content.innerHTML = `
       ${images}
 
@@ -197,9 +247,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p>${esc(offer.description || "لا يوجد وصف مضاف لهذا العرض.")}</p>
       </section>
 
+      ${contact}
+
       <p class="form-note">
-        تنبيه: يجب التحقق من مستندات الوحدة، والمبالغ المستحقة،
-        ورسوم التنازل وموافقة المطور قبل إتمام أي اتفاق.
+        تنبيه: تحقق من مستندات الوحدة والمبالغ المستحقة ورسوم التنازل
+        وموافقة المطور قبل إتمام أي اتفاق.
       </p>
     `;
   }
@@ -213,20 +265,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function closeDetails() {
-    if (detailsDialog?.open) {
-      detailsDialog.close();
-    }
+    if (detailsDialog?.open) detailsDialog.close();
   }
 
-  $("closeDetailsDialog")?.addEventListener(
-    "click",
-    closeDetails
-  );
+  $("closeDetailsDialog")?.addEventListener("click", closeDetails);
 
   detailsDialog.addEventListener("click", (event) => {
-    if (event.target === detailsDialog) {
-      closeDetails();
-    }
+    if (event.target === detailsDialog) closeDetails();
   });
 
   function updateAreaFilter() {
@@ -243,9 +288,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         `<option value="${esc(area)}">${esc(area)}</option>`
       ).join("");
 
-    if (areas.includes(current)) {
-      areaFilter.value = current;
-    }
+    if (areas.includes(current)) areaFilter.value = current;
   }
 
   function render() {
@@ -290,12 +333,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         <article class="offer-card">
           ${image
             ? `
-              <img
-                class="offer-image"
-                src="${esc(image)}"
-                alt="${esc(offer.title)}"
-                loading="lazy"
-              >
+              <img class="offer-image"
+                   src="${esc(image)}"
+                   alt="${esc(offer.title)}"
+                   loading="lazy">
             `
             : `
               <div class="offer-image offer-image-placeholder">
@@ -368,11 +409,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             ${offer.description
-              ? `
-                <p class="offer-description">
-                  ${esc(offer.description)}
-                </p>
-              `
+              ? `<p class="offer-description">${esc(offer.description)}</p>`
               : ""
             }
 
@@ -383,7 +420,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             <button
               class="btn btn-dark full-width"
               type="button"
-              data-offer-details="${esc(offer.id ?? "")}"
               data-offer-index="${offers.indexOf(offer)}"
             >
               عرض التفاصيل
@@ -394,17 +430,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).join("");
   }
 
-  /* تشغيل زر التفاصيل حتى بعد إعادة رسم العروض */
   grid?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-offer-index]");
-
     if (!button) return;
 
     const index = Number(button.dataset.offerIndex);
-
-    if (!Number.isInteger(index) || !offers[index]) return;
-
-    openDetails(offers[index]);
+    if (Number.isInteger(index) && offers[index]) {
+      openDetails(offers[index]);
+    }
   });
 
   function openDialog() {
@@ -444,7 +477,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
-
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
@@ -462,6 +494,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       remaining_amount: num(get("remaining_installments")),
       assignment_fee: num(get("transfer_fee")),
       discount_percent: num(get("discount_percent")),
+      contact_name: text("contact_name"),
+      contact_phone: text("contact_phone"),
       description: text("description"),
       image_urls: []
     };
@@ -484,7 +518,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const button = form.querySelector('[type="submit"]');
-
     if (button) button.disabled = true;
 
     try {
@@ -494,40 +527,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (files.length) {
         if (!window.LAYAN_SUPABASE.uploadImages) {
-          throw new Error(
-            "رفع الصور لم يُفعّل بعد في ملف gubabase.js."
-          );
+          throw new Error("رفع الصور غير مفعّل.");
         }
 
         setStatus("جارٍ رفع صور الوحدة...");
-
         offer.image_urls =
           await window.LAYAN_SUPABASE.uploadImages(files);
       }
 
       setStatus("جارٍ حفظ العرض...");
-
       const saved =
         await window.LAYAN_SUPABASE.createOffer(offer);
 
-      if (!saved) {
-        throw new Error("لم يتم إرجاع العرض المحفوظ.");
-      }
+      if (!saved) throw new Error("لم يتم إرجاع العرض المحفوظ.");
 
       offers.unshift(normalize(saved));
       updateAreaFilter();
       form.reset();
       closeDialog();
       render();
-
       setStatus("تم حفظ العرض بنجاح.");
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
-
-      setStatus(
-        error.message ||
-        "فشل الحفظ. راجع إعدادات قاعدة البيانات والتخزين."
-      );
+      setStatus(error.message || "فشل الحفظ. حاول مرة أخرى.");
     } finally {
       if (button) button.disabled = false;
     }
@@ -537,7 +559,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("ميزة تسجيل الدخول قيد التجهيز.");
   });
 
-  /* تنسيق نافذة التفاصيل دون تعديل styles.css */
   const detailsStyle = document.createElement("style");
 
   detailsStyle.textContent = `
@@ -623,10 +644,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       font-size: 23px;
     }
 
-    .details-summary p {
-      color: #718096;
-    }
-
     .details-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -656,13 +673,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       font-size: 14px;
     }
 
-    .details-description {
+    .details-description,
+    .details-contact {
+      margin-top: 14px;
       padding: 14px;
       background: #fff;
       border-radius: 10px;
     }
 
-    .details-description h3 {
+    .details-description h3,
+    .details-contact h3 {
       margin-top: 0;
       color: #102746;
     }
@@ -670,6 +690,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     .details-description p {
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+    }
+
+    .contact-name {
+      font-weight: 700;
+    }
+
+    .contact-phone {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .contact-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .contact-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 140px;
+      min-height: 46px;
+      padding: 12px 16px;
+      border-radius: 9px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .call-button {
+      background: #102746;
+    }
+
+    .whatsapp-button {
+      background: #168548;
     }
 
     #detailsDialog .form-note {
@@ -718,7 +775,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
     } catch (error) {
       console.error("خطأ تحميل العروض:", error);
-
       offers = [];
       updateAreaFilter();
       render();
