@@ -39,18 +39,16 @@
     async createOffer(offer) {
       const payload = {
         title: offer.title,
-        governorate: "أسيوط",
+        city: "أسيوط",
         area: offer.area || null,
         property_type: offer.property_type,
-        description: offer.description || null,
         total_price: Number(offer.total_price || 0),
-        down_payment: Number(offer.down_payment || 0),
-        paid_amount: Number(offer.paid_amount || 0),
-        remaining_installments: Number(
-          offer.remaining_installments || 0
+        remaining: Number(
+          offer.remaining ?? offer.remaining_installments ?? 0
         ),
-        transfer_fee: Number(offer.transfer_fee || 0),
-        discount_percent: Number(offer.discount_percent || 0)
+        description: offer.description || null,
+        development: offer.development || null,
+        contact: offer.contact || null
       };
 
       const rows = await request("property_offers", {
@@ -67,4 +65,3 @@
 
   console.log("LAYAN: تم تجهيز الاتصال بـ Supabase.");
 })();
-
