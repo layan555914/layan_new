@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const money = (value) =>
-    num(value).toLocaleString("ar-EG") + " ج.م";
+    num(value).toLocaleString("ar-EG", {
+      maximumFractionDigits: 2
+    }) + " ج.م";
 
   const esc = (value) =>
     String(value ?? "").replace(/[&<>"']/g, (c) => ({
@@ -41,7 +43,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   function whatsappPhone(value) {
     let phone = normalizePhone(value).replace(/\+/g, "");
 
-    // تحويل أرقام المحمول المصرية المحلية إلى صيغة دولية.
     if (phone.startsWith("01") && phone.length === 11) {
       phone = "2" + phone;
     } else if (phone.startsWith("1") && phone.length === 10) {
@@ -49,6 +50,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     return phone;
+  }
+
+  // حساب الخصم على المبلغ المدفوع من العميل الأصلي.
+  function calculateDiscount(paidAmount, discountPercent) {
+    return Math.round(
+      num(paidAmount) * num(discountPercent) / 100 * 100
+    ) / 100;
   }
 
   function normalize(row) {
@@ -64,6 +72,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!Array.isArray(images)) images = [];
 
+    const paidAmount = num(row.paid_amount);
+    const discountPercent = Math.min(
+      100,
+      num(row.discount_percent)
+    );
+
+    // النسبة هي أساس الحساب، وليست قيمة الخصم القديمة المخزنة.
+    const discountAmount = calculateDiscount(
+      paidAmount,
+      discountPercent
+    );
+
     return {
       ...row,
       title: row.title || "عرض عقاري",
@@ -71,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       property_type: row.property_type || "شقة",
       total_price: num(row.total_price),
       down_payment: num(row.down_payment),
-      paid_amount: num(row.paid_amount),
+      paid_amount: paidAmount,
       remaining_amount: num(
         row.remaining_amount ?? row.remaining_installments
       ),
@@ -82,8 +102,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       assignment_fee_percentage: num(
         row.assignment_fee_percentage
       ),
-      discount_amount: num(row.discount_amount),
-      discount_percent: num(row.discount_percent),
+      discount_amount: discountAmount,
+      discount_percent: discountPercent,
+      net_paid_amount: Math.max(0, paidAmount - discountAmount),
       bedrooms: num(row.bedrooms),
       bathrooms: num(row.bathrooms),
       area_m2: num(row.area_m2),
@@ -172,8 +193,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       ["القسط الشهري", money(offer.monthly_installment)],
       ["رسوم التنازل", money(offer.assignment_fee)],
       ["نسبة رسوم التنازل", offer.assignment_fee_percentage + "٪"],
-      ["قيمة الخصم", money(offer.discount_amount)],
-      ["نسبة الخصم", offer.discount_percent + "٪"]
+      ["نسبة الخصم", offer.discount_percent + "٪"],
+      ["قيمة الخصم المحسوبة", money(offer.discount_amount)],
+      ["صافي المبلغ بعد الخصم", money(offer.net_paid_amount)]
     ];
 
     if (offer.area_m2) {
@@ -199,9 +221,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       ? `
         <section class="details-contact">
           <h3>التواصل مع صاحب العرض</h3>
-          ${offer.contact_name
-            ? `<p class="contact-name">${esc(offer.contact_name)}</p>`
-            : ""
+          ${
+            offer.contact_name
+              ? `<p class="contact-name">${esc(offer.contact_name)}</p>`
+              : ""
           }
           <p class="contact-phone" dir="ltr">${esc(phone)}</p>
           <div class="contact-actions">
@@ -209,14 +232,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                href="tel:${esc(phone)}">
               ☎ اتصال مباشر
             </a>
-            <a class="contact-button whatsapp-button"
-               href="https://wa.me/${encodeURIComponent(waPhone)}?text=${encodeURIComponent(
-                 "مرحبًا، أنا مهتم بعرض العقار: " + offer.title
-               )}"
-               target="_blank"
-               rel="noopener noreferrer">
-              واتساب
-            </a>
+            ${
+              waPhone
+                ? `
+                  <a class="contact-button whatsapp-button"
+                     href="https://wa.me/${encodeURIComponent(waPhone)}?text=${encodeURIComponent(
+                       "مرحبًا، أنا مهتم بعرض العقار: " + offer.title
+                     )}"
+                     target="_blank"
+                     rel="noopener noreferrer">
+                    واتساب
+                  </a>
+                `
+                : ""
+            }
           </div>
         </section>
       `
@@ -244,14 +273,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       <section class="details-description">
         <h3>وصف الوحدة</h3>
-        <p>${esc(offer.description || "لا يوجد وصف مضاف لهذا العرض.")}</p>
+        <p>${esc(
+          offer.description || "لا يوجد وصف مضاف لهذا العرض."
+        )}</p>
       </section>
 
       ${contact}
 
       <p class="form-note">
-        تنبيه: تحقق من مستندات الوحدة والمبالغ المستحقة ورسوم التنازل
-        وموافقة المطور قبل إتمام أي اتفاق.
+        الخصم المعروض محسوب على المبلغ المدفوع وفقًا للنسبة المدخلة.
+        تحقق من شروط المطور والمستندات والمبالغ المستحقة قبل إتمام الاتفاق.
       </p>
     `;
   }
@@ -268,7 +299,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (detailsDialog?.open) detailsDialog.close();
   }
 
-  $("closeDetailsDialog")?.addEventListener("click", closeDetails);
+  $("closeDetailsDialog")?.addEventListener(
+    "click",
+    closeDetails
+  );
 
   detailsDialog.addEventListener("click", (event) => {
     if (event.target === detailsDialog) closeDetails();
@@ -331,18 +365,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       return `
         <article class="offer-card">
-          ${image
-            ? `
-              <img class="offer-image"
-                   src="${esc(image)}"
-                   alt="${esc(offer.title)}"
-                   loading="lazy">
-            `
-            : `
-              <div class="offer-image offer-image-placeholder">
-                LAYAN
-              </div>
-            `
+          ${
+            image
+              ? `
+                <img class="offer-image"
+                     src="${esc(image)}"
+                     alt="${esc(offer.title)}"
+                     loading="lazy">
+              `
+              : `
+                <div class="offer-image offer-image-placeholder">
+                  LAYAN
+                </div>
+              `
           }
 
           <div class="offer-card-content">
@@ -380,37 +415,39 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <strong>${offer.assignment_fee_percentage}٪</strong>
               </div>
               <div>
+                <span>نسبة الخصم</span>
+                <strong>${offer.discount_percent}٪</strong>
+              </div>
+              <div>
                 <span>قيمة الخصم</span>
                 <strong>${money(offer.discount_amount)}</strong>
               </div>
-              ${offer.discount_percent
-                ? `
-                  <div>
-                    <span>نسبة الخصم</span>
-                    <strong>${offer.discount_percent}٪</strong>
-                  </div>
-                `
-                : ""
-              }
-              ${offer.area_m2
-                ? `
-                  <div>
-                    <span>المساحة</span>
-                    <strong>${offer.area_m2} م²</strong>
-                  </div>
-                `
-                : ""
+              <div>
+                <span>صافي المبلغ بعد الخصم</span>
+                <strong>${money(offer.net_paid_amount)}</strong>
+              </div>
+              ${
+                offer.area_m2
+                  ? `
+                    <div>
+                      <span>المساحة</span>
+                      <strong>${offer.area_m2} م²</strong>
+                    </div>
+                  `
+                  : ""
               }
             </div>
 
-            ${offer.developer_name
-              ? `<p>المطور: ${esc(offer.developer_name)}</p>`
-              : ""
+            ${
+              offer.developer_name
+                ? `<p>المطور: ${esc(offer.developer_name)}</p>`
+                : ""
             }
 
-            ${offer.description
-              ? `<p class="offer-description">${esc(offer.description)}</p>`
-              : ""
+            ${
+              offer.description
+                ? `<p class="offer-description">${esc(offer.description)}</p>`
+                : ""
             }
 
             <p class="form-note">
@@ -435,6 +472,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!button) return;
 
     const index = Number(button.dataset.offerIndex);
+
     if (Number.isInteger(index) && offers[index]) {
       openDetails(offers[index]);
     }
@@ -477,11 +515,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
+
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
     const get = (name) => data.get(name);
     const text = (name) => String(get(name) || "").trim();
+
+    const paidAmount = num(get("paid_amount"));
+    const discountPercent = Math.min(
+      100,
+      num(get("discount_percent"))
+    );
+    const discountAmount = calculateDiscount(
+      paidAmount,
+      discountPercent
+    );
 
     const offer = {
       title: text("title"),
@@ -490,10 +539,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       property_type: text("property_type") || "شقة",
       total_price: num(get("total_price")),
       down_payment: num(get("down_payment")),
-      paid_amount: num(get("paid_amount")),
+      paid_amount: paidAmount,
       remaining_amount: num(get("remaining_installments")),
       assignment_fee: num(get("transfer_fee")),
-      discount_percent: num(get("discount_percent")),
+      discount_percent: discountPercent,
+      discount_amount: discountAmount,
       contact_name: text("contact_name"),
       contact_phone: text("contact_phone"),
       description: text("description"),
@@ -518,6 +568,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const button = form.querySelector('[type="submit"]');
+
     if (button) button.disabled = true;
 
     try {
@@ -531,22 +582,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         setStatus("جارٍ رفع صور الوحدة...");
+
         offer.image_urls =
           await window.LAYAN_SUPABASE.uploadImages(files);
       }
 
       setStatus("جارٍ حفظ العرض...");
+
       const saved =
         await window.LAYAN_SUPABASE.createOffer(offer);
 
-      if (!saved) throw new Error("لم يتم إرجاع العرض المحفوظ.");
+      if (!saved) {
+        throw new Error("لم يتم إرجاع العرض المحفوظ.");
+      }
 
       offers.unshift(normalize(saved));
       updateAreaFilter();
       form.reset();
       closeDialog();
       render();
-      setStatus("تم حفظ العرض بنجاح.");
+
+      setStatus(
+        `تم حفظ العرض بنجاح. قيمة الخصم المحسوبة: ${money(discountAmount)}.`
+      );
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
       setStatus(error.message || "فشل الحفظ. حاول مرة أخرى.");
