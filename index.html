@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -190,13 +191,42 @@
       </label>
 
       <label>
+        اسم صاحب العرض
+        <input
+          name="contact_name"
+          type="text"
+          autocomplete="name"
+          placeholder="اكتب اسم صاحب العرض"
+        >
+      </label>
+
+      <label>
+        رقم الموبايل للتواصل
+        <input
+          name="contact_phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="مثال: 01012345678"
+          pattern="[0-9+\s()-]{7,20}"
+          title="اكتب رقم هاتف صحيحًا"
+        >
+      </label>
+
+      <label>
         وصف الوحدة
         <textarea name="description" rows="4"></textarea>
       </label>
 
       <label>
         صور الوحدة
-        <input id="photosInput" name="photos" type="file" accept="image/*" multiple>
+        <input
+          id="photosInput"
+          name="photos"
+          type="file"
+          accept="image/*"
+          multiple
+        >
       </label>
 
       <button class="btn btn-gold" type="submit">إرسال العرض</button>
