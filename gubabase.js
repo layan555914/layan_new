@@ -1,4 +1,3 @@
-
 (function () {
   "use strict";
 
@@ -32,10 +31,11 @@
       throw new Error(`قاعدة البيانات: ${message}`);
     }
 
-    const text = await response.text();
-    return text ? JSON.parse(text) : null;
+    const responseText = await response.text();
+    return responseText ? JSON.parse(responseText) : null;
   }
 
+  // رفع صور العقار إلى مخزن الصور العام الحالي.
   async function uploadImages(files) {
     if (!Array.isArray(files) || files.length === 0) {
       return [];
@@ -89,48 +89,62 @@
     return uploadedUrls;
   }
 
+  // جلب العروض وحالات التحقق وموافقة المطور.
+  async function getOffers() {
+    return request(
+      "property_offers?select=*&order=created_at.desc"
+    );
+  }
+
+  // إنشاء عرض جديد بالحالات الافتراضية الآمنة.
+  async function createOffer(offer) {
+    const payload = {
+      title: offer.title,
+      governorate: offer.governorate || "أسيوط",
+      city: offer.city || "أسيوط",
+      area: offer.area || null,
+      property_type: offer.property_type || "شقة",
+
+      total_price: Number(offer.total_price || 0),
+      down_payment: Number(offer.down_payment || 0),
+      paid_amount: Number(offer.paid_amount || 0),
+      remaining_amount: Number(offer.remaining_amount || 0),
+      assignment_fee: Number(offer.assignment_fee || 0),
+      discount_percent: Number(offer.discount_percent || 0),
+
+      contact_name: offer.contact_name || null,
+      contact_phone: offer.contact_phone || null,
+      description: offer.description || null,
+
+      image_urls: Array.isArray(offer.image_urls)
+        ? offer.image_urls
+        : [],
+
+      // لا نعتبر العرض موثقًا بمجرد إرساله.
+      verification_status: "pending",
+
+      // لا نعتبر موافقة المطور مؤكدة دون مراجعة.
+      developer_approval_status: "unknown",
+
+      status: "available"
+    };
+
+    const rows = await request("property_offers", {
+      method: "POST",
+      headers: {
+        Prefer: "return=representation"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    return rows?.[0] || null;
+  }
+
   window.LAYAN_SUPABASE = {
-    async getOffers() {
-      return request(
-        "property_offers?select=*&order=created_at.desc"
-      );
-    },
-
+    getOffers,
     uploadImages,
-
-    async createOffer(offer) {
-      const payload = {
-        title: offer.title,
-        governorate: offer.governorate || "أسيوط",
-        city: offer.city || "أسيوط",
-        area: offer.area || null,
-        property_type: offer.property_type || "شقة",
-        total_price: Number(offer.total_price || 0),
-        down_payment: Number(offer.down_payment || 0),
-        paid_amount: Number(offer.paid_amount || 0),
-        remaining_amount: Number(offer.remaining_amount || 0),
-        assignment_fee: Number(offer.assignment_fee || 0),
-        discount_percent: Number(offer.discount_percent || 0),
-        contact_name: offer.contact_name || null,
-        contact_phone: offer.contact_phone || null,
-        description: offer.description || null,
-        image_urls: Array.isArray(offer.image_urls)
-          ? offer.image_urls
-          : [],
-        status: offer.status || "available"
-      };
-
-      const rows = await request("property_offers", {
-        method: "POST",
-        headers: {
-          Prefer: "return=representation"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      return rows?.[0] || null;
-    }
+    createOffer
   };
 
-  console.log("LAYAN: تم تجهيز الاتصال ورفع الصور.");
+  console.log("LAYAN: تم تجهيز الاتصال وقاعدة العروض.");
 })();
