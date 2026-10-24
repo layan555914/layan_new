@@ -787,3 +787,34 @@ footer {
   }
 }
 6
+/* إصلاح زر إغلاق نافذة إضافة العرض */
+.dialog-header,
+.dialog-head {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+#closeDialog {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #a93636;
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 10;
+}
