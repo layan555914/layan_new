@@ -59,15 +59,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         row.remaining_amount ?? row.remaining_installments
       ),
       monthly_installment: num(row.monthly_installment),
-      assignment_fee: num(row.assignment_fee ?? row.transfer_fee),
-      assignment_fee_percentage: num(row.assignment_fee_percentage),
+      assignment_fee: num(
+        row.assignment_fee ?? row.transfer_fee
+      ),
+      assignment_fee_percentage: num(
+        row.assignment_fee_percentage
+      ),
       discount_amount: num(row.discount_amount),
       discount_percent: num(row.discount_percent),
       bedrooms: num(row.bedrooms),
       bathrooms: num(row.bathrooms),
       area_m2: num(row.area_m2),
       description: row.description || "",
-      image_urls: images,
+      image_urls: images.filter(
+        (image) =>
+          typeof image === "string" &&
+          /^https?:\/\//i.test(image)
+      ),
       developer_name: row.developer_name || "",
       contact_name: row.contact_name || "",
       contact_phone: row.contact_phone || "",
@@ -75,12 +83,158 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
+  /* إنشاء نافذة التفاصيل تلقائيًا */
+  function createDetailsDialog() {
+    let detailsDialog = $("detailsDialog");
+
+    if (detailsDialog) return detailsDialog;
+
+    detailsDialog = document.createElement("dialog");
+    detailsDialog.id = "detailsDialog";
+    detailsDialog.className = "details-dialog";
+
+    detailsDialog.innerHTML = `
+      <div class="dialog-header">
+        <h2 id="detailsTitle">تفاصيل الوحدة العقارية</h2>
+        <button
+          id="closeDetailsDialog"
+          type="button"
+          aria-label="إغلاق"
+        >×</button>
+      </div>
+      <div id="detailsContent"></div>
+    `;
+
+    document.body.appendChild(detailsDialog);
+
+    return detailsDialog;
+  }
+
+  const detailsDialog = createDetailsDialog();
+
+  function detailRow(label, value) {
+    return `
+      <div class="detail-item">
+        <span>${esc(label)}</span>
+        <strong>${esc(value)}</strong>
+      </div>
+    `;
+  }
+
+  function renderDetails(offer) {
+    const title = $("detailsTitle");
+    const content = $("detailsContent");
+
+    if (!content || !offer) return;
+
+    if (title) title.textContent = offer.title;
+
+    const images = offer.image_urls.length
+      ? `
+        <div class="details-gallery">
+          ${offer.image_urls.map((url) => `
+            <img
+              src="${esc(url)}"
+              alt="${esc(offer.title)}"
+              loading="lazy"
+            >
+          `).join("")}
+        </div>
+      `
+      : `
+        <div class="offer-image-placeholder details-placeholder">
+          LAYAN AQAR
+        </div>
+      `;
+
+    const fields = [
+      ["نوع العقار", offer.property_type],
+      ["المنطقة", offer.area || "أسيوط"],
+      ["السعر الإجمالي", money(offer.total_price)],
+      ["المقدم المطلوب", money(offer.down_payment)],
+      ["المبلغ المدفوع", money(offer.paid_amount)],
+      ["المبلغ المتبقي", money(offer.remaining_amount)],
+      ["القسط الشهري", money(offer.monthly_installment)],
+      ["رسوم التنازل", money(offer.assignment_fee)],
+      ["نسبة رسوم التنازل", offer.assignment_fee_percentage + "٪"],
+      ["قيمة الخصم", money(offer.discount_amount)],
+      ["نسبة الخصم", offer.discount_percent + "٪"]
+    ];
+
+    if (offer.area_m2) {
+      fields.push(["المساحة", offer.area_m2 + " م²"]);
+    }
+
+    if (offer.bedrooms) {
+      fields.push(["غرف النوم", offer.bedrooms]);
+    }
+
+    if (offer.bathrooms) {
+      fields.push(["الحمامات", offer.bathrooms]);
+    }
+
+    if (offer.developer_name) {
+      fields.push(["المطور العقاري", offer.developer_name]);
+    }
+
+    content.innerHTML = `
+      ${images}
+
+      <div class="details-summary">
+        <span class="offer-type">${esc(offer.property_type)}</span>
+        <h3>${esc(offer.title)}</h3>
+        <p>${esc(offer.area || "أسيوط")}</p>
+      </div>
+
+      <div class="details-grid">
+        ${fields.map(([label, value]) =>
+          detailRow(label, value)
+        ).join("")}
+      </div>
+
+      <section class="details-description">
+        <h3>وصف الوحدة</h3>
+        <p>${esc(offer.description || "لا يوجد وصف مضاف لهذا العرض.")}</p>
+      </section>
+
+      <p class="form-note">
+        تنبيه: يجب التحقق من مستندات الوحدة، والمبالغ المستحقة،
+        ورسوم التنازل وموافقة المطور قبل إتمام أي اتفاق.
+      </p>
+    `;
+  }
+
+  function openDetails(offer) {
+    renderDetails(offer);
+
+    if (detailsDialog && !detailsDialog.open) {
+      detailsDialog.showModal();
+    }
+  }
+
+  function closeDetails() {
+    if (detailsDialog?.open) {
+      detailsDialog.close();
+    }
+  }
+
+  $("closeDetailsDialog")?.addEventListener(
+    "click",
+    closeDetails
+  );
+
+  detailsDialog.addEventListener("click", (event) => {
+    if (event.target === detailsDialog) {
+      closeDetails();
+    }
+  });
+
   function updateAreaFilter() {
     if (!areaFilter) return;
 
     const current = areaFilter.value;
     const areas = [...new Set(
-      offers.map((o) => o.area.trim()).filter(Boolean)
+      offers.map((offer) => offer.area.trim()).filter(Boolean)
     )].sort((a, b) => a.localeCompare(b, "ar"));
 
     areaFilter.innerHTML =
@@ -89,30 +243,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         `<option value="${esc(area)}">${esc(area)}</option>`
       ).join("");
 
-    if (areas.includes(current)) areaFilter.value = current;
+    if (areas.includes(current)) {
+      areaFilter.value = current;
+    }
   }
 
   function render() {
     if (!grid) return;
 
     const search = ($("searchInput")?.value || "")
-      .trim().toLowerCase();
+      .trim()
+      .toLowerCase();
+
     const type = $("typeFilter")?.value || "";
     const area = areaFilter?.value || "";
 
-    const filtered = offers.filter((o) => {
+    const filtered = offers.filter((offer) => {
       const searchable = [
-        o.title,
-        o.area,
-        o.property_type,
-        o.description,
-        o.developer_name
+        offer.title,
+        offer.area,
+        offer.property_type,
+        offer.description,
+        offer.developer_name
       ].join(" ").toLowerCase();
 
       return (!search || searchable.includes(search)) &&
-        (!type || o.property_type === type) &&
-        (!area || o.area === area) &&
-        (!activeKind || o.property_type === activeKind);
+        (!type || offer.property_type === type) &&
+        (!area || offer.area === area) &&
+        (!activeKind || offer.property_type === activeKind);
     });
 
     if (!filtered.length) {
@@ -120,130 +278,134 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="empty-state">
           <h3>لا توجد عروض مطابقة</h3>
           <p>غيّر البحث أو أضف عرضًا جديدًا.</p>
-        </div>`;
+        </div>
+      `;
       return;
     }
 
-    grid.innerHTML = filtered.map((o) => {
-      const image = o.image_urls.find(
-        (p) => typeof p === "string" &&
-          /^https?:\/\//i.test(p)
-      );
+    grid.innerHTML = filtered.map((offer) => {
+      const image = offer.image_urls[0];
 
       return `
         <article class="offer-card">
           ${image
-            ? `<img class="offer-image"
+            ? `
+              <img
+                class="offer-image"
                 src="${esc(image)}"
-                alt="${esc(o.title)}"
-                loading="lazy">`
-            : `<div class="offer-image offer-image-placeholder">
+                alt="${esc(offer.title)}"
+                loading="lazy"
+              >
+            `
+            : `
+              <div class="offer-image offer-image-placeholder">
                 LAYAN
-              </div>`}
+              </div>
+            `
+          }
 
           <div class="offer-card-content">
-            <span class="offer-type">${esc(o.property_type)}</span>
-            <h3>${esc(o.title)}</h3>
-            <p>${esc(o.area || "أسيوط")}</p>
+            <span class="offer-type">${esc(offer.property_type)}</span>
+            <h3>${esc(offer.title)}</h3>
+            <p>${esc(offer.area || "أسيوط")}</p>
 
             <div class="offer-details">
               <div>
                 <span>السعر الإجمالي</span>
-                <strong>${money(o.total_price)}</strong>
+                <strong>${money(offer.total_price)}</strong>
               </div>
               <div>
                 <span>المقدم المطلوب</span>
-                <strong>${money(o.down_payment)}</strong>
+                <strong>${money(offer.down_payment)}</strong>
               </div>
               <div>
                 <span>المبلغ المدفوع</span>
-                <strong>${money(o.paid_amount)}</strong>
+                <strong>${money(offer.paid_amount)}</strong>
               </div>
               <div>
                 <span>المبلغ المتبقي</span>
-                <strong>${money(o.remaining_amount)}</strong>
+                <strong>${money(offer.remaining_amount)}</strong>
               </div>
               <div>
                 <span>القسط الشهري</span>
-                <strong>${money(o.monthly_installment)}</strong>
+                <strong>${money(offer.monthly_installment)}</strong>
               </div>
               <div>
                 <span>رسوم التنازل</span>
-                <strong>${money(o.assignment_fee)}</strong>
+                <strong>${money(offer.assignment_fee)}</strong>
               </div>
               <div>
                 <span>نسبة رسوم التنازل</span>
-                <strong>${o.assignment_fee_percentage}٪</strong>
+                <strong>${offer.assignment_fee_percentage}٪</strong>
               </div>
               <div>
                 <span>قيمة الخصم</span>
-                <strong>${money(o.discount_amount)}</strong>
+                <strong>${money(offer.discount_amount)}</strong>
               </div>
-              ${o.discount_percent
-                ? `<div><span>نسبة الخصم</span>
-                    <strong>${o.discount_percent}٪</strong></div>`
-                : ""}
-              ${o.area_m2
-                ? `<div><span>المساحة</span>
-                    <strong>${o.area_m2} م²</strong></div>`
-                : ""}
-              ${o.bedrooms
-                ? `<div><span>غرف النوم</span>
-                    <strong>${o.bedrooms}</strong></div>`
-                : ""}
-              ${o.bathrooms
-                ? `<div><span>الحمامات</span>
-                    <strong>${o.bathrooms}</strong></div>`
-                : ""}
+              ${offer.discount_percent
+                ? `
+                  <div>
+                    <span>نسبة الخصم</span>
+                    <strong>${offer.discount_percent}٪</strong>
+                  </div>
+                `
+                : ""
+              }
+              ${offer.area_m2
+                ? `
+                  <div>
+                    <span>المساحة</span>
+                    <strong>${offer.area_m2} م²</strong>
+                  </div>
+                `
+                : ""
+              }
             </div>
 
-            ${o.developer_name
-              ? `<p>المطور: ${esc(o.developer_name)}</p>`
-              : ""}
-            ${o.description
-              ? `<p class="offer-description">
-                  ${esc(o.description)}
-                </p>`
-              : ""}
+            ${offer.developer_name
+              ? `<p>المطور: ${esc(offer.developer_name)}</p>`
+              : ""
+            }
+
+            ${offer.description
+              ? `
+                <p class="offer-description">
+                  ${esc(offer.description)}
+                </p>
+              `
+              : ""
+            }
+
             <p class="form-note">
               تحقق من شروط المطور قبل إتمام التنازل.
             </p>
+
+            <button
+              class="btn btn-dark full-width"
+              type="button"
+              data-offer-details="${esc(offer.id ?? "")}"
+              data-offer-index="${offers.indexOf(offer)}"
+            >
+              عرض التفاصيل
+            </button>
           </div>
-        </article>`;
+        </article>
+      `;
     }).join("");
   }
 
-  async function loadOffers() {
-    setStatus("جارٍ تحميل العروض...");
+  /* تشغيل زر التفاصيل حتى بعد إعادة رسم العروض */
+  grid?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-offer-index]");
 
-    try {
-      if (!window.LAYAN_SUPABASE?.getOffers) {
-        throw new Error("اتصال Supabase غير جاهز.");
-      }
+    if (!button) return;
 
-      const rows = await window.LAYAN_SUPABASE.getOffers();
+    const index = Number(button.dataset.offerIndex);
 
-      if (!Array.isArray(rows)) {
-        throw new Error("استجابة غير متوقعة.");
-      }
+    if (!Number.isInteger(index) || !offers[index]) return;
 
-      offers = rows.map(normalize);
-      updateAreaFilter();
-      render();
-
-      setStatus(offers.length
-        ? `تم تحميل ${offers.length} عرض من قاعدة البيانات.`
-        : "لا توجد عروض في قاعدة البيانات حتى الآن.");
-    } catch (error) {
-      console.error("خطأ تحميل العروض:", error);
-      offers = [];
-      updateAreaFilter();
-      render();
-      setStatus(
-        "تعذر تحميل العروض. راجع إعدادات الاتصال وصلاحيات القراءة."
-      );
-    }
-  }
+    openDetails(offers[index]);
+  });
 
   function openDialog() {
     if (dialog && !dialog.open && dialog.showModal) {
@@ -282,6 +444,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
+
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
@@ -321,6 +484,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const button = form.querySelector('[type="submit"]');
+
     if (button) button.disabled = true;
 
     try {
@@ -328,7 +492,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         throw new Error("وظيفة حفظ العروض غير جاهزة.");
       }
 
-      // رفع الصور أولًا إذا اختار المستخدم صورًا.
       if (files.length) {
         if (!window.LAYAN_SUPABASE.uploadImages) {
           throw new Error(
@@ -344,7 +507,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       setStatus("جارٍ حفظ العرض...");
 
-      const saved = await window.LAYAN_SUPABASE.createOffer(offer);
+      const saved =
+        await window.LAYAN_SUPABASE.createOffer(offer);
 
       if (!saved) {
         throw new Error("لم يتم إرجاع العرض المحفوظ.");
@@ -359,6 +523,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       setStatus("تم حفظ العرض بنجاح.");
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
+
       setStatus(
         error.message ||
         "فشل الحفظ. راجع إعدادات قاعدة البيانات والتخزين."
@@ -371,6 +536,198 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("loginBtn")?.addEventListener("click", () => {
     alert("ميزة تسجيل الدخول قيد التجهيز.");
   });
+
+  /* تنسيق نافذة التفاصيل دون تعديل styles.css */
+  const detailsStyle = document.createElement("style");
+
+  detailsStyle.textContent = `
+    #detailsDialog {
+      width: min(760px, calc(100% - 24px));
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 22px;
+      color: #1b2c42;
+      background: #f8fafc;
+      border: 1px solid #c5a15d;
+      border-radius: 16px;
+      box-shadow: 0 25px 90px #0005;
+    }
+
+    #detailsDialog::backdrop {
+      background: #071629c9;
+      backdrop-filter: blur(3px);
+    }
+
+    #detailsDialog .dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    #detailsDialog .dialog-header h2 {
+      margin: 0;
+      color: #102746;
+      font-size: 21px;
+    }
+
+    #closeDetailsDialog {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: #a93636;
+      color: #fff;
+      font-size: 29px;
+      cursor: pointer;
+    }
+
+    .details-gallery {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      margin-bottom: 18px;
+      padding-bottom: 8px;
+    }
+
+    .details-gallery img {
+      width: min(100%, 360px);
+      min-width: 220px;
+      height: 230px;
+      flex: 0 0 auto;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #e1e7ef;
+    }
+
+    .details-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 150px;
+      margin-bottom: 16px;
+      background: #102746;
+      color: #ead9b2;
+      border-radius: 12px;
+    }
+
+    .details-summary h3 {
+      margin: 8px 0;
+      color: #102746;
+      font-size: 23px;
+    }
+
+    .details-summary p {
+      color: #718096;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #e1e7ef;
+      border-radius: 10px;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-item span {
+      color: #718096;
+      font-size: 12px;
+    }
+
+    .detail-item strong {
+      color: #102746;
+      font-size: 14px;
+    }
+
+    .details-description {
+      padding: 14px;
+      background: #fff;
+      border-radius: 10px;
+    }
+
+    .details-description h3 {
+      margin-top: 0;
+      color: #102746;
+    }
+
+    .details-description p {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    #detailsDialog .form-note {
+      margin-top: 16px;
+    }
+
+    @media (max-width: 520px) {
+      #detailsDialog {
+        padding: 14px;
+      }
+
+      .details-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .details-gallery img {
+        height: 190px;
+      }
+    }
+  `;
+
+  document.head.appendChild(detailsStyle);
+
+  async function loadOffers() {
+    setStatus("جارٍ تحميل العروض...");
+
+    try {
+      if (!window.LAYAN_SUPABASE?.getOffers) {
+        throw new Error("اتصال Supabase غير جاهز.");
+      }
+
+      const rows = await window.LAYAN_SUPABASE.getOffers();
+
+      if (!Array.isArray(rows)) {
+        throw new Error("استجابة غير متوقعة.");
+      }
+
+      offers = rows.map(normalize);
+      updateAreaFilter();
+      render();
+
+      setStatus(
+        offers.length
+          ? `تم تحميل ${offers.length} عرض من قاعدة البيانات.`
+          : "لا توجد عروض في قاعدة البيانات حتى الآن."
+      );
+    } catch (error) {
+      console.error("خطأ تحميل العروض:", error);
+
+      offers = [];
+      updateAreaFilter();
+      render();
+
+      setStatus(
+        "تعذر تحميل العروض. راجع إعدادات الاتصال وصلاحيات القراءة."
+      );
+    }
+  }
 
   await loadOffers();
 });
