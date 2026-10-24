@@ -39,16 +39,31 @@
     async createOffer(offer) {
       const payload = {
         title: offer.title,
-        city: "أسيوط",
+        governorate: "أسيوط",
+        city: offer.city || "أسيوط",
         area: offer.area || null,
-        property_type: offer.property_type,
+        property_type: offer.property_type || "شقة",
         total_price: Number(offer.total_price || 0),
-        remaining: Number(
-          offer.remaining ?? offer.remaining_installments ?? 0
+        paid_amount: Number(offer.paid_amount || 0),
+        remaining_amount: Number(
+          offer.remaining_amount ??
+          offer.remaining_installments ??
+          0
+        ),
+        assignment_fee: Number(
+          offer.assignment_fee ??
+          offer.transfer_fee ??
+          0
+        ),
+        discount_amount: Number(
+          offer.discount_amount ??
+          offer.discount_amount ??
+          0
         ),
         description: offer.description || null,
-        development: offer.development || null,
-        contact: offer.contact || null
+        image_urls: Array.isArray(offer.image_urls)
+          ? offer.image_urls
+          : []
       };
 
       const rows = await request("property_offers", {
@@ -63,5 +78,5 @@
     }
   };
 
-  console.log("LAYAN: تم تجهيز الاتصال بـ Supabase.");
+  console.log("LAYAN: تم تجهيز الاتصال بقاعدة البيانات.");
 })();
