@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
         <label>كلمة المرور<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل"></label>
         <p id="authStatus" role="status" aria-live="polite"></p>
+        <button class="btn btn-outline-dark" id="resendConfirmationBtn" type="button" hidden>إعادة إرسال رسالة التأكيد</button>
         <button class="btn btn-gold" id="authSubmit" type="submit">تسجيل الدخول</button>
         <button class="btn btn-outline-dark" id="authToggle" type="button">إنشاء حساب جديد</button>
       </form>`;
@@ -64,7 +65,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const toggle = authDialog.querySelector("#authToggle");
     const password = authDialog.querySelector("#authPassword");
     const status = authDialog.querySelector("#authStatus");
+    const resendButton = authDialog.querySelector("#resendConfirmationBtn");
     const paintMode = () => {
+      resendButton.hidden = true;
       title.textContent = mode === "login" ? "تسجيل الدخول إلى ليان" : "إنشاء حساب مجاني";
       submit.textContent = mode === "login" ? "تسجيل الدخول" : "إنشاء الحساب";
       toggle.textContent = mode === "login" ? "ليس لديك حساب؟ أنشئ حسابًا" : "لديك حساب بالفعل؟ سجّل الدخول";
@@ -72,6 +75,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       status.textContent = "";
     };
     toggle.addEventListener("click", () => { mode = mode === "login" ? "signup" : "login"; paintMode(); });
+    resendButton.addEventListener("click", async () => {
+      const api = window.LAYAN_SUPABASE;
+      const email = authDialog.querySelector("#authEmail").value.trim();
+      if (!email) { status.textContent = "اكتب بريدك الإلكتروني أولًا."; return; }
+      if (!api?.resendConfirmation) { status.textContent = "إعادة إرسال التأكيد غير متاحة حاليًا."; return; }
+      resendButton.disabled = true;
+      status.textContent = "جارٍ إرسال رسالة تأكيد جديدة...";
+      try {
+        await api.resendConfirmation(email);
+        status.textContent = "طلبنا إرسال رسالة جديدة. راجع الوارد والرسائل غير المرغوب فيها.";
+        resendButton.hidden = true;
+      } catch (error) {
+        status.textContent = friendlyAuthError(error.message);
+        if (mode === "login" && /Email not confirmed/i.test(error.message || "")) {
+          resendButton.hidden = false;
+        }
+      } finally {
+        resendButton.disabled = false;
+      }
+    });
     authDialog.querySelector("#closeAuthDialog").addEventListener("click", () => authDialog.close());
     authDialog.addEventListener("click", event => { if (event.target === authDialog) authDialog.close(); });
     authDialog.querySelector("#authForm").addEventListener("submit", async event => {
