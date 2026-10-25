@@ -11,6 +11,35 @@ document.addEventListener("DOMContentLoaded", async () => {
   const photosInput = $("photosInput");
   const areaFilter = $("areaFilter");
 
+  // Progressive Web App: install prompt and offline shell.
+  let installPrompt = null;
+  const installBanner = $("installAppBanner");
+  const installButton = $("installAppBtn");
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    navigator.serviceWorker.register("./sw.js").catch(error => console.warn("تعذر تسجيل وضع العمل دون اتصال:", error));
+  }
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    installPrompt = event;
+    if (!standalone && installBanner && !sessionStorage.getItem("layanInstallDismissed")) installBanner.hidden = false;
+  });
+  installButton?.addEventListener("click", async () => {
+    if (!installPrompt) {
+      setStatus("لو خيار التثبيت مش ظاهر، افتح قائمة المتصفح ثم اختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق».");
+      return;
+    }
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    if (installBanner) installBanner.hidden = true;
+  });
+  $("dismissInstallBtn")?.addEventListener("click", () => {
+    if (installBanner) installBanner.hidden = true;
+    sessionStorage.setItem("layanInstallDismissed", "1");
+  });
+  window.addEventListener("appinstalled", () => { if (installBanner) installBanner.hidden = true; });
+
   let offers = [];
   let activeKind = "";
   let selectedAccountType = "individual";
@@ -320,6 +349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   $("addOfferTop")?.addEventListener("click", () => { selectedAccountType = "individual"; openDialog(); });
   $("addOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; openDialog(); });
+  $("mobileAddOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; openDialog(); });
   document.querySelectorAll("[data-account-type]").forEach(button => {
     button.addEventListener("click", () => {
       selectedAccountType = button.dataset.accountType || "individual";
