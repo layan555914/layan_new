@@ -4,7 +4,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#071b30">
+  <meta name="theme-color" content="#102746">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
   <meta name="description" content="LAYAN AQAR - ليان عقار للتنازلات والفرص العقارية في أسيوط">
   <title>LAYAN AQAR | ليان عقار</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +17,11 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="install-app-banner" id="installAppBanner" hidden>
+    <span><strong>ثبّت ليان على موبايلك</strong><small>افتح المنصة بسهولة من شاشة التطبيقات</small></span>
+    <button class="btn btn-gold" id="installAppBtn" type="button">تثبيت</button>
+    <button class="install-dismiss" id="dismissInstallBtn" type="button" aria-label="إخفاء">×</button>
+  </div>
   <header class="topbar">
     <a class="brand" href="#" aria-label="LAYAN AQAR الصفحة الرئيسية">
       <img src="file_000000004bbc821184c084bfa178e416.jpg"
@@ -207,6 +216,13 @@
       </div>
     </section>
   </main>
+
+  <nav class="mobile-nav" aria-label="التنقل السريع">
+    <a href="#" aria-label="الرئيسية"><span>⌂</span><small>الرئيسية</small></a>
+    <a href="#offers" aria-label="العروض"><span>▦</span><small>العروض</small></a>
+    <a href="#companies" aria-label="الشركات"><span>♙</span><small>الشركات</small></a>
+    <button type="button" id="mobileAddOfferBtn" aria-label="إضافة عرض"><span>＋</span><small>أضف عرضك</small></button>
+  </nav>
 
   <footer class="footer">
     <a class="brand footer-brand" href="#" aria-label="LAYAN AQAR">
