@@ -1454,3 +1454,22 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 .mobile-nav button span{background:linear-gradient(135deg,#f0dba5,#c9a052);color:#10233b}
 ::selection{background:rgba(212,177,106,.32);color:#081b32}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+/* LAYAN AQAR — pre-launch free registration campaign */
+.launch-campaign{
+  display:grid;grid-template-columns:minmax(0,1.35fr) minmax(230px,.8fr);gap:28px;align-items:center;
+  margin:28px auto;padding:clamp(22px,4vw,42px);width:min(1180px,calc(100% - 32px));
+  color:#fff;background:radial-gradient(ellipse at 10% 0%,rgba(212,177,106,.17),transparent 45%),linear-gradient(125deg,#07172b,#123556);
+  border:1px solid rgba(212,177,106,.62);border-radius:24px;box-shadow:0 16px 38px rgba(8,27,50,.14)
+}
+.launch-campaign-copy h2{margin:14px 0 10px;color:#f2e4bf;font-size:clamp(1.45rem,3vw,2.2rem);line-height:1.4}
+.launch-campaign-copy p{margin:0 0 12px;color:#fff;line-height:1.9}
+.launch-campaign-copy small{display:block;color:#e5eaf0;line-height:1.9}
+.launch-pill{display:inline-flex;padding:7px 12px;border:1px solid rgba(212,177,106,.65);border-radius:999px;color:#f2e4bf;background:rgba(212,177,106,.1);font-size:.88rem;font-weight:700}
+.launch-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.launch-benefits{display:grid;gap:12px}
+.launch-benefits>div{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 17px;border:1px solid rgba(242,228,191,.2);border-radius:15px;background:rgba(255,255,255,.06)}
+.launch-benefits strong{color:#f2d89a;font-size:1.15rem;white-space:nowrap}
+.launch-benefits span{color:#fff;font-size:.92rem}
+@media(max-width:700px){.launch-campaign{grid-template-columns:1fr;gap:20px;margin:18px auto;padding:22px 18px;width:calc(100% - 24px);border-radius:18px}.launch-benefits{grid-template-columns:1fr}.launch-actions .btn{flex:1;justify-content:center}}
