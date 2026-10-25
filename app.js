@@ -40,6 +40,100 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   window.addEventListener("appinstalled", () => { if (installBanner) installBanner.hidden = true; });
 
+
+  let authDialog;
+  function ensureAuthDialog() {
+    if (authDialog) return authDialog;
+    authDialog = document.createElement("dialog");
+    authDialog.id = "authDialog";
+    authDialog.className = "details-dialog auth-dialog";
+    authDialog.innerHTML = `
+      <div class="details-dialog-header"><h2 id="authTitle">تسجيل الدخول إلى ليان</h2><button type="button" id="closeAuthDialog" aria-label="إغلاق">×</button></div>
+      <p class="auth-intro">أنشئ حسابًا مجانيًا أو سجّل الدخول لإضافة عروضك ومتابعتها.</p>
+      <form id="authForm" class="auth-form">
+        <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
+        <label>كلمة المرور<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل"></label>
+        <p id="authStatus" role="status" aria-live="polite"></p>
+        <button class="btn btn-gold" id="authSubmit" type="submit">تسجيل الدخول</button>
+        <button class="btn btn-outline-dark" id="authToggle" type="button">إنشاء حساب جديد</button>
+      </form>`;
+    document.body.appendChild(authDialog);
+    let mode = "login";
+    const title = authDialog.querySelector("#authTitle");
+    const submit = authDialog.querySelector("#authSubmit");
+    const toggle = authDialog.querySelector("#authToggle");
+    const password = authDialog.querySelector("#authPassword");
+    const status = authDialog.querySelector("#authStatus");
+    const paintMode = () => {
+      title.textContent = mode === "login" ? "تسجيل الدخول إلى ليان" : "إنشاء حساب مجاني";
+      submit.textContent = mode === "login" ? "تسجيل الدخول" : "إنشاء الحساب";
+      toggle.textContent = mode === "login" ? "ليس لديك حساب؟ أنشئ حسابًا" : "لديك حساب بالفعل؟ سجّل الدخول";
+      password.autocomplete = mode === "login" ? "current-password" : "new-password";
+      status.textContent = "";
+    };
+    toggle.addEventListener("click", () => { mode = mode === "login" ? "signup" : "login"; paintMode(); });
+    authDialog.querySelector("#closeAuthDialog").addEventListener("click", () => authDialog.close());
+    authDialog.addEventListener("click", event => { if (event.target === authDialog) authDialog.close(); });
+    authDialog.querySelector("#authForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!event.currentTarget.reportValidity()) return;
+      const api = window.LAYAN_SUPABASE;
+      if (!api) { status.textContent = "الاتصال بقاعدة البيانات غير جاهز."; return; }
+      const email = authDialog.querySelector("#authEmail").value.trim();
+      const pass = password.value;
+      submit.disabled = true;
+      toggle.disabled = true;
+      status.textContent = mode === "login" ? "جارٍ تسجيل الدخول..." : "جارٍ إنشاء الحساب...";
+      try {
+        if (mode === "login") {
+          await api.signIn(email, pass);
+          status.textContent = "تم تسجيل الدخول بنجاح.";
+          updateAuthButton();
+          window.setTimeout(() => { authDialog.close(); setStatus("أهلًا بك، يمكنك الآن إضافة عرضك."); }, 450);
+        } else {
+          const result = await api.signUp(email, pass);
+          if (result.needsEmailConfirmation) {
+            status.textContent = "تم إنشاء الحساب. افتح بريدك الإلكتروني وأكّد الحساب، ثم ارجع وسجّل الدخول.";
+          } else {
+            status.textContent = "تم إنشاء الحساب وتسجيل الدخول.";
+            updateAuthButton();
+            window.setTimeout(() => { authDialog.close(); setStatus("أهلًا بك في ليان."); }, 450);
+          }
+        }
+      } catch (error) {
+        status.textContent = friendlyAuthError(error.message);
+      } finally {
+        submit.disabled = false;
+        toggle.disabled = false;
+      }
+    });
+    authDialog.dataset.mode = "login";
+    authDialog._setMode = value => { mode = value || "login"; paintMode(); };
+    return authDialog;
+  }
+  function friendlyAuthError(message) {
+    const text = String(message || "");
+    if (/Invalid login credentials/i.test(text)) return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+    if (/already registered|User already registered/i.test(text)) return "هذا البريد مسجّل بالفعل. سجّل الدخول بدلًا من إنشاء حساب جديد.";
+    if (/Password should be at least|weak password/i.test(text)) return "كلمة المرور ضعيفة؛ استخدم 6 أحرف على الأقل.";
+    if (/Email not confirmed/i.test(text)) return "أكّد بريدك الإلكتروني من الرسالة التي وصلتك ثم سجّل الدخول.";
+    if (/rate limit/i.test(text)) return "تمت محاولات كثيرة. انتظر قليلًا ثم حاول مرة أخرى.";
+    return text.length < 220 ? text : "تعذر إتمام العملية. راجع البريد وكلمة المرور ثم حاول مجددًا.";
+  }
+  function updateAuthButton() {
+    const button = $("loginBtn");
+    const api = window.LAYAN_SUPABASE;
+    if (!button || !api) return;
+    const user = api.getUser();
+    button.textContent = user ? "خروج (" + (user.email || "حسابي") + ")" : "تسجيل الدخول";
+    button.title = user ? "اضغط لتسجيل الخروج" : "تسجيل الدخول أو إنشاء حساب";
+  }
+  function openAuth(mode = "login") {
+    const d = ensureAuthDialog();
+    d._setMode(mode);
+    if (!d.open) d.showModal();
+  }
+
   let offers = [];
   let activeKind = "";
   let selectedAccountType = "individual";
@@ -347,9 +441,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  $("addOfferTop")?.addEventListener("click", () => { selectedAccountType = "individual"; openDialog(); });
-  $("addOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; openDialog(); });
-  $("mobileAddOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; openDialog(); });
+
+  $("loginBtn")?.addEventListener("click", async () => {
+    const api = window.LAYAN_SUPABASE;
+    if (api?.isAuthenticated()) {
+      if (!window.confirm("هل تريد تسجيل الخروج من حساب ليان؟")) return;
+      try { await api.signOut(); updateAuthButton(); setStatus("تم تسجيل الخروج."); }
+      catch (error) { setStatus(friendlyAuthError(error.message)); }
+    } else openAuth("login");
+  });
+  function startAddOffer() {
+    const api = window.LAYAN_SUPABASE;
+    if (!api?.isAuthenticated()) { openAuth("login"); setStatus("سجّل الدخول أولًا، ثم أضف عرضك."); return; }
+    selectedAccountType = selectedAccountType || "individual";
+    openDialog();
+  }
+  $("addOfferTop")?.addEventListener("click", () => { selectedAccountType = "individual"; startAddOffer(); });
+  $("addOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; startAddOffer(); });
+  $("mobileAddOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; startAddOffer(); });
   document.querySelectorAll("[data-account-type]").forEach(button => {
     button.addEventListener("click", () => {
       selectedAccountType = button.dataset.accountType || "individual";
@@ -359,7 +468,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const plan = $("promotionPlanSelect");
         if (plan) plan.value = duration === 15 ? "featured_15" : "featured_30";
       }
-      openDialog();
+      startAddOffer();
     });
   });
   $("accountTypeSelect")?.addEventListener("change", event => {
@@ -486,9 +595,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       const api = window.LAYAN_SUPABASE;
-      if (!api?.createOffer) {
-        throw new Error("اتصال Supabase غير جاهز.");
-      }
+      if (!api?.createOffer) throw new Error("اتصال Supabase غير جاهز.");
+      if (!api.isAuthenticated()) throw new Error("سجّل الدخول أو أنشئ حسابًا أولًا لإرسال عرضك.");
 
       if (files.length) {
         if (!api.uploadImages) throw new Error("رفع الصور غير مفعّل.");
@@ -546,5 +654,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  updateAuthButton();
   await loadOffers();
 });
