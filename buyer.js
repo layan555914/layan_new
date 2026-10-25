@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function render(rows,p) {
     count.textContent = rows.length + " عرض";
     if (!rows.length) { cards.innerHTML='<div class="buyer-empty">مفيش عرض مطابق لكل الشروط حاليًا. جرّب توسّع الميزانية أو تغيّر المنطقة.</div>'; return; }
-    cards.innerHTML=rows.map(o=>`<article class="buyer-match-card"><span class="buyer-match-type">${esc(o.property_type||"عقار")}</span><h4>${esc(o.title||"عرض عقاري")}</h4><p>📍 ${esc(o.area||o.governorate||"أسيوط")}</p><div class="buyer-match-price"><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></div><div class="buyer-match-price"><span>المدفوع + رسوم التنازل</span><strong>${money(Number(o.paid_amount||0)+Number(o.assignment_fee||0))}</strong></div>${Number(o.monthly_installment||0)>0?`<div class="buyer-match-price"><span>القسط الشهري المسجل</span><strong>${money(o.monthly_installment)}</strong></div>`:""}<a class="btn btn-gold" href="#offers" data-buyer-offer="${esc(o.id)}">شوف العرض في القائمة</a></article>`).join("");
+    cards.innerHTML=rows.map(o=>`<article class="buyer-match-card"><span class="buyer-match-type">${esc(o.property_type||"عقار")}</span><h4>${esc(o.title||"عرض عقاري")}</h4><p>📍 ${esc(o.area||o.governorate||"أسيوط")}</p><div class="buyer-match-price"><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></div><div class="buyer-match-price"><span>المدفوع + رسوم التنازل</span><strong>${money(Number(o.paid_amount||0)+Number(o.assignment_fee||0))}</strong></div>${Number(o.monthly_installment||0)>0?`<div class="buyer-match-price"><span>القسط الشهري المسجل</span><strong>${money(o.monthly_installment)}</strong></div>`:""}<a class="btn btn-gold" href="#offers" data-buyer-title="${esc(o.title||"عرض عقاري")}">شوف العرض في القائمة</a></article>`).join("");
   }
   let saved = null;
   let knownMatches = new Set();
@@ -140,12 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
     status.textContent=permission==="granted"?"تم تفعيل إشعارات المتصفح. ستظهر عند وجود عروض مطابقة أثناء فتح المنصة.":"لم يتم السماح بالإشعارات؛ ستظل العروض المطابقة ظاهرة داخل المنصة.";
   });
   cards.addEventListener("click",e=>{
-    const a=e.target.closest("[data-buyer-offer]"); if(!a) return;
-    const target=document.querySelector(`[data-offer-index]`);
+    const a=e.target.closest("[data-buyer-title]"); if(!a) return;
     const offersGrid=document.getElementById("offersGrid");
-    if(offersGrid) offersGrid.scrollIntoView({behavior:"smooth",block:"start"});
     const search=document.getElementById("searchInput");
-    if(search) search.value="";
+    if(search) { search.value=a.dataset.buyerTitle || ""; search.dispatchEvent(new Event("input",{bubbles:true})); }
+    if(offersGrid) offersGrid.scrollIntoView({behavior:"smooth",block:"start"});
   });
   loadSaved().then(()=>{ if(saved) refreshMatches(false); });
   window.addEventListener("focus",()=>{if(saved)refreshMatches(true);});
