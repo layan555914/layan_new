@@ -55,7 +55,8 @@
     return data;
   }
   async function signUp(email, password) {
-    const data = await authRequest("signup", { email: email.trim(), password });
+    const redirectTo = window.location.origin + window.location.pathname;
+    const data = await authRequest("signup?redirect_to=" + encodeURIComponent(redirectTo), { email: email.trim(), password });
     normalizeSession(data);
     return { user: data?.user || null, session: session, needsEmailConfirmation: !data?.access_token };
   }
