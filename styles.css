@@ -1123,3 +1123,50 @@ footer {
     font-size: 12px;
   }
 }
+
+
+/* LAYAN assignment calculator */
+.calculator-section {
+  padding: clamp(30px, 4vw, 48px) clamp(16px, 6%, 76px);
+  background: #f3f6fa;
+}
+.calculator-card {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: clamp(16px, 3vw, 28px);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--gold);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.calculator-card > label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: bold;
+}
+.calculator-results {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.calculator-results > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #102746;
+  color: #fff;
+}
+.calculator-results span { color: #ead9b2; font-size: 12px; }
+.calculator-results strong { font-size: clamp(16px, 2.6vw, 23px); overflow-wrap: anywhere; }
+.calculator-note { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 12px; }
+@media (max-width: 700px) {
+  .calculator-card { grid-template-columns: 1fr; }
+  .calculator-results { grid-template-columns: 1fr; }
+}
