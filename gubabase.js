@@ -1,3 +1,4 @@
+
 (function () {
   "use strict";
 
@@ -10,36 +11,7 @@
 
   const url = config.SUPABASE_URL.replace(/\/$/, "");
   const key = config.SUPABASE_PUBLISHABLE_KEY;
-  const BUCKET = "layan_real_estat";
-
-  // الحقول العامة فقط، بدون اسم أو هاتف صاحب العرض.
-  const PUBLIC_FIELDS = [
-    "id",
-    "title",
-    "governorate",
-    "city",
-    "area",
-    "property_type",
-    "bedrooms",
-    "bathrooms",
-    "area_m2",
-    "total_price",
-    "down_payment",
-    "paid_amount",
-    "remaining_amount",
-    "monthly_installment",
-    "assignment_fee",
-    "assignment_fee_percentage",
-    "discount_amount",
-    "discount_percent",
-    "description",
-    "image_urls",
-    "developer_name",
-    "status",
-    "created_at",
-    "verification_status",
-    "developer_approval_status"
-  ].join(",");
+  const bucket = "layan_real_estat";
 
   async function request(path, options = {}) {
     const response = await fetch(`${url}/rest/v1/${path}`, {
@@ -52,39 +24,49 @@
       }
     });
 
-    const text = await response.text();
+    const body = await response.text();
 
     if (!response.ok) {
-      throw new Error(`قاعدة البيانات: ${text}`);
+      throw new Error(`Supabase ${response.status}: ${body}`);
     }
 
-    return text ? JSON.parse(text) : null;
+    return body ? JSON.parse(body) : null;
+  }
+
+  async function getOffers() {
+    const fields = [
+      "id", "title", "governorate", "area", "property_type",
+      "description", "total_price", "down_payment", "paid_amount",
+      "remaining_installments", "transfer_fee",
+      "transfer_fee_percentage", "discount_amount",
+      "developer_name", "image_urls", "status", "created_at"
+    ].join(",");
+
+    const rows = await request(
+      `property_offers?select=${fields}` +
+      "&status=eq.published&order=created_at.desc"
+    );
+
+    return Array.isArray(rows) ? rows : [];
   }
 
   async function uploadImages(files) {
-    if (!Array.isArray(files) || files.length === 0) return [];
+    const uploaded = [];
 
-    const uploadedUrls = [];
-
-    for (const file of files) {
-      if (!file.type?.startsWith("image/")) {
-        throw new Error("الملف المحدد ليس صورة.");
+    for (const file of files || []) {
+      if (!file.type.startsWith("image/")) {
+        throw new Error("اختر ملفات صور فقط.");
       }
 
       if (file.size > 10 * 1024 * 1024) {
         throw new Error("حجم الصورة يجب ألا يتجاوز 10 ميجابايت.");
       }
 
-      const safeName = file.name
-        .normalize("NFKD")
-        .replace(/[^a-zA-Z0-9._-]/g, "_")
-        .replace(/_+/g, "_");
-
-      const objectPath =
-        `offers/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `offers/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
 
       const response = await fetch(
-        `${url}/storage/v1/object/${BUCKET}/${objectPath}`,
+        `${url}/storage/v1/object/${bucket}/${path}`,
         {
           method: "POST",
           headers: {
@@ -98,75 +80,45 @@
       );
 
       if (!response.ok) {
-        throw new Error(`تعذر رفع الصورة: ${await response.text()}`);
+        throw new Error("فشل رفع الصورة: " + await response.text());
       }
 
-      uploadedUrls.push(
-        `${url}/storage/v1/object/public/${BUCKET}/` +
-        objectPath.split("/").map(encodeURIComponent).join("/")
+      uploaded.push(
+        `${url}/storage/v1/object/public/${bucket}/` +
+        path.split("/").map(encodeURIComponent).join("/")
       );
     }
 
-    return uploadedUrls;
+    return uploaded;
   }
 
-  // جلب بيانات العرض العامة فقط.
-  async function getOffers() {
-    const rows = await request(
-      `property_offers?select=${PUBLIC_FIELDS}` +
-      "&status=eq.available&order=created_at.desc"
-    );
-
-    return (rows || []).map(row => ({
-      ...row,
-      contact_name: "",
-      contact_phone: ""
-    }));
-  }
-
-  // إنشاء العرض دون إعادة بيانات صاحب العرض إلى المتصفح.
   async function createOffer(offer) {
     const payload = {
       title: offer.title,
-      governorate: offer.governorate || "أسيوط",
-      city: offer.city || "أسيوط",
+      governorate: "أسيوط",
       area: offer.area || null,
       property_type: offer.property_type || "شقة",
+      description: offer.description || null,
       total_price: Number(offer.total_price || 0),
       down_payment: Number(offer.down_payment || 0),
       paid_amount: Number(offer.paid_amount || 0),
-      remaining_amount: Number(offer.remaining_amount || 0),
-      assignment_fee: Number(offer.assignment_fee || 0),
-      discount_percent: Number(offer.discount_percent || 0),
-      contact_name: offer.contact_name || null,
+      remaining_installments: Number(offer.remaining_installments || 0),
+      transfer_fee: Number(offer.transfer_fee || 0),
+      transfer_fee_percentage: Number(offer.transfer_fee_percentage || 0),
+      discount_amount: Number(offer.discount_amount || 0),
+      developer_name: offer.developer_name || null,
       contact_phone: offer.contact_phone || null,
-      description: offer.description || null,
-      image_urls: Array.isArray(offer.image_urls)
-        ? offer.image_urls
-        : [],
-      verification_status: "pending",
-      developer_approval_status: "unknown",
-      status: "available"
+      image_urls: Array.isArray(offer.image_urls) ? offer.image_urls : [],
+      status: "pending"
     };
 
-    // لا نطلب إرجاع الصف الذي يحتوي على بيانات التواصل.
-    await request("property_offers", {
+    const rows = await request("property_offers", {
       method: "POST",
-      headers: {
-        Prefer: "return=minimal"
-      },
+      headers: { Prefer: "return=representation" },
       body: JSON.stringify(payload)
     });
 
-    // نتيجة عامة مؤقتة؛ يُعاد تحميل العرض من قائمة العروض العامة.
-    return {
-      ...payload,
-      id: null,
-      contact_name: "",
-      contact_phone: "",
-      status: "available",
-      created_at: new Date().toISOString()
-    };
+    return Array.isArray(rows) ? rows[0] : rows;
   }
 
   window.LAYAN_SUPABASE = {
@@ -175,5 +127,5 @@
     createOffer
   };
 
-  console.log("LAYAN: تم تجهيز الاتصال.");
+  console.log("LAYAN: اتصال Supabase جاهز.");
 })();
