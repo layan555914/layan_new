@@ -100,7 +100,7 @@
       "id","title","governorate","area","property_type","description","total_price",
       "down_payment","paid_amount","remaining_amount","assignment_fee",
       "assignment_fee_percentage","discount_amount","developer_name","image_urls",
-      "status","featured_requested","is_featured","featured_until","promotion_status","created_at"
+      "status","featured_requested","is_featured","featured_until","promotion_status","contact_name","contact_phone","created_at"
     ].join(",");
     const rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
     return Array.isArray(rows) ? rows : [];
