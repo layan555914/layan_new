@@ -212,7 +212,9 @@ function offerCode(offer) {
           تواصل مع إدارة ليان.
         </p>
 
-        <div class="contact-actions">
+        <div class="contact-actions"><p class="offer-code">
+  كود الإعلان: <strong>${esc(offerCode(offer))}</strong>
+</p>
           <a
             class="contact-button call-button"
             href="tel:+${LAYAN_PHONE}"
