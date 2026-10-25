@@ -1334,3 +1334,34 @@ footer {
 [hidden]{display:none!important}
 @media(max-width:900px){.pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.company-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.audience-grid,.pricing-grid,.company-grid{grid-template-columns:1fr}.company-search{grid-template-columns:1fr}.audience-card{padding:18px}}
+
+
+/* تجربة تطبيق ويب قابلة للتثبيت — LAYAN AQAR */
+.install-app-banner{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fffaf0;border-bottom:1px solid #ead9b2;box-shadow:0 5px 18px #10274612}
+.install-app-banner[hidden]{display:none}
+.install-app-banner span{display:grid;flex:1;line-height:1.5}
+.install-app-banner strong{color:#102746;font-size:14px}
+.install-app-banner small{color:#718096;font-size:11px}
+.install-dismiss{border:0;background:transparent;color:#718096;font-size:26px;line-height:1;padding:4px 8px}
+.mobile-nav{display:none}
+@media(max-width:700px){
+ body{padding-bottom:72px}
+ .topbar{gap:10px;padding:12px 14px}
+ .brand-logo{width:46px;height:46px;flex-basis:46px}
+ .brand strong{font-size:17px;letter-spacing:2px}
+ .topbar nav{order:3;justify-content:space-between;width:100%;gap:8px;font-size:12px}
+ .top-actions{gap:8px}
+ .top-actions .btn{padding:8px 12px;font-size:12px}
+ .hero{min-height:unset;padding:44px 18px}
+ .hero-content{width:100%}
+ .audience-grid,.pricing-grid,.company-grid,#offersGrid,.how-grid{grid-template-columns:minmax(0,1fr)}
+ .filters{grid-template-columns:minmax(0,1fr);padding:12px}
+ .calculator-card{padding:16px}
+ .mobile-nav{position:fixed;bottom:0;right:0;left:0;z-index:30;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:8px 8px max(8px,env(safe-area-inset-bottom));background:#102746;border-top:2px solid #c5a15d;box-shadow:0 -8px 24px #10274622}
+ .mobile-nav a,.mobile-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:48px;border:0;border-radius:10px;background:transparent;color:#fff;font:inherit}
+ .mobile-nav span{font-size:21px;line-height:1.25;color:#ead9b2}
+ .mobile-nav small{font-size:10px}
+ .mobile-nav button span{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#c5a15d;color:#102746;font-weight:bold}
+ .footer{padding-bottom:22px}
+}
+@media(min-width:701px){.install-app-banner{max-width:1120px;margin:0 auto;border-radius:0 0 14px 14px}}
