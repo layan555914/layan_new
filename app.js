@@ -278,6 +278,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   areaFilter?.addEventListener("change", render);
   $("searchBtn")?.addEventListener("click", render);
 
+  const calcContract = $("calcContract");
+  const calcPaid = $("calcPaid");
+  const calcFees = $("calcFees");
+  const formatCalc = (value) => num(value).toLocaleString("ar-EG", { maximumFractionDigits: 2 }) + " ج.م";
+  function updateCalculator() {
+    if (!calcContract || !calcPaid || !calcFees) return;
+    const contract = num(calcContract.value);
+    const paid = num(calcPaid.value);
+    const fees = num(calcFees.value);
+    const remaining = Math.max(0, contract - paid);
+    $("calcRemaining").textContent = formatCalc(remaining);
+    $("calcTotal").textContent = formatCalc(paid + fees);
+    if (paid > contract && contract > 0) {
+      $("calcRemaining").textContent = "راجع المبلغ المدفوع";
+    }
+  }
+  [calcContract, calcPaid, calcFees].forEach((input) => input?.addEventListener("input", updateCalculator));
+  updateCalculator();
+
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
