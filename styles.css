@@ -1302,3 +1302,35 @@ footer {
   .details-dialog { padding: 14px; }
   .details-info, .details-contact { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* LAYAN audience, company directory and promotion plans */
+.audience-section,.company-section,.pricing-section{padding:clamp(28px,4vw,48px) clamp(16px,6%,76px)}
+.audience-section,.pricing-section{background:#fff}
+.audience-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.audience-card{display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:24px;text-align:right;border:1px solid var(--border);border-radius:14px;background:#fff;color:var(--text);box-shadow:var(--shadow);font:inherit;cursor:pointer}
+.audience-card:hover,.audience-card:focus-visible{border-color:var(--gold);outline:2px solid #c5a15d55}
+.audience-card strong{font-size:20px;color:var(--navy)}
+.audience-card span:not(.audience-icon){font-size:13px;color:var(--muted)}
+.audience-card b{margin-top:5px;color:var(--red)}
+.audience-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:#f7efdc;color:var(--navy);font-size:26px}
+.company-search{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;max-width:720px}
+.company-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+.company-card{padding:18px;border:1px solid var(--border);border-radius:12px;background:white}
+.company-card h3{margin:0 0 5px;color:var(--navy)}
+.company-card p{margin:5px 0;color:var(--muted);font-size:13px}
+.company-empty{color:var(--muted);font-size:13px}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.pricing-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:20px;border:1px solid var(--border);border-radius:14px;background:#fff}
+.pricing-card-featured{border:2px solid var(--gold);background:linear-gradient(160deg,#fff,#fffaf0)}
+.pricing-card h3{margin:0;color:var(--navy);font-size:20px}
+.pricing-label{color:var(--red);font-size:12px;font-weight:800}
+.pricing-price{margin:0;color:var(--navy);font-size:30px;font-weight:800}
+.pricing-price small{font-size:13px}
+.pricing-card p:not(.pricing-price){margin:0 0 8px;color:var(--muted);font-size:12px}
+.pricing-card .btn{margin-top:auto;width:100%}
+.pricing-note{padding:12px 14px;border-right:3px solid var(--gold);background:#fff8e8;color:#6e572b;font-size:12px}
+.btn-outline-dark{border:1px solid var(--navy);background:#fff;color:var(--navy)}
+[hidden]{display:none!important}
+@media(max-width:900px){.pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.company-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.audience-grid,.pricing-grid,.company-grid{grid-template-columns:1fr}.company-search{grid-template-columns:1fr}.audience-card{padding:18px}}
