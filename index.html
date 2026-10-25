@@ -56,6 +56,47 @@
       </div>
     </section>
 
+    <section class="audience-section" id="accounts">
+      <div class="section-heading">
+        <div><span class="eyebrow">ابدأ مع ليان</span><h2>أنت عميل أم شركة عقارية؟</h2>
+        <p>اختَر المسار المناسب لك للوصول إلى الخدمات الملائمة.</p></div>
+      </div>
+      <div class="audience-grid">
+        <button class="audience-card" type="button" data-account-type="individual">
+          <span class="audience-icon" aria-hidden="true">♙</span><strong>عميل / مالك عقار</strong>
+          <span>تصفح العروض أو أرسل عقارك للتنازل.</span><b>متابعة كعميل</b>
+        </button>
+        <button class="audience-card" type="button" data-account-type="company">
+          <span class="audience-icon" aria-hidden="true">▦</span><strong>شركة عقارية</strong>
+          <span>اعرض عقارات الشركة واستكشف باقات التمييز.</span><b>متابعة كشركة</b>
+        </button>
+      </div>
+    </section>
+
+    <section class="company-section" id="companies">
+      <div class="section-heading"><div><span class="eyebrow">دليل الشركات</span><h2>ابحث عن شركة عقارية</h2>
+      <p>اكتب اسم الشركة للعثور على العروض المرتبطة بها في الإعلانات المنشورة.</p></div></div>
+      <div class="company-search">
+        <input id="companySearchInput" type="search" placeholder="ابحث باسم الشركة..." aria-label="البحث باسم الشركة">
+        <button class="btn btn-gold" id="companySearchBtn" type="button">بحث عن شركة</button>
+      </div>
+      <div class="company-grid" id="companyGrid" aria-live="polite">
+        <p class="company-empty">سيظهر هنا اسم الشركة عندما تكون لديها عروض منشورة تتضمن اسمها.</p>
+      </div>
+    </section>
+
+    <section class="pricing-section" id="pricing">
+      <div class="section-heading"><div><span class="eyebrow">تمييز الإعلانات</span><h2>باقات التمييز</h2>
+      <p>أسعار مبدئية لتمييز الإعلانات. يتم التفعيل بعد مراجعة الدفع يدويًا.</p></div></div>
+      <div class="pricing-grid">
+        <article class="pricing-card"><span class="pricing-label">إعلان فردي</span><h3>15 يومًا</h3><p class="pricing-price">100 <small>جنيه</small></p><p>تمييز عقار واحد لمدة 15 يومًا.</p><button class="btn btn-gold" type="button" data-account-type="individual" data-promotion-duration="15">اختيار الباقة</button></article>
+        <article class="pricing-card pricing-card-featured"><span class="pricing-label">الأكثر مرونة</span><h3>30 يومًا</h3><p class="pricing-price">200 <small>جنيه</small></p><p>تمييز عقار واحد لمدة 30 يومًا.</p><button class="btn btn-gold" type="button" data-account-type="individual" data-promotion-duration="30">اختيار الباقة</button></article>
+        <article class="pricing-card"><span class="pricing-label">للشركات — مقترح</span><h3>3 عقارات</h3><p class="pricing-price">250 <small>جنيه</small></p><p>15 يومًا — سعر مقترح يحتاج اعتمادًا نهائيًا.</p><button class="btn btn-outline-dark" type="button" data-account-type="company">استفسار عن باقة الشركات</button></article>
+        <article class="pricing-card"><span class="pricing-label">للشركات — مقترح</span><h3>5 عقارات</h3><p class="pricing-price">600 <small>جنيه</small></p><p>30 يومًا — سعر مقترح يحتاج اعتمادًا نهائيًا.</p><button class="btn btn-outline-dark" type="button" data-account-type="company">استفسار عن باقة الشركات</button></article>
+      </div>
+      <p class="pricing-note">تحصيل Vodafone Cash ومراجعة SMS يدويًا ضمن خطة التنفيذ؛ لا تحوّل أي مبلغ الآن. باقات الشركات أسعار مقترحة وليست متاحة للدفع حتى اعتمادها وإعداد إجراءاتها.</p>
+    </section>
+
     <section class="offers-section" id="offers">
       <div class="section-heading">
         <div>
@@ -69,7 +110,7 @@
         <input
           id="searchInput"
           type="search"
-          placeholder="ابحث عن وحدة أو منطقة..."
+          placeholder="ابحث عن وحدة أو منطقة أو شركة..."
           aria-label="البحث عن العروض"
         >
 
@@ -187,6 +228,17 @@
     <form id="offerForm">
       <div id="formStatusMessage" role="status" aria-live="polite"></div>
       <label>
+        نوع الحساب
+        <select name="account_type" id="accountTypeSelect" required>
+          <option value="individual">عميل / مالك عقار</option>
+          <option value="company">شركة عقارية</option>
+        </select>
+      </label>
+      <label id="companyNameField" hidden>
+        اسم الشركة العقارية
+        <input name="developer_name" id="companyNameInput" type="text" placeholder="اكتب اسم الشركة">
+      </label>
+      <label>
         عنوان العرض
         <input name="title" type="text" required>
       </label>
@@ -267,11 +319,12 @@
 
       <label>
         نوع الإعلان
-        <select name="promotion_plan">
+        <select name="promotion_plan" id="promotionPlanSelect">
           <option value="standard">إعلان عادي — مجاني</option>
-          <option value="featured">طلب إعلان مميز — بمقابل مادي</option>
+          <option value="featured_15">تمييز 15 يومًا — 100 جنيه (طلب مبدئي)</option>
+          <option value="featured_30">تمييز 30 يومًا — 200 جنيه (طلب مبدئي)</option>
         </select>
-        <small>الإعلان المميز يظهر أولًا بعد مراجعة إدارة ليان وتأكيد الدفع.</small>
+        <small id="promotionPlanNote">الإعلان المميز لا يتفعّل إلا بعد مراجعة الدفع يدويًا. الدفع غير متاح من خلال الموقع حاليًا.</small>
       </label>
 
       <label>
