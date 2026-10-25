@@ -1365,3 +1365,92 @@ footer {
  .footer{padding-bottom:22px}
 }
 @media(min-width:701px){.install-app-banner{max-width:1120px;margin:0 auto;border-radius:0 0 14px 14px}}
+
+
+/* LAYAN AQAR — Premium navy, champagne-gold and restrained ruby palette */
+:root{
+  --navy:#081b32;
+  --blue:#15385b;
+  --gold:#d4b16a;
+  --gold-light:#f2e4bf;
+  --red:#a52f42;
+  --white:#fff;
+  --bg:#f5f6f8;
+  --text:#18283c;
+  --muted:#68788b;
+  --border:#e2e6ec;
+  --shadow:0 14px 38px rgba(8,27,50,.10);
+}
+body{background:var(--bg);color:var(--text)}
+.topbar{
+  background:linear-gradient(112deg,#07172b 0%,#0d2948 62%,#143758 100%);
+  border-bottom:3px solid var(--gold);
+  box-shadow:0 8px 28px rgba(8,27,50,.16)
+}
+.brand-logo{
+  padding:3px;
+  border:1px solid rgba(212,177,106,.85);
+  border-radius:12px;
+  background:linear-gradient(145deg,#fffdf6,#e7d4a4);
+  box-shadow:0 0 0 3px rgba(212,177,106,.10),0 5px 16px rgba(0,0,0,.18)
+}
+/* Keep the original logo file untouched; use gold around it, not a destructive recolor. */
+.brand strong{color:#fffdf7}
+.brand small{color:var(--gold-light)}
+.topbar nav a{transition:color .18s ease}
+.topbar nav a:hover,.topbar nav a.active{color:var(--gold-light)}
+.btn-gold{
+  background:linear-gradient(135deg,#f0dba5 0%,#d4b16a 48%,#bd9447 100%);
+  color:#10233b;
+  border:1px solid #e9d39a;
+  box-shadow:0 5px 14px rgba(212,177,106,.22)
+}
+.btn-gold:hover{filter:brightness(1.06);box-shadow:0 8px 18px rgba(212,177,106,.30)}
+.btn-outline{border-color:rgba(242,228,191,.55);color:#fffdf7}
+.btn-outline:hover{background:rgba(242,228,191,.09);border-color:var(--gold)}
+.btn-dark{background:linear-gradient(135deg,#0a203a,#173b60);color:#fff}
+.btn-outline-dark{border-color:#173b60;color:#102746}
+.btn-outline-dark:hover{background:#102746;color:#fff}
+.hero{
+  background:
+    radial-gradient(ellipse at 88% 8%,rgba(212,177,106,.18) 0,transparent 34%),
+    radial-gradient(ellipse at 12% 20%,#234b70 0,transparent 42%),
+    linear-gradient(125deg,#07172b 0%,#0c2744 54%,#163d60 100%);
+  border-bottom:4px solid var(--gold)
+}
+.hero::after{border-color:rgba(212,177,106,.48);box-shadow:0 0 0 25px rgba(212,177,106,.05),0 0 0 50px rgba(212,177,106,.035)}
+.eyebrow{color:#b18b43}
+.hero .eyebrow,.hero .hero-content .eyebrow{color:var(--gold-light)}
+.hero h1 span{color:var(--gold-light)}
+.section-heading h2,.how-section>h2{color:var(--navy)}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,177,106,.19)}
+.audience-card{border-color:#e3e6eb;box-shadow:0 8px 24px rgba(8,27,50,.055)}
+.audience-card:hover,.audience-card:focus-visible{border-color:var(--gold);box-shadow:0 12px 28px rgba(8,27,50,.10),0 0 0 2px rgba(212,177,106,.14)}
+.audience-icon{background:linear-gradient(145deg,#fffaf0,#f0e1bd);color:#102746;border:1px solid #ead9b2}
+.audience-card b,.pricing-label{color:var(--red)}
+.pricing-card{border-color:#e3e6eb;box-shadow:0 8px 24px rgba(8,27,50,.045)}
+.pricing-card-featured{border-color:var(--gold);background:linear-gradient(155deg,#fff 0%,#fffaf0 100%);box-shadow:0 12px 28px rgba(212,177,106,.14)}
+.pricing-price{color:#102746}
+.offer-card{border-color:#e1e5eb;box-shadow:0 8px 26px rgba(8,27,50,.055)}
+.offer-card:hover{box-shadow:0 16px 36px rgba(8,27,50,.12)}
+.offer-type{background:#f3e8cb;color:#102746;border:1px solid #e6d4a6}
+.offer-details>div,.details-info p{background:#f3f5f8;border:1px solid #e7ebf0}
+.featured-badge{border-color:#d4b16a;background:linear-gradient(135deg,#fff9e8,#e8d19a);color:#102746}
+.offer-card:has(.featured-badge){border-color:#d4b16a;box-shadow:0 12px 30px rgba(212,177,106,.20)}
+.calculator-card{border-top-color:var(--gold)}
+.calculator-results>div{background:linear-gradient(135deg,#081b32,#173b60)}
+.calculator-results span{color:#f2e4bf}
+.how-section{background:#fff}
+.how-card,.steps article{border-color:#e4e8ee;background:#fff}
+.how-card h3,.steps h3{color:#102746}
+.footer,footer{background:linear-gradient(115deg,#061529,#102c4b);border-top-color:var(--gold)}
+#offerDialog,.details-dialog{border:1px solid var(--gold)}
+#offerDialog::backdrop,.details-dialog::backdrop{background:rgba(4,15,29,.78)}
+#closeDialog,#closeDetailsDialog{background:var(--red)}
+.pricing-note,.form-note,.status-message{border-right-color:var(--gold);background:#fff8e8;color:#67542d}
+.install-app-banner{background:#fffaf0;border-bottom-color:#e4d09d}
+.mobile-nav{background:linear-gradient(110deg,#07172b,#123556);border-top-color:var(--gold)}
+.mobile-nav span{color:var(--gold-light)}
+.mobile-nav button span{background:linear-gradient(135deg,#f0dba5,#c9a052);color:#10233b}
+::selection{background:rgba(212,177,106,.32);color:#081b32}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
