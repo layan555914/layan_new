@@ -17,6 +17,20 @@
   box-sizing: border-box;
 }
 
+h1, h2, h3, h4,
+.brand small,
+.topbar nav,
+.btn,
+.eyebrow {
+  font-family: "Cairo", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.45;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 90px;
@@ -27,7 +41,7 @@ body {
   direction: rtl;
   background: var(--bg);
   color: var(--text);
-  font-family: Tahoma, Arial, sans-serif;
+  font-family: "IBM Plex Sans Arabic", "Cairo", Tahoma, Arial, sans-serif;
   line-height: 1.8;
 }
 
