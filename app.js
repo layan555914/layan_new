@@ -214,43 +214,62 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!d) {
       d = document.createElement("dialog");
       d.id = "detailsDialog";
+      d.className = "details-dialog";
       d.innerHTML = `
-        <button id="closeDetailsDialog" type="button">إغلاق ✕</button>
+        <div class="details-dialog-header">
+          <h2>تفاصيل الوحدة</h2>
+          <button id="closeDetailsDialog" type="button" aria-label="إغلاق التفاصيل">×</button>
+        </div>
         <div id="detailsContent"></div>`;
       document.body.appendChild(d);
-      $("closeDetailsDialog").addEventListener("click", () => d.close());
+      $("closeDetailsDialog").addEventListener("click", () => {
+        if (typeof d.close === "function") d.close();
+        else d.removeAttribute("open");
+      });
+      d.addEventListener("click", (event) => {
+        if (event.target === d) {
+          if (typeof d.close === "function") d.close();
+          else d.removeAttribute("open");
+        }
+      });
     }
 
     const content = $("detailsContent");
     const images = o.image_urls.length
       ? o.image_urls.map((url) =>
-          `<img src="${esc(url)}" alt="${esc(o.title)}"
-            style="width:100%;max-height:260px;object-fit:cover">`
+          `<img class="details-image" src="${esc(url)}" alt="${esc(o.title)}">`
         ).join("")
-      : `<div class="offer-image-placeholder">LAYAN AQAR</div>`;
+      : `<div class="offer-image offer-image-placeholder details-placeholder">LAYAN AQAR</div>`;
 
     content.innerHTML = `
       ${images}
+      <span class="offer-type">${esc(o.property_type)}</span>
       <h2>${esc(o.title)}</h2>
-      <p>كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
-      <p>المنطقة: ${esc(o.area || "أسيوط")}</p>
-      <p>نوع العقار: ${esc(o.property_type)}</p>
-      <p>السعر الإجمالي: ${money(o.total_price)}</p>
-      <p>المقدم: ${money(o.down_payment)}</p>
-      <p>المبلغ المدفوع: ${money(o.paid_amount)}</p>
-      <p>الأقساط المتبقية: ${money(o.remaining_installments)}</p>
-      <p>رسوم التنازل: ${money(o.transfer_fee)}</p>
-      <p>المطور: ${esc(o.developer_name || "غير محدد")}</p>
+      <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
+      <div class="details-info">
+        <p><span>المنطقة</span><strong>${esc(o.area || "أسيوط")}</strong></p>
+        <p><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></p>
+        <p><span>المقدم</span><strong>${money(o.down_payment)}</strong></p>
+        <p><span>المبلغ المدفوع</span><strong>${money(o.paid_amount)}</strong></p>
+        <p><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></p>
+        <p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>
+      </div>
       <p>${esc(o.description || "لا يوجد وصف إضافي.")}</p>
-      <h3>تواصل مع ليان عقار</h3>
-      <a href="tel:+${LAYAN_PHONE}">اتصال بليان</a>
-      <a target="_blank" rel="noopener noreferrer"
-        href="https://wa.me/${LAYAN_PHONE}?text=${encodeURIComponent(
-          "أنا مهتم بالعرض " + o.title + " - كود " + offerCode(o)
-        )}">واتساب ليان</a>
+      <h3>تواصل بشأن هذا العرض</h3>
+      <div class="details-contact">
+        <a class="btn btn-gold" href="tel:+${LAYAN_PHONE}">اتصال بليان</a>
+        <a class="btn btn-dark" target="_blank" rel="noopener noreferrer"
+          href="https://wa.me/${LAYAN_PHONE}?text=${encodeURIComponent(
+            "أنا مهتم بالعرض " + o.title + " - كود " + offerCode(o)
+          )}">واتساب ليان</a>
+      </div>
+      <p class="details-warning">تحقق من العقد والمستندات وموافقة المطوّر قبل دفع أي مبلغ.</p>
     `;
 
-    if (!d.open) d.showModal();
+    if (!d.open) {
+      if (typeof d.showModal === "function") d.showModal();
+      else d.setAttribute("open", "");
+    }
   }
 
   $("addOfferTop")?.addEventListener("click", openDialog);
