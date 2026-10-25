@@ -1063,3 +1063,39 @@ footer {
     font-size: 16px;
   }
 }
+
+/* LAYAN AQAR - Header refinement */
+@media (max-width: 520px) {
+  .topbar {
+    padding: 10px 14px;
+    gap: 9px;
+  }
+
+  .brand-logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    border-radius: 12px;
+  }
+
+  .topbar nav {
+    gap: 6px;
+    justify-content: space-between;
+  }
+
+  .topbar nav a {
+    font-size: 13px;
+    padding: 8px 5px;
+    white-space: nowrap;
+  }
+
+  .top-actions {
+    gap: 8px;
+  }
+
+  .top-actions .btn {
+    min-height: 42px;
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+}
