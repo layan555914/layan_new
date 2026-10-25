@@ -17,7 +17,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const n = Number(value);
     return Number.isFinite(n) && n >= 0 ? n : 0;
   };
-
+function offerCode(offer) {
+  const id = String(offer?.id || "");
+  if (!id) return "جارٍ تخصيص الكود";
+  return "LAY-" + id.replace(/-/g, "").slice(0, 8).toUpperCase();
+}
   const money = (value) =>
     num(value).toLocaleString("ar-EG", {
       maximumFractionDigits: 2
