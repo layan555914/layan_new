@@ -15,7 +15,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="buyer.css">\n  <link rel="stylesheet" href="sponsor.css">
+  <link rel="stylesheet" href="buyer.css">
+  <link rel="stylesheet" href="sponsor.css">
 </head>
 <body>
   <div class="install-app-banner" id="installAppBanner" hidden>
@@ -381,6 +382,29 @@
   <script src="config.js"></script>
   <script src="gubabase.js"></script>
   <script src="app.js"></script>
-  <script src="buyer.js"></script>\n  <script src="sponsor.js"></script>
+  <script src="buyer.js"></script>
+  <script src="sponsor.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+    let layanInstallPrompt;
+    const layanBanner = document.getElementById('installAppBanner');
+    const layanInstallButton = document.getElementById('installAppBtn');
+    const layanDismissButton = document.getElementById('dismissInstallBtn');
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      layanInstallPrompt = event;
+      if (layanBanner) layanBanner.hidden = false;
+    });
+    if (layanInstallButton) layanInstallButton.addEventListener('click', async () => {
+      if (!layanInstallPrompt) return;
+      layanInstallPrompt.prompt();
+      await layanInstallPrompt.userChoice;
+      layanInstallPrompt = null;
+      if (layanBanner) layanBanner.hidden = true;
+    });
+    if (layanDismissButton) layanDismissButton.addEventListener('click', () => { if (layanBanner) layanBanner.hidden = true; });
+  </script>
 </body>
 </html>
