@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let offers = [];
   let activeKind = "";
+  let selectedAccountType = "individual";
+  let selectedPromotionDuration = 15;
   const LAYAN_PHONE = "201007044265";
 
   const num = (v) => {
@@ -118,6 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .trim().toLowerCase();
     const type = $("typeFilter")?.value || "";
     const area = areaFilter?.value || "";
+    const companyQuery = ($("companySearchInput")?.value || "").trim().toLowerCase();
 
     const filtered = offers.filter((o) => {
       const text = [
@@ -126,6 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ].join(" ").toLowerCase();
 
       return (!search || text.includes(search)) &&
+        (!companyQuery || String(o.developer_name || "").toLowerCase().includes(companyQuery)) &&
         (!type || o.property_type === type) &&
         (!area || o.area === area) &&
         (!activeKind || o.property_type === activeKind);
@@ -193,7 +197,49 @@ document.addEventListener("DOMContentLoaded", async () => {
     }).join("");
   }
 
+  function updateAccountForm() {
+    const select = $("accountTypeSelect");
+    const companyField = $("companyNameField");
+    const companyInput = $("companyNameInput");
+    if (select) select.value = selectedAccountType;
+    if (companyField) companyField.hidden = selectedAccountType !== "company";
+    if (companyInput) {
+      companyInput.required = selectedAccountType === "company";
+      if (selectedAccountType !== "company") companyInput.value = "";
+    }
+  }
+
+  function updatePromotionNote() {
+    const plan = $("promotionPlanSelect")?.value || "standard";
+    const note = $("promotionPlanNote");
+    if (!note) return;
+    if (plan === "featured_15") note.textContent = "السعر 100 جنيه لمدة 15 يومًا. لا تحوّل أي مبلغ الآن؛ سيتم الإعلان عن وسيلة التحصيل الرسمية بعد تجهيزها.";
+    else if (plan === "featured_30") note.textContent = "السعر 200 جنيه لمدة 30 يومًا. لا تحوّل أي مبلغ الآن؛ التفعيل بعد مراجعة التحويل يدويًا.";
+    else note.textContent = "الإعلان العادي مجاني. طلب التمييز لا يفعّل الإعلان تلقائيًا.";
+  }
+
+  function renderCompanies() {
+    const companyGrid = $("companyGrid");
+    if (!companyGrid) return;
+    const query = ($("companySearchInput")?.value || "").trim().toLowerCase();
+    const groups = new Map();
+    offers.filter(o => o.developer_name && String(o.developer_name).trim()).forEach(o => {
+      const name = String(o.developer_name).trim();
+      const key = name.toLocaleLowerCase();
+      if (!groups.has(key)) groups.set(key, {name, count:0});
+      groups.get(key).count += 1;
+    });
+    const found = [...groups.values()].filter(c => !query || c.name.toLowerCase().includes(query));
+    companyGrid.innerHTML = found.length ? found.map(c => `
+      <article class="company-card"><h3>${esc(c.name)}</h3>
+      <p>${c.count} إعلان منشور</p>
+      <button class="btn btn-outline-dark" type="button" data-company-name="${esc(c.name)}">عرض عقارات الشركة</button></article>`
+    ).join("") : `<p class="company-empty">${query ? "لا توجد شركة بهذا الاسم ضمن العروض المنشورة حاليًا." : "لا توجد أسماء شركات مرتبطة بعروض منشورة حتى الآن."}</p>`;
+  }
+
   function openDialog() {
+    updateAccountForm();
+    updatePromotionNote();
     if (!dialog) {
       setStatus("نموذج الإضافة غير موجود في الصفحة.");
       return;
@@ -272,8 +318,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  $("addOfferTop")?.addEventListener("click", openDialog);
-  $("addOfferBtn")?.addEventListener("click", openDialog);
+  $("addOfferTop")?.addEventListener("click", () => { selectedAccountType = "individual"; openDialog(); });
+  $("addOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; openDialog(); });
+  document.querySelectorAll("[data-account-type]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedAccountType = button.dataset.accountType || "individual";
+      const duration = Number(button.dataset.promotionDuration);
+      if (duration === 15 || duration === 30) {
+        selectedPromotionDuration = duration;
+        const plan = $("promotionPlanSelect");
+        if (plan) plan.value = duration === 15 ? "featured_15" : "featured_30";
+      }
+      if (selectedAccountType === "company") {
+        $("companies")?.scrollIntoView({behavior:"smooth",block:"start"});
+        updateAccountForm();
+        return;
+      }
+      openDialog();
+    });
+  });
+  $("accountTypeSelect")?.addEventListener("change", event => {
+    selectedAccountType = event.target.value;
+    updateAccountForm();
+  });
+  $("promotionPlanSelect")?.addEventListener("change", updatePromotionNote);
+  $("companySearchInput")?.addEventListener("input", renderCompanies);
+  $("companySearchBtn")?.addEventListener("click", renderCompanies);
+  $("companyGrid")?.addEventListener("click", event => {
+    const button = event.target.closest("[data-company-name]");
+    if (!button) return;
+    const search = $("searchInput");
+    if (search) search.value = button.dataset.companyName;
+    const companySearch = $("companySearchInput");
+    if (companySearch) companySearch.value = "";
+    renderCompanies();
+    render();
+    $("offers")?.scrollIntoView({behavior:"smooth",block:"start"});
+  });
   $("closeDialog")?.addEventListener("click", closeDialog);
 
   dialog?.addEventListener("click", (event) => {
@@ -347,13 +428,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       discount_amount: amount("discount_amount"),
       discount_percent: amount("discount_percent"),
       contact_name: value("contact_name"),
-      developer_name: value("developer_name"),
+      developer_name: selectedAccountType === "company" ? value("developer_name") : "",
       contact_phone: value("contact_phone"),
-      featured_requested: value("promotion_plan") === "featured",
-      promotion_status: value("promotion_plan") === "featured" ? "requested" : "none",
+      featured_requested: value("promotion_plan") === "featured_15" || value("promotion_plan") === "featured_30",
+      promotion_status: (value("promotion_plan") === "featured_15" || value("promotion_plan") === "featured_30") ? "requested" : "none",
       is_featured: false,
       image_urls: []
     };
+
+    if (selectedAccountType === "company" && !offer.developer_name) {
+      setStatus("اكتب اسم الشركة العقارية.");
+      return;
+    }
 
     if (!offer.title) {
       setStatus("اكتب عنوان العرض أولًا.");
@@ -417,6 +503,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       offers = rows.map(normalize);
       updateAreaFilter();
+      renderCompanies();
       render();
 
       setStatus(
@@ -428,6 +515,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("خطأ تحميل العروض:", error);
       offers = [];
       updateAreaFilter();
+      renderCompanies();
       render();
       setStatus("تعذر تحميل العروض. راجع إعدادات الاتصال والصلاحيات.");
     }
