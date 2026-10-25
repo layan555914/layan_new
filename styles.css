@@ -1064,38 +1064,62 @@ footer {
   }
 }
 
-/* LAYAN AQAR - Header refinement */
+
+/* LAYAN AQAR - Final mobile header */
 @media (max-width: 520px) {
   .topbar {
-    padding: 10px 14px;
-    gap: 9px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .brand {
+    width: 100%;
+    gap: 10px;
   }
 
   .brand-logo {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
     object-fit: contain;
-    border-radius: 12px;
+  }
+
+  .brand strong {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  .brand small {
+    font-size: 10px;
   }
 
   .topbar nav {
-    gap: 6px;
+    order: 0;
+    width: 100%;
     justify-content: space-between;
+    gap: 4px;
   }
 
   .topbar nav a {
-    font-size: 13px;
-    padding: 8px 5px;
+    padding: 8px 3px;
+    font-size: 12px;
     white-space: nowrap;
   }
 
   .top-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+    width: 100%;
   }
 
   .top-actions .btn {
-    min-height: 42px;
-    padding: 10px 8px;
-    font-size: 14px;
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 6px;
+    font-size: 12px;
   }
 }
