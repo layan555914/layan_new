@@ -1486,3 +1486,72 @@ input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 
 .auth-form button{width:100%;min-height:46px}
 #loginBtn{max-width:100%;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:520px){.auth-dialog{padding:16px}.auth-dialog .details-dialog-header h2{font-size:18px}}
+
+
+/* LAYAN AQAR — unified visual system */
+:root{
+  --navy:#0a1d35;
+  --blue:#183b60;
+  --gold:#cba65c;
+  --gold-light:#f0dfb4;
+  --red:#a63746;
+  --bg:#f5f6f8;
+  --text:#1b2b40;
+  --muted:#69798c;
+  --border:#e3e7ed;
+  --shadow:0 12px 30px rgba(10,29,53,.08);
+}
+/* Preserve the original logo artwork and its natural colors. */
+.brand-logo{
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  object-fit:contain;
+}
+.topbar{color:#fff}
+.hero{color:#fff}
+.search-panel,.filters,.calculator-card,.pricing-card,.company-card,.audience-card,.how-card{
+  box-shadow:0 8px 24px rgba(10,29,53,.055);
+}
+.offer-card,.company-card,.how-card,.steps article,.audience-card,.pricing-card{
+  border-color:var(--border);
+}
+.offer-card h3,.section-heading h2,.how-section>h2,.pricing-card h3,.company-card h3{
+  color:var(--navy);
+}
+.offer-details>div,.details-info p{
+  background:#f4f6f9;
+  border:1px solid #e7ebf0;
+}
+.offer-details strong,.details-info strong{color:var(--navy)}
+.btn{border-radius:10px}
+.btn-gold{color:#10233b}
+input,select,textarea{border-color:#dbe2eb;background:#fff}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(203,166,92,.18);
+}
+.category{transition:background .18s,border-color .18s,color .18s}
+.category.active,.category:hover{background:var(--navy);border-color:var(--gold)}
+.sponsor-card{border:1px solid #d8bf83;background:linear-gradient(180deg,#fff 0%,#fffdf8 100%)}
+.sponsor-label{background:#f6edd8;color:#735721;border:1px solid #ead9b2}
+.pricing-card-featured{border:2px solid var(--gold);box-shadow:0 12px 28px rgba(203,166,92,.14)}
+.status-message,.form-note,.pricing-note,.sponsor-price-note{
+  border-right-color:var(--gold);
+  background:#fff8e9;
+  color:#68552f;
+}
+footer{background:linear-gradient(115deg,#07172b,#123556);border-top-color:var(--gold)}
+.mobile-nav{background:linear-gradient(110deg,#07172b,#123556);border-top-color:var(--gold)}
+.mobile-nav span{color:var(--gold-light)}
+.btn:focus-visible,button:focus-visible,a:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:3px;
+}
+@media(max-width:700px){
+  .offer-card{border-radius:16px}
+  .offer-image{background:#e9edf3}
+  .launch-campaign{box-shadow:0 12px 28px rgba(10,29,53,.12)}
+}
