@@ -44,9 +44,9 @@
       "total_price",
       "down_payment",
       "paid_amount",
-      "remaining_installments",
-      "transfer_fee",
-      "transfer_fee_percentage",
+      "remaining_amount",
+      "assignment_fee",
+      "assignment_fee_percentage",
       "discount_amount",
       "developer_name",
       "image_urls",
@@ -56,7 +56,7 @@
 
     const rows = await request(
       `property_offers?select=${fields}` +
-      "&status=eq.published&order=created_at.desc"
+      "&status=eq.available&order=created_at.desc"
     );
 
     return Array.isArray(rows) ? rows : [];
@@ -121,15 +121,17 @@
       total_price: Number(offer.total_price || 0),
       down_payment: Number(offer.down_payment || 0),
       paid_amount: Number(offer.paid_amount || 0),
-      remaining_installments: Number(
-        offer.remaining_installments || 0
+      remaining_amount: Number(
+        offer.remaining_amount ?? offer.remaining_installments ?? 0
       ),
-      transfer_fee: Number(offer.transfer_fee || 0),
-      transfer_fee_percentage: Number(
-        offer.transfer_fee_percentage || 0
+      assignment_fee: Number(offer.assignment_fee ?? offer.transfer_fee ?? 0),
+      assignment_fee_percentage: Number(
+        offer.assignment_fee_percentage ?? offer.transfer_fee_percentage ?? 0
       ),
       discount_amount: Number(offer.discount_amount || 0),
       developer_name: offer.developer_name || null,
+      contact_name: offer.contact_name || null,
+      discount_percent: Number(offer.discount_percent || 0),
       contact_phone: offer.contact_phone || null,
       image_urls: Array.isArray(offer.image_urls)
         ? offer.image_urls
