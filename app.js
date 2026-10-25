@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       description: row.description || "",
       developer_name: row.developer_name || "",
       image_urls: images.filter(
-        (url) => typeof url === "string" && /^https?:\/\//i.test(url)
+        (url) => typeof url === "string" && (/^https?:\/\//i.test(url) || /^assets\//i.test(url))
       ),
       status: row.status || "pending"
     };
