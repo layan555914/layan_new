@@ -1187,3 +1187,31 @@ footer {
   .calculator-card { grid-template-columns: 1fr; }
   .calculator-results { grid-template-columns: 1fr; }
 }
+
+
+/* Paid featured listings */
+.featured-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 0 0 8px;
+  padding: 4px 10px;
+  border: 1px solid #c5a15d;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff8e7, #ead9b2);
+  color: #102746;
+  font-family: "Cairo", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+}
+#offerForm label small {
+  display: block;
+  margin-top: 5px;
+  color: #718096;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.offer-card:has(.featured-badge) {
+  border: 2px solid #c5a15d;
+  box-shadow: 0 12px 28px rgba(197, 161, 93, .18);
+}
