@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", async () => {
   "use strict";
 
@@ -12,6 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let offers = [];
   let activeKind = "";
+  const LAYAN_PHONE = "201007044265";
 
   const num = (value) => {
     const n = Number(value);
@@ -36,23 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (status) status.textContent = message;
   }
 
-  function normalizePhone(value) {
-    return String(value || "").trim().replace(/[^\d+]/g, "");
-  }
-
-  function whatsappPhone(value) {
-    let phone = normalizePhone(value).replace(/\+/g, "");
-
-    if (phone.startsWith("01") && phone.length === 11) {
-      phone = "2" + phone;
-    } else if (phone.startsWith("1") && phone.length === 10) {
-      phone = "20" + phone;
-    }
-
-    return phone;
-  }
-
-  // حساب الخصم على المبلغ المدفوع من العميل الأصلي.
   function calculateDiscount(paidAmount, discountPercent) {
     return Math.round(
       num(paidAmount) * num(discountPercent) / 100 * 100
@@ -78,7 +61,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       num(row.discount_percent)
     );
 
-    // النسبة هي أساس الحساب، وليست قيمة الخصم القديمة المخزنة.
     const discountAmount = calculateDiscount(
       paidAmount,
       discountPercent
@@ -104,7 +86,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       ),
       discount_amount: discountAmount,
       discount_percent: discountPercent,
-      net_paid_amount: Math.max(0, paidAmount - discountAmount),
+      net_paid_amount: Math.max(
+        0,
+        paidAmount - discountAmount
+      ),
       bedrooms: num(row.bedrooms),
       bathrooms: num(row.bathrooms),
       area_m2: num(row.area_m2),
@@ -162,7 +147,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const content = $("detailsContent");
 
     if (!content || !offer) return;
-
     if (title) title.textContent = offer.title;
 
     const images = offer.image_urls.length
@@ -214,47 +198,40 @@ document.addEventListener("DOMContentLoaded", async () => {
       fields.push(["المطور العقاري", offer.developer_name]);
     }
 
-    const phone = normalizePhone(offer.contact_phone);
-    const waPhone = whatsappPhone(offer.contact_phone);
+    // التواصل يتجه إلى إدارة ليان فقط.
+    // رقم واتساب والاتصال بصيغة دولية مصرية.
+    const contact = `
+      <section class="details-contact">
+        <h3>تواصل مع ليان عقار</h3>
+        <p>
+          للاستفسار عن هذا العرض والتنسيق مع صاحبه،
+          تواصل مع إدارة ليان.
+        </p>
 
-    const contact = phone
-      ? `
-        <section class="details-contact">
-          <h3>التواصل مع صاحب العرض</h3>
-          ${
-            offer.contact_name
-              ? `<p class="contact-name">${esc(offer.contact_name)}</p>`
-              : ""
-          }
-          <p class="contact-phone" dir="ltr">${esc(phone)}</p>
-          <div class="contact-actions">
-            <a class="contact-button call-button"
-               href="tel:${esc(phone)}">
-              ☎ اتصال مباشر
-            </a>
-            ${
-              waPhone
-                ? `
-                  <a class="contact-button whatsapp-button"
-                     href="https://wa.me/${encodeURIComponent(waPhone)}?text=${encodeURIComponent(
-                       "مرحبًا، أنا مهتم بعرض العقار: " + offer.title
-                     )}"
-                     target="_blank"
-                     rel="noopener noreferrer">
-                    واتساب
-                  </a>
-                `
-                : ""
-            }
-          </div>
-        </section>
-      `
-      : `
-        <section class="details-contact">
-          <h3>التواصل مع صاحب العرض</h3>
-          <p>لم يضف صاحب العرض رقم هاتف للتواصل.</p>
-        </section>
-      `;
+        <div class="contact-actions">
+          <a
+            class="contact-button call-button"
+            href="tel:+${LAYAN_PHONE}"
+          >
+            ☎ اتصال بليان
+          </a>
+
+          <a
+            class="contact-button whatsapp-button"
+            href="https://wa.me/${LAYAN_PHONE}?text=${encodeURIComponent(
+              "السلام عليكم، أنا مهتم بعرض العقار: " +
+              offer.title +
+              ". أرجو التواصل معي وتوضيح التفاصيل. كود العرض: " +
+              (offer.id || "غير متاح")
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            واتساب ليان
+          </a>
+        </div>
+      </section>
+    `;
 
     content.innerHTML = `
       ${images}
@@ -322,7 +299,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         `<option value="${esc(area)}">${esc(area)}</option>`
       ).join("");
 
-    if (areas.includes(current)) areaFilter.value = current;
+    if (areas.includes(current)) {
+      areaFilter.value = current;
+    }
   }
 
   function render() {
@@ -368,10 +347,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${
             image
               ? `
-                <img class="offer-image"
-                     src="${esc(image)}"
-                     alt="${esc(offer.title)}"
-                     loading="lazy">
+                <img
+                  class="offer-image"
+                  src="${esc(image)}"
+                  alt="${esc(offer.title)}"
+                  loading="lazy"
+                >
               `
               : `
                 <div class="offer-image offer-image-placeholder">
@@ -527,6 +508,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       100,
       num(get("discount_percent"))
     );
+
     const discountAmount = calculateDiscount(
       paidAmount,
       discountPercent
@@ -748,15 +730,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     .details-description p {
       white-space: pre-wrap;
       overflow-wrap: anywhere;
-    }
-
-    .contact-name {
-      font-weight: 700;
-    }
-
-    .contact-phone {
-      font-size: 18px;
-      font-weight: 700;
     }
 
     .contact-actions {
