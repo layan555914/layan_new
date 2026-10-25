@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const form = $("offerForm");
   const dialog = $("offerDialog");
   const statusBox = $("statusMessage");
+  const formStatusBox = $("formStatusMessage");
   const photosInput = $("photosInput");
   const areaFilter = $("areaFilter");
 
@@ -42,6 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function setStatus(message) {
     if (statusBox) statusBox.textContent = message;
+    if (formStatusBox) formStatusBox.textContent = message;
   }
 
   function normalize(row = {}) {
@@ -68,9 +70,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       total_price: num(row.total_price),
       down_payment: num(row.down_payment),
       paid_amount: paid,
-      remaining_installments: num(row.remaining_installments),
-      transfer_fee: num(row.transfer_fee),
-      transfer_fee_percentage: num(row.transfer_fee_percentage),
+      remaining_amount: num(row.remaining_amount ?? row.remaining_installments),
+      assignment_fee: num(row.assignment_fee ?? row.transfer_fee),
+      assignment_fee_percentage: num(row.assignment_fee_percentage ?? row.transfer_fee_percentage),
       discount_amount: discount,
       description: row.description || "",
       developer_name: row.developer_name || "",
@@ -160,10 +162,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <strong>${money(o.down_payment)}</strong></div>
               <div><span>المبلغ المدفوع</span>
                 <strong>${money(o.paid_amount)}</strong></div>
-              <div><span>الأقساط المتبقية</span>
-                <strong>${money(o.remaining_installments)}</strong></div>
+              <div><span>المبلغ المتبقي</span>
+                <strong>${money(o.remaining_amount)}</strong></div>
               <div><span>رسوم التنازل</span>
-                <strong>${money(o.transfer_fee)}</strong></div>
+                <strong>${money(o.assignment_fee)}</strong></div>
             </div>
             <button type="button"
               class="details-button"
@@ -285,10 +287,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       total_price: amount("total_price"),
       down_payment: amount("down_payment"),
       paid_amount: amount("paid_amount"),
-      remaining_installments: amount("remaining_installments"),
-      transfer_fee: amount("transfer_fee"),
-      transfer_fee_percentage: amount("transfer_fee_percentage"),
+      remaining_amount: amount("remaining_installments"),
+      assignment_fee: amount("transfer_fee"),
+      assignment_fee_percentage: 0,
       discount_amount: amount("discount_amount"),
+      discount_percent: amount("discount_percent"),
+      contact_name: value("contact_name"),
       developer_name: value("developer_name"),
       contact_phone: value("contact_phone"),
       image_urls: []
