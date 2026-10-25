@@ -447,13 +447,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>
       </div>
       <p>${esc(o.description || "لا يوجد وصف إضافي.")}</p>
-      <h3>تواصل بشأن هذا العرض</h3>
+      <h3>تواصل مباشرة مع صاحب الإعلان</h3>
+      <p>ليان منصة إعلانات فقط؛ التواصل والاتفاق يتمان مباشرة بين المعلن والمهتم بالعقار.</p>
       <div class="details-contact">
-        <a class="btn btn-gold" href="tel:+${LAYAN_PHONE}">اتصال بليان</a>
+        ${o.contact_phone ? `<a class="btn btn-gold" href="tel:${esc(String(o.contact_phone).replace(/[^0-9+]/g, ""))}">اتصال بصاحب الإعلان</a>
         <a class="btn btn-dark" target="_blank" rel="noopener noreferrer"
-          href="https://wa.me/${LAYAN_PHONE}?text=${encodeURIComponent(
-            "أنا مهتم بالعرض " + o.title + " - كود " + offerCode(o)
-          )}">واتساب ليان</a>
+          href="https://wa.me/${String(o.contact_phone).replace(/[^0-9]/g, "").replace(/^0/, "2")}?text=${encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + o.title + " - كود " + offerCode(o) + "، من منصة LAYAN AQAR.")}">واتساب صاحب الإعلان</a>` : `<p class="details-warning">لم يضف صاحب الإعلان رقم تواصل؛ يمكنك الرجوع لاحقًا أو اختيار عرض آخر.</p>`}
       </div>
       <p class="details-warning">تحقق من العقد والمستندات وموافقة المطوّر قبل دفع أي مبلغ.</p>
     `;
