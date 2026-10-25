@@ -459,8 +459,7 @@ function offerCode(offer) {
     if (!button) return;
 
     const index = Number(button.dataset.offerIndex);
-
-      document.querySelectorAll("[data-kind]").forEach((button) => {
+  document.querySelectorAll("[data-kind]").forEach((button) => {
     button.addEventListener("click", () => {
       activeKind = button.dataset.kind || "";
 
@@ -473,7 +472,6 @@ function offerCode(offer) {
   });
 
   form?.addEventListener("submit", async (event) => {
-
   $("addOfferTop")?.addEventListener("click", openDialog);
   $("addOfferBtn")?.addEventListener("click", openDialog);
   $("closeDialog")?.addEventListener("click", closeDialog);
