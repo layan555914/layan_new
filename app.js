@@ -494,9 +494,11 @@ function offerCode(offer) {
         item.classList.toggle("active", item === button);
       });
 
-      render();
-    });
-  });
+      <span class="offer-type">${esc(offer.property_type)}</span>
+<p class="offer-code">
+  كود الإعلان: <strong>${esc(offerCode(offer))}</strong>
+</p>
+<h3>${esc(offer.title)}</h3>
 
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
