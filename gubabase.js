@@ -51,6 +51,10 @@
       "developer_name",
       "image_urls",
       "status",
+      "featured_requested",
+      "is_featured",
+      "featured_until",
+      "promotion_status",
       "created_at"
     ].join(",");
 
@@ -136,6 +140,9 @@
       image_urls: Array.isArray(offer.image_urls)
         ? offer.image_urls
         : [],
+      featured_requested: offer.featured_requested === true,
+      is_featured: false,
+      promotion_status: offer.featured_requested === true ? "requested" : "none",
       status: "pending"
     };
 
