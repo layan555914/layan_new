@@ -329,11 +329,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const plan = $("promotionPlanSelect");
         if (plan) plan.value = duration === 15 ? "featured_15" : "featured_30";
       }
-      if (selectedAccountType === "company") {
-        $("companies")?.scrollIntoView({behavior:"smooth",block:"start"});
-        updateAccountForm();
-        return;
-      }
       openDialog();
     });
   });
