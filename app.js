@@ -428,37 +428,16 @@ function offerCode(offer) {
             ${
               offer.developer_name
                 ? `<p>المطور: ${esc(offer.developer_name)}</p>`
-                : ""
-            }
-
-            ${
-              offer.description
-                ? `<p class="offer-description">${esc(offer.description)}</p>`
-                : ""
-            }
-
-            <p class="form-note">
-              تحقق من شروط المطور قبل إتمام التنازل.
-            </p>
-
-            <button
-              class="btn btn-dark full-width"
-              type="button"
-              data-offer-index="${offers.indexOf(offer)}"
-            >
-              عرض التفاصيل
-            </button>
-          </div>
-        </article>
-      `;
-    }).join("");
-  }
-
-  grid?.addEventListener("click", (event) => {
+  $("addOfferTop")?.addEventListener("click", openDialog);grid?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-offer-index]");
     if (!button) return;
 
     const index = Number(button.dataset.offerIndex);
+    if (Number.isInteger(index) && offers[index]) {
+      openDetails(offers[index]);
+    }
+  });
+
   document.querySelectorAll("[data-kind]").forEach((button) => {
     button.addEventListener("click", () => {
       activeKind = button.dataset.kind || "";
@@ -472,7 +451,6 @@ function offerCode(offer) {
   });
 
   form?.addEventListener("submit", async (event) => {
-  $("addOfferTop")?.addEventListener("click", openDialog);
   $("addOfferBtn")?.addEventListener("click", openDialog);
   $("closeDialog")?.addEventListener("click", closeDialog);
 
