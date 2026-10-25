@@ -60,6 +60,14 @@
     normalizeSession(data);
     return { user: data?.user || null, session: session, needsEmailConfirmation: !data?.access_token };
   }
+  async function resendConfirmation(email) {
+    const redirectTo = window.location.origin + window.location.pathname;
+    return authRequest("resend", {
+      type: "signup",
+      email: email.trim(),
+      options: { emailRedirectTo: redirectTo }
+    });
+  }
   async function signIn(email, password) {
     const data = await authRequest("token?grant_type=password", { email: email.trim(), password });
     normalizeSession(data);
@@ -156,6 +164,6 @@
     });
     return Array.isArray(rows) ? rows[0] : rows;
   }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, isAuthenticated, getMyOffers, getOffers, uploadImages, createOffer };
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, isAuthenticated, getMyOffers, getOffers, uploadImages, createOffer, resendConfirmation };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
