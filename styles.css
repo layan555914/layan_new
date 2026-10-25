@@ -206,9 +206,12 @@ a {
 }
 
 .hero h1 {
-  margin: 8px 0 18px;
-  font-size: clamp(29px, 5vw, 48px);
-  line-height: 1.5;
+  margin: 8px 0 14px;
+  font-family: "Cairo", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
+  font-size: clamp(25px, 3.8vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.4;
 }
 
 .hero h1 span {
