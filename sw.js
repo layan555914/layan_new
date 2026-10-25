@@ -1,5 +1,5 @@
 const CACHE_NAME = "layan-aqar-shell-v1";
-const APP_SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.json", "./icon.svg"];
+const APP_SHELL = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.json", "./file_000000004bbc821184c084bfa178e416.jpg"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
 });
