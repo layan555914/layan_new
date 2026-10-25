@@ -131,6 +131,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!activeKind || o.property_type === activeKind);
     });
 
+    filtered.sort((a, b) => {
+      const aFeatured = a.is_featured && (!a.featured_until || new Date(a.featured_until) > new Date());
+      const bFeatured = b.is_featured && (!b.featured_until || new Date(b.featured_until) > new Date());
+      return Number(bFeatured) - Number(aFeatured) ||
+        new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    });
+
     if (!filtered.length) {
       grid.innerHTML = `
         <div class="empty-state">
@@ -157,6 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                  </div>`
           }
           <div class="offer-card-content">
+            ${o.is_featured && (!o.featured_until || new Date(o.featured_until) > new Date()) ? '<span class="featured-badge">★ عرض مميز</span>' : ''}
             <span class="offer-type">${esc(o.property_type)}</span>
             <p class="offer-code">كود الإعلان:
               <strong>${esc(offerCode(o))}</strong>
@@ -322,6 +330,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       contact_name: value("contact_name"),
       developer_name: value("developer_name"),
       contact_phone: value("contact_phone"),
+      featured_requested: value("promotion_plan") === "featured",
+      promotion_status: value("promotion_plan") === "featured" ? "requested" : "none",
+      is_featured: false,
       image_urls: []
     };
 
@@ -360,7 +371,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       form.reset();
       closeDialog();
-      setStatus("تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
+      setStatus(offer.featured_requested
+        ? "تم إرسال العرض وطلب التمييز. لن يظهر كمميز إلا بعد مراجعة ليان وتأكيد الدفع. للتنسيق اتصل بإدارة ليان على 01007044265."
+        : "تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
       setStatus(error.message || "فشل الحفظ. راجع إعدادات Supabase.");
