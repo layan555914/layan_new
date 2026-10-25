@@ -460,20 +460,19 @@ function offerCode(offer) {
 
     const index = Number(button.dataset.offerIndex);
 
-    if (Number.isInteger(index) && offers[index]) {
-      openDetails(offers[index]);
-    }
+      document.querySelectorAll("[data-kind]").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeKind = button.dataset.kind || "";
+
+      document.querySelectorAll("[data-kind]").forEach((item) => {
+        item.classList.toggle("active", item === button);
+      });
+
+      render();
+    });
   });
 
-  function openDialog() {
-    if (dialog && !dialog.open && dialog.showModal) {
-      dialog.showModal();
-    }
-  }
-
-  function closeDialog() {
-    if (dialog?.open) dialog.close();
-  }
+  form?.addEventListener("submit", async (event) => {
 
   $("addOfferTop")?.addEventListener("click", openDialog);
   $("addOfferBtn")?.addEventListener("click", openDialog);
