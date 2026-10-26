@@ -1,4 +1,4 @@
-const CACHE_NAME = "layan-aqar-shell-v10";
+const CACHE_NAME = "layan-aqar-shell-v11";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -12,7 +12,6 @@ const APP_SHELL = [
   "./sponsor.js",
   "./manifest.json",
   "./pwa.js",
-  "./icon.svg",
   "./icon.svg",
   "./file_000000004bbc821184c084bfa178e416.jpg"
 ];
