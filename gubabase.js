@@ -172,6 +172,7 @@
     });
     return Array.isArray(rows) ? rows[0] : rows;
   }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, isAuthenticated, getMyOffers, getOffers, uploadImages, createOffer, resendConfirmation };
+  function getSession() { return session; }
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, getMyOffers, getOffers, uploadImages, createOffer, resendConfirmation };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
