@@ -115,9 +115,17 @@
     if (!isAuthenticated()) throw new Error("سجّل الدخول أولًا قبل رفع صور العرض.");
     const uploaded = [];
     for (const file of files || []) {
-      if (!file.type.startsWith("image/")) throw new Error("اختر ملفات صور فقط.");
-      if (file.size > 10 * 1024 * 1024) throw new Error("حجم الصورة يجب ألا يتجاوز 10 ميجابايت.");
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      // Restrict uploads to real JPEG files; the storage bucket and public-read rules are JPEG-oriented.
+      if (file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name)) {
+        throw new Error("لأمان المنصة، ارفع الصور بصيغة JPG أو JPEG فقط.");
+      }
+      if (file.size > 5 * 1024 * 1024) throw new Error("حجم الصورة يجب ألا يتجاوز 5 ميجابايت.");
+      if (file.size < 4) throw new Error("ملف الصورة غير صالح.");
+      const signature = new Uint8Array(await file.slice(0, 3).arrayBuffer());
+      if (signature[0] !== 0xFF || signature[1] !== 0xD8 || signature[2] !== 0xFF) {
+        throw new Error("محتوى الملف لا يبدو صورة JPEG سليمة.");
+      }
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/\.jpe?g$/i, "") + ".jpg";
       const uniqueId = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2);
       const path = "offers/" + session.user.id + "/" + Date.now() + "-" + uniqueId + "-" + safeName;
       const response = await fetch(url + "/storage/v1/object/" + bucket + "/" + path, {
