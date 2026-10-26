@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="buyer.css">
   <link rel="stylesheet" href="sponsor.css">
+  <link rel="stylesheet" href="ai.css">
 </head>
 <body>
   <div class="install-app-banner" id="installAppBanner" hidden>
@@ -68,6 +69,20 @@
       </div>
     </section>
 
+
+    <section class="layan-ai-section" id="layan-ai" aria-labelledby="layanAiTitle">
+      <div class="layan-ai-head"><div><h2 id="layanAiTitle">مساعد ليان الذكي</h2><p>ابحث عن الفرصة المناسبة، أو افتح أدوات الإرشاد الإداري للحسابات المخوّلة.</p></div><span aria-hidden="true">✦ LAYAN AI</span></div>
+      <div class="layan-ai-tabs" role="group" aria-label="نوع المساعد">
+        <button type="button" data-ai-mode="search" aria-pressed="true">مساعد البحث العقاري</button>
+        <button type="button" data-ai-mode="admin" aria-pressed="false">مساعد الإدارة</button>
+      </div>
+      <form id="layanAiForm" class="layan-ai-form">
+        <textarea id="layanAiPrompt" maxlength="1200" required placeholder="مثال: عايز شقة في أسيوط بمقدم أقل من 300 ألف..." aria-label="اكتب سؤالك لمساعد ليان"></textarea>
+        <button class="btn btn-gold" id="layanAiSend" type="submit">اسأل ليان</button>
+      </form>
+      <div id="layanAiAnswer" class="layan-ai-answer" role="status" aria-live="polite"></div>
+      <small class="layan-ai-note">الإجابات مساعدة وليست ضمانًا لصحة الإعلان. تحقق من التفاصيل مباشرة مع صاحب العرض. مساعد الإدارة محمي بصلاحية إدارية على الخادم.</small>
+    </section>
     <section class="launch-campaign" id="free-launch" aria-labelledby="launchCampaignTitle">
       <div class="launch-campaign-copy">
         <span class="launch-pill">حملة ما قبل الإطلاق</span>
@@ -386,6 +401,7 @@
   <script src="app.js"></script>
   <script src="buyer.js"></script>
   <script src="sponsor.js"></script>
+  <script src="ai.js"></script>
   <script src="pwa.js" defer></script>
 </body>
 </html>
