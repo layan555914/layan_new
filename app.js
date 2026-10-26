@@ -602,13 +602,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const files = Array.from(photosInput?.files || []);
-    if (files.some((f) => !f.type.startsWith("image/"))) {
-      setStatus("اختر ملفات صور فقط.");
+    if (offer.total_price <= 0) {
+      setStatus("اكتب إجمالي سعر صحيحًا أكبر من صفر.");
       return;
     }
-    if (files.some((f) => f.size > 10 * 1024 * 1024)) {
-      setStatus("حجم الصورة الواحدة يجب ألا يتجاوز 10 ميجابايت.");
+    if (offer.down_payment < 0 || offer.down_payment > offer.total_price) {
+      setStatus("المقدم يجب أن يكون بين صفر وإجمالي السعر.");
+      return;
+    }
+    if (offer.paid_amount < 0 || offer.paid_amount > offer.total_price) {
+      setStatus("المبلغ المدفوع يجب ألا يتجاوز إجمالي السعر.");
+      return;
+    }
+
+    const files = Array.from(photosInput?.files || []);
+    if (files.some((file) => file.type !== "image/jpeg" || !/\\.jpe?g$/i.test(file.name))) {
+      setStatus("لأمان المنصة، ارفع الصور بصيغة JPG أو JPEG فقط.");
+      return;
+    }
+    if (files.some((file) => file.size > 5 * 1024 * 1024)) {
+      setStatus("حجم الصورة الواحدة يجب ألا يتجاوز 5 ميجابايت.");
       return;
     }
 
