@@ -331,7 +331,8 @@ document.addEventListener("DOMContentLoaded", async () => {
               <strong>${esc(offerCode(o))}</strong>
             </p>
             <h3>${esc(o.title)}</h3>
-            <p>${esc(o.area || "أسيوط")}</p>
+            <p class="offer-location">${esc([o.city, o.area].filter(Boolean).join(" · ") || "أسيوط")}</p>
+            ${(o.area_m2 || o.bedrooms || o.bathrooms) ? `<p class="offer-specs">${o.area_m2 ? `المساحة ${esc(o.area_m2)} م²` : ""}${o.bedrooms ? ` · غرف ${esc(o.bedrooms)}` : ""}${o.bathrooms ? ` · حمامات ${esc(o.bathrooms)}` : ""}</p>` : ""}
             <div class="offer-details">
               <div><span>السعر الإجمالي</span>
                 <strong>${money(o.total_price)}</strong></div>
@@ -341,6 +342,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <strong>${money(o.paid_amount)}</strong></div>
               <div><span>المبلغ المتبقي</span>
                 <strong>${money(o.remaining_amount)}</strong></div>
+              ${o.monthly_installment ? `<div><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></div>` : ""}
               <div><span>رسوم التنازل</span>
                 <strong>${money(o.assignment_fee)}</strong></div>
             </div>
