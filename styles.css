@@ -1667,3 +1667,13 @@ footer{background:linear-gradient(115deg,#07172b,#123556);border-top-color:var(-
 .social-link:hover{transform:translateY(-2px);filter:brightness(1.08)}
 .social-link:focus-visible{outline:3px solid #f0dfb4;outline-offset:3px}
 @media(max-width:520px){.social-links{gap:10px}.social-link{flex:1;max-width:190px;padding:10px 12px}.social-links-title{font-size:13px}}
+
+
+/* Compact social links in LAYAN footer */
+.social-links{gap:8px}
+.social-link{min-height:34px;padding:7px 11px;gap:6px;font-size:13px}
+.social-link svg{width:16px;height:16px;flex:0 0 16px}
+@media(max-width:520px){
+  .social-link{flex:0 1 auto;max-width:none;min-height:32px;padding:7px 10px;font-size:12px}
+  .social-link svg{width:15px;height:15px;flex-basis:15px}
+}
