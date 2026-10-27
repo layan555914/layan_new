@@ -308,8 +308,28 @@
       </label>
 
       <label>
+        المدينة / المركز
+        <input name="city" type="text" placeholder="مثال: مدينة أسيوط أو القوصية">
+      </label>
+
+      <label>
         المنطقة
-        <input name="area" type="text">
+        <input name="area" type="text" placeholder="اسم الحي أو المنطقة">
+      </label>
+
+      <label>
+        مساحة الوحدة (م²)
+        <input name="area_m2" type="number" min="0" step="0.1" inputmode="decimal">
+      </label>
+
+      <label>
+        عدد غرف النوم
+        <input name="bedrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
+      </label>
+
+      <label>
+        عدد الحمامات
+        <input name="bathrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
       </label>
 
       <label>
@@ -333,8 +353,18 @@
       </label>
 
       <label>
+        القسط الشهري (إن وجد)
+        <input name="monthly_installment" type="number" min="0" step="0.01" inputmode="decimal">
+      </label>
+
+      <label>
         رسوم التنازل
         <input name="transfer_fee" type="number" min="0">
+      </label>
+
+      <label>
+        قيمة الخصم بالجنيه (إن وجدت)
+        <input name="discount_amount" type="number" min="0" step="0.01" inputmode="decimal">
       </label>
 
       <label>
