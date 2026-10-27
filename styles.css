@@ -1677,3 +1677,28 @@ footer{background:linear-gradient(115deg,#07172b,#123556);border-top-color:var(-
   .social-link{flex:0 1 auto;max-width:none;min-height:32px;padding:7px 10px;font-size:12px}
   .social-link svg{width:15px;height:15px;flex-basis:15px}
 }
+
+
+/* Strong override: make footer social icons tiny */
+footer.footer .social-links .social-link svg,
+footer.footer .social-links .social-link img{
+  width:12px !important;
+  height:12px !important;
+  min-width:12px !important;
+  min-height:12px !important;
+  max-width:12px !important;
+  max-height:12px !important;
+  flex:0 0 12px !important;
+}
+footer.footer .social-links .social-link{
+  min-height:28px !important;
+  padding:5px 8px !important;
+  gap:4px !important;
+  font-size:11px !important;
+  line-height:1 !important;
+}
+footer.footer .social-links{gap:6px !important}
+@media(max-width:520px){
+  footer.footer .social-links .social-link{flex:0 1 auto !important;max-width:none !important;padding:5px 7px !important;font-size:10px !important}
+  footer.footer .social-links .social-link svg{width:11px !important;height:11px !important;flex-basis:11px !important}
+}
