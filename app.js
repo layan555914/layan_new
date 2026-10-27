@@ -701,7 +701,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const config = window.LAYAN_CONFIG || {};
     if (!section || !config.SUPABASE_URL || !config.SUPABASE_PUBLISHABLE_KEY) return;
     try {
-      const base = config.SUPABASE_URL.replace(/\\/$/, "");
+      const base = config.SUPABASE_URL.replace(/\/$/, "");
       const response = await fetch(base + "/rest/v1/partner_ad_slots?select=slot_key,category,title,description,is_free_trial,status&status=eq.active&order=display_order.asc", {
         headers: { apikey: config.SUPABASE_PUBLISHABLE_KEY, Authorization: "Bearer " + config.SUPABASE_PUBLISHABLE_KEY }
       });
