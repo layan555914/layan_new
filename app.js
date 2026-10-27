@@ -693,6 +693,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  window.addEventListener("layan-auth-callback", event => {
+    if (event.detail?.success) {
+      updateAuthButton();
+      setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في ليان.");
+    } else if (event.detail?.message) {
+      setStatus("تعذر إكمال تأكيد البريد. جرّب فتح رابط التأكيد مرة أخرى أو سجّل الدخول بعد التأكيد.");
+      console.warn("LAYAN auth callback:", event.detail.message);
+    }
+  });
   updateAuthButton();
   await loadOffers();
 });
