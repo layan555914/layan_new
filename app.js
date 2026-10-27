@@ -151,6 +151,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     button.textContent = user ? "خروج (" + (user.email || "حسابي") + ")" : "تسجيل الدخول";
     button.title = user ? "اضغط لتسجيل الخروج" : "تسجيل الدخول أو إنشاء حساب";
   }
+  window.addEventListener("layan:auth-ready", () => {
+    updateAuthButton();
+    setStatus("تم تأكيد بريدك الإلكتروني وتسجيل دخولك بنجاح. أهلًا بك في ليان.");
+  });
   function openAuth(mode = "login") {
     const d = ensureAuthDialog();
     d._setMode(mode);
