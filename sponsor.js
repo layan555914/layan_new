@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(payload)
       });
       form.reset();
-      status.textContent = "تم إرسال الطلب بنجاح. يبدأ الشهر المجاني من وقت الإرسال ويستمر 30 يومًا حتى أثناء المراجعة. لن تُحصّل رسوم بعده دون موافقتك. النشر بعد موافقة الإدارة.";
+      status.textContent = "تم إرسال الطلب بنجاح للمراجعة. تبدأ التجربة المجانية لمدة 30 يومًا بعد موافقة الإدارة وتفعيل الإعلان. لن تُحصّل رسوم بعد التجربة دون موافقتك.";
     } catch (error) {
       status.textContent = error.message || "تعذر إرسال الطلب. حاول مرة أخرى.";
     } finally {
