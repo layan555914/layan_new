@@ -111,6 +111,38 @@
     }
     saveSession(null);
   }
+  async function consumeAuthCallback() {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const accessToken = hash.get("access_token");
+    const refreshToken = hash.get("refresh_token");
+    const authError = hash.get("error_description") || hash.get("error");
+    if (authError) {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      window.dispatchEvent(new CustomEvent("layan-auth-callback", { detail: { success: false, message: authError } }));
+      return;
+    }
+    if (!accessToken) return;
+    try {
+      const response = await fetch(url + "/auth/v1/user", {
+        headers: { apikey: key, Authorization: "Bearer " + accessToken }
+      });
+      const user = await readResponse(response);
+      saveSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        token_type: hash.get("token_type") || "bearer",
+        expires_at: hash.get("expires_at") ? Number(hash.get("expires_at")) :
+          (hash.get("expires_in") ? Math.floor(Date.now()/1000) + Number(hash.get("expires_in")) : null),
+        user
+      });
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      window.dispatchEvent(new CustomEvent("layan-auth-callback", { detail: { success: true } }));
+    } catch (error) {
+      console.error("LAYAN: تعذر إكمال تأكيد البريد:", error);
+      window.dispatchEvent(new CustomEvent("layan-auth-callback", { detail: { success: false, message: error.message } }));
+    }
+  }
+  consumeAuthCallback();
   function getUser() { return session?.user || null; }
   function isAuthenticated() { return Boolean(session?.access_token && session?.user?.id); }
 
