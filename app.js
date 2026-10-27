@@ -620,7 +620,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const files = Array.from(photosInput?.files || []);
-    if (files.some((file) => file.type !== "image/jpeg" || !/\\.jpe?g$/i.test(file.name))) {
+    if (files.some((file) => file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name))) {
       setStatus("لأمان المنصة، ارفع الصور بصيغة JPG أو JPEG فقط.");
       return;
     }
