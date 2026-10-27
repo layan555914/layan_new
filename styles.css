@@ -1626,3 +1626,44 @@ footer{background:linear-gradient(115deg,#07172b,#123556);border-top-color:var(-
  .partner-free-note{width:100%}
  .partner-ad-content small{min-height:0}
 }
+
+
+/* LAYAN social media links — visible in footer on desktop and mobile */
+.social-links{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin:0 auto 18px;
+  padding:0 12px;
+}
+.social-links-title{
+  flex-basis:100%;
+  text-align:center;
+  color:#f0dfb4;
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:2px;
+}
+.social-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  padding:9px 16px;
+  border:1px solid rgba(240,223,180,.55);
+  border-radius:999px;
+  color:#fff!important;
+  text-decoration:none;
+  font-weight:700;
+  line-height:1;
+  transition:transform .18s ease,background .18s ease;
+}
+.social-link svg{width:21px;height:21px;fill:currentColor;flex:0 0 21px}
+.social-facebook{background:#1877f2;border-color:#1877f2}
+.social-instagram{background:linear-gradient(120deg,#833ab4,#e1306c,#f77737);border-color:#d65a83}
+.social-link:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.social-link:focus-visible{outline:3px solid #f0dfb4;outline-offset:3px}
+@media(max-width:520px){.social-links{gap:10px}.social-link{flex:1;max-width:190px;padding:10px 12px}.social-links-title{font-size:13px}}
