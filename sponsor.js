@@ -129,8 +129,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (grid) {
-    new MutationObserver(() => {
+    new MutationObserver(records => {
       if (placing) return;
+      // Ignore our own sponsor-card insertions/removals to avoid an observer loop.
+      const changedPropertyContent = records.some(record =>
+        [...record.addedNodes, ...record.removedNodes].some(node =>
+          node.nodeType === 1 &&
+          !node.matches?.("[data-sponsor-card]") &&
+          !node.closest?.("[data-sponsor-card]")
+        )
+      );
+      if (!changedPropertyContent) return;
       clearTimeout(placeTimer);
       placeTimer = setTimeout(placeAds, 120);
     }).observe(grid, { childList: true });
