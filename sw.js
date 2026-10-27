@@ -1,4 +1,4 @@
-const CACHE_NAME = "layan-aqar-shell-v15";
+const CACHE_NAME = "layan-aqar-shell-v16";
 const APP_SHELL = [
   "./",
   "./index.html",
