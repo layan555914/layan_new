@@ -146,7 +146,26 @@
   function getUser() { return session?.user || null; }
   function isAuthenticated() { return Boolean(session?.access_token && session?.user?.id); }
 
+  async function ensureFreshSession() {
+    if (!session?.access_token) return;
+    const expiresAt = Number(session.expires_at || 0);
+    if (expiresAt > Math.floor(Date.now() / 1000) + 60) return;
+    if (!session.refresh_token) {
+      saveSession(null);
+      throw new Error("انتهت جلسة الدخول. سجّل الدخول مرة أخرى.");
+    }
+    try {
+      const refreshed = await authRequest("token?grant_type=refresh_token", { refresh_token: session.refresh_token });
+      if (!refreshed?.access_token || !refreshed?.user) throw new Error("تعذر تجديد الجلسة.");
+      normalizeSession(refreshed);
+    } catch (error) {
+      saveSession(null);
+      throw new Error("انتهت جلسة الدخول. سجّل الدخول مرة أخرى.");
+    }
+  }
+
   async function request(path, options = {}) {
+    await ensureFreshSession();
     const response = await fetch(url + "/rest/v1/" + path, {
       ...options,
       headers: {
