@@ -44,7 +44,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderCard(ad) {
-    const image = safeUrl(ad.image_url);
+    const categoryText = String(ad.category || "").toLowerCase();
+    const businessText = String(ad.business_name || "").toLowerCase();
+    // Use reliable photo URLs when an approved partner has not uploaded an image.
+    const fallbackImage = /jotun|دهان|paint/.test(categoryText + " " + businessText)
+      ? "https://images.pexels.com/photos/6474471/pexels-photo-6474471.jpeg?auto=compress&cs=tinysrgb&w=900"
+      : /doctor|سيراميك|بورسلين|تشطيب|tile/.test(categoryText + " " + businessText)
+        ? "https://images.pexels.com/photos/6585756/pexels-photo-6585756.jpeg?auto=compress&cs=tinysrgb&w=900"
+        : "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=900";
+    const image = safeUrl(ad.image_url) || fallbackImage;
     const target = safeUrl(ad.target_url);
     const phone = String(ad.contact_phone || "").replace(/[^+0-9]/g, "");
     const phoneLink = phone ? '<a class="btn btn-outline-dark" href="tel:' + esc(phone) + '">اتصل بالمعلن</a>' : "";
