@@ -197,7 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = new FormData(form);
     const plan = String(data.get("plan_code") || "starter_15");
     const planDetails = {
-      trial_30: { days: 30, price: 0 },\n      starter_15: { days: 15, price: 250 },
+      trial_30: { days: 30, price: 0 },
+      starter_15: { days: 15, price: 250 },
       growth_30: { days: 30, price: 450 },
       partner_90: { days: 90, price: 1200 }
     }[plan];
