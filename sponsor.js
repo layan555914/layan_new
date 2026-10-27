@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dialog.className = "sponsor-dialog";
     dialog.innerHTML =
       '<div class="sponsor-dialog-head"><h2>اطلب إعلانًا ممولًا</h2><button type="button" class="sponsor-close" aria-label="إغلاق">×</button></div>' +
-      '<p class="sponsor-price-note">شهر مجاني لمدة 30 يومًا يبدأ من لحظة إرسال طلب الإعلان، وليس من تاريخ الموافقة أو النشر. بعد انتهاء الشهر، لا تُفرض رسوم إلا بعد موافقتك.</p>' +
+      '<p class="sponsor-price-note">تجربة مجانية لمدة 30 يومًا تبدأ بعد موافقة الإدارة وتفعيل الإعلان، وليس بمجرد إرسال الطلب. بعد انتهاء التجربة، لا تُفرض رسوم إلا بعد موافقتك.</p>' +
       '<p>الإعلانات تظهر داخل قائمة العروض العقارية بعد موافقة الإدارة. أرسل بيانات نشاطك للمراجعة.</p>' +
       '<form class="sponsor-form">' +
       '<label>اسم النشاط<input name="business_name" required minlength="2" maxlength="120" autocomplete="organization"></label>' +
