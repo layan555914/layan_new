@@ -49,9 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const phone = String(ad.contact_phone || "").replace(/[^+0-9]/g, "");
     const phoneLink = phone ? '<a class="btn btn-outline-dark" href="tel:' + esc(phone) + '">اتصل بالمعلن</a>' : "";
     return '<article class="offer-card sponsor-card" data-sponsor-card="' + esc(ad.id) + '">' +
-      '<span class="sponsor-label">إعلان ممول</span>' +
+      '<span class="sponsor-label">' + esc(ad.demo ? "نموذج مجاني تجريبي — غير معتمد رسميًا" : "إعلان ممول") + '</span>' +
       (image ? '<img class="offer-image" src="' + esc(image) + '" alt="' + esc(ad.business_name) + '" loading="lazy" referrerpolicy="no-referrer">' :
-        '<div class="offer-image offer-image-placeholder sponsor-placeholder">خدمات ومستلزمات العقارات</div>') +
+        '<div class="offer-image offer-image-placeholder sponsor-placeholder">' + esc(ad.business_name) + '</div>') +
       '<div class="offer-card-content"><span class="offer-type">' + esc(ad.category) + '</span>' +
       '<p class="sponsor-business">' + esc(ad.business_name) + '</p><h3>' + esc(ad.title) + '</h3>' +
       '<p>' + esc(ad.description) + '</p><div class="sponsor-actions">' +
@@ -65,12 +65,19 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       grid.querySelectorAll("[data-sponsor-card]").forEach(node => node.remove());
       const propertyCards = [...grid.querySelectorAll(".offer-card:not([data-sponsor-card])")];
-      if (!ads.length || propertyCards.length < 3) return;
+      if (!ads.length) return;
+      if (propertyCards.length < 3) {
+        // Keep the starter/demo sponsor cards visible even when the marketplace has few property listings.
+        ads.forEach(ad => grid.insertAdjacentHTML("beforeend", renderCard(ad)));
+        return;
+      }
       let adIndex = 0;
       // Insert one sponsored card after each group of three property cards.
       for (let i = 2; i < propertyCards.length && adIndex < ads.length; i += 3) {
         propertyCards[i].insertAdjacentHTML("afterend", renderCard(ads[adIndex++]));
       }
+      // If there are more sponsor cards than placement slots, append the rest.
+      while (adIndex < ads.length) grid.insertAdjacentHTML("beforeend", renderCard(ads[adIndex++]));
     } finally {
       placing = false;
     }
@@ -80,7 +87,41 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!base || !key) return;
     try {
       const rows = await api("supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone&status=eq.active&order=created_at.desc&limit=12");
-      ads = Array.isArray(rows) ? rows : [];
+      const approvedAds = Array.isArray(rows) ? rows : [];
+      const demoAds = [
+        {
+          id: "layan-demo-iereny",
+          demo: true,
+          business_name: "Original Iereny — إيريني الأصلي",
+          category: "أثاث وموبيليا",
+          title: "جهّز بيتك بعد استلام وحدتك",
+          description: "نموذج تعريفي تجريبي لمعرض أثاث في أسيوط. هذا العرض غير رسمي ولا يعني وجود اتفاق أو موافقة من العلامة التجارية.",
+          target_url: "https://www.originaliereny.com/",
+          contact_phone: "01207180692"
+        },
+        {
+          id: "layan-demo-aldoctor",
+          demo: true,
+          business_name: "AlDoctor Group — مجموعة الدكتور",
+          category: "سيراميك وبورسلين وأدوات صحية",
+          title: "أفكار لتشطيب وحدتك العقارية",
+          description: "نموذج تعريفي تجريبي لخدمات السيراميك والتشطيبات في أسيوط. الإعلان غير رسمي لحين موافقة النشاط التجاري.",
+          target_url: "https://aldoctorgroup.com/",
+          contact_phone: "01226771010"
+        },
+        {
+          id: "layan-demo-jotun",
+          demo: true,
+          business_name: "Jotun — جوتن",
+          category: "دهانات وتشطيبات",
+          title: "اختيارات ألوان وتشطيبات لمنزلك",
+          description: "نموذج تجريبي للتعريف بعلامة الدهانات. ليس إعلانًا معتمدًا من جوتن؛ استخدم الدليل الرسمي للعثور على موزع.",
+          target_url: "https://www.jotun.com/eg-en/industries/dealers/find-a-jotun-dealer",
+          contact_phone: ""
+        }
+      ];
+      // Real, approved ads take priority. Demo cards appear only when no approved ads are available.
+      ads = approvedAds.length ? approvedAds : demoAds;
       placeAds();
     } catch (error) {
       console.warn("LAYAN sponsored ads:", error.message);
