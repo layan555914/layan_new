@@ -16,19 +16,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const setStatus = message => { status.textContent = message || ""; };
   async function request(path, options = {}) {
     if (!base || !key) throw new Error("إعدادات قاعدة البيانات غير مكتملة.");
-    const response = await fetch(base + path, {
-      ...options,
-      headers: {
-        apikey: key,
-        Authorization: "Bearer " + (session?.access_token || key),
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-      }
-    });
+    let response;
+    try {
+      const isAuthEndpoint = path.startsWith("/auth/v1/");
+      response = await fetch(base + path, {
+        ...options,
+        headers: {
+          apikey: key,
+          Authorization: "Bearer " + (isAuthEndpoint ? key : (session?.access_token || key)),
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        }
+      });
+    } catch (networkError) {
+      throw new Error("تعذر الاتصال بخدمة Supabase. تحقق من الإنترنت وإعدادات عنوان المشروع والمفتاح العام ثم أعد المحاولة.");
+    }
     const raw = await response.text();
     let data = null;
     try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
-    if (!response.ok) throw new Error(data?.message || data?.details || data?.hint || "تعذر تنفيذ الطلب.");
+    if (!response.ok) {
+      const detail = data?.message || data?.error_description || data?.msg || data?.error || data?.details || data?.hint;
+      if (response.status === 400 && path.startsWith("/auth/v1/token")) {
+        throw new Error(detail || "بيانات الدخول غير صحيحة أو لم يتم تفعيل تأكيد البريد في حساب Supabase.");
+      }
+      throw new Error(detail || ("تعذر تنفيذ الطلب (HTTP " + response.status + ")."));
+    }
     return data;
   }
   function showState(isLoggedIn) {
