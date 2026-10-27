@@ -696,6 +696,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  async function loadPartnerAdSlots() {
+    const section = $("partner-ads");
+    const config = window.LAYAN_CONFIG || {};
+    if (!section || !config.SUPABASE_URL || !config.SUPABASE_PUBLISHABLE_KEY) return;
+    try {
+      const base = config.SUPABASE_URL.replace(/\\/$/, "");
+      const response = await fetch(base + "/rest/v1/partner_ad_slots?select=slot_key,category,title,description,is_free_trial,status&status=eq.active&order=display_order.asc", {
+        headers: { apikey: config.SUPABASE_PUBLISHABLE_KEY, Authorization: "Bearer " + config.SUPABASE_PUBLISHABLE_KEY }
+      });
+      if (!response.ok) throw new Error("تعذر تحميل مساحات الشركاء من قاعدة البيانات.");
+      const rows = await response.json();
+      const byKey = new Map((Array.isArray(rows) ? rows : []).map(row => [row.slot_key, row]));
+      section.querySelectorAll("[data-partner-slot]").forEach(card => {
+        const row = byKey.get(card.dataset.partnerSlot);
+        if (!row) { card.hidden = true; return; }
+        card.hidden = false;
+        const category = card.querySelector(".partner-ad-category");
+        const title = card.querySelector("h3");
+        const description = card.querySelector(".partner-ad-content p");
+        const note = card.querySelector(".partner-ad-content small");
+        if (category) category.textContent = row.category || "";
+        if (title) title.textContent = row.title || "";
+        if (description) description.textContent = row.description || "";
+        if (note) note.textContent = row.is_free_trial ? "مساحة مجانية طوال فترة التجربة — تُضاف بيانات النشاط بعد موافقة صاحبه." : "مساحة تجارية؛ راجع تفاصيل العرض مع المعلن.";
+      });
+      const visible = [...section.querySelectorAll("[data-partner-slot]")].some(card => !card.hidden);
+      if (!visible) section.hidden = true;
+    } catch (error) {
+      console.warn("LAYAN partner ad slots:", error.message);
+    }
+  }
+
   async function loadOffers() {
     setStatus("جارٍ تحميل العروض...");
 
@@ -740,5 +772,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
   updateAuthButton();
-  await loadOffers();
+  await Promise.all([loadOffers(), loadPartnerAdSlots()]);
 });
