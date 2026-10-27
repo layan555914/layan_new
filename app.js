@@ -452,12 +452,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       <h2>${esc(o.title)}</h2>
       <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
       <div class="details-info">
-        <p><span>المنطقة</span><strong>${esc(o.area || "أسيوط")}</strong></p>
+        <p><span>المدينة / المركز</span><strong>${esc(o.city || "أسيوط")}</strong></p>
+        <p><span>المنطقة</span><strong>${esc(o.area || "غير محدد")}</strong></p>
+        ${o.area_m2 ? `<p><span>المساحة</span><strong>${esc(o.area_m2)} م²</strong></p>` : ""}
+        ${o.bedrooms ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
+        ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
         <p><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></p>
         <p><span>المقدم</span><strong>${money(o.down_payment)}</strong></p>
         <p><span>المبلغ المدفوع</span><strong>${money(o.paid_amount)}</strong></p>
         <p><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></p>
+        ${o.monthly_installment ? `<p><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></p>` : ""}
         <p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>
+        ${o.discount_amount ? `<p><span>قيمة الخصم</span><strong>${money(o.discount_amount)}</strong></p>` : ""}
+        ${o.discount_percent ? `<p><span>نسبة الخصم</span><strong>${esc(o.discount_percent)}٪</strong></p>` : ""}
       </div>
       <p>${esc(o.description || "لا يوجد وصف إضافي.")}</p>
       <h3>تواصل مباشرة مع صاحب الإعلان</h3>
