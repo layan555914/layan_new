@@ -620,6 +620,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       setStatus("المبلغ المدفوع يجب ألا يتجاوز إجمالي السعر.");
       return;
     }
+    if (offer.remaining_amount < 0 || offer.remaining_amount > offer.total_price) {
+      setStatus("المبلغ المتبقي يجب أن يكون بين صفر وإجمالي السعر.");
+      return;
+    }
+    if (offer.paid_amount + offer.remaining_amount > offer.total_price + 0.01) {
+      setStatus("مجموع المبلغ المدفوع والمتبقي أكبر من إجمالي السعر؛ راجع الأرقام قبل الإرسال.");
+      return;
+    }
+    if (offer.discount_percent < 0 || offer.discount_percent > 100) {
+      setStatus("نسبة الخصم يجب أن تكون بين 0 و100٪.");
+      return;
+    }
+    if (offer.assignment_fee < 0 || offer.discount_amount < 0) {
+      setStatus("رسوم التنازل والخصم لا يمكن أن تكون أرقامًا سالبة.");
+      return;
+    }
 
     const files = Array.from(photosInput?.files || []);
     if (files.some((file) => file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name))) {
