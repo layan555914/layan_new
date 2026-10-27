@@ -159,7 +159,7 @@
   }
   async function getOffers() {
     const fields = [
-      "id","title","governorate","area","property_type","description","total_price",
+      "id","title","governorate","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price",
       "down_payment","paid_amount","remaining_amount","assignment_fee",
       "assignment_fee_percentage","discount_amount","developer_name","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_name","contact_phone","created_at"
@@ -209,7 +209,12 @@
       owner_id: session.user.id,
       title: offer.title,
       governorate: "أسيوط",
+      city: offer.city || null,
       area: offer.area || null,
+      area_m2: Number(offer.area_m2 || 0) || null,
+      bedrooms: Number(offer.bedrooms || 0) || null,
+      bathrooms: Number(offer.bathrooms || 0) || null,
+      monthly_installment: Number(offer.monthly_installment || 0) || null,
       property_type: offer.property_type || "شقة",
       description: offer.description || null,
       total_price: Number(offer.total_price || 0),
