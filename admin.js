@@ -14,8 +14,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const readSession = () => { try { return JSON.parse(sessionStorage.getItem(sessionKey) || "null"); } catch (_) { return null; } };
   let session = readSession();
   const setStatus = message => { status.textContent = message || ""; };
+  async function ensureFreshSession() {
+    if (!session?.access_token) return;
+    const expiresAt = Number(session.expires_at || 0);
+    if (expiresAt > Math.floor(Date.now() / 1000) + 60) return;
+    if (!session.refresh_token) {
+      session = null;
+      sessionStorage.removeItem(sessionKey);
+      showState(false);
+      throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
+    }
+    try {
+      const response = await fetch(base + "/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        headers: { apikey: key, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: session.refresh_token })
+      });
+      const raw = await response.text();
+      let data = null;
+      try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
+      if (!response.ok || !data?.access_token || !data?.user) throw new Error("refresh failed");
+      session = { access_token: data.access_token, refresh_token: data.refresh_token || session.refresh_token, expires_at: data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600), user: data.user };
+      sessionStorage.setItem(sessionKey, JSON.stringify(session));
+    } catch (_) {
+      session = null;
+      sessionStorage.removeItem(sessionKey);
+      showState(false);
+      throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
+    }
+  }
   async function request(path, options = {}) {
     if (!base || !key) throw new Error("إعدادات قاعدة البيانات غير مكتملة.");
+    const isAuthEndpoint = path.startsWith("/auth/v1/");
+    if (!isAuthEndpoint) await ensureFreshSession();
     let response;
     try {
       const isAuthEndpoint = path.startsWith("/auth/v1/");
