@@ -98,7 +98,11 @@
       options: { emailRedirectTo: redirectTo }
     });
   }
-  async function resetPasswordForEmail(email) {\n    const redirectTo = window.location.origin + window.location.pathname.replace(/[^/]*$/, "reset-password.html");\n    return authRequest("recover?redirect_to=" + encodeURIComponent(redirectTo), { email: email.trim() });\n  }\n  async function signIn(email, password) {
+  async function resetPasswordForEmail(email) {
+    const redirectTo = window.location.origin + window.location.pathname.replace(/[^/]*$/, "reset-password.html");
+    return authRequest("recover?redirect_to=" + encodeURIComponent(redirectTo), { email: email.trim() });
+  }
+  async function signIn(email, password) {
     const data = await authRequest("token?grant_type=password", { email: email.trim(), password });
     normalizeSession(data);
     if (!session?.access_token) throw new Error("لم يرجع النظام جلسة دخول. راجع إعدادات تأكيد البريد في Supabase.");
