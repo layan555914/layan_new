@@ -54,7 +54,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
         <label>كلمة المرور<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل"></label>
         <p id="authStatus" role="status" aria-live="polite"></p>
-        <button class="btn btn-outline-dark" id="resendConfirmationBtn" type="button" hidden>إعادة إرسال رسالة التأكيد</button>\n        <button class="btn btn-outline-dark" id="forgotPasswordBtn" type="button">نسيت كلمة المرور؟</button>
+        <button class="btn btn-outline-dark" id="resendConfirmationBtn" type="button" hidden>إعادة إرسال رسالة التأكيد</button>
+        <button class="btn btn-outline-dark" id="forgotPasswordBtn" type="button">نسيت كلمة المرور؟</button>
         <button class="btn btn-gold" id="authSubmit" type="submit">تسجيل الدخول</button>
         <button class="btn btn-outline-dark" id="authToggle" type="button">إنشاء حساب جديد</button>
       </form>`;
@@ -65,7 +66,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const toggle = authDialog.querySelector("#authToggle");
     const password = authDialog.querySelector("#authPassword");
     const status = authDialog.querySelector("#authStatus");
-    const resendButton = authDialog.querySelector("#resendConfirmationBtn");\n    const forgotButton = authDialog.querySelector("#forgotPasswordBtn");
+    const resendButton = authDialog.querySelector("#resendConfirmationBtn");
+    const forgotButton = authDialog.querySelector("#forgotPasswordBtn");
     const paintMode = () => {
       resendButton.hidden = true;
       title.textContent = mode === "login" ? "تسجيل الدخول إلى ليان" : "إنشاء حساب مجاني";
@@ -74,7 +76,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       password.autocomplete = mode === "login" ? "current-password" : "new-password";
       status.textContent = "";
     };
-    toggle.addEventListener("click", () => { mode = mode === "login" ? "signup" : "login"; paintMode(); });\n    forgotButton.addEventListener("click", async () => {\n      const api = window.LAYAN_SUPABASE;\n      const email = authDialog.querySelector("#authEmail").value.trim();\n      if (!email) { status.textContent = "اكتب بريدك الإلكتروني أولًا، ثم اضغط نسيت كلمة المرور."; authDialog.querySelector("#authEmail").focus(); return; }\n      if (!api?.resetPasswordForEmail) { status.textContent = "ميزة استعادة كلمة المرور غير جاهزة حاليًا."; return; }\n      forgotButton.disabled = true; status.textContent = "جارٍ إرسال رابط استعادة كلمة المرور...";\n      try { await api.resetPasswordForEmail(email); status.textContent = "لو البريد مسجل، هتوصلك رسالة استعادة. افتحها واضغط الرابط لتعيين كلمة مرور جديدة، وراجع الرسائل غير المرغوب فيها."; }\n      catch (error) { status.textContent = friendlyAuthError(error.message); }\n      finally { forgotButton.disabled = false; }\n    });
+    toggle.addEventListener("click", () => { mode = mode === "login" ? "signup" : "login"; paintMode(); });
+    forgotButton.addEventListener("click", async () => {
+      const api = window.LAYAN_SUPABASE;
+      const email = authDialog.querySelector("#authEmail").value.trim();
+      if (!email) { status.textContent = "اكتب بريدك الإلكتروني أولًا، ثم اضغط نسيت كلمة المرور."; authDialog.querySelector("#authEmail").focus(); return; }
+      if (!api?.resetPasswordForEmail) { status.textContent = "ميزة استعادة كلمة المرور غير جاهزة حاليًا."; return; }
+      forgotButton.disabled = true; status.textContent = "جارٍ إرسال رابط استعادة كلمة المرور...";
+      try { await api.resetPasswordForEmail(email); status.textContent = "لو البريد مسجل، هتوصلك رسالة استعادة. افتحها واضغط الرابط لتعيين كلمة مرور جديدة، وراجع الرسائل غير المرغوب فيها."; }
+      catch (error) { status.textContent = friendlyAuthError(error.message); }
+      finally { forgotButton.disabled = false; }
+    });
     resendButton.addEventListener("click", async () => {
       const api = window.LAYAN_SUPABASE;
       const email = authDialog.querySelector("#authEmail").value.trim();
