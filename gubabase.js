@@ -226,6 +226,43 @@
     }
     return uploaded;
   }
+  async function getOrCreateCompanyAd(businessName) {
+    if (!isAuthenticated()) throw new Error("سجّل الدخول أولًا لإنشاء إعلان الشركة.");
+    const name = String(businessName || "").trim();
+    if (name.length < 2) throw new Error("اكتب اسم الشركة العقارية.");
+    const ownerId = session.user.id;
+    const existing = await request(
+      "company_property_ads?select=id,business_name,plan_code,status,created_at&owner_id=eq." +
+      encodeURIComponent(ownerId) + "&order=created_at.desc"
+    );
+    const matching = (Array.isArray(existing) ? existing : []).find(row =>
+      String(row.business_name || "").trim().toLocaleLowerCase() === name.toLocaleLowerCase() &&
+      ["pending", "active"].includes(row.status)
+    );
+    if (matching) {
+      const linked = await request(
+        "property_offers?select=id&company_ad_id=eq." + encodeURIComponent(matching.id)
+      );
+      if ((Array.isArray(linked) ? linked.length : 0) >= 3) {
+        throw new Error("وصل إعلان الشركة إلى الحد الأقصى: 3 عقارات في الإعلان الواحد. لا يمكن إضافة عقار رابع إلى الإعلان نفسه.");
+      }
+      return matching.id;
+    }
+    const created = await request("company_property_ads", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({
+        owner_id: ownerId,
+        business_name: name,
+        plan_code: "trial_30",
+        status: "pending"
+      })
+    });
+    const row = Array.isArray(created) ? created[0] : created;
+    if (!row?.id) throw new Error("تعذر إنشاء إعلان الشركة. حاول مرة أخرى.");
+    return row.id;
+  }
+
   async function createOffer(offer) {
     if (!isAuthenticated()) throw new Error("سجّل الدخول أو أنشئ حسابًا أولًا لإرسال عرضك.");
     const payload = {
@@ -263,6 +300,6 @@
     return Array.isArray(rows) ? rows[0] : rows;
   }
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, getMyOffers, getOffers, uploadImages, createOffer, resendConfirmation, resetPasswordForEmail };
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, getMyOffers, getOffers, uploadImages, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
