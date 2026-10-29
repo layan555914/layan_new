@@ -1999,3 +1999,47 @@ a:focus-visible, button:focus-visible { outline:3px solid #c7a45e; outline-offse
   .partner-ad-content small{font-size:10px}
   .partner-ad-content .btn{padding-inline:8px;font-size:11px;min-height:40px}
 }
+
+
+/* Final layout fix: make all four partner ads fill the section and show full images */
+#partner-ads.partner-ads-section{
+  display:block !important;
+  width:min(1240px,calc(100% - 32px)) !important;
+  max-width:1240px !important;
+  margin:32px auto !important;
+  box-sizing:border-box !important;
+}
+#partner-ads .partner-ads-grid{
+  display:grid !important;
+  width:100% !important;
+  max-width:none !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:22px !important;
+  align-items:stretch !important;
+}
+#partner-ads .partner-ad{
+  width:100% !important;
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  overflow:hidden !important;
+}
+#partner-ads img.partner-ad-art{
+  display:block !important;
+  width:100% !important;
+  height:260px !important;
+  min-height:260px !important;
+  max-height:none !important;
+  object-fit:cover !important;
+  object-position:center !important;
+}
+#partner-ads .partner-ad-content{width:100%;box-sizing:border-box;padding:20px}
+#partner-ads .partner-ad-content h3{font-size:20px;line-height:1.5}
+#partner-ads .partner-ad-content p{font-size:14px;line-height:1.9}
+#partner-ads .partner-ad-content small{font-size:12px;line-height:1.8}
+@media(max-width:600px){
+  #partner-ads.partner-ads-section{width:calc(100% - 20px) !important;padding:16px 12px !important}
+  #partner-ads .partner-ads-grid{grid-template-columns:minmax(0,1fr) !important;gap:16px !important}
+  #partner-ads img.partner-ad-art{height:220px !important;min-height:220px !important}
+  #partner-ads .partner-ad-content{padding:16px}
+}
