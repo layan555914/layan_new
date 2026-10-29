@@ -2495,3 +2495,30 @@ p,small,label,input,select,textarea,button,a,.offer-details{
   .topbar .brand>span>strong{font-size:22px!important}
   .topbar .brand>span>small{font-size:14px!important}
 }
+
+
+/* LAYAN smart search: clear, mobile-friendly budget filters */
+.filters .smart-filter-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:0;
+  color:var(--navy);
+  font-size:12px;
+  font-weight:800;
+}
+.filters .smart-filter-field input{
+  width:100%;
+  min-width:0;
+  min-height:44px;
+  border:1px solid #cbd8e6;
+  border-radius:9px;
+  background:#f8fbff;
+}
+.filters .smart-filter-field input:focus{
+  border-color:#0788bd;
+  box-shadow:0 0 0 3px #0788bd20;
+}
+@media(max-width:700px){
+  .filters .smart-filter-field{grid-column:1 / -1}
+}
