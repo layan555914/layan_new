@@ -1702,3 +1702,124 @@ footer.footer .social-links{gap:6px !important}
   footer.footer .social-links .social-link{flex:0 1 auto !important;max-width:none !important;padding:5px 7px !important;font-size:10px !important}
   footer.footer .social-links .social-link svg{width:11px !important;height:11px !important;flex-basis:11px !important}
 }
+
+
+/* LAYAN AQAR — premium visual refinement */
+:root {
+  --navy: #102746;
+  --blue: #173d68;
+  --gold: #c5a15d;
+  --gold-light: #ead9b2;
+  --red: #b52f3b;
+  --bg: #f5f7fb;
+  --text: #172a43;
+  --muted: #6f7f93;
+  --border: #e4e9f1;
+  --shadow: 0 16px 42px rgba(16, 39, 70, .10);
+}
+body { background: #f5f7fb; }
+.topbar {
+  position: sticky; top: 0; backdrop-filter: blur(14px);
+  padding-block: 12px;
+  background: rgba(16,39,70,.97);
+}
+.brand-logo { background: #fff; padding: 3px; border: 1px solid rgba(234,217,178,.65); }
+.topbar nav a { position: relative; transition: color .2s ease; }
+.topbar nav a.active::after, .topbar nav a:hover::after {
+  content: ""; position: absolute; right: 0; left: 0; bottom: -5px;
+  height: 2px; border-radius: 3px; background: var(--gold);
+}
+.btn { min-height: 44px; padding-inline: 20px; border-radius: 10px; box-shadow: 0 3px 10px rgba(16,39,70,.05); }
+.btn-gold { background: linear-gradient(135deg,#e0c17d,#c5a15d); color: #14263e; }
+.btn-gold:hover { box-shadow: 0 8px 20px rgba(197,161,93,.28); }
+.btn-outline:hover { border-color: var(--gold-light); background: rgba(255,255,255,.07); }
+.hero {
+  padding-block: clamp(54px, 7vw, 96px);
+  background:
+    radial-gradient(ellipse at 8% 12%, rgba(197,161,93,.18), transparent 35%),
+    radial-gradient(ellipse at 90% 90%, rgba(181,47,59,.14), transparent 28%),
+    linear-gradient(120deg,#091a30 0%,#173d68 58%,#102746 100%);
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0 55% 0 0; pointer-events: none;
+  background: linear-gradient(135deg, transparent 48%, rgba(255,255,255,.025) 49%, transparent 50%);
+}
+.hero-content { max-width: 1120px; }
+.hero .eyebrow {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 6px 13px; border: 1px solid rgba(234,217,178,.32);
+  border-radius: 999px; background: rgba(255,255,255,.05);
+  letter-spacing: .12em;
+}
+.hero h1 { font-size: clamp(34px,5vw,54px); margin-top: 15px; }
+.hero-content > p:first-of-type { color: var(--gold-light); font-size: clamp(16px,2vw,21px); font-weight: 700; }
+.hero-content > p:last-child { max-width: 720px; font-size: 15px; line-height: 2; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.search-panel {
+  position: relative; z-index: 3; margin: -26px auto 36px;
+  padding: 22px; border-radius: 18px; box-shadow: 0 18px 45px rgba(16,39,70,.12);
+}
+.section, .how-section { padding-block: clamp(36px,5vw,64px); }
+.section-heading { margin-bottom: 18px; }
+.section-heading h2, .how-section h2 { color: var(--navy); font-size: clamp(22px,3vw,30px); margin: 0; }
+.section-heading p { color: var(--muted); margin: 5px 0 0; font-size: 13px; }
+.offers-grid { gap: 22px; }
+.offer-card {
+  position: relative; border-radius: 17px; padding: 22px;
+  border-color: #e5eaf2; box-shadow: 0 7px 24px rgba(16,39,70,.055);
+}
+.offer-card::before {
+  content: ""; position: absolute; right: 0; top: 18px; bottom: 18px; width: 3px;
+  border-radius: 4px 0 0 4px; background: var(--gold);
+}
+.offer-card:hover { border-color: #d8c18f; transform: translateY(-4px); }
+.offer-card h3 { font-size: 18px; padding-right: 2px; }
+.category { padding: 8px 17px; transition: .2s ease; }
+.steps { gap: 20px; }
+.steps article { border-radius: 16px; background: linear-gradient(160deg,#fff,#f7f9fc); padding: 25px; }
+.steps article > b { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: #f5ecd8; color: #8b6a2d; font-size: 20px; }
+.layan-ai-section, .launch-campaign {
+  width: min(1120px, calc(100% - 32px)); margin: 32px auto;
+  padding: clamp(22px,4vw,38px); border-radius: 20px;
+  border: 1px solid var(--border); box-shadow: 0 12px 36px rgba(16,39,70,.07);
+}
+.layan-ai-section { background: linear-gradient(135deg,#fff,#f7f9fc); }
+.layan-ai-head { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:14px; }
+.layan-ai-head h2, .launch-campaign h2 { color:var(--navy); margin:0 0 8px; }
+.layan-ai-head p, .launch-campaign p { color:var(--muted); }
+.layan-ai-head > span { color:#8d6c2d; background:#f5ecd8; border-radius:999px; padding:7px 12px; font-size:12px; font-weight:700; }
+.layan-ai-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 14px; }
+.layan-ai-tabs button { border:1px solid var(--border); background:#fff; border-radius:999px; padding:9px 15px; color:var(--navy); }
+.layan-ai-tabs button[aria-pressed="true"] { background:var(--navy); color:#fff; border-color:var(--navy); }
+.layan-ai-form { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:stretch; }
+.layan-ai-form textarea { min-height:64px; border-radius:12px; }
+.layan-ai-note { display:block; margin-top:14px; color:var(--muted); line-height:1.9; }
+.layan-ai-answer { margin-top:14px; }
+.launch-campaign { background:linear-gradient(125deg,#102746,#173d68); color:#fff; border:1px solid #29496e; }
+.launch-campaign h2 { color:#fff; font-size:clamp(23px,3vw,32px); }
+.launch-campaign p { color:#e2eaf4; }
+.launch-campaign small { color:#d0dbea; line-height:1.9; }
+.launch-pill { display:inline-block; color:#f4dfac; background:#ffffff12; border:1px solid #ead9b244; border-radius:999px; padding:5px 12px; font-size:12px; }
+footer { gap:24px; }
+footer .brand-logo { background:#fff; }
+input, select, textarea { border-radius:10px; }
+input:focus, select:focus, textarea:focus { border-color:var(--gold); box-shadow:0 0 0 4px rgba(197,161,93,.14); }
+#offerDialog, .details-dialog { border-radius:20px; border-color:#d9c28e; }
+#offerDialog::backdrop, .details-dialog::backdrop { background:rgba(6,19,36,.72); backdrop-filter:blur(5px); }
+.install-app-banner { border-bottom:1px solid var(--border); box-shadow:0 8px 25px rgba(16,39,70,.08); }
+button:focus-visible, a:focus-visible { outline:3px solid #e0c17d; outline-offset:3px; }
+@media (max-width: 760px) {
+  .topbar { position:relative; gap:12px; }
+  .hero { padding-block:46px; }
+  .search-panel { margin-top:18px; }
+  .layan-ai-form { grid-template-columns:minmax(0,1fr); }
+  .layan-ai-section, .launch-campaign { margin:22px auto; border-radius:16px; }
+}
+@media (max-width: 600px) {
+  .hero h1 { font-size:clamp(31px,9vw,40px); }
+  .hero-actions .btn { flex:1 1 145px; }
+  .section-heading { align-items:flex-start; }
+  .offers-grid { gap:14px; }
+  .offer-card { padding:20px; }
+  .steps article { padding:20px; }
+}
