@@ -348,6 +348,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .trim().toLowerCase();
     const type = $("typeFilter")?.value || "";
     const area = areaFilter?.value || "";
+    const sort = $("sortFilter")?.value || "newest";
     const companyQuery = ($("companySearchInput")?.value || "").trim().toLowerCase();
 
     const filtered = offers.filter((o) => {
@@ -366,8 +367,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     filtered.sort((a, b) => {
       const aFeatured = a.is_featured && (!a.featured_until || new Date(a.featured_until) > new Date());
       const bFeatured = b.is_featured && (!b.featured_until || new Date(b.featured_until) > new Date());
-      return Number(bFeatured) - Number(aFeatured) ||
-        new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      const featuredOrder = Number(bFeatured) - Number(aFeatured);
+      if (featuredOrder) return featuredOrder;
+      if (sort === "price-asc") return num(a.total_price) - num(b.total_price);
+      if (sort === "price-desc") return num(b.total_price) - num(a.total_price);
+      if (sort === "paid-asc") return num(a.paid_amount || a.down_payment) - num(b.paid_amount || b.down_payment);
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
     });
 
     if (!filtered.length) {
@@ -648,6 +653,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("searchInput")?.addEventListener("input", render);
   $("typeFilter")?.addEventListener("change", render);
   areaFilter?.addEventListener("change", render);
+  $("sortFilter")?.addEventListener("change", render);
   $("searchBtn")?.addEventListener("click", render);
 
   const calcContract = $("calcContract");
