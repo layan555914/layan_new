@@ -2407,3 +2407,56 @@ footer,.footer{
  .offer-card-content{padding:15px!important}
  .offer-card h3{font-size:18px!important}
 }
+
+
+/* User-requested final corrections: darker ocean hero, smaller Arabic brand line, English LAYAN more prominent, paid/remaining boxes clear */
+.hero{
+  background:
+    linear-gradient(100deg,rgba(2,35,57,.78),rgba(3,62,91,.70)),
+    url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90') center 52%/cover no-repeat!important;
+}
+.hero:before{
+  background:linear-gradient(90deg,rgba(1,29,47,.22),rgba(2,51,77,.30))!important;
+}
+.hero h1,.hero p,.hero .eyebrow,.hero-content p{
+  color:#fff!important;
+  text-shadow:0 2px 8px rgba(0,20,34,.8)!important;
+}
+.hero .eyebrow{color:#ffe5a8!important}
+
+/* Paid and remaining amounts: darker, readable pale-blue tiles */
+.offer-details > div{
+  background:linear-gradient(135deg,#d9f2ff,#c5eaff)!important;
+  border:1px solid #8fd1ed!important;
+}
+.offer-details span{color:#315e75!important;font-size:12px!important;font-weight:600!important}
+.offer-details strong{color:#075477!important;font-size:17px!important;font-weight:900!important}
+.offer-details [class*="paid"],.offer-details [class*="remaining"]{color:#075477!important}
+
+/* English brand is the main word; Arabic subtitle deliberately smaller */
+.topbar .brand>span>strong,.brand>span>strong{
+  font-size:clamp(29px,3.2vw,38px)!important;
+  line-height:1.05!important;
+  font-weight:900!important;
+  letter-spacing:.09em!important;
+}
+.topbar .brand>span>small,.brand>span>small{
+  font-size:9px!important;
+  line-height:1.2!important;
+  margin-top:3px!important;
+  font-weight:600!important;
+}
+h1,h2,h3,h4,.section-heading h2,.offer-card h3{
+  font-family:"Cairo",Tahoma,Arial,sans-serif!important;
+  font-weight:800!important;
+  letter-spacing:-.02em!important;
+}
+p,small,label,input,select,textarea,button,a,.offer-details{
+  font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif!important;
+}
+@media(max-width:600px){
+  .topbar .brand>span>strong,.brand>span>strong{font-size:26px!important}
+  .topbar .brand>span>small,.brand>span>small{font-size:8px!important}
+  .offer-details strong{font-size:15px!important}
+  .hero{background-position:center!important}
+}
