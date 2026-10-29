@@ -421,18 +421,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!companyGrid) return;
     const query = ($("companySearchInput")?.value || "").trim().toLowerCase();
     const groups = new Map();
+
     offers.filter(o => o.developer_name && String(o.developer_name).trim()).forEach(o => {
       const name = String(o.developer_name).trim();
-      const key = name.toLocaleLowerCase();
-      if (!groups.has(key)) groups.set(key, {name, count:0});
-      groups.get(key).count += 1;
+      // New company ads are grouped by their database ID; older listings remain discoverable by company name.
+      const key = o.company_ad_id ? "ad:" + o.company_ad_id : "legacy:" + name.toLocaleLowerCase();
+      if (!groups.has(key)) groups.set(key, {name, id: o.company_ad_id || null, properties: []});
+      groups.get(key).properties.push(o);
     });
+
     const found = [...groups.values()].filter(c => !query || c.name.toLowerCase().includes(query));
-    companyGrid.innerHTML = found.length ? found.map(c => `
-      <article class="company-card"><h3>${esc(c.name)}</h3>
-      <p>${c.count} إعلان منشور</p>
-      <button class="btn btn-outline-dark" type="button" data-company-name="${esc(c.name)}">عرض عقارات الشركة</button></article>`
-    ).join("") : `<p class="company-empty">${query ? "لا توجد شركة بهذا الاسم ضمن العروض المنشورة حاليًا." : "لا توجد أسماء شركات مرتبطة بعروض منشورة حتى الآن."}</p>`;
+    companyGrid.innerHTML = found.length ? found.map(c => {
+      const propertyRows = c.properties.slice(0, 3).map(o => `
+        <li class="company-property">
+          <span class="company-property-type">${esc(o.property_type || "عقار")}</span>
+          <strong>${esc(o.title || "عرض عقاري")}</strong>
+          <span>${esc([o.city, o.area].filter(Boolean).join("، ") || "أسيوط")}</span>
+          <b>${money(o.total_price)}</b>
+        </li>`).join("");
+      const countLabel = c.id
+        ? `${c.properties.length} من 3 عقارات منشورة ضمن إعلان الشركة`
+        : `${c.properties.length} عقار مرتبط باسم الشركة`;
+      return `
+        <article class="company-card">
+          <div class="company-card-heading"><h3>${esc(c.name)}</h3><span class="company-count">${c.properties.length}/3</span></div>
+          <p>${countLabel}</p>
+          <ul class="company-property-list">${propertyRows}</ul>
+          <button class="btn btn-outline-dark" type="button" data-company-name="${esc(c.name)}">عرض التفاصيل في قائمة العروض</button>
+        </article>`;
+    }).join("") : `<p class="company-empty">${query ? "لا توجد شركة بهذا الاسم ضمن العروض المنشورة حاليًا." : "ستظهر الشركات هنا بعد نشر عروضها وموافقة الإدارة."}</p>`;
   }
 
   function openDialog() {
