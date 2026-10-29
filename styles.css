@@ -1823,3 +1823,15 @@ button:focus-visible, a:focus-visible { outline:3px solid #e0c17d; outline-offse
   .offer-card { padding:20px; }
   .steps article { padding:20px; }
 }
+
+
+/* Group up to three published properties inside each company advertisement card. */
+.company-card-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.company-count{display:inline-flex;align-items:center;justify-content:center;min-width:38px;padding:4px 8px;border-radius:999px;background:var(--navy);color:#fff;font-size:12px;font-weight:700}
+.company-property-list{display:grid;gap:8px;margin:12px 0;padding:0;list-style:none}
+.company-property{display:grid;gap:4px;padding:10px;border:1px solid var(--border);border-radius:9px;background:#faf9f6}
+.company-property-type{font-size:11px;color:var(--muted)}
+.company-property strong{font-size:14px;color:var(--navy)}
+.company-property span:not(.company-property-type){font-size:12px;color:var(--muted)}
+.company-property b{font-size:13px;color:var(--navy)}
+.company-card .btn{width:100%;margin-top:8px}
