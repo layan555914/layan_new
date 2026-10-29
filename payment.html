@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#102746">
+<title>الدفع للإعلانات | LAYAN AQAR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#102746;--gold:#d5ad55;--red:#d9233d;--paper:#f5f6f8;--ink:#172335}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Cairo,Arial,sans-serif;line-height:1.8}
+header{background:var(--navy);color:#fff;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{color:#fff;text-decoration:none;font-weight:800;letter-spacing:1px;font-size:1.2rem}.brand small{display:block;font-size:.8rem;color:var(--gold);letter-spacing:0}
+header a.back{color:#fff;text-decoration:none;border:1px solid #ffffff66;padding:7px 13px;border-radius:10px}
+main{max-width:760px;margin:32px auto;padding:0 16px}.panel{background:#fff;border:1px solid #e5e8ed;border-radius:20px;padding:clamp(20px,5vw,36px);box-shadow:0 12px 35px #10274612}
+h1{margin:0 0 8px;color:var(--navy);font-size:clamp(1.5rem,4vw,2.1rem)}.intro{color:#5a6676;margin-top:0}
+.payment-card{background:var(--navy);color:white;border-radius:16px;padding:22px;margin:22px 0}.payment-card .label{color:#dbe2ec;font-size:.92rem}.phone{font-size:clamp(1.65rem,5vw,2.2rem);font-weight:800;direction:ltr;display:inline-block;letter-spacing:1px;color:#fff}
+button,.btn{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:11px 16px;text-decoration:none;display:inline-block;font-weight:700}.copy{background:var(--gold);color:var(--navy);margin-inline-start:10px}.whatsapp{background:#147b48;color:white;width:100%;text-align:center;margin-top:12px}.step{display:flex;gap:12px;align-items:flex-start;margin:14px 0}.num{background:#fff0f1;color:var(--red);font-weight:800;border-radius:50%;min-width:34px;height:34px;display:grid;place-items:center}.warning{background:#fff8e7;border-right:4px solid var(--gold);padding:12px 14px;border-radius:8px;margin-top:20px;font-size:.92rem}
+label{display:block;font-weight:700;margin:14px 0 6px}input,select{width:100%;padding:12px;border:1px solid #d4dbe4;border-radius:10px;font:inherit;background:white}small,.muted{color:#667085}.status{min-height:1.5em;font-size:.9rem}
+footer{text-align:center;color:#697386;padding:22px;font-size:.9rem}
+</style>
+</head>
+<body>
+<header><a class="brand" href="./index.html">LAYAN AQAR <small>ليان عقار</small></a><a class="back" href="./index.html#pricing">العودة إلى الباقات</a></header>
+<main><section class="panel">
+<h1>الدفع مقابل إعلانات ليان</h1>
+<p class="intro">طريقة الدفع الحالية هي فودافون كاش. اختر الباقة التي تريد دفعها ثم اتبع الخطوات. لا توجد عمولة على إتمام التنازل العقاري.</p>
+<label for="plan">الباقة الإعلانية</label>
+<select id="plan">
+<option value="إعلان مميز 15 يومًا" data-amount="100">تمييز إعلان واحد — 15 يومًا — 100 جنيه</option>
+<option value="إعلان مميز 30 يومًا" data-amount="200">تمييز إعلان واحد — 30 يومًا — 200 جنيه</option>
+<option value="باقة شركات 3 عقارات" data-amount="250">الشركات — 3 عقارات / 15 يومًا — 250 جنيه (سعر مقترح، غير متاح للدفع حاليًا)</option>
+<option value="باقة شركات 5 عقارات" data-amount="600">الشركات — 5 عقارات / 30 يومًا — 600 جنيه (سعر مقترح، غير متاح للدفع حاليًا)</option>
+</select>
+<p><strong>المبلغ المطلوب:</strong> <span id="amount">100</span> جنيه مصري</p>
+<div class="payment-card"><div class="label">حوّل إلى رقم فودافون كاش التالي</div><div><span class="phone" id="phone">01007044265</span><button class="copy" id="copyPhone" type="button">نسخ الرقم</button></div><small style="color:#dbe2ec">تأكد من الرقم والمبلغ قبل تأكيد التحويل.</small></div>
+<div class="step"><span class="num">1</span><div>حوّل قيمة الباقة المحددة إلى رقم فودافون كاش الموضح أعلاه.</div></div>
+<div class="step"><span class="num">2</span><div>احتفظ بإيصال التحويل ورقم العملية، واكتب بياناتك أدناه.</div></div>
+<div class="step"><span class="num">3</span><div>اضغط على إرسال بيانات الدفع عبر واتساب، ثم أرفق صورة الإيصال في المحادثة.</div></div>
+<label for="customerName">الاسم</label><input id="customerName" autocomplete="name" placeholder="اسم صاحب الإعلان">
+<label for="customerPhone">رقم الموبايل</label><input id="customerPhone" inputmode="tel" autocomplete="tel" placeholder="رقم للتواصل">
+<label for="offerTitle">عنوان الإعلان أو رقم الطلب</label><input id="offerTitle" placeholder="مثال: شقة في أسيوط الجديدة">
+<label for="transactionRef">رقم عملية التحويل (إن توفر)</label><input id="transactionRef" placeholder="اكتب رقم العملية الموجود بالإيصال">
+<button class="whatsapp" id="sendPayment" type="button">إرسال بيانات الدفع عبر واتساب</button>
+<p class="status" id="status" role="status" aria-live="polite"></p>
+<div class="warning"><strong>تنبيه مهم:</strong> إرسال البيانات أو صورة الإيصال لا يعني تفعيل الإعلان فورًا. ستراجع إدارة ليان التحويل وتتأكد من وصول المبلغ، ثم يتم تفعيل الباقة. باقات الشركات المعروضة كسعر مقترح ليست متاحة للدفع حتى اعتمادها رسميًا.</div>
+</section></main>
+<footer>LAYAN AQAR — ليان عقار · منصة إعلانات عقارية</footer>
+<script>
+const plan=document.getElementById('plan'), amount=document.getElementById('amount'), status=document.getElementById('status');
+function syncPlan(){const option=plan.options[plan.selectedIndex];const unavailable=plan.selectedIndex>=2;amount.textContent=option.dataset.amount;document.getElementById('sendPayment').disabled=unavailable;document.getElementById('sendPayment').style.opacity=unavailable?'.5':'1';status.textContent=unavailable?'هذه الباقة سعرها مقترح وغير متاحة للدفع حاليًا.':''}
+plan.addEventListener('change',syncPlan);syncPlan();
+document.getElementById('copyPhone').addEventListener('click',async()=>{try{await navigator.clipboard.writeText('01007044265');status.textContent='تم نسخ الرقم.'}catch(e){status.textContent='انسخ الرقم يدويًا: 01007044265'}});
+document.getElementById('sendPayment').addEventListener('click',()=>{const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim(),offer=document.getElementById('offerTitle').value.trim(),ref=document.getElementById('transactionRef').value.trim();if(!name||!phone||!offer){status.textContent='من فضلك اكتب الاسم ورقم الموبايل وعنوان الإعلان أو رقم الطلب.';return}const msg='طلب مراجعة دفع إعلان على LAYAN AQAR%0Aالباقة: '+encodeURIComponent(plan.value)+'%0Aالمبلغ: '+encodeURIComponent(amount.textContent+' جنيه')+'%0Aالاسم: '+encodeURIComponent(name)+'%0Aرقم التواصل: '+encodeURIComponent(phone)+'%0Aالإعلان/الطلب: '+encodeURIComponent(offer)+'%0Aرقم العملية: '+encodeURIComponent(ref||'سيتم إرفاق الإيصال');window.open('https://wa.me/201007044265?text='+msg,'_blank','noopener,noreferrer');status.textContent='أرسل الرسالة عبر واتساب وأرفق صورة الإيصال في المحادثة.'});
+</script>
+</body>
+</html>
