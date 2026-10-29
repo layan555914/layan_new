@@ -1858,3 +1858,11 @@ button:focus-visible, a:focus-visible { outline:3px solid #e0c17d; outline-offse
 @media(max-width:800px){.category-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.category-tile{min-height:184px;padding:18px 16px}.category-trust-strip{align-items:flex-start;flex-wrap:wrap}.category-trust-strip>div{flex:1 1 calc(100% - 60px)}.category-trust-strip .btn{width:100%;text-align:center}}
 @media(max-width:380px){.category-explorer{padding-inline:12px}.category-tiles{gap:9px}.category-tile{min-height:175px;padding:14px 12px;border-radius:15px}.category-tile strong{font-size:17px}.category-tile>span:not(.category-tile-icon){font-size:12px}}
 @media(prefers-reduced-motion:reduce){.category-tile{transition:none}}
+
+
+/* Share and report actions on each listing detail dialog. */
+.details-actions{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 4px}
+.details-actions .btn{flex:1 1 180px;text-align:center;justify-content:center}
+#reportOfferBtn{border-color:#b94747;color:#a52e35}
+#reportOfferBtn:hover{background:#fff0f0}
+@media(max-width:520px){.details-actions .btn{flex-basis:100%;width:100%}}
