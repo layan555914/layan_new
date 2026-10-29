@@ -411,8 +411,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const plan = $("promotionPlanSelect")?.value || "standard";
     const note = $("promotionPlanNote");
     if (!note) return;
-    if (plan === "featured_15") note.textContent = "السعر 100 جنيه لمدة 15 يومًا. لا تحوّل أي مبلغ الآن؛ سيتم الإعلان عن وسيلة التحصيل الرسمية بعد تجهيزها.";
-    else if (plan === "featured_30") note.textContent = "السعر 200 جنيه لمدة 30 يومًا. لا تحوّل أي مبلغ الآن؛ التفعيل بعد مراجعة التحويل يدويًا.";
+    if (plan === "featured_15") note.textContent = "السعر 100 جنيه لمدة 15 يومًا. استخدم صفحة الدفع عبر فودافون كاش بعد إرسال العرض، ثم أرسل بيانات التحويل والإيصال للمراجعة. لا يتم التفعيل قبل تأكيد وصول المبلغ.";
+    else if (plan === "featured_30") note.textContent = "السعر 200 جنيه لمدة 30 يومًا. استخدم صفحة الدفع عبر فودافون كاش بعد إرسال العرض، ثم أرسل بيانات التحويل والإيصال للمراجعة. لا يتم التفعيل قبل تأكيد وصول المبلغ.";
     else note.textContent = "الإعلان العادي مجاني. طلب التمييز لا يفعّل الإعلان تلقائيًا.";
   }
 
