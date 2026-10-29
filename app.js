@@ -223,14 +223,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   const LAYAN_PHONE = "201007044265";
 
   function categoryMatches(offer, category) {
-    const value = String(offer.property_type || "").trim().toLowerCase();
-    const title = String(offer.title || "").trim().toLowerCase();
-    const text = value + " " + title;
-    const has = (...words) => words.some((word) => text.includes(word));
+    const normalize = (value) => String(value || "")
+      .trim().toLowerCase()
+      .replace(/[أإآ]/g, "ا")
+      .replace(/ى/g, "ي")
+      .replace(/[\u064B-\u065F\u0670]/g, "");
+    const text = normalize([
+      offer.property_type, offer.title, offer.description
+    ].filter(Boolean).join(" "));
+    const has = (...words) => words.some((word) => text.includes(normalize(word)));
     if (category === "سكني") return has("سكن", "شقة", "شقق", "فيلا", "فلل", "دوبلكس", "استوديو", "تاون", "بنتهاوس", "residential");
-    if (category === "تجاري") return has("تجار", "محل", "معرض", "مخزن", "مول", "كافيه", "مطعم", "commercial");
-    if (category === "إداري") return has("إدار", "ادار", "مكتب", "مقر", "عيادة إدارية", "office", "administrative");
-    if (category === "طبي") return has("طبي", "طبى", "عيادة", "عيادات", "مركز طبي", "medical", "clinic");
+    if (category === "تجاري") return has("تجار", "محل", "معرض", "مخزن", "مول", "كافيه", "مطعم", "مكتب تجاري", "commercial");
+    if (category === "إداري") return has("اداري", "مكتب", "مقر", "مبني اداري", "office", "administrative");
+    if (category === "طبي") return has("طبي", "عياده", "عيادات", "مركز طبي", "مستشفي", "medical", "clinic");
     return false;
   }
 
