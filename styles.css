@@ -2230,3 +2230,24 @@ p,button,a,label,input,select,textarea,.offer-details,.pricing-card{
  .brand small{font-size:11px!important}
  .hero{background-position:center!important}
 }
+
+
+/* Header brand hierarchy: English name prominent, Arabic subtitle smaller */
+.topbar .brand>span>strong,
+.brand>span>strong{
+ font-size:clamp(28px,3vw,36px)!important;
+ line-height:1.05!important;
+ font-weight:900!important;
+ letter-spacing:.08em!important;
+}
+.topbar .brand>span>small,
+.brand>span>small{
+ font-size:10px!important;
+ line-height:1.25!important;
+ margin-top:2px!important;
+ font-weight:600!important;
+}
+@media(max-width:600px){
+ .topbar .brand>span>strong,.brand>span>strong{font-size:25px!important}
+ .topbar .brand>span>small,.brand>span>small{font-size:9px!important}
+}
