@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <form id="buyerPreferenceForm" class="buyer-preference-form">
           <p class="buyer-login-note" id="buyerLoginNote">سجّل الدخول لحفظ طلبك ومتابعة العروض المناسبة لك.</p>
           <label>إيه نوع العقار اللي بتدور عليه؟
-            <select name="property_type" required><option value="أي نوع">أي نوع</option><option value="شقة">شقة</option><option value="فيلا">فيلا</option><option value="محل">محل تجاري</option><option value="أرض">أرض</option></select>
+            <select name="property_type" required><option value="أي نوع">أي نوع</option><option value="شقة">شقة</option><option value="فيلا">فيلا</option><option value="محل">محل تجاري</option><option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option><option value="مخزن">مخزن</option><option value="معرض">معرض</option><option value="أرض">أرض</option></select>
           </label>
           <label>المنطقة المفضلة
             <input name="area" type="text" maxlength="100" placeholder="مثال: أسيوط الجديدة (اختياري)">
