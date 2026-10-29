@@ -28,14 +28,15 @@ footer{text-align:center;color:#697386;padding:22px;font-size:.9rem}
 <h1>الدفع مقابل إعلانات ليان</h1>
 <p class="intro">أول 30 يومًا من الإطلاق الرسمي مجانية لجميع المستخدمين: الأفراد والشركات العقارية وشركات التشطيب والديكور. صفحة الدفع معروضة للتعريف بالأسعار التي ستبدأ بعد انتهاء الشهر التجريبي، لكن الدفع غير مفعّل حاليًا. لا تحوّل أي مبلغ الآن.</p>
 <label for="plan">الباقة الإعلانية</label>
-<p class="muted">باقات الشركات العقارية تتيح للشركة عرض حتى 3 عقارات في الإعلان الواحد، ضمن مدة الباقة المختارة.</p>
+<p class="muted">اختر الباقة لمشاهدة تفاصيلها. جميع الأسعار أدناه مستقبلية، والدفع غير متاح خلال الشهر المجاني.</p>
 <select id="plan">
-<option value="إعلان مميز 15 يومًا" data-amount="100">تمييز إعلان واحد — 15 يومًا — 100 جنيه</option>
-<option value="إعلان مميز 30 يومًا" data-amount="200">تمييز إعلان واحد — 30 يومًا — 200 جنيه</option>
-<option value="شركة — باقة أساسية 15 يومًا" data-amount="250">الشركات — باقة أساسية / 15 يومًا — 250 جنيه</option>
-<option value="شركة — باقة نمو 30 يومًا" data-amount="450">الشركات — باقة نمو / 30 يومًا — 450 جنيه</option>
-<option value="شركة — باقة شركاء 90 يومًا" data-amount="1200">الشركات — باقة شركاء / 90 يومًا — 1200 جنيه</option>
+<option value="إعلان مميز 15 يومًا" data-amount="100">الأفراد: تمييز إعلان واحد — 15 يومًا — 100 جنيه</option>
+<option value="إعلان مميز 30 يومًا" data-amount="200">الأفراد: تمييز إعلان واحد — 30 يومًا — 200 جنيه</option>
+<option value="شركة — باقة أساسية 15 يومًا" data-amount="250">الشركات العقارية: أساسية — 15 يومًا — 250 جنيه</option>
+<option value="شركة — باقة نمو 30 يومًا" data-amount="450">الشركات العقارية: النمو — 30 يومًا — 450 جنيه</option>
+<option value="شركة — باقة شركاء 90 يومًا" data-amount="1200">الشركات العقارية: الشركاء — 90 يومًا — 1200 جنيه</option>
 </select>
+<div id="planDescription" class="warning" aria-live="polite">تمييز إعلان فردي واحد لمدة 15 يومًا لزيادة وضوحه أمام الباحثين عن العقارات.</div>
 <p><strong>المبلغ المطلوب:</strong> <span id="amount">100</span> جنيه مصري</p>
 <div class="warning"><strong>الشهر التجريبي للجميع:</strong> لن يتم استقبال مدفوعات خلال أول 30 يومًا من الإطلاق الرسمي. ستعلن إدارة ليان عن تفعيل الدفع بعد انتهاء الشهر المجاني. الأسعار الظاهرة للتعريف بالباقات المستقبلية فقط.</div>
 <p class="muted">بعد انتهاء الشهر المجاني والإعلان عن بدء الدفع، ستُتاح خطوات التحويل وإرسال الإيصال من هذه الصفحة.</p>
@@ -50,7 +51,14 @@ footer{text-align:center;color:#697386;padding:22px;font-size:.9rem}
 <footer>LAYAN AQAR — ليان عقار · منصة إعلانات عقارية</footer>
 <script>
 const plan=document.getElementById('plan'), amount=document.getElementById('amount'), status=document.getElementById('status');
-function syncPlan(){const option=plan.options[plan.selectedIndex];amount.textContent=option.dataset.amount;document.getElementById('sendPayment').disabled=true;document.getElementById('sendPayment').style.opacity='.65';status.textContent='الأسعار للتعريف فقط؛ الدفع غير مفعّل خلال الشهر المجاني.'}
+const planDescriptions={
+'إعلان مميز 15 يومًا':'للأفراد: تمييز إعلان واحد لعقار واحد لمدة 15 يومًا ليظهر بشكل أوضح للباحثين. السعر المستقبلي 100 جنيه.',
+'إعلان مميز 30 يومًا':'للأفراد: تمييز إعلان واحد لعقار واحد لمدة 30 يومًا ليظهر بشكل أوضح للباحثين. السعر المستقبلي 200 جنيه.',
+'شركة — باقة أساسية 15 يومًا':'للشركات العقارية: إعلان لمدة 15 يومًا مع إمكانية عرض حتى 3 عقارات في الإعلان الواحد، وبيانات الشركة ووسيلة التواصل. مناسبة للحملات القصيرة. السعر المستقبلي 250 جنيهًا.',
+'شركة — باقة نمو 30 يومًا':'للشركات العقارية: إعلان لمدة 30 يومًا مع إمكانية عرض حتى 3 عقارات في الإعلان الواحد، وبيانات الشركة ووسيلة التواصل. تمنح وقتًا أطول لعرض العقارات ومتابعة اهتمام العملاء. السعر المستقبلي 450 جنيهًا.',
+'شركة — باقة شركاء 90 يومًا':'للشركات العقارية: إعلان لمدة 90 يومًا مع إمكانية عرض حتى 3 عقارات في الإعلان الواحد، وبيانات الشركة ووسيلة التواصل. مناسبة للتسويق المستمر لمدة ثلاثة أشهر. السعر المستقبلي 1200 جنيه.'
+};
+function syncPlan(){const option=plan.options[plan.selectedIndex];amount.textContent=option.dataset.amount;document.getElementById('planDescription').textContent=planDescriptions[option.value]||'الإعلان العادي مجاني للأفراد بعد مراجعة الإدارة.';document.getElementById('sendPayment').disabled=true;document.getElementById('sendPayment').style.opacity='.65';status.textContent='الأسعار للتعريف فقط؛ الدفع غير مفعّل خلال الشهر المجاني.'}
 plan.addEventListener('change',syncPlan);syncPlan();
 
 
