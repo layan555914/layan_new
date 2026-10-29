@@ -2154,3 +2154,34 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offse
  #partner-ads .partner-ad{border-radius:15px!important}
 }
 @media(prefers-reduced-motion:reduce){.btn{transition:none}}
+
+
+/* Requested polish: paid/remaining figures in sky blue, and a brighter ocean hero */
+.offer-details>div,
+.offer-details > div,
+.details-info p,
+.offer-details .detail-item{
+ background:linear-gradient(135deg,#eaf8ff,#d8f3ff)!important;
+ border:1px solid #a9e1f5!important;
+ border-radius:10px!important;
+}
+.offer-details span,.details-info span{color:#32718d!important}
+.offer-details strong,.details-info strong,
+.offer-details [class*="paid"],.offer-details [class*="remaining"],
+.details-info [class*="paid"],.details-info [class*="remaining"]{
+ color:#0788bd!important;
+}
+.hero{
+ background:
+  linear-gradient(90deg,rgba(231,249,255,.14),rgba(230,249,255,.28)),
+  url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90') center 52%/cover no-repeat!important;
+}
+.hero:before{
+ background:
+  radial-gradient(ellipse at 78% 20%,rgba(255,255,255,.32),transparent 42%),
+  linear-gradient(90deg,rgba(220,247,255,.06),rgba(224,248,255,.34))!important;
+}
+.hero h1,.hero p,.hero .eyebrow{ text-shadow:0 1px 10px rgba(255,255,255,.7)!important }
+@media(max-width:700px){
+ .hero{background-position:center!important}
+}
