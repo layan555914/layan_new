@@ -84,9 +84,13 @@
     }
   }
   restoreConfirmedEmailSession();
+  function normalizeEmail(email) { return String(email || "").trim().toLowerCase(); }
   async function signUp(email, password) {
+    const cleanEmail = normalizeEmail(email);
+    if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
+    if (String(password || "").length < 6) throw new Error("Password should be at least 6 characters.");
     const redirectTo = window.location.origin + window.location.pathname;
-    const data = await authRequest("signup?redirect_to=" + encodeURIComponent(redirectTo), { email: email.trim(), password });
+    const data = await authRequest("signup?redirect_to=" + encodeURIComponent(redirectTo), { email: cleanEmail, password });
     normalizeSession(data);
     return { user: data?.user || null, session: session, needsEmailConfirmation: !data?.access_token };
   }
@@ -94,16 +98,16 @@
     const redirectTo = window.location.origin + window.location.pathname;
     return authRequest("resend", {
       type: "signup",
-      email: email.trim(),
+      email: normalizeEmail(email),
       options: { emailRedirectTo: redirectTo }
     });
   }
   async function resetPasswordForEmail(email) {
     const redirectTo = window.location.origin + window.location.pathname.replace(/[^/]*$/, "reset-password.html");
-    return authRequest("recover?redirect_to=" + encodeURIComponent(redirectTo), { email: email.trim() });
+    return authRequest("recover?redirect_to=" + encodeURIComponent(redirectTo), { email: normalizeEmail(email) });
   }
   async function signIn(email, password) {
-    const data = await authRequest("token?grant_type=password", { email: email.trim(), password });
+    const data = await authRequest("token?grant_type=password", { email: normalizeEmail(email), password });
     normalizeSession(data);
     if (!session?.access_token) throw new Error("لم يرجع النظام جلسة دخول. راجع إعدادات تأكيد البريد في Supabase.");
     return session.user;
