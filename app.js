@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const filtered = offers.filter((o) => {
       const text = [
-        o.title, o.area, o.property_type,
+        o.title, o.city, o.area, o.property_type,
         o.description, o.developer_name
       ].join(" ").toLowerCase();
 
