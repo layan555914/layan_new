@@ -128,7 +128,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
           const result = await api.signUp(email, pass);
           if (result.needsEmailConfirmation) {
-            status.textContent = "تم إنشاء الحساب. افتح بريدك الإلكتروني وأكّد الحساب، ثم ارجع وسجّل الدخول.";
+            status.textContent = "تم إنشاء الحساب بنجاح. افتح رسالة تأكيد البريد واضغط رابط التأكيد، ثم ارجع إلى منصة ليان وسجّل الدخول. لو لم تصلك الرسالة، راجع مجلد الرسائل غير المرغوب فيها أو اضغط «إعادة إرسال رسالة التأكيد».";
+            resendButton.hidden = false;
           } else {
             status.textContent = "تم إنشاء الحساب وتسجيل الدخول.";
             updateAuthButton();
@@ -137,6 +138,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       } catch (error) {
         status.textContent = friendlyAuthError(error.message);
+        if (/Email not confirmed/i.test(error.message || "")) {
+          resendButton.hidden = false;
+        }
       } finally {
         submit.disabled = false;
         toggle.disabled = false;
