@@ -2043,3 +2043,54 @@ a:focus-visible, button:focus-visible { outline:3px solid #c7a45e; outline-offse
   #partner-ads img.partner-ad-art{height:220px !important;min-height:220px !important}
   #partner-ads .partner-ad-content{padding:16px}
 }
+
+
+/* LAYAN AQAR refresh: sky blue + gold + red; keep the original logo untouched */
+:root{
+  --navy:#168fc4;
+  --blue:#0879ad;
+  --gold:#c7a45e;
+  --gold-light:#f0dfb6;
+  --red:#b8323a;
+  --text:#183447;
+  --muted:#647b8b;
+  --bg:#f3faff;
+  --border:#d9eaf3;
+  --shadow:0 14px 36px rgba(8,121,173,.12);
+}
+body{background:#f3faff;color:#183447}
+.topbar{background:#0879ad;border-bottom:3px solid #c7a45e}
+.brand small,.topbar nav a:hover,.topbar nav a.active{color:#fff0c8}
+.btn-dark{background:#0879ad;color:#fff;border-color:#0879ad}
+.btn-dark:hover{background:#06658f}
+.hero{
+ background:
+  radial-gradient(ellipse at 12% 18%,rgba(199,164,94,.22),transparent 38%),
+  radial-gradient(ellipse at 90% 100%,rgba(184,50,58,.13),transparent 35%),
+  linear-gradient(125deg,#075b83 0%,#0879ad 58%,#35b3df 100%);
+ border-bottom:5px solid #c7a45e
+}
+.section-heading h2,.how-section>h2,.offer-card h3,.offer-details strong,
+.pricing-label,.pricing-price{color:#0879ad}
+.category.active,.category:hover{background:#0879ad;border-color:#c7a45e}
+.offer-card,#offersGrid .offer-card{box-shadow:0 8px 24px rgba(8,121,173,.09)}
+.offer-card:hover,#offersGrid .offer-card:hover{box-shadow:0 16px 34px rgba(8,121,173,.16)}
+input:focus,select:focus,textarea:focus{border-color:#35a9d4;box-shadow:0 0 0 3px rgba(53,169,212,.18)}
+footer{background:#064d70;border-top:3px solid #c7a45e}
+
+/* Partner ads: full-width cards and prominent images, including small phones */
+#partner-ads.partner-ads-section{width:min(1240px,calc(100% - 24px))!important;max-width:1240px!important;margin:32px auto!important;padding:clamp(14px,2.5vw,28px)!important;box-sizing:border-box!important;background:#f0f9fe;border:1px solid #d6edf8;border-radius:22px}
+#partner-ads .partner-ads-grid{display:grid!important;width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:22px!important}
+#partner-ads .partner-ad{display:flex!important;flex-direction:column!important;width:100%!important;min-width:0!important;overflow:hidden!important;border:1px solid #d7eaf3!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 26px rgba(8,121,173,.11)!important}
+#partner-ads img.partner-ad-art{display:block!important;width:100%!important;height:clamp(220px,26vw,320px)!important;min-height:220px!important;max-height:none!important;object-fit:cover!important;object-position:center!important;flex:0 0 auto!important}
+#partner-ads .partner-ad-content{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;box-sizing:border-box!important;padding:20px!important}
+#partner-ads .partner-ad-content .btn{margin-top:auto!important}
+#partner-ads .partner-ad-category{color:#0879ad;font-weight:800}
+@media(max-width:600px){
+ #partner-ads.partner-ads-section{width:calc(100% - 16px)!important;padding:12px!important;border-radius:16px!important}
+ #partner-ads .partner-ads-grid{grid-template-columns:minmax(0,1fr)!important;gap:16px!important}
+ #partner-ads img.partner-ad-art{height:240px!important;min-height:240px!important}
+ #partner-ads .partner-ad-content{padding:16px!important}
+ #partner-ads .partner-ad-content h3{font-size:18px!important}
+ #partner-ads .partner-ad-content p{font-size:14px!important}
+}
