@@ -3,6 +3,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   "use strict";
 
   const $ = (id) => document.getElementById(id);
+  // Category explorer filters the live offers list without reloading the page.
+  document.querySelectorAll(".category-tile[data-category]").forEach((tile) => {
+    tile.addEventListener("click", () => {
+      const typeFilter = $("typeFilter");
+      if (typeFilter) {
+        typeFilter.value = tile.dataset.category || "";
+        typeFilter.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      $("offers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      $("searchBtn")?.click();
+    });
+  });
   const grid = $("offersGrid");
   const form = $("offerForm");
   const dialog = $("offerDialog");
