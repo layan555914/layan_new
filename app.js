@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!event.currentTarget.reportValidity()) return;
       const api = window.LAYAN_SUPABASE;
       if (!api) { status.textContent = "الاتصال بقاعدة البيانات غير جاهز."; return; }
-      const email = authDialog.querySelector("#authEmail").value.trim();
+      const email = authDialog.querySelector("#authEmail").value.trim().toLowerCase();
       const pass = password.value;
       submit.disabled = true;
       toggle.disabled = true;
@@ -195,7 +195,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (/Email not confirmed/i.test(text)) return "أكّد بريدك الإلكتروني من الرسالة التي وصلتك ثم سجّل الدخول.";
     if (/captcha_failed|captcha protection|captcha_token/i.test(text)) return "التسجيل متوقف بسبب إعداد CAPTCHA في خدمة المصادقة. يجب ضبط إعداد CAPTCHA في لوحة Supabase؛ ليست المشكلة في البريد أو كلمة المرور.";
     if (/redirect.*(allow|url)|not allowed.*redirect|invalid.*redirect/i.test(text)) return "رابط العودة بعد تأكيد البريد غير مسموح به في إعدادات Supabase Auth. أضف رابط منصة LAYAN إلى قائمة Redirect URLs المسموح بها.";
-    if (/rate limit/i.test(text)) return "تمت محاولات كثيرة. انتظر قليلًا ثم حاول مرة أخرى.";
+    if (/rate limit|over_email_send_rate_limit/i.test(text)) return "تم تجاوز عدد محاولات الإرسال المسموح. انتظر قليلًا ثم حاول مرة أخرى.";
+    if (/email_address_invalid|invalid email/i.test(text)) return "صيغة البريد الإلكتروني غير صحيحة. راجع كتابة البريد وحاول مرة أخرى.";
+    if (/signup_disabled|signups not allowed/i.test(text)) return "إنشاء الحسابات متوقف حاليًا من إعدادات المنصة. يلزم تفعيل التسجيل في إعدادات Supabase Auth.";
+    if (/user already registered/i.test(text)) return "هذا البريد مسجّل بالفعل. ارجع إلى تسجيل الدخول أو استخدم «نسيت كلمة المرور؟».";
     return text.length < 220 ? text : "تعذر إتمام العملية. راجع البريد وكلمة المرور ثم حاول مجددًا.";
   }
   function updateAuthButton() {
