@@ -194,8 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
       '<label>رابط صورة الإعلان (اختياري)<input name="image_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رابط صفحة النشاط (اختياري)<input name="target_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رقم التواصل<input name="contact_phone" required minlength="7" maxlength="30" type="tel" autocomplete="tel"></label>' +
-      '<label>الباقة المطلوبة بعد الشهر المجاني<select name="plan_code" required><option value="trial_30">تجربة مجانية — 30 يومًا (0 جنيه)</option><option value="starter_15">15 يومًا — 250 جنيهًا (مقترح)</option><option value="growth_30">30 يومًا — 450 جنيهًا (مقترح)</option><option value="partner_90">90 يومًا — 1200 جنيه (مقترح)</option></select></label>' +
-      '<p class="sponsor-plan-note">الأسعار مبدئية للتوضيح فقط، وليست طلب دفع. لن يتم الخصم أو تحصيل أي مبلغ تلقائيًا.</p>' +
+      '<label>الباقة المطلوبة بعد الشهر المجاني<select name="plan_code" required><option value="trial_30">تجربة مجانية — 30 يومًا (0 جنيه)</option><option value="starter_15">الباقة الأساسية — 15 يومًا (250 جنيهًا)</option><option value="growth_30">باقة النمو — 30 يومًا (450 جنيهًا)</option><option value="partner_90">باقة الشركاء — 90 يومًا (1200 جنيه)</option></select></label>' +
+      '<p class="sponsor-plan-note">الأسعار المعتمدة للباقات المدفوعة موضحة أعلاه. أرسل الطلب أولًا وانتظر موافقة الإدارة؛ لن يتم تحصيل أي مبلغ تلقائيًا.</p>' +
       '<p class="sponsor-form-status" role="status" aria-live="polite"></p>' +
       '<button class="btn btn-gold" type="submit">إرسال طلب الإعلان</button></form>';
     document.body.appendChild(dialog);
