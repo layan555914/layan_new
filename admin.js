@@ -109,6 +109,35 @@ document.addEventListener("DOMContentLoaded", () => {
         : error.message);
     }
   }
+  const forgotPassword = document.getElementById("adminForgotPassword");
+  forgotPassword?.addEventListener("click", async event => {
+    event.preventDefault();
+    const recoveryEmail = email.value.trim();
+    if (!recoveryEmail) {
+      setStatus("اكتب بريدك الإلكتروني أولًا، ثم اضغط «نسيت كلمة المرور؟».");
+      email.focus();
+      return;
+    }
+    const link = forgotPassword;
+    link.style.pointerEvents = "none";
+    setStatus("جارٍ إرسال رابط استعادة كلمة المرور إلى بريدك...");
+    try {
+      const response = await fetch(base + "/auth/v1/recover?redirect_to=" + encodeURIComponent("https://layan-eg.com/reset-password.html"), {
+        method: "POST",
+        headers: { apikey: key, "Content-Type": "application/json" },
+        body: JSON.stringify({ email: recoveryEmail })
+      });
+      const raw = await response.text();
+      let data = {};
+      try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
+      if (!response.ok) throw new Error(data.msg || data.message || data.error_description || data.error || "تعذر إرسال رسالة الاستعادة.");
+      setStatus("لو البريد مسجل في المنصة، ستصلك رسالة استعادة. افتح أحدث رسالة من Supabase واضغط الرابط، ثم عيّن كلمة مرور جديدة. راجع الرسائل غير المرغوب فيها أيضًا.");
+    } catch (error) {
+      setStatus("تعذر إرسال رابط الاستعادة: " + error.message + " إذا ظهر خطأ في الرابط المسموح، يلزم إضافة https://layan-eg.com/reset-password.html إلى إعدادات Redirect URLs في Supabase.");
+    } finally {
+      link.style.pointerEvents = "";
+    }
+  });
   login.addEventListener("submit", async event => {
     event.preventDefault();
     const button = login.querySelector('button[type="submit"]');
