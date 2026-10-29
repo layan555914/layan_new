@@ -1866,3 +1866,79 @@ button:focus-visible, a:focus-visible { outline:3px solid #e0c17d; outline-offse
 #reportOfferBtn{border-color:#b94747;color:#a52e35}
 #reportOfferBtn:hover{background:#fff0f0}
 @media(max-width:520px){.details-actions .btn{flex-basis:100%;width:100%}}
+
+
+/* LAYAN AQAR — premium real-estate color system */
+:root {
+  --navy: #102746;
+  --blue: #1b416b;
+  --gold: #c7a45e;
+  --gold-light: #f0dfb6;
+  --red: #b8323a;
+  --white: #ffffff;
+  --bg: #f5f7fa;
+  --text: #1b2c42;
+  --muted: #6f7d90;
+  --border: #e2e7ef;
+  --shadow: 0 14px 36px rgba(16, 39, 70, .10);
+}
+body { background: #f5f7fa; color: #1b2c42; }
+.topbar { background: #102746; border-bottom: 3px solid #c7a45e; }
+.brand small, .topbar nav a:hover, .topbar nav a.active { color: #f0dfb6; }
+.btn { border-radius: 10px; font-weight: 700; }
+.btn-gold {
+  color: #102746;
+  background: linear-gradient(135deg, #e2c783, #c7a45e);
+  border-color: #c7a45e;
+  box-shadow: 0 4px 12px rgba(199,164,94,.20);
+}
+.btn-gold:hover { background: #ecd69d; }
+.btn-dark { background: #102746; color: #fff; border-color: #102746; }
+.btn-dark:hover { background: #1b416b; }
+.btn-outline { border-color: rgba(255,255,255,.48); }
+.btn-outline:hover { border-color: #c7a45e; color: #f0dfb6; }
+.hero {
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(199,164,94,.20), transparent 38%),
+    radial-gradient(ellipse at 90% 100%, rgba(184,50,58,.16), transparent 35%),
+    linear-gradient(125deg, #0b1b30 0%, #102746 58%, #1b416b 100%);
+  border-bottom: 5px solid #c7a45e;
+}
+.hero h1 span, .hero .eyebrow { color: #f0dfb6; }
+.hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:22px; }
+.section-heading h2, .how-section > h2 { color:#102746; }
+.category { transition: .18s ease; }
+.category.active, .category:hover {
+  color:#fff; background:#102746; border-color:#c7a45e;
+  box-shadow: 0 4px 12px rgba(16,39,70,.12);
+}
+.search-panel, .filters { border-color:#e2e7ef; box-shadow:0 12px 30px rgba(16,39,70,.08); }
+input:focus, select:focus, textarea:focus {
+  border-color:#c7a45e; box-shadow:0 0 0 3px rgba(199,164,94,.20);
+}
+.offer-card, #offersGrid .offer-card {
+  border-color:#e2e7ef; border-radius:16px;
+  box-shadow:0 8px 24px rgba(16,39,70,.07);
+}
+.offer-card:hover, #offersGrid .offer-card:hover {
+  border-color:#d5bd84; box-shadow:0 16px 34px rgba(16,39,70,.12);
+}
+.offer-card h3 { color:#102746; }
+.offer-type { color:#102746; background:#f4e7c9; border:1px solid #ead9b2; }
+.offer-details > div { background:#f4f6f9; border:1px solid #edf0f4; }
+.offer-details strong { color:#102746; }
+.status-message { border-right-color:#c7a45e; background:#fffaf0; }
+.steps article, .how-card { background:#fff; border-color:#e2e7ef; }
+.steps article > b { color:#b8323a; }
+.close-btn, #closeDialog { background:#b8323a; }
+.close-btn:hover, #closeDialog:hover { background:#96252d; }
+footer { background:#0b1b30; border-top:3px solid #c7a45e; }
+.launch-pill, .partner-free-note { border-color:#c7a45e; }
+.pricing-card-featured { border-color:#c7a45e; box-shadow:0 12px 30px rgba(199,164,94,.16); }
+.pricing-label { color:#102746; }
+.pricing-price { color:#102746; }
+a:focus-visible, button:focus-visible { outline:3px solid #c7a45e; outline-offset:3px; }
+@media (max-width:600px) {
+  .hero-actions .btn { flex:1 1 145px; }
+  .offer-card, #offersGrid .offer-card { border-radius:14px; }
+}
