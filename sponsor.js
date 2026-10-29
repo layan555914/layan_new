@@ -263,8 +263,28 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { Prefer: "return=minimal" },
         body: JSON.stringify(payload)
       });
+      const businessName = String(data.get("business_name") || "").trim();
+      const category = String(data.get("category") || "");
+      const title = String(data.get("title") || "").trim();
+      const phone = String(data.get("contact_phone") || "").trim();
+      const planNames = {
+        trial_30: "فترة التعريف المجانية — 30 يومًا",
+        starter_15: "باقة أساسية — 15 يومًا",
+        growth_30: "باقة نمو — 30 يومًا",
+        partner_90: "باقة شركاء — 90 يومًا"
+      };
+      const message = [
+        "مرحبًا، أرسلت طلب إعلان إلى منصة LAYAN AQAR وأريد متابعة الطلب.",
+        "اسم النشاط: " + businessName,
+        "المجال: " + category,
+        "عنوان الإعلان: " + title,
+        "رقم التواصل: " + phone,
+        "الباقة المطلوبة: " + (planNames[plan] || plan),
+        "أرجو تأكيد استلام الطلب وإرسال تفاصيل الباقة قبل أي دفع."
+      ].join("\n");
+      const whatsappUrl = "https://wa.me/201007044265?text=" + encodeURIComponent(message);
       form.reset();
-      status.textContent = "تم إرسال طلب الإعلان للمراجعة. الشهر الأول مجاني لجميع المستخدمين. الباقات المدفوعة تبدأ بعد انتهاء أول 30 يومًا من الإطلاق الرسمي وإعلان ليان عن تفعيل الدفع؛ لا تحوّل أي مبلغ الآن.";
+      status.innerHTML = "تم حفظ طلبك في ليان للمراجعة. الشهر الأول مجاني، ولا يتم تحصيل أي مبلغ الآن. <a class=\"sponsor-whatsapp-followup\" href=\"" + whatsappUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\">اضغط هنا لمتابعة الطلب عبر واتساب</a>";
     } catch (error) {
       status.textContent = error.message || "تعذر إرسال الطلب. حاول مرة أخرى.";
     } finally {
