@@ -10,32 +10,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   const formStatusBox = $("formStatusMessage");
   const photosInput = $("photosInput");
   const areaFilter = $("areaFilter");
-  // Share the canonical LAYAN domain; on browsers without the share sheet, open Instagram and copy the link.
+  // Instagram does not accept a website URL as a direct feed-post share.
+  // Open Instagram directly and copy the official LAYAN URL for pasting into a bio, story, or DM.
   const instagramShareLink = $("instagramShareLink");
   instagramShareLink?.addEventListener("click", async (event) => {
-    const shareData = {
-      title: "LAYAN AQAR | ليان عقار",
-      text: "اكتشف الفرص والتنازلات العقارية في أسيوط عبر منصة ليان",
-      url: "https://layan-eg.com/"
-    };
-    if (navigator.share) {
-      event.preventDefault();
-      try { await navigator.share(shareData); }
-      catch (error) { if (error?.name !== "AbortError") console.warn("تعذرت المشاركة:", error); }
-    } else {
-      event.preventDefault();
-      // Open synchronously from the tap to avoid popup blockers after clipboard access.
-      window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+    event.preventDefault();
+    const siteUrl = "https://layan-eg.com/";
+    // Open on the direct tap to avoid mobile popup blockers.
+    window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+    try {
       if (navigator.clipboard?.writeText) {
-        try {
-          await navigator.clipboard.writeText(shareData.url);
-          alert("تم نسخ رابط ليان. افتح إنستجرام والصقه في الرسالة أو القصة.");
-        } catch {
-          alert("افتح إنستجرام وشارك الرابط يدويًا: " + shareData.url);
-        }
+        await navigator.clipboard.writeText(siteUrl);
+        alert("تم نسخ رابط ليان: " + siteUrl + "\nالصقه داخل إنستجرام في الرسالة أو النبذة أو القصة.");
       } else {
-        alert("افتح إنستجرام وشارك الرابط يدويًا: " + shareData.url);
+        window.prompt("انسخ رابط ليان والصقه في إنستجرام:", siteUrl);
       }
+    } catch {
+      window.prompt("انسخ رابط ليان والصقه في إنستجرام:", siteUrl);
     }
   });
 
