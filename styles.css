@@ -2185,3 +2185,48 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offse
 @media(max-width:700px){
  .hero{background-position:center!important}
 }
+
+
+/* Final typography and contrast polish */
+.hero{
+ background:
+  linear-gradient(100deg,rgba(3,66,100,.68),rgba(5,107,151,.54)),
+  url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90') center 52%/cover no-repeat!important;
+}
+.hero:before{
+ background:linear-gradient(90deg,rgba(3,54,83,.16),rgba(2,77,113,.22))!important;
+}
+.hero h1,.hero p,.hero .eyebrow,.hero-content p{
+ color:#fff!important;
+ text-shadow:0 2px 8px rgba(0,35,57,.75)!important;
+}
+.hero .eyebrow{color:#ffe3a0!important}
+.brand strong{
+ display:block!important;
+ font-size:clamp(25px,2.7vw,34px)!important;
+ line-height:1.12!important;
+ letter-spacing:.07em!important;
+ font-weight:900!important;
+ color:#07527b!important;
+}
+.brand small{
+ display:block!important;
+ margin-top:3px!important;
+ font-size:12px!important;
+ line-height:1.35!important;
+ font-weight:600!important;
+ letter-spacing:0!important;
+ color:#3287aa!important;
+}
+h1,h2,h3,h4,.section-heading h2,.offer-card h3{
+ font-family:"Cairo","IBM Plex Sans Arabic",Tahoma,Arial,sans-serif!important;
+ letter-spacing:-.02em!important;
+}
+p,button,a,label,input,select,textarea,.offer-details,.pricing-card{
+ font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif;
+}
+@media(max-width:600px){
+ .brand strong{font-size:24px!important}
+ .brand small{font-size:11px!important}
+ .hero{background-position:center!important}
+}
