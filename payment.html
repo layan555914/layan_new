@@ -26,7 +26,7 @@ footer{text-align:center;color:#697386;padding:22px;font-size:.9rem}
 <header><a class="brand" href="./index.html">LAYAN AQAR <small>ليان عقار</small></a><a class="back" href="./index.html#pricing">العودة إلى الباقات</a></header>
 <main><section class="panel">
 <h1>الدفع مقابل إعلانات ليان</h1>
-<p class="intro">طريقة الدفع الحالية هي فودافون كاش. اختر الباقة التي تريد دفعها ثم اتبع الخطوات. لا توجد عمولة على إتمام التنازل العقاري.</p>
+<p class="intro">أول 30 يومًا من الإطلاق الرسمي مجانية لجميع المستخدمين: الأفراد والشركات العقارية وشركات التشطيب والديكور. صفحة الدفع معروضة للتعريف بالأسعار التي ستبدأ بعد انتهاء الشهر التجريبي، لكن الدفع غير مفعّل حاليًا. لا تحوّل أي مبلغ الآن.</p>
 <label for="plan">الباقة الإعلانية</label>
 <select id="plan">
 <option value="إعلان مميز 15 يومًا" data-amount="100">تمييز إعلان واحد — 15 يومًا — 100 جنيه</option>
@@ -36,25 +36,23 @@ footer{text-align:center;color:#697386;padding:22px;font-size:.9rem}
 <option value="شركة — باقة شركاء 90 يومًا" data-amount="1200">الشركات — باقة شركاء / 90 يومًا — 1200 جنيه</option>
 </select>
 <p><strong>المبلغ المطلوب:</strong> <span id="amount">100</span> جنيه مصري</p>
-<div class="payment-card"><div class="label">حوّل إلى رقم فودافون كاش التالي</div><div><span class="phone" id="phone">01007044265</span><button class="copy" id="copyPhone" type="button">نسخ الرقم</button></div><small style="color:#dbe2ec">تأكد من الرقم والمبلغ قبل تأكيد التحويل.</small></div>
-<div class="step"><span class="num">1</span><div>حوّل قيمة الباقة المحددة إلى رقم فودافون كاش الموضح أعلاه.</div></div>
-<div class="step"><span class="num">2</span><div>احتفظ بإيصال التحويل ورقم العملية، واكتب بياناتك أدناه.</div></div>
-<div class="step"><span class="num">3</span><div>اضغط على إرسال بيانات الدفع عبر واتساب، ثم أرفق صورة الإيصال في المحادثة.</div></div>
+<div class="warning"><strong>الشهر التجريبي للجميع:</strong> لن يتم استقبال مدفوعات خلال أول 30 يومًا من الإطلاق الرسمي. ستعلن إدارة ليان عن تفعيل الدفع بعد انتهاء الشهر المجاني. الأسعار الظاهرة للتعريف بالباقات المستقبلية فقط.</div>
+<p class="muted">بعد انتهاء الشهر المجاني والإعلان عن بدء الدفع، ستُتاح خطوات التحويل وإرسال الإيصال من هذه الصفحة.</p>
 <label for="customerName">الاسم</label><input id="customerName" autocomplete="name" placeholder="اسم صاحب الإعلان">
 <label for="customerPhone">رقم الموبايل</label><input id="customerPhone" inputmode="tel" autocomplete="tel" placeholder="رقم للتواصل">
 <label for="offerTitle">عنوان الإعلان أو رقم الطلب</label><input id="offerTitle" placeholder="مثال: شقة في أسيوط الجديدة">
 <label for="transactionRef">رقم عملية التحويل (إن توفر)</label><input id="transactionRef" placeholder="اكتب رقم العملية الموجود بالإيصال">
-<button class="whatsapp" id="sendPayment" type="button">إرسال بيانات الدفع عبر واتساب</button>
+<button class="whatsapp" id="sendPayment" type="button" disabled>الدفع غير مفعّل خلال الشهر المجاني</button>
 <p class="status" id="status" role="status" aria-live="polite"></p>
-<div class="warning"><strong>تنبيه مهم:</strong> إرسال البيانات أو صورة الإيصال لا يعني تفعيل الإعلان فورًا. ستراجع إدارة ليان التحويل وتتأكد من وصول المبلغ، ثم يتم تفعيل الباقة. تجربة إعلانات الشركاء المجانية لمدة 30 يومًا تُطلب من نموذج إعلانات الشركاء، ولا يلزم دفع أي مبلغ لها. الباقات المدفوعة تُفعّل بعد مراجعة الإدارة وتأكيد وصول التحويل.</div>
+<div class="warning"><strong>تنبيه مهم:</strong> الشهر الأول مجاني لجميع المستخدمين وليس للشركاء فقط. لا تحوّل أي أموال الآن. بعد انتهاء أول 30 يومًا من الإطلاق الرسمي، ستعلن إدارة ليان عن تفعيل الدفع وتبدأ مراجعة التحويلات يدويًا قبل تفعيل أي باقة.</div>
 </section></main>
 <footer>LAYAN AQAR — ليان عقار · منصة إعلانات عقارية</footer>
 <script>
 const plan=document.getElementById('plan'), amount=document.getElementById('amount'), status=document.getElementById('status');
-function syncPlan(){const option=plan.options[plan.selectedIndex];amount.textContent=option.dataset.amount;document.getElementById('sendPayment').disabled=false;document.getElementById('sendPayment').style.opacity='1';status.textContent=''}
+function syncPlan(){const option=plan.options[plan.selectedIndex];amount.textContent=option.dataset.amount;document.getElementById('sendPayment').disabled=true;document.getElementById('sendPayment').style.opacity='.65';status.textContent='الأسعار للتعريف فقط؛ الدفع غير مفعّل خلال الشهر المجاني.'}
 plan.addEventListener('change',syncPlan);syncPlan();
-document.getElementById('copyPhone').addEventListener('click',async()=>{try{await navigator.clipboard.writeText('01007044265');status.textContent='تم نسخ الرقم.'}catch(e){status.textContent='انسخ الرقم يدويًا: 01007044265'}});
-document.getElementById('sendPayment').addEventListener('click',()=>{const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim(),offer=document.getElementById('offerTitle').value.trim(),ref=document.getElementById('transactionRef').value.trim();if(!name||!phone||!offer){status.textContent='من فضلك اكتب الاسم ورقم الموبايل وعنوان الإعلان أو رقم الطلب.';return}const msg='طلب مراجعة دفع إعلان على LAYAN AQAR%0Aالباقة: '+encodeURIComponent(plan.value)+'%0Aالمبلغ: '+encodeURIComponent(amount.textContent+' جنيه')+'%0Aالاسم: '+encodeURIComponent(name)+'%0Aرقم التواصل: '+encodeURIComponent(phone)+'%0Aالإعلان/الطلب: '+encodeURIComponent(offer)+'%0Aرقم العملية: '+encodeURIComponent(ref||'سيتم إرفاق الإيصال');window.open('https://wa.me/201007044265?text='+msg,'_blank','noopener,noreferrer');status.textContent='أرسل الرسالة عبر واتساب وأرفق صورة الإيصال في المحادثة.'});
+
+
 </script>
 </body>
 </html>
