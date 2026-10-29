@@ -267,6 +267,7 @@
     if (!isAuthenticated()) throw new Error("سجّل الدخول أو أنشئ حسابًا أولًا لإرسال عرضك.");
     const payload = {
       owner_id: session.user.id,
+      ...(offer.company_ad_id ? { company_ad_id: offer.company_ad_id } : {}),
       title: offer.title,
       governorate: "أسيوط",
       city: offer.city || null,
