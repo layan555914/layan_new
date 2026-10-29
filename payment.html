@@ -31,8 +31,9 @@ footer{text-align:center;color:#697386;padding:22px;font-size:.9rem}
 <select id="plan">
 <option value="إعلان مميز 15 يومًا" data-amount="100">تمييز إعلان واحد — 15 يومًا — 100 جنيه</option>
 <option value="إعلان مميز 30 يومًا" data-amount="200">تمييز إعلان واحد — 30 يومًا — 200 جنيه</option>
-<option value="باقة شركات 3 عقارات" data-amount="250">الشركات — 3 عقارات / 15 يومًا — 250 جنيه (سعر مقترح، غير متاح للدفع حاليًا)</option>
-<option value="باقة شركات 5 عقارات" data-amount="600">الشركات — 5 عقارات / 30 يومًا — 600 جنيه (سعر مقترح، غير متاح للدفع حاليًا)</option>
+<option value="شركة — باقة أساسية 15 يومًا" data-amount="250">الشركات — باقة أساسية / 15 يومًا — 250 جنيه</option>
+<option value="شركة — باقة نمو 30 يومًا" data-amount="450">الشركات — باقة نمو / 30 يومًا — 450 جنيه</option>
+<option value="شركة — باقة شركاء 90 يومًا" data-amount="1200">الشركات — باقة شركاء / 90 يومًا — 1200 جنيه</option>
 </select>
 <p><strong>المبلغ المطلوب:</strong> <span id="amount">100</span> جنيه مصري</p>
 <div class="payment-card"><div class="label">حوّل إلى رقم فودافون كاش التالي</div><div><span class="phone" id="phone">01007044265</span><button class="copy" id="copyPhone" type="button">نسخ الرقم</button></div><small style="color:#dbe2ec">تأكد من الرقم والمبلغ قبل تأكيد التحويل.</small></div>
@@ -45,12 +46,12 @@ footer{text-align:center;color:#697386;padding:22px;font-size:.9rem}
 <label for="transactionRef">رقم عملية التحويل (إن توفر)</label><input id="transactionRef" placeholder="اكتب رقم العملية الموجود بالإيصال">
 <button class="whatsapp" id="sendPayment" type="button">إرسال بيانات الدفع عبر واتساب</button>
 <p class="status" id="status" role="status" aria-live="polite"></p>
-<div class="warning"><strong>تنبيه مهم:</strong> إرسال البيانات أو صورة الإيصال لا يعني تفعيل الإعلان فورًا. ستراجع إدارة ليان التحويل وتتأكد من وصول المبلغ، ثم يتم تفعيل الباقة. باقات الشركات المعروضة كسعر مقترح ليست متاحة للدفع حتى اعتمادها رسميًا.</div>
+<div class="warning"><strong>تنبيه مهم:</strong> إرسال البيانات أو صورة الإيصال لا يعني تفعيل الإعلان فورًا. ستراجع إدارة ليان التحويل وتتأكد من وصول المبلغ، ثم يتم تفعيل الباقة. تجربة إعلانات الشركاء المجانية لمدة 30 يومًا تُطلب من نموذج إعلانات الشركاء، ولا يلزم دفع أي مبلغ لها. الباقات المدفوعة تُفعّل بعد مراجعة الإدارة وتأكيد وصول التحويل.</div>
 </section></main>
 <footer>LAYAN AQAR — ليان عقار · منصة إعلانات عقارية</footer>
 <script>
 const plan=document.getElementById('plan'), amount=document.getElementById('amount'), status=document.getElementById('status');
-function syncPlan(){const option=plan.options[plan.selectedIndex];const unavailable=plan.selectedIndex>=2;amount.textContent=option.dataset.amount;document.getElementById('sendPayment').disabled=unavailable;document.getElementById('sendPayment').style.opacity=unavailable?'.5':'1';status.textContent=unavailable?'هذه الباقة سعرها مقترح وغير متاحة للدفع حاليًا.':''}
+function syncPlan(){const option=plan.options[plan.selectedIndex];amount.textContent=option.dataset.amount;document.getElementById('sendPayment').disabled=false;document.getElementById('sendPayment').style.opacity='1';status.textContent=''}
 plan.addEventListener('change',syncPlan);syncPlan();
 document.getElementById('copyPhone').addEventListener('click',async()=>{try{await navigator.clipboard.writeText('01007044265');status.textContent='تم نسخ الرقم.'}catch(e){status.textContent='انسخ الرقم يدويًا: 01007044265'}});
 document.getElementById('sendPayment').addEventListener('click',()=>{const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim(),offer=document.getElementById('offerTitle').value.trim(),ref=document.getElementById('transactionRef').value.trim();if(!name||!phone||!offer){status.textContent='من فضلك اكتب الاسم ورقم الموبايل وعنوان الإعلان أو رقم الطلب.';return}const msg='طلب مراجعة دفع إعلان على LAYAN AQAR%0Aالباقة: '+encodeURIComponent(plan.value)+'%0Aالمبلغ: '+encodeURIComponent(amount.textContent+' جنيه')+'%0Aالاسم: '+encodeURIComponent(name)+'%0Aرقم التواصل: '+encodeURIComponent(phone)+'%0Aالإعلان/الطلب: '+encodeURIComponent(offer)+'%0Aرقم العملية: '+encodeURIComponent(ref||'سيتم إرفاق الإيصال');window.open('https://wa.me/201007044265?text='+msg,'_blank','noopener,noreferrer');status.textContent='أرسل الرسالة عبر واتساب وأرفق صورة الإيصال في المحادثة.'});
