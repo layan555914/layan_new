@@ -10,6 +10,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   const formStatusBox = $("formStatusMessage");
   const photosInput = $("photosInput");
   const areaFilter = $("areaFilter");
+  // Share LAYAN using the device share sheet so users can choose Instagram or another app.
+  const instagramShareLink = $("instagramShareLink");
+  instagramShareLink?.addEventListener("click", async (event) => {
+    const shareData = {
+      title: "LAYAN AQAR | ليان عقار",
+      text: "اكتشف الفرص والتنازلات العقارية في أسيوط عبر منصة ليان",
+      url: "https://layan555914.github.io/layan_new/"
+    };
+    if (navigator.share) {
+      event.preventDefault();
+      try { await navigator.share(shareData); }
+      catch (error) { if (error?.name !== "AbortError") console.warn("تعذرت المشاركة:", error); }
+    } else if (navigator.clipboard?.writeText) {
+      event.preventDefault();
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+        alert("تم نسخ رابط ليان. افتح إنستجرام والصقه في الرسالة أو القصة.");
+      } catch {
+        window.open("https://www.instagram.com/", "_blank", "noopener");
+      }
+    }
+  });
+
 
   // Progressive Web App: install prompt and offline shell.
   let installPrompt = null;
