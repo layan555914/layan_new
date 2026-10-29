@@ -719,14 +719,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         offer.image_urls = await api.uploadImages(files);
       }
 
-      setStatus("جارٍ حفظ العرض...");
+      setStatus(selectedAccountType === "company" ? "جارٍ ربط العقار بإعلان الشركة والتحقق من حد 3 عقارات..." : "جارٍ حفظ العرض...");
+      if (selectedAccountType === "company") {
+        if (!api.getOrCreateCompanyAd) throw new Error("ميزة إعلانات الشركات غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
+        offer.company_ad_id = await api.getOrCreateCompanyAd(offer.developer_name);
+      }
       await api.createOffer(offer);
 
       form.reset();
       closeDialog();
       setStatus(offer.featured_requested
         ? "تم إرسال العرض وطلب الإعلان المميز للمراجعة. الدفع الإلكتروني غير مفعّل حاليًا؛ لا تحوّل أي مبلغ قبل إعلان وسيلة دفع رسمية من إدارة ليان. لن يظهر الإعلان كمميز إلا بعد تأكيد الدفع من الإدارة."
-        : "تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
+        : selectedAccountType === "company"
+          ? "تم إرسال العقار للمراجعة وربطه بإعلان الشركة. يمكنك إضافة عقارين آخرين كحد أقصى إلى إعلان الشركة نفسه باستخدام اسم الشركة ذاته. قاعدة البيانات تمنع إضافة عقار رابع إلى الإعلان الواحد."
+          : "تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
       setStatus(error.message || "فشل الحفظ. راجع إعدادات Supabase.");
