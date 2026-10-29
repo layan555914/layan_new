@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dialog.className = "sponsor-dialog";
     dialog.innerHTML =
       '<div class="sponsor-dialog-head"><h2>اطلب إعلانًا ممولًا</h2><button type="button" class="sponsor-close" aria-label="إغلاق">×</button></div>' +
-      '<p class="sponsor-price-note">تجربة مجانية لمدة 30 يومًا تبدأ بعد موافقة الإدارة وتفعيل الإعلان، وليس بمجرد إرسال الطلب. بعد انتهاء التجربة، لا تُفرض رسوم إلا بعد موافقتك.</p>' +
+      '<p class="sponsor-price-note">أول 30 يومًا من الإطلاق الرسمي مجانية لجميع المستخدمين: الأفراد والشركات العقارية وشركات التشطيب والديكور. الأسعار المدفوعة تبدأ بعد انتهاء الشهر المجاني والإعلان رسميًا عن تفعيل الدفع. إرسال الطلب لا يفرض أي رسوم.</p>' +
       '<p>الإعلانات تظهر داخل قائمة العروض العقارية بعد موافقة الإدارة. أرسل بيانات نشاطك للمراجعة.</p>' +
       '<form class="sponsor-form">' +
       '<label>اسم النشاط<input name="business_name" required minlength="2" maxlength="120" autocomplete="organization"></label>' +
@@ -194,8 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
       '<label>رابط صورة الإعلان (اختياري)<input name="image_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رابط صفحة النشاط (اختياري)<input name="target_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رقم التواصل<input name="contact_phone" required minlength="7" maxlength="30" type="tel" autocomplete="tel"></label>' +
-      '<label>الباقة المطلوبة بعد الشهر المجاني<select name="plan_code" required><option value="trial_30">تجربة مجانية — 30 يومًا (0 جنيه)</option><option value="starter_15">الباقة الأساسية — 15 يومًا (250 جنيهًا)</option><option value="growth_30">باقة النمو — 30 يومًا (450 جنيهًا)</option><option value="partner_90">باقة الشركاء — 90 يومًا (1200 جنيه)</option></select></label>' +
-      '<p class="sponsor-plan-note">الأسعار المعتمدة للباقات المدفوعة موضحة أعلاه. أرسل الطلب أولًا وانتظر موافقة الإدارة؛ لن يتم تحصيل أي مبلغ تلقائيًا.</p>' +
+      '<label>الباقة المطلوبة بعد الشهر المجاني<select name="plan_code" required><option value="trial_30">الشهر الأول المجاني للجميع — 30 يومًا (0 جنيه)</option><option value="starter_15">بعد الشهر المجاني: الباقة الأساسية — 15 يومًا (250 جنيهًا)</option><option value="growth_30">بعد الشهر المجاني: باقة النمو — 30 يومًا (450 جنيهًا)</option><option value="partner_90">بعد الشهر المجاني: باقة الشركاء — 90 يومًا (1200 جنيه)</option></select></label>' +
+      '<p class="sponsor-plan-note">الشهر الأول مجاني لجميع المستخدمين. الباقات المدفوعة تبدأ بعد انتهاء أول 30 يومًا من الإطلاق الرسمي، وبعد إعلان ليان عن تفعيل الدفع. لا تحوّل أي مبلغ خلال الفترة المجانية.</p>' +
       '<p class="sponsor-form-status" role="status" aria-live="polite"></p>' +
       '<button class="btn btn-gold" type="submit">إرسال طلب الإعلان</button></form>';
     document.body.appendChild(dialog);
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(payload)
       });
       form.reset();
-      status.textContent = "تم إرسال طلب إعلان الشريك للمراجعة. إذا تمت الموافقة على باقة مدفوعة، افتح صفحة الدفع عبر فودافون كاش من رابط الدفع بالموقع وأرسل بيانات التحويل والإيصال. لا تدفع قبل اعتماد طلبك، ولا تُحصّل رسوم بعد التجربة دون موافقتك.";
+      status.textContent = "تم إرسال طلب الإعلان للمراجعة. الشهر الأول مجاني لجميع المستخدمين. الباقات المدفوعة تبدأ بعد انتهاء أول 30 يومًا من الإطلاق الرسمي وإعلان ليان عن تفعيل الدفع؛ لا تحوّل أي مبلغ الآن.";
     } catch (error) {
       status.textContent = error.message || "تعذر إرسال الطلب. حاول مرة أخرى.";
     } finally {
