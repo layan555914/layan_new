@@ -348,6 +348,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       .trim().toLowerCase();
     const type = $("typeFilter")?.value || "";
     const area = areaFilter?.value || "";
+    const downPaymentMaxRaw = $("downPaymentMaxFilter")?.value ?? "";
+    const monthlyMaxRaw = $("monthlyMaxFilter")?.value ?? "";
+    const downPaymentMax = downPaymentMaxRaw.trim() === "" ? null : num(downPaymentMaxRaw);
+    const monthlyMax = monthlyMaxRaw.trim() === "" ? null : num(monthlyMaxRaw);
     const sort = $("sortFilter")?.value || "newest";
     const companyQuery = ($("companySearchInput")?.value || "").trim().toLowerCase();
 
@@ -361,6 +365,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!companyQuery || String(o.developer_name || "").toLowerCase().includes(companyQuery)) &&
         (!type || o.property_type === type) &&
         (!area || o.area === area) &&
+        (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
+        (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
         (!activeKind || categoryMatches(o, activeKind));
     });
 
@@ -676,6 +682,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("typeFilter")?.addEventListener("change", render);
   areaFilter?.addEventListener("change", render);
   $("sortFilter")?.addEventListener("change", render);
+  $("downPaymentMaxFilter")?.addEventListener("input", render);
+  $("monthlyMaxFilter")?.addEventListener("input", render);
   $("searchBtn")?.addEventListener("click", render);
 
   const calcContract = $("calcContract");
