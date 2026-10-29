@@ -10,8 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const password = document.getElementById("adminPassword");
   const authPanel = document.getElementById("authPanel");
   const reviewPanel = document.getElementById("reviewPanel");
+  // Persist the admin session across tabs and browser restarts; refresh it when needed.
   const sessionKey = "layanSupabaseSession";
-  const readSession = () => { try { return JSON.parse(sessionStorage.getItem(sessionKey) || "null"); } catch (_) { return null; } };
+  const readSession = () => { try { return JSON.parse(localStorage.getItem(sessionKey) || "null"); } catch (_) { return null; } };
   let session = readSession();
   const setStatus = message => { status.textContent = message || ""; };
   async function ensureFreshSession() {
@@ -20,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (expiresAt > Math.floor(Date.now() / 1000) + 60) return;
     if (!session.refresh_token) {
       session = null;
-      sessionStorage.removeItem(sessionKey);
+      localStorage.removeItem(sessionKey);
       showState(false);
       throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
     }
@@ -35,10 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
       try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
       if (!response.ok || !data?.access_token || !data?.user) throw new Error("refresh failed");
       session = { access_token: data.access_token, refresh_token: data.refresh_token || session.refresh_token, expires_at: data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600), user: data.user };
-      sessionStorage.setItem(sessionKey, JSON.stringify(session));
+      localStorage.setItem(sessionKey, JSON.stringify(session));
     } catch (_) {
       session = null;
-      sessionStorage.removeItem(sessionKey);
+      localStorage.removeItem(sessionKey);
       showState(false);
       throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
     }
@@ -119,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (!data?.access_token || !data?.user?.id) throw new Error("لم يتم إنشاء جلسة دخول صالحة.");
       session = {access_token:data.access_token,refresh_token:data.refresh_token || null,expires_at:data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600),user:data.user};
-      sessionStorage.setItem(sessionKey, JSON.stringify(session));
+      localStorage.setItem(sessionKey, JSON.stringify(session));
       showState(true);
       await loadPending();
     } catch (error) {
@@ -152,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("adminLogout").addEventListener("click", async () => {
     try { if (session?.access_token) await request("/auth/v1/logout", {method:"POST"}); } catch (_) {}
     session = null;
-    sessionStorage.removeItem(sessionKey);
+    localStorage.removeItem(sessionKey);
     showState(false);
     setStatus("تم تسجيل الخروج.");
   });
