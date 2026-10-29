@@ -568,7 +568,29 @@ document.addEventListener("DOMContentLoaded", async () => {
           href="https://wa.me/${String(o.contact_phone).replace(/[^0-9]/g, "").replace(/^0/, "2")}?text=${encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + o.title + " - كود " + offerCode(o) + "، من منصة LAYAN AQAR.")}">واتساب صاحب الإعلان</a>` : `<p class="details-warning">لم يضف صاحب الإعلان رقم تواصل؛ يمكنك الرجوع لاحقًا أو اختيار عرض آخر.</p>`}
       </div>
       <p class="details-warning">تحقق من العقد والمستندات وموافقة المطوّر قبل دفع أي مبلغ.</p>
+      <div class="details-actions">
+        <button type="button" class="btn btn-outline-dark" id="shareOfferBtn">مشاركة الإعلان</button>
+        <a class="btn btn-outline-dark" id="reportOfferBtn" target="_blank" rel="noopener noreferrer"
+          href="https://wa.me/201007044265?text=${encodeURIComponent("أرغب في الإبلاغ عن إعلان على LAYAN AQAR: " + o.title + " - كود الإعلان " + offerCode(o))}">الإبلاغ عن الإعلان</a>
+      </div>
     `;
+
+    const shareButton = $("shareOfferBtn");
+    shareButton?.addEventListener("click", async () => {
+      const shareUrl = "https://layan-eg.com/#offers";
+      const shareData = {title: "LAYAN AQAR | " + o.title, text: "إعلان عقاري على ليان: " + o.title + " — كود الإعلان " + offerCode(o), url: shareUrl};
+      try {
+        if (navigator.share) await navigator.share(shareData);
+        else if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(shareData.text + "\\n" + shareUrl);
+          setStatus("تم نسخ تفاصيل الإعلان ورابط ليان للمشاركة.");
+        } else {
+          window.prompt("انسخ تفاصيل الإعلان ورابط ليان:", shareData.text + "\\n" + shareUrl);
+        }
+      } catch (error) {
+        if (error?.name !== "AbortError") setStatus("تعذرت المشاركة تلقائيًا. يمكنك نسخ رابط ليان ومشاركة كود الإعلان: " + offerCode(o));
+      }
+    });
 
     if (!d.open) {
       if (typeof d.showModal === "function") d.showModal();
