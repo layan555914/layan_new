@@ -1,2 +1,16 @@
 .layan-ai-section{padding:28px 18px;margin:22px auto;max-width:1180px;border:1px solid rgba(197,157,83,.38);border-radius:22px;background:linear-gradient(135deg,#102746,#172f50);color:#fff;box-shadow:0 16px 38px rgba(16,39,70,.12)}
 .layan-ai-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.layan-ai-head h2{margin:0;color:#e4bd72;font-size:1.35rem}.layan-ai-head p{margin:7px 0 0;color:#e3e9f1}.layan-ai-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 12px}.layan-ai-tabs button{border:1px solid #b99759;border-radius:999px;padding:9px 15px;background:transparent;color:#fff;font:inherit;cursor:pointer}.layan-ai-tabs button[aria-pressed=true]{background:#d6ad62;color:#102746;font-weight:800}.layan-ai-form{display:flex;gap:10px;align-items:stretch}.layan-ai-form textarea{flex:1;min-width:0;min-height:76px;resize:vertical;border-radius:14px;border:1px solid #c5a363;padding:12px;font:inherit;color:#172f50;background:#fff}.layan-ai-form button{align-self:stretch;min-width:112px}.layan-ai-answer{margin-top:14px;padding:14px;border-radius:14px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);white-space:pre-wrap;line-height:1.9;overflow-wrap:anywhere}.layan-ai-answer:empty{display:none}.layan-ai-note{display:block;margin-top:12px;color:#d8e0ea;font-size:.85rem}.layan-ai-error{color:#ffe1df}.layan-ai-loading{opacity:.72}@media(max-width:600px){.layan-ai-section{margin:16px 10px;padding:20px 14px}.layan-ai-form{flex-direction:column}.layan-ai-form button{min-height:46px}.layan-ai-head h2{font-size:1.15rem}}
+
+/* Final pass: remove remaining navy surfaces across all sections; retain dark blue only as ocean depth */
+:root{--navy:#0788bd!important;--blue:#0788bd!important}
+.topbar,.topbar *{--navy:#0788bd}
+.topbar{background:rgba(237,250,255,.98)!important}
+.btn-dark,.btn-primary,.category.active,.category:hover{background:#0788bd!important;border-color:#0788bd!important;color:#fff!important}
+.layan-ai-section,.layan-ai-section .layan-ai-head{background:linear-gradient(125deg,#087eaf,#35bde9)!important}
+.layan-ai-section h2,.layan-ai-section p,.layan-ai-section .layan-ai-head p,.layan-ai-note{color:#fff!important}
+.layan-ai-tabs button[aria-pressed=true]{background:#d4ad62!important;color:#073b5b!important}
+.sponsor-placeholder{background:linear-gradient(135deg,#0788bd,#35bde9)!important;color:#fff!important}
+.buyer-match-card h4,.buyer-match-price strong,.sponsor-business,.sponsor-form-status{color:#0788bd!important}
+.sponsor-plan-note{border-right-color:#0788bd!important;background:#eaf8ff!important}
+footer,.footer{background:linear-gradient(110deg,#087eaf,#0788bd 65%,#35bde9)!important}
+@media(max-width:700px){.topbar{background:rgba(237,250,255,.99)!important}}
