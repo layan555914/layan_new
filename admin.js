@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
     try {
-      const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,requested_price,created_at&status=eq.pending&order=created_at.asc");
+      const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       render(rows);
       setStatus("تم التحقق من الصلاحيات وتحميل طلبات المراجعة.");
     } catch (error) {
