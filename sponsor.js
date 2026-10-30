@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const config = window.LAYAN_CONFIG || {};
   const base = (config.SUPABASE_URL || "").replace(/\/$/, "");
   const key = config.SUPABASE_PUBLISHABLE_KEY || "";
-  const grid = document.getElementById("offersGrid");
+  const grid = document.getElementById("supplierAdsGrid");
   let ads = [];
   let placing = false;
   let placeTimer;
@@ -68,27 +68,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function placeAds() {
-    if (!grid || placing) return;
-    placing = true;
-    try {
-      grid.querySelectorAll("[data-sponsor-card]").forEach(node => node.remove());
-      const propertyCards = [...grid.querySelectorAll(".offer-card:not([data-sponsor-card])")];
-      if (!ads.length) return;
-      if (propertyCards.length < 3) {
-        // Keep the starter/demo sponsor cards visible even when the marketplace has few property listings.
-        ads.forEach(ad => grid.insertAdjacentHTML("beforeend", renderCard(ad)));
-        return;
-      }
-      let adIndex = 0;
-      // Insert one sponsored card after each group of three property cards.
-      for (let i = 2; i < propertyCards.length && adIndex < ads.length; i += 3) {
-        propertyCards[i].insertAdjacentHTML("afterend", renderCard(ads[adIndex++]));
-      }
-      // If there are more sponsor cards than placement slots, append the rest.
-      while (adIndex < ads.length) grid.insertAdjacentHTML("beforeend", renderCard(ads[adIndex++]));
-    } finally {
-      placing = false;
-    }
+    if (!grid) return;
+    grid.querySelectorAll("[data-sponsor-card]").forEach(node => node.remove());
+    ads.forEach(ad => grid.insertAdjacentHTML("beforeend", renderCard(ad)));
+    if (!ads.length) grid.innerHTML = '<p class="company-directory-state">لا توجد إعلانات تجارية معتمدة حاليًا.</p>';
   }
 
   async function loadAds() {
