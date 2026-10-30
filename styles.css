@@ -2664,3 +2664,14 @@ footer{border-top:4px solid var(--gold)}
 .layan-photo-preview-grid figure { min-width: 0; margin: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
 .layan-photo-preview-grid img { display: block; width: 100%; height: 88px; object-fit: cover; }
 .layan-photo-preview-grid figcaption { padding: 6px 7px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+
+
+/* My listings account panel */
+.my-offers-section { padding: clamp(26px,5vw,54px) 0; }
+.my-offers-status { color: var(--muted); margin: 12px 0; }
+.my-offers-list { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 12px; }
+.my-offer-card { display: grid; gap: 8px; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
+.my-offer-card h3 { margin: 0; color: var(--navy); font-size: 16px; }
+.my-offer-card p,.my-offer-card small { margin: 0; color: var(--muted); font-size: 12px; }
+.my-offer-state { justify-self: start; padding: 5px 10px; border-radius: 999px; background: #f5edda; color: var(--navy); font-size: 12px; font-weight: 800; }
+#loadMyOffersBtn:disabled { opacity: .65; cursor: wait; }
