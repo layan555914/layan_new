@@ -91,11 +91,11 @@ document.addEventListener("DOMContentLoaded", () => {
       '<div><span class="admin-chip">' + esc(ad.category) + '</span><h2>' + esc(ad.title) + '</h2>' +
       '<p><strong>النشاط:</strong> ' + esc(ad.business_name) + '</p><p>' + esc(ad.description) + '</p>' +
       '<p><strong>الهاتف:</strong> ' + esc(ad.contact_phone) + '</p><p><strong>نوع الطلب:</strong> ' + esc(ad.plan_code) + '</p>' +
-      '<p><strong>المدة المطلوبة:</strong> ' + esc(ad.requested_days) + ' يومًا</p>' +
+      '<p><strong>المدة:</strong> ' + (Number(ad.requested_days) > 0 ? esc(ad.requested_days) + ' يومًا (مبدئية)' : 'تُحدد بعد الاتفاق') + '</p>' +
       (ad.image_url ? '<p><a href="' + esc(ad.image_url) + '" target="_blank" rel="noopener noreferrer">عرض صورة الإعلان</a></p>' : '') +
       (ad.target_url ? '<p><a href="' + esc(ad.target_url) + '" target="_blank" rel="noopener noreferrer">رابط النشاط</a></p>' : '') +
       '</div><div class="admin-actions">' +
-      '<div class="admin-activation-fields"><label>المدة المتفق عليها (يومًا)<input type="number" min="1" max="365" step="1" value="' + esc(ad.requested_days || 15) + '" data-agreed-days></label>' +
+      '<div class="admin-activation-fields"><label>المدة المتفق عليها (يومًا)<input type="number" min="1" max="365" step="1" value="' + esc(ad.requested_days > 0 ? ad.requested_days : "") + '" data-agreed-days></label>' +
       '<label>السعر المتفق عليه (جنيه)<input type="number" min="0" step="1" placeholder="اكتب السعر بعد الاتفاق" data-agreed-price></label></div>' +
       '<button type="button" class="btn btn-gold" data-action="activate">تفعيل بعد تأكيد الاتفاق</button>' +
       '<button type="button" class="btn btn-outline-dark" data-action="reject">رفض الطلب</button></div></article>').join("");
