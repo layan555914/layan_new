@@ -610,9 +610,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       <span class="offer-type">${esc(o.property_type)}</span>
       <h2>${esc(o.title)}</h2>
       <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
+      <div class="details-price-highlight" aria-label="ملخص المبالغ">
+        <div><span>المقدم المطلوب</span><strong>${money(o.down_payment)}</strong></div>
+        <div><span>المتبقي</span><strong>${money(o.remaining_amount)}</strong></div>
+      </div>
       <div class="details-info">
         <p><span>المدينة / المركز</span><strong>${esc(o.city || "أسيوط")}</strong></p>
         <p><span>المنطقة</span><strong>${esc(o.area || "غير محدد")}</strong></p>
+        ${o.developer_name ? `<p><span>المطور العقاري</span><strong>${esc(o.developer_name)}</strong></p>` : ""}
         ${o.area_m2 ? `<p><span>المساحة</span><strong>${esc(o.area_m2)} م²</strong></p>` : ""}
         ${o.bedrooms ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
         ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
