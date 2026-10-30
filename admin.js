@@ -149,8 +149,10 @@ document.addEventListener("DOMContentLoaded", () => {
       render(rows);
       await loadPendingCompanyProfiles();
       await loadPendingPropertyDocuments();
+      showState(true);
       setStatus("تم التحقق من الصلاحيات وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
     } catch (error) {
+      showState(false);
       list.innerHTML = "";
       if (companyProfilesList) companyProfilesList.innerHTML = "";
       setStatus(/غير مصرح|permission|row-level|policy|401|403/i.test(error.message)
