@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const statusBox = $("statusMessage");
   const formStatusBox = $("formStatusMessage");
   const photosInput = $("photosInput");
+  const documentsInput = $("documentsInput");
   // Live financial cross-check helps catch amount-entry mistakes before submission.
   const financeNote = document.createElement("p");
   financeNote.className = "layan-finance-check";
@@ -1037,7 +1038,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       discount_amount: amount("discount_amount"),
       discount_percent: amount("discount_percent"),
       contact_name: value("contact_name"),
-      developer_name: selectedAccountType === "company" ? value("developer_name") : "",
+      developer_name: value("developer_name"),
+      project_name: value("project_name"),
+      company_business_name: selectedAccountType === "company" ? value("company_business_name") : "",
       contact_phone: value("contact_phone"),
       featured_requested: value("promotion_plan") === "featured_15" || value("promotion_plan") === "featured_30",
       promotion_status: (value("promotion_plan") === "featured_15" || value("promotion_plan") === "featured_30") ? "requested" : "none",
@@ -1045,8 +1048,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       image_urls: []
     };
 
-    if (selectedAccountType === "company" && !offer.developer_name) {
-      setStatus("اكتب اسم الشركة العقارية.");
+    if (selectedAccountType === "company" && !offer.company_business_name) {
+      setStatus("اكتب اسم الشركة صاحبة الإعلان.");
       return;
     }
 
@@ -1085,6 +1088,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const files = Array.from(photosInput?.files || []);
+    const documentFiles = Array.from(documentsInput?.files || []);
     if (files.some((file) => file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name))) {
       setStatus("لأمان المنصة، ارفع الصور بصيغة JPG أو JPEG فقط.");
       return;
@@ -1098,6 +1102,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (submitButton) submitButton.disabled = true;
 
     let uploadedImageUrls = [];
+    let uploadedDocumentPaths = [];
     let offerWasCreated = false;
     let apiForCleanup = null;
     try {
@@ -1114,9 +1119,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       setStatus(selectedAccountType === "company" ? "جارٍ ربط العقار بإعلان الشركة والتحقق من حد 3 عقارات..." : "جارٍ حفظ العرض...");
+      if (documentFiles.length) {
+        if (!api.uploadPropertyDocuments) throw new Error("رفع مستندات العقار غير جاهز. حدّث الصفحة وحاول مرة أخرى.");
+        setStatus("جارٍ رفع المستندات إلى مساحة خاصة...");
+        uploadedDocumentPaths = await api.uploadPropertyDocuments(documentFiles);
+        offer.document_urls = uploadedDocumentPaths;
+      }
+
       if (selectedAccountType === "company") {
         if (!api.getOrCreateCompanyAd) throw new Error("ميزة إعلانات الشركات غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
-        offer.company_ad_id = await api.getOrCreateCompanyAd(offer.developer_name);
+        offer.company_ad_id = await api.getOrCreateCompanyAd(offer.company_business_name);
       }
       await api.createOffer(offer);
       offerWasCreated = true;
@@ -1131,6 +1143,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           : "تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
+      if (!offerWasCreated && uploadedDocumentPaths.length && apiForCleanup?.deleteUploadedPropertyDocuments) {
+        try { await apiForCleanup.deleteUploadedPropertyDocuments(uploadedDocumentPaths); } catch (cleanupError) { console.warn("تعذر تنظيف المستندات المؤقتة:", cleanupError); }
+      }
       if (!offerWasCreated && uploadedImageUrls.length && apiForCleanup?.deleteUploadedImages) {
         setStatus("تعذر حفظ الإعلان. جارٍ حذف الصور التي رُفعت لهذا الإعلان غير المكتمل...");
         try {
