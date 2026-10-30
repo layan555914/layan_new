@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           await api.signIn(email, pass);
           status.textContent = "تم تسجيل الدخول بنجاح.";
           updateAuthButton();
-          window.setTimeout(() => { authDialog.close(); setStatus("أهلًا بك، يمكنك الآن إضافة عرضك."); }, 450);
+          window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك، يمكنك الآن إضافة عرضك."); }, 450);
         } else {
           const result = await api.signUp(email, pass);
           if (result.needsEmailConfirmation) {
@@ -279,7 +279,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           } else {
             status.textContent = "تم إنشاء الحساب وتسجيل الدخول.";
             updateAuthButton();
-            window.setTimeout(() => { authDialog.close(); setStatus("أهلًا بك في ليان."); }, 450);
+            window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك في ليان."); }, 450);
           }
         }
       } catch (error) {
@@ -326,6 +326,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const d = ensureAuthDialog();
     d._setMode(mode);
     if (!d.open) d.showModal();
+  }
+
+  function continueCompanyRegistration() {
+    if (sessionStorage.getItem("layanCompanyRegistrationPending") !== "1") return false;
+    sessionStorage.removeItem("layanCompanyRegistrationPending");
+    window.location.href = "./companies.html?resumeCompanyRegistration=1";
+    return true;
   }
 
   let offers = [];
@@ -1248,6 +1255,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("layan-auth-callback", event => {
     if (event.detail?.success) {
       updateAuthButton();
+      if (continueCompanyRegistration()) return;
       setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في ليان.");
     } else if (event.detail?.message) {
       setStatus("تعذر إكمال تأكيد البريد. جرّب فتح رابط التأكيد مرة أخرى أو سجّل الدخول بعد التأكيد.");
@@ -1255,5 +1263,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
   updateAuthButton();
+  if (new URLSearchParams(window.location.search).get("company-register") === "1") {
+    sessionStorage.setItem("layanCompanyRegistrationPending", "1");
+    if (window.LAYAN_SUPABASE?.isAuthenticated?.()) continueCompanyRegistration();
+    else { openAuth("login"); setStatus("سجّل الدخول أو أنشئ حسابًا مجانيًا، وسنعود بك تلقائيًا إلى نموذج تسجيل الشركة."); }
+  }
   await Promise.all([loadOffers(), loadPartnerAdSlots()]);
 });
