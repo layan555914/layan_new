@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!data?.access_token || !data?.user?.id) throw new Error("لم يتم إنشاء جلسة دخول صالحة.");
       session = {access_token:data.access_token,refresh_token:data.refresh_token || null,expires_at:data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600),user:data.user};
       localStorage.setItem(sessionKey, JSON.stringify(session));
-      showState(true);
+      showState(false);
       await loadPending();
     } catch (error) {
       setStatus("تعذر تسجيل الدخول: " + error.message);
