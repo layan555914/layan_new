@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
       companyProfilesList.innerHTML = '<p class="admin-empty">لا توجد طلبات ملفات شركات معلقة.</p>';
       return;
     }
-    companyProfilesList.innerHTML = rows.map(c => '<article class="admin-ad" data-company-profile-id="' + esc(c.id) + '"><div><span class="admin-chip">' + esc(c.category) + '</span><h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p><p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + ' — <strong>الهاتف:</strong> ' + esc(c.phone) + '</p><p><strong>الخدمات:</strong> ' + esc((c.services || []).join("، ")) + '</p><p><strong>المشروعات:</strong> ' + esc((c.projects || []).map(p => p.title).join("، ") || "لم تُضف") + '</p>' + (c.website ? '<p><a href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">الموقع الإلكتروني</a></p>' : '') + (c.logo_url ? '<p><a href="' + esc(c.logo_url) + '" target="_blank" rel="noopener noreferrer">شعار الشركة</a></p>' : '') + '<p><strong>صور الأعمال:</strong> ' + (c.gallery_urls || []).length + '</p>' + (c.gallery_urls || []).map((u,i) => '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">صورة ' + (i+1) + '</a>').join(' · ') + '</div><div class="admin-actions"><button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button><button type="button" class="btn btn-outline-dark" data-company-action="request_changes">طلب استكمال البيانات</button><button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>').join("");
+    companyProfilesList.innerHTML = rows.map(c => '<article class="admin-ad" data-company-profile-id="' + esc(c.id) + '"><div class="company-review-details" data-company-details hidden><span class="admin-chip">' + esc(c.category) + '</span><h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p><p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + ' — <strong>الهاتف:</strong> ' + esc(c.phone) + '</p><p><strong>الخدمات:</strong> ' + esc((c.services || []).join("، ")) + '</p><p><strong>المشروعات:</strong> ' + esc((c.projects || []).map(p => p.title).join("، ") || "لم تُضف") + '</p>' + (c.website ? '<p><a href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">الموقع الإلكتروني</a></p>' : '') + (c.logo_url ? '<p><a href="' + esc(c.logo_url) + '" target="_blank" rel="noopener noreferrer">شعار الشركة</a></p>' : '') + '<p><strong>صور الأعمال:</strong> ' + (c.gallery_urls || []).length + '</p>' + (c.gallery_urls || []).map((u,i) => '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">صورة ' + (i+1) + '</a>').join(' · ') + '</div><div class="admin-actions"><button type="button" class="btn btn-outline-dark" data-company-action="review" aria-expanded="false">مراجعة البيانات</button><button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button><button type="button" class="btn btn-outline-dark" data-company-action="request_changes">طلب استكمال البيانات</button><button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>').join("");
   }
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
@@ -228,6 +228,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!button || !card) return;
     const action = button.dataset.companyAction;
     const id = card.dataset.companyProfileId;
+    if (action === "review") {
+      const details = card.querySelector("[data-company-details]");
+      const expanded = button.getAttribute("aria-expanded") === "true";
+      details.hidden = expanded;
+      button.setAttribute("aria-expanded", String(!expanded));
+      button.textContent = expanded ? "مراجعة البيانات" : "إخفاء البيانات";
+      return;
+    }
     let notes = null;
     if (action === "reject") {
       notes = window.prompt("اكتب سبب رفض ملف الشركة:");
