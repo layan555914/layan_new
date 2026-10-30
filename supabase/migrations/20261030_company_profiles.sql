@@ -23,6 +23,7 @@ create table if not exists public.company_profiles (
   updated_at timestamptz not null default now()
 );
 create index if not exists company_profiles_public_directory_idx on public.company_profiles(status, category, company_name);
+create unique index if not exists company_profiles_one_per_owner_idx on public.company_profiles(owner_id);
 create index if not exists company_profiles_owner_idx on public.company_profiles(owner_id, created_at desc);
 alter table public.company_profiles enable row level security;
 drop policy if exists "Public can view approved company profiles" on public.company_profiles;
@@ -32,7 +33,7 @@ create policy "Owners can view own company profiles" on public.company_profiles 
 drop policy if exists "Owners can submit pending company profiles" on public.company_profiles;
 create policy "Owners can submit pending company profiles" on public.company_profiles for insert to authenticated with check (owner_id = (select auth.uid()) and status = 'pending' and reviewed_at is null and reviewed_by is null and admin_notes is null);
 drop policy if exists "Owners can edit own pending company profiles" on public.company_profiles;
-create policy "Owners can edit own pending company profiles" on public.company_profiles for update to authenticated using (owner_id = (select auth.uid()) and status = 'pending') with check (owner_id = (select auth.uid()) and status = 'pending' and reviewed_at is null and reviewed_by is null);
+create policy "Owners can edit own pending company profiles" on public.company_profiles for update to authenticated using (owner_id = (select auth.uid()) and status in ('pending','active')) with check (owner_id = (select auth.uid()) and status = 'pending' and reviewed_at is null and reviewed_by is null);
 drop policy if exists "Admins can review company profiles" on public.company_profiles;
 create policy "Admins can review company profiles" on public.company_profiles for all to authenticated using (public.layan_is_admin()) with check (public.layan_is_admin());
 create or replace function public.set_company_profiles_updated_at()
