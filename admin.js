@@ -149,8 +149,10 @@ document.addEventListener("DOMContentLoaded", () => {
       render(rows);
       await loadPendingCompanyProfiles();
       await loadPendingPropertyDocuments();
+      showState(true);
       setStatus("تم التحقق من الصلاحيات وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
     } catch (error) {
+      showState(false);
       list.innerHTML = "";
       if (companyProfilesList) companyProfilesList.innerHTML = "";
       setStatus(/غير مصرح|permission|row-level|policy|401|403/i.test(error.message)
@@ -199,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!data?.access_token || !data?.user?.id) throw new Error("لم يتم إنشاء جلسة دخول صالحة.");
       session = {access_token:data.access_token,refresh_token:data.refresh_token || null,expires_at:data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600),user:data.user};
       localStorage.setItem(sessionKey, JSON.stringify(session));
-      showState(true);
+      showState(false);
       await loadPending();
     } catch (error) {
       setStatus("تعذر تسجيل الدخول: " + error.message);
@@ -259,12 +261,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.getElementById("reloadPending").addEventListener("click", loadPending);
   document.getElementById("adminLogout").addEventListener("click", async () => {
-    try { if (session?.access_token) await request("/auth/v1/logout", {method:"POST"}); } catch (_) {}
+    try { if (session?.access_token) await fetch(base + "/auth/v1/logout", {method:"POST", headers:{apikey:key, Authorization:"Bearer "+session.access_token}}); } catch (_) {}
     session = null;
     localStorage.removeItem(sessionKey);
     showState(false);
     setStatus("تم تسجيل الخروج.");
   });
-  showState(Boolean(session?.access_token && session?.user?.id));
-  if (session?.access_token) loadPending();
+  // Never reveal the administration panel from a locally cached token alone.
+  showState(false);
+  async function verifyAndLoadAdmin() {
+    if (!session?.access_token || !session?.user?.id) return;
+    try {
+      const response = await fetch(base + "/auth/v1/user", {headers:{apikey:key, Authorization:"Bearer "+session.access_token}});
+      const user = response.ok ? await response.json() : null;
+      if (!user?.id || user.id !== session.user.id) throw new Error("جلسة الدخول غير صالحة.");
+      session.user = user;
+      localStorage.setItem(sessionKey, JSON.stringify(session));
+      const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", {method:"POST", body:"{}"});
+      if (adminAllowed !== true) throw new Error("الحساب غير مصرح له بدخول لوحة الإدارة.");
+      await loadPending();
+    } catch (error) {
+      session = null;
+      localStorage.removeItem(sessionKey);
+      showState(false);
+      setStatus("يلزم تسجيل الدخول والتحقق من صلاحية الإدارة مرة أخرى.");
+    }
+  }
+  if (session?.access_token) verifyAndLoadAdmin();
 });
