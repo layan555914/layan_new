@@ -2645,3 +2645,12 @@ footer{border-top:4px solid var(--gold)}
 .details-thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
 .details-placeholder{height:230px;display:grid;place-items:center;border-radius:15px;margin-bottom:18px}
 @media(max-width:600px){.gallery-arrow{width:35px;height:35px}.details-thumb{flex-basis:66px;width:66px;height:56px}}
+
+
+/* Keep native hidden state authoritative for authentication actions. */
+.auth-form button[hidden] { display: none !important; }
+.auth-form button:not([hidden]) { display: block; visibility: visible; opacity: 1; }
+.auth-form #forgotPasswordBtn { order: 2; }
+.auth-form #authSubmit { order: 3; }
+.auth-form #authToggle { order: 4; }
+.auth-form #resendConfirmationBtn { order: 1; }
