@@ -118,6 +118,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   const areaFilter = $("areaFilter");
   // Instagram does not accept a website URL as a direct feed-post share.
   // Open Instagram directly and copy the official LAYAN URL for pasting into a bio, story, or DM.
+  // Prefer the Android/iOS native share sheet so Facebook can open in its installed app.
+  // This shares the LAYAN platform homepage, not an individual property listing.
+  const facebookShareLink = document.querySelector(".social-facebook");
+  facebookShareLink?.addEventListener("click", async (event) => {
+    if (!navigator.share) return; // Keep the standard Facebook sharer as a fallback.
+    event.preventDefault();
+    try {
+      await navigator.share({
+        title: "LAYAN AQAR | ليان عقار",
+        text: "اكتشف عروض التنازل العقاري على منصة ليان",
+        url: "https://layan-eg.com/"
+      });
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        const shareUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent("https://layan-eg.com/");
+        window.open(shareUrl, "_blank", "noopener,noreferrer");
+      }
+    }
+  });
   const instagramShareLink = $("instagramShareLink");
   instagramShareLink?.addEventListener("click", async (event) => {
     event.preventDefault();
