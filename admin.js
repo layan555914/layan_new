@@ -147,10 +147,12 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       render(rows);
+      await loadPendingCompanyProfiles();
       await loadPendingPropertyDocuments();
-      setStatus("تم التحقق من الصلاحيات وتحميل طلبات المراجعة ومستندات العقارات.");
+      setStatus("تم التحقق من الصلاحيات وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
     } catch (error) {
       list.innerHTML = "";
+      if (companyProfilesList) companyProfilesList.innerHTML = "";
       setStatus(/غير مصرح|permission|row-level|policy|401|403/i.test(error.message)
         ? "هذا الحساب غير مخوّل للإدارة. يلزم إضافة معرّف حسابك إلى قائمة مديري LAYAN من لوحة Supabase الآمنة."
         : error.message);
