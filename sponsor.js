@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ].join("\n");
       const whatsappUrl = "https://wa.me/201007044265?text=" + encodeURIComponent(message);
       form.reset();
-      status.innerHTML = "تم حفظ طلبك للمراجعة. تواصل مع إدارة ليان لمعرفة مميزات الإعلان والسعر النهائي قبل تأكيد الحجز. <a class=\\\"sponsor-whatsapp-followup\\\" href=\\\""+ whatsappUrl + "\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">متابعة الطلب عبر واتساب</a>";
+      status.innerHTML = "تم حفظ طلبك للمراجعة. تواصل مع إدارة ليان لمعرفة مميزات الإعلان والسعر النهائي قبل تأكيد الحجز. <a class=\"sponsor-whatsapp-followup\" href=\"" + whatsappUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\">متابعة الطلب عبر واتساب</a>";
     } catch (error) {
       status.textContent = error.message || "تعذر إرسال الطلب. حاول مرة أخرى.";
     } finally {
