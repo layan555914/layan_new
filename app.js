@@ -542,14 +542,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const content = $("detailsContent");
-    const images = o.image_urls.length
-      ? o.image_urls.map((url) =>
-          `<img class="details-image" src="${esc(url)}" alt="${esc(o.title)}">`
-        ).join("")
+    const galleryImages = Array.isArray(o.image_urls) ? o.image_urls.filter(Boolean) : [];
+    const galleryMarkup = galleryImages.length
+      ? `
+        <div class="details-gallery" aria-label="معرض صور الوحدة">
+          <div class="details-gallery-main">
+            <button type="button" class="gallery-arrow gallery-prev" aria-label="الصورة السابقة" ${galleryImages.length < 2 ? "hidden" : ""}>‹</button>
+            <img id="detailsMainImage" class="details-image" src="${esc(galleryImages[0])}" alt="${esc(o.title)} — صورة 1">
+            <button type="button" class="gallery-arrow gallery-next" aria-label="الصورة التالية" ${galleryImages.length < 2 ? "hidden" : ""}>›</button>
+            <span class="gallery-counter" id="galleryCounter">1 / ${galleryImages.length}</span>
+          </div>
+          ${galleryImages.length > 1 ? `<div class="details-thumbnails">${galleryImages.map((url,index)=>`<button type="button" class="details-thumb ${index===0?"active":""}" data-gallery-index="${index}" aria-label="عرض الصورة ${index+1}" aria-pressed="${index===0?"true":"false"}"><img src="${esc(url)}" alt=""></button>`).join("")}</div>` : ""}
+        </div>`
       : `<div class="offer-image offer-image-placeholder details-placeholder">LAYAN AQAR</div>`;
 
     content.innerHTML = `
-      ${images}
+      ${galleryMarkup}
       <span class="offer-type">${esc(o.property_type)}</span>
       <h2>${esc(o.title)}</h2>
       <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
@@ -583,6 +591,28 @@ document.addEventListener("DOMContentLoaded", async () => {
           href="https://wa.me/201007044265?text=${encodeURIComponent("أرغب في الإبلاغ عن إعلان على LAYAN AQAR: " + o.title + " - كود الإعلان " + offerCode(o))}">الإبلاغ عن الإعلان</a>
       </div>
     `;
+
+    if (galleryImages.length > 1) {
+      let activeImage = 0;
+      const mainImage = $("detailsMainImage");
+      const counter = $("galleryCounter");
+      const paintGallery = (nextIndex) => {
+        activeImage = (nextIndex + galleryImages.length) % galleryImages.length;
+        mainImage.src = galleryImages[activeImage];
+        mainImage.alt = `${o.title} — صورة ${activeImage + 1}`;
+        counter.textContent = `${activeImage + 1} / ${galleryImages.length}`;
+        content.querySelectorAll("[data-gallery-index]").forEach((thumb) => {
+          const active = Number(thumb.dataset.galleryIndex) === activeImage;
+          thumb.classList.toggle("active", active);
+          thumb.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+      };
+      content.querySelector(".gallery-prev")?.addEventListener("click", () => paintGallery(activeImage - 1));
+      content.querySelector(".gallery-next")?.addEventListener("click", () => paintGallery(activeImage + 1));
+      content.querySelectorAll("[data-gallery-index]").forEach((thumb) => {
+        thumb.addEventListener("click", () => paintGallery(Number(thumb.dataset.galleryIndex)));
+      });
+    }
 
     const shareButton = $("shareOfferBtn");
     shareButton?.addEventListener("click", async () => {
