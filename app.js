@@ -730,6 +730,21 @@ document.addEventListener("DOMContentLoaded", async () => {
           ? "تاريخ الإرسال: " + parsed.toLocaleDateString("ar-EG")
           : "تاريخ الإرسال غير متاح";
         card.append(heading, meta, state, date);
+        if (offer.status === "available") {
+          const viewLink = document.createElement("a");
+          viewLink.className = "my-offer-view-link";
+          viewLink.href = "?offer=" + encodeURIComponent(String(offer.id)) + "#offers";
+          viewLink.textContent = "فتح الإعلان المنشور";
+          viewLink.setAttribute("aria-label", "فتح الإعلان المنشور: " + (offer.title || "عرض عقاري"));
+          card.appendChild(viewLink);
+        } else {
+          const note = document.createElement("small");
+          note.className = "my-offer-private-note";
+          note.textContent = offer.status === "pending"
+            ? "سيظهر رابط الإعلان بعد اعتماده ونشره."
+            : "هذا الإعلان غير متاح حاليًا للعرض العام.";
+          card.appendChild(note);
+        }
         list.appendChild(card);
       });
       status.textContent = "تم تحميل " + offers.length + " من عروضك.";
