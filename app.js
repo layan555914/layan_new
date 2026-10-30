@@ -557,9 +557,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="offer-details">
               <div><span>السعر الإجمالي</span>
                 <strong>${money(o.total_price)}</strong></div>
-              <div><span>المقدم</span>
+              <div><span>المقدم عند التعاقد</span>
                 <strong>${money(o.down_payment)}</strong></div>
-              <div><span>المبلغ المدفوع</span>
+              <div><span>إجمالي المدفوع حتى الآن (شامل المقدم)</span>
                 <strong>${money(o.paid_amount)}</strong></div>
               <div><span>المبلغ المتبقي</span>
                 <strong>${money(o.remaining_amount)}</strong></div>
@@ -717,8 +717,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${o.bedrooms ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
         ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
         <p><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></p>
-        <p><span>المقدم</span><strong>${money(o.down_payment)}</strong></p>
-        <p><span>المبلغ المدفوع</span><strong>${money(o.paid_amount)}</strong></p>
+        <p><span>المقدم المدفوع عند التعاقد</span><strong>${money(o.down_payment)}</strong></p>
+        <p><span>إجمالي المدفوع حتى الآن (شامل المقدم)</span><strong>${money(o.paid_amount)}</strong></p>
         <p><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></p>
         ${o.monthly_installment ? `<p><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></p>` : ""}
         <p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>
