@@ -25,6 +25,7 @@ create table if not exists public.company_profiles (
 create index if not exists company_profiles_public_directory_idx on public.company_profiles(status, category, company_name);
 create unique index if not exists company_profiles_one_per_owner_idx on public.company_profiles(owner_id);
 create index if not exists company_profiles_owner_idx on public.company_profiles(owner_id, created_at desc);
+revoke all on table public.company_profiles from anon, authenticated;
 grant select on public.company_profiles to anon;
 grant select, insert, update on public.company_profiles to authenticated;
 grant all on public.company_profiles to service_role;
