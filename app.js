@@ -1078,15 +1078,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     const submitButton = form.querySelector('[type="submit"]');
     if (submitButton) submitButton.disabled = true;
 
+    let uploadedImageUrls = [];
+    let offerWasCreated = false;
+    let apiForCleanup = null;
     try {
       const api = window.LAYAN_SUPABASE;
+      apiForCleanup = api;
       if (!api?.createOffer) throw new Error("اتصال Supabase غير جاهز.");
       if (!api.isAuthenticated()) throw new Error("سجّل الدخول أو أنشئ حسابًا أولًا لإرسال عرضك.");
 
       if (files.length) {
         if (!api.uploadImages) throw new Error("رفع الصور غير مفعّل.");
         setStatus("جارٍ رفع الصور...");
-        offer.image_urls = await api.uploadImages(files);
+        uploadedImageUrls = await api.uploadImages(files);
+        offer.image_urls = uploadedImageUrls;
       }
 
       setStatus(selectedAccountType === "company" ? "جارٍ ربط العقار بإعلان الشركة والتحقق من حد 3 عقارات..." : "جارٍ حفظ العرض...");
@@ -1095,6 +1100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         offer.company_ad_id = await api.getOrCreateCompanyAd(offer.developer_name);
       }
       await api.createOffer(offer);
+      offerWasCreated = true;
 
       form.reset();
       clearPhotoPreview();
@@ -1106,7 +1112,22 @@ document.addEventListener("DOMContentLoaded", async () => {
           : "تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
-      setStatus(error.message || "فشل الحفظ. راجع إعدادات Supabase.");
+      if (!offerWasCreated && uploadedImageUrls.length && apiForCleanup?.deleteUploadedImages) {
+        setStatus("تعذر حفظ الإعلان. جارٍ حذف الصور التي رُفعت لهذا الإعلان غير المكتمل...");
+        try {
+          await apiForCleanup.deleteUploadedImages(uploadedImageUrls);
+          uploadedImageUrls = [];
+        } catch (cleanupError) {
+          console.warn("تعذر تنظيف الصور المؤقتة:", cleanupError);
+        }
+      }
+      const rawMessage = String(error?.message || "");
+      const friendlyMessage = /failed to fetch|network|load failed/i.test(rawMessage)
+        ? "تعذر الاتصال بالخادم. راجع الإنترنت وحاول مرة أخرى."
+        : /duplicate|already exists|unique/i.test(rawMessage)
+          ? "تعذر إكمال العملية بسبب سجل موجود بالفعل. حدّث الصفحة وحاول مرة أخرى."
+          : rawMessage || "لم يتم حفظ الإعلان. حاول مرة أخرى بعد مراجعة البيانات.";
+      setStatus("لم يتم إرسال الإعلان. " + friendlyMessage);
     } finally {
       if (submitButton) submitButton.disabled = false;
     }
