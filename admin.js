@@ -113,7 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const cards = [];
       for (const offer of rows) {
-        const docs = Array.isArray(offer.document_urls) ? offer.document_urls : [];
+        const docs = Array.isArray(offer.document_urls) ? offer.document_urls.filter(path => typeof path === "string" && path.startsWith("documents/")) : [];
+        // Do not show an empty document card for an offer that has no attached files.
+        if (!docs.length) continue;
         const links = [];
         for (const path of docs) {
           if (typeof path !== "string" || !path.startsWith("documents/")) continue;
@@ -127,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         cards.push('<article class="admin-ad"><div><h3>'+esc(offer.title)+'</h3><p><strong>المطور:</strong> '+esc(offer.developer_name || "غير مسجل")+'</p><p><strong>المشروع:</strong> '+esc(offer.project_name || "غير مسجل")+'</p><p><strong>المستندات:</strong> '+links.length+' من '+docs.length+'</p>'+ (links.length ? links.join(" · ") : '<span>تعذر إنشاء روابط العرض المؤقتة.</span>') +'</div></article>');
       }
-      propertyDocsList.innerHTML = cards.join("");
+      propertyDocsList.innerHTML = cards.length ? cards.join("") : '<p class="admin-empty">لا توجد مستندات مرفقة بعقارات قيد المراجعة حاليًا.</p>';
     } catch (error) {
       propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
     }
