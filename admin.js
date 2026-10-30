@@ -145,19 +145,34 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
     try {
+      // Fail closed: password authentication is not proof of administrator authorization.
+      // Check the protected server-side allowlist before requesting any review data or signing documents.
+      const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", { method: "POST", body: "{}" });
+      if (adminAllowed !== true) {
+        showState(false);
+        list.innerHTML = "";
+        if (companyProfilesList) companyProfilesList.innerHTML = "";
+        if (propertyDocsList) propertyDocsList.innerHTML = "";
+        setStatus("هذا الحساب غير مخوّل بدخول لوحة إدارة LAYAN. يمكنك متابعة ملف شركتك من صفحة دليل الشركات.");
+        return false;
+      }
+
       const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       render(rows);
       await loadPendingCompanyProfiles();
       await loadPendingPropertyDocuments();
       showState(true);
-      setStatus("تم التحقق من الصلاحيات وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
+      setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
+      return true;
     } catch (error) {
       showState(false);
       list.innerHTML = "";
       if (companyProfilesList) companyProfilesList.innerHTML = "";
-      setStatus(/غير مصرح|permission|row-level|policy|401|403/i.test(error.message)
-        ? "هذا الحساب غير مخوّل للإدارة. يلزم إضافة معرّف حسابك إلى قائمة مديري LAYAN من لوحة Supabase الآمنة."
+      if (propertyDocsList) propertyDocsList.innerHTML = "";
+      setStatus(/غير مصرح|permission|row-level|policy|401|403|غير مخوّل/i.test(error.message)
+        ? "هذا الحساب غير مخوّل للإدارة. يمكنك متابعة ملف شركتك من صفحة دليل الشركات."
         : error.message);
+      return false;
     }
   }
   const forgotPassword = document.getElementById("adminForgotPassword");
