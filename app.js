@@ -689,6 +689,58 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
 
+  const myOffersButton = $("loadMyOffersBtn");
+  myOffersButton?.addEventListener("click", async () => {
+    const status = $("myOffersStatus");
+    const list = $("myOffersList");
+    const api = window.LAYAN_SUPABASE;
+    if (!api?.isAuthenticated?.()) {
+      status.textContent = "سجّل الدخول أولًا لعرض إعلاناتك.";
+      openAuth("login");
+      return;
+    }
+    myOffersButton.disabled = true;
+    status.textContent = "جارٍ تحميل عروضك...";
+    list.replaceChildren();
+    try {
+      const offers = await api.getMyOffers();
+      if (!offers.length) {
+        status.textContent = "لا توجد عروض مرتبطة بحسابك حتى الآن. يمكنك إرسال عقارك من نموذج «اعرض وحدتك».";
+        return;
+      }
+      const labels = {
+        pending: "قيد المراجعة",
+        available: "متاح للمهتمين",
+        reserved: "محجوز",
+        sold: "تم البيع"
+      };
+      offers.forEach(offer => {
+        const card = document.createElement("article");
+        card.className = "my-offer-card";
+        const heading = document.createElement("h3");
+        heading.textContent = offer.title || "عرض عقاري";
+        const meta = document.createElement("p");
+        meta.textContent = "رقم العرض: " + offer.id;
+        const state = document.createElement("span");
+        state.className = "my-offer-state";
+        state.textContent = labels[offer.status] || "الحالة: " + (offer.status || "غير محددة");
+        const date = document.createElement("small");
+        const parsed = offer.created_at ? new Date(offer.created_at) : null;
+        date.textContent = parsed && !Number.isNaN(parsed.getTime())
+          ? "تاريخ الإرسال: " + parsed.toLocaleDateString("ar-EG")
+          : "تاريخ الإرسال غير متاح";
+        card.append(heading, meta, state, date);
+        list.appendChild(card);
+      });
+      status.textContent = "تم تحميل " + offers.length + " من عروضك.";
+    } catch (error) {
+      console.error("تعذر تحميل عروض الحساب:", error);
+      status.textContent = "تعذر تحميل عروضك حاليًا. " + (error.message || "حاول مرة أخرى.");
+    } finally {
+      myOffersButton.disabled = false;
+    }
+  });
+
   $("loginBtn")?.addEventListener("click", async () => {
     const api = window.LAYAN_SUPABASE;
     if (api?.isAuthenticated()) {
