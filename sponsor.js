@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
       '<label>رابط صورة الإعلان (اختياري)<input name="image_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رابط صفحة النشاط (اختياري)<input name="target_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رقم التواصل<input name="contact_phone" required minlength="7" maxlength="30" type="tel" autocomplete="tel"></label>' +
-      '<label>نوع الإعلان المطلوب<select name="plan_code" required><option value="starter_15">إعلان تجاري — مدة قصيرة</option><option value="growth_30">إعلان تجاري — مدة متوسطة</option><option value="partner_90">شراكة إعلانية — مدة ممتدة</option></select></label>' +
+      '<p class="sponsor-plan-note">سيتم تحديد مدة الإعلان والسعر النهائي بعد مراجعة الطلب والتواصل معك عبر واتساب.</p>' +
       '<p class="sponsor-plan-note">تفاصيل الباقات يتم إرسالها بعد التواصل مع الإدارة، حسب نوع النشاط ومدة الإعلان. لا يتم تحصيل أي مبلغ من خلال هذا النموذج.</p>' +
       '<p class="sponsor-plan-note">يمكن للشركات العقارية طلب عرض مشروعاتها، ويمكن لشركات التشطيب والديكور والموردين عرض خدماتهم ومنتجاتهم. لا يتم نشر الإعلان إلا بعد مراجعة الإدارة والاتفاق على التفاصيل.</p>' +
       '<p class="sponsor-form-status" role="status" aria-live="polite"></p>' +
@@ -182,16 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const data = new FormData(form);
-    const plan = String(data.get("plan_code") || "starter_15");
-    const planDetails = {
-      starter_15: { days: 15, price: 0 },
-      growth_30: { days: 30, price: 0 },
-      partner_90: { days: 90, price: 0 }
-    }[plan];
-    if (!planDetails) {
-      status.textContent = "اختر باقة صحيحة.";
-      return;
-    }
+    const plan = "custom";
     const imageUrl = safeUrl(data.get("image_url"));
     const targetUrl = safeUrl(data.get("target_url"));
     if (data.get("image_url") && !imageUrl) {
@@ -212,8 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
       target_url: targetUrl || null,
       contact_phone: String(data.get("contact_phone") || "").trim(),
       plan_code: plan,
-      requested_days: planDetails.days,
-      requested_price: planDetails.price,
+      requested_days: 0,
+      requested_price: 0,
       status: "pending",
       price: 0,
       starts_at: null,
@@ -232,18 +223,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const category = String(data.get("category") || "");
       const title = String(data.get("title") || "").trim();
       const phone = String(data.get("contact_phone") || "").trim();
-      const planNames = {
-        starter_15: "باقة أساسية — 15 يومًا",
-        growth_30: "باقة نمو — 30 يومًا",
-        partner_90: "باقة شركاء — 90 يومًا"
-      };
       const message = [
         "مرحبًا، أرسلت طلب إعلان إلى منصة LAYAN AQAR وأريد متابعة الطلب.",
         "اسم النشاط: " + businessName,
         "المجال: " + category,
         "عنوان الإعلان: " + title,
         "رقم التواصل: " + phone,
-        "الباقة المطلوبة: " + (planNames[plan] || plan),
+        "مدة الإعلان: يتم تحديدها بعد التواصل مع الإدارة",
         "أرجو إرسال مميزات الإعلان والسعر النهائي والمدة المقترحة عبر واتساب قبل تأكيد أي اتفاق أو دفع."
       ].join("\n");
       const whatsappUrl = "https://wa.me/201007044265?text=" + encodeURIComponent(message);
