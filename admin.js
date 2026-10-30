@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     list.innerHTML = rows.map(ad => '<article class="admin-ad" data-ad-id="' + esc(ad.id) + '">' +
       '<div><span class="admin-chip">' + esc(ad.category) + '</span><h2>' + esc(ad.title) + '</h2>' +
       '<p><strong>النشاط:</strong> ' + esc(ad.business_name) + '</p><p>' + esc(ad.description) + '</p>' +
-      '<p><strong>الهاتف:</strong> ' + esc(ad.contact_phone) + '</p><p><strong>نوع الطلب:</strong> ' + esc(ad.plan_code) + '</p>' +
+      '<p><strong>الهاتف:</strong> ' + esc(ad.contact_phone) + '</p><p><strong>نوع الطلب:</strong> ' + 'طلب إعلان مخصص' + '</p>' +
       '<p><strong>المدة:</strong> ' + (Number(ad.requested_days) > 0 ? esc(ad.requested_days) + ' يومًا (مبدئية)' : 'تُحدد بعد الاتفاق') + '</p>' +
       (ad.image_url ? '<p><a href="' + esc(ad.image_url) + '" target="_blank" rel="noopener noreferrer">عرض صورة الإعلان</a></p>' : '') +
       (ad.target_url ? '<p><a href="' + esc(ad.target_url) + '" target="_blank" rel="noopener noreferrer">رابط النشاط</a></p>' : '') +
