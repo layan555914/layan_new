@@ -420,27 +420,35 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const search = ($("searchInput")?.value || "")
-      .trim().toLowerCase();
-    const type = $("typeFilter")?.value || "";
-    const area = areaFilter?.value || "";
+    const normalizeSearch = (value) => String(value || "")
+      .trim().toLowerCase()
+      .replace(/[أإآ]/g, "ا")
+      .replace(/ى/g, "ي")
+      .replace(/ة/g, "ه")
+      .replace(/[\u064B-\u065F\u0670]/g, "")
+      .replace(/[ـ]/g, "")
+      .replace(/\s+/g, " ");
+    const search = normalizeSearch($("searchInput")?.value || "");
+    const type = normalizeSearch($("typeFilter")?.value || "");
+    const area = normalizeSearch(areaFilter?.value || "");
     const downPaymentMaxRaw = $("downPaymentMaxFilter")?.value ?? "";
     const monthlyMaxRaw = $("monthlyMaxFilter")?.value ?? "";
     const downPaymentMax = downPaymentMaxRaw.trim() === "" ? null : num(downPaymentMaxRaw);
     const monthlyMax = monthlyMaxRaw.trim() === "" ? null : num(monthlyMaxRaw);
     const sort = $("sortFilter")?.value || "newest";
-    const companyQuery = ($("companySearchInput")?.value || "").trim().toLowerCase();
+    const companyQuery = normalizeSearch($("companySearchInput")?.value || "");
 
     const filtered = offers.filter((o) => {
       const text = [
         o.title, o.city, o.area, o.property_type,
         o.description, o.developer_name
-      ].join(" ").toLowerCase();
+      ].join(" ");
+      const normalizedText = normalizeSearch(text);
 
-      return (!search || text.includes(search)) &&
-        (!companyQuery || String(o.developer_name || "").toLowerCase().includes(companyQuery)) &&
-        (!type || o.property_type === type) &&
-        (!area || o.area === area) &&
+      return (!search || normalizedText.includes(search)) &&
+        (!companyQuery || normalizeSearch(o.developer_name).includes(companyQuery)) &&
+        (!type || normalizeSearch(o.property_type) === type) &&
+        (!area || normalizeSearch(o.area) === area) &&
         (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
         (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
         (!activeKind || categoryMatches(o, activeKind));
