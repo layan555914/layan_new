@@ -184,9 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = new FormData(form);
     const plan = String(data.get("plan_code") || "starter_15");
     const planDetails = {
-      starter_15: { days: 15, price: 250 },
-      growth_30: { days: 30, price: 450 },
-      partner_90: { days: 90, price: 1200 }
+      starter_15: { days: 15, price: 0 },
+      growth_30: { days: 30, price: 0 },
+      partner_90: { days: 90, price: 0 }
     }[plan];
     if (!planDetails) {
       status.textContent = "اختر باقة صحيحة.";
