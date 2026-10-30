@@ -21,6 +21,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
   const grid = $("offersGrid");
+  // Keep broken remote property photos from leaving empty or broken-image areas.
+  document.addEventListener("error", (event) => {
+    const image = event.target;
+    if (!(image instanceof HTMLImageElement)) return;
+    if (image.classList.contains("details-thumb") || image.closest(".details-thumb")) {
+      image.closest(".details-thumb")?.remove();
+      return;
+    }
+    if (!image.classList.contains("offer-image") && !image.classList.contains("details-image")) return;
+    const fallback = document.createElement("div");
+    fallback.className = "offer-image offer-image-placeholder image-load-fallback";
+    fallback.textContent = "LAYAN AQAR";
+    fallback.setAttribute("role", "img");
+    fallback.setAttribute("aria-label", "صورة العقار غير متاحة");
+    image.replaceWith(fallback);
+  }, true);
   const form = $("offerForm");
   const dialog = $("offerDialog");
   const statusBox = $("statusMessage");
