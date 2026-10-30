@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       '<label>رابط صفحة النشاط (اختياري)<input name="target_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رقم التواصل<input name="contact_phone" required minlength="7" maxlength="30" type="tel" autocomplete="tel"></label>' +
       '<p class="sponsor-plan-note">سيتم تحديد مدة الإعلان والسعر النهائي بعد مراجعة الطلب والتواصل معك عبر واتساب.</p>' +
-      '<p class="sponsor-plan-note">تفاصيل الباقات يتم إرسالها بعد التواصل مع الإدارة، حسب نوع النشاط ومدة الإعلان. لا يتم تحصيل أي مبلغ من خلال هذا النموذج.</p>' +
+      '<p class="sponsor-plan-note">لا يتم تحصيل أي مبلغ من خلال هذا النموذج. السعر والمدة يعتمدان بعد التواصل والاتفاق مع الإدارة.</p>' +
       '<p class="sponsor-plan-note">يمكن للشركات العقارية طلب عرض مشروعاتها، ويمكن لشركات التشطيب والديكور والموردين عرض خدماتهم ومنتجاتهم. لا يتم نشر الإعلان إلا بعد مراجعة الإدارة والاتفاق على التفاصيل.</p>' +
       '<p class="sponsor-form-status" role="status" aria-live="polite"></p>' +
       '<button class="btn btn-gold" type="submit">إرسال طلب الإعلان</button></form>';
