@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
   const key = config.SUPABASE_PUBLISHABLE_KEY || "";
   const list = document.getElementById("pendingAds");
-  const propertyDocsList = document.getElementById("pendingPropertyDocuments");\n  const companyProfilesList = document.getElementById("pendingCompanyProfiles");
+  const propertyDocsList = document.getElementById("pendingPropertyDocuments");
+  const companyProfilesList = document.getElementById("pendingCompanyProfiles");
   const status = document.getElementById("adminStatus");
   const login = document.getElementById("adminLogin");
   const email = document.getElementById("adminEmail");
