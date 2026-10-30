@@ -2708,3 +2708,100 @@ footer{border-top:4px solid var(--gold)}
 .layan-finance-check[data-state="warning"] { background: rgba(190,55,55,.09); color: #a32f2f; }
 .layan-photo-preview-title { font-size: 12px; font-weight: 800; line-height: 1.7; overflow-wrap: anywhere; }
 #photosInput:invalid { outline: 2px solid rgba(190,55,55,.45); outline-offset: 3px; }
+
+
+/* LAYAN AQAR mobile usability polish */
+@media (max-width: 600px) {
+  html { scroll-padding-top: 14px; }
+  body { overflow-x: hidden; }
+  .topbar {
+    position: relative;
+    padding: 10px 4%;
+    gap: 10px;
+  }
+  .topbar nav {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 5px 0 7px;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+  .topbar nav a { flex: 0 0 auto; padding: 7px 10px; }
+  .top-actions { flex: 1 1 100%; justify-content: stretch; }
+  .top-actions .btn { flex: 1 1 0; min-height: 42px; font-size: 12px; }
+  .hero { padding: 34px 5% 40px; }
+  .hero-content { width: 100%; }
+  .hero-actions { gap: 9px; }
+  .hero-actions .btn { min-height: 46px; }
+  .search-panel { width: 92%; }
+  .search-panel input, .search-panel select,
+  .filters input, .filters select { min-height: 44px; font-size: 14px; }
+  .offers-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .offer-card {
+    padding: 0;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+  .offer-card > .offer-image {
+    display: block;
+    width: 100%;
+    height: 190px;
+    max-height: 190px;
+    object-fit: cover;
+    border-radius: 0;
+  }
+  .offer-card > .offer-image-placeholder {
+    display: grid;
+    place-items: center;
+  }
+  .offer-card-content { padding: 15px; }
+  .offer-card h3 { font-size: 17px; line-height: 1.5; }
+  .offer-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .offer-details > div {
+    min-width: 0;
+    padding: 9px;
+    border-radius: 9px;
+    background: #f5f7fa;
+  }
+  .offer-details span { font-size: 11px; }
+  .offer-details strong { font-size: 13px; overflow-wrap: anywhere; }
+  .details-button { width: 100%; min-height: 46px; margin-top: 12px; }
+  .details-dialog {
+    width: calc(100% - 12px);
+    max-width: none;
+    max-height: 94dvh;
+    margin: auto 6px 6px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+  .details-dialog-header h2 { font-size: 19px; }
+  .details-info { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .details-info p { padding: 10px 12px; }
+  .details-gallery-main { position: relative; }
+  .details-image { max-height: 230px; object-fit: contain; background: #f1f3f6; }
+  .details-thumbnails {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 2px 0 8px;
+    scrollbar-width: thin;
+  }
+  .details-thumb { flex: 0 0 64px; }
+  .details-contact { display: grid; grid-template-columns: 1fr; gap: 9px; }
+  .details-contact .btn { width: 100%; min-height: 46px; justify-content: center; }
+  .details-actions { display: grid; grid-template-columns: 1fr; }
+  .details-actions .btn { width: 100%; min-height: 44px; }
+  .category-trust-strip { padding: 15px; }
+}
+@media (max-width: 360px) {
+  .brand strong { font-size: 15px; letter-spacing: 1px; }
+  .top-actions .btn { padding-inline: 7px; font-size: 11px; }
+  .offer-card > .offer-image { height: 165px; max-height: 165px; }
+  .offer-details { grid-template-columns: minmax(0, 1fr); }
+}
