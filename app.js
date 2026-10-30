@@ -714,6 +714,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         reserved: "محجوز",
         sold: "تم البيع"
       };
+      const summary = document.createElement("div");
+      summary.className = "my-offers-summary";
+      summary.setAttribute("aria-label", "ملخص حالات عروضك");
+      const counts = [
+        ["pending", "قيد المراجعة"],
+        ["available", "متاح"],
+        ["reserved", "محجوز"],
+        ["sold", "تم البيع"]
+      ];
+      counts.forEach(([key, label]) => {
+        const item = document.createElement("div");
+        item.className = "my-offers-summary-item";
+        const count = document.createElement("strong");
+        count.textContent = String(offers.filter(offer => offer.status === key).length);
+        const caption = document.createElement("span");
+        caption.textContent = label;
+        item.append(count, caption);
+        summary.appendChild(item);
+      });
+      list.appendChild(summary);
       offers.forEach(offer => {
         const card = document.createElement("article");
         card.className = "my-offer-card";
