@@ -2686,3 +2686,10 @@ footer{border-top:4px solid var(--gold)}
 .my-offers-summary-item strong { color: var(--navy); font-size: 21px; line-height: 1.2; }
 .my-offers-summary-item span { color: var(--muted); font-size: 11px; line-height: 1.4; }
 @media (max-width: 520px) { .my-offers-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+
+.details-price-highlight { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+.details-price-highlight > div { display: flex; flex-direction: column; gap: 6px; padding: 14px; border: 1px solid rgba(190,151,76,.35); border-radius: 14px; background: linear-gradient(145deg, rgba(14,35,64,.06), rgba(190,151,76,.10)); min-width: 0; }
+.details-price-highlight span { color: var(--muted); font-size: 13px; }
+.details-price-highlight strong { color: var(--navy); font-size: clamp(16px, 3.6vw, 21px); overflow-wrap: anywhere; }
+@media (max-width: 420px) { .details-price-highlight { gap: 8px; } .details-price-highlight > div { padding: 11px 9px; } }
