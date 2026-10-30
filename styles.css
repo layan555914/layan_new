@@ -2654,3 +2654,13 @@ footer{border-top:4px solid var(--gold)}
 .auth-form #authSubmit { order: 3; }
 .auth-form #authToggle { order: 4; }
 .auth-form #resendConfirmationBtn { order: 1; }
+
+
+/* Listing photo selection preview */
+.layan-photo-preview { margin-top: 12px; }
+.layan-photo-preview:empty { display: none; }
+.layan-photo-preview-title { margin: 0 0 9px; color: var(--navy); font-size: 13px; font-weight: 800; }
+.layan-photo-preview-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(104px,1fr)); gap: 10px; }
+.layan-photo-preview-grid figure { min-width: 0; margin: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+.layan-photo-preview-grid img { display: block; width: 100%; height: 88px; object-fit: cover; }
+.layan-photo-preview-grid figcaption { padding: 6px 7px; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
