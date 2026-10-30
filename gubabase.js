@@ -145,6 +145,28 @@
     }
   }
 
+  async function requireAuthenticated() {
+    if (!session?.access_token) throw new Error("سجّل الدخول أولًا قبل تقديم طلب تسجيل شركة.");
+    await ensureFreshSession();
+    try {
+      const response = await fetch(url + "/auth/v1/user", {
+        method: "GET",
+        headers: { apikey: key, Authorization: "Bearer " + session.access_token }
+      });
+      const user = await readResponse(response);
+      if (!user?.id || user.id !== session?.user?.id) {
+        saveSession(null);
+        throw new Error("تعذر التحقق من الحساب. سجّل الدخول مرة أخرى.");
+      }
+      session = { ...session, user };
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch (_) {}
+      return session;
+    } catch (error) {
+      if (/401|403|invalid|expired|JWT/i.test(String(error.message || error))) saveSession(null);
+      throw new Error("جلسة الدخول غير صالحة أو انتهت. سجّل الدخول مرة أخرى.");
+    }
+  }
+
   async function request(path, options = {}) {
     await ensureFreshSession();
     const response = await fetch(url + "/rest/v1/" + path, {
@@ -335,6 +357,6 @@
     return Array.isArray(rows) ? rows[0] : rows;
   }
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail };
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
