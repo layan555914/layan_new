@@ -203,6 +203,28 @@
     }
     return uploaded;
   }
+  async function deleteUploadedImages(publicUrls) {
+    if (!isAuthenticated() || !Array.isArray(publicUrls) || !publicUrls.length) return;
+    const prefix = url.replace(/\/$/, "") + "/storage/v1/object/public/" + bucket + "/";
+    for (const publicUrl of publicUrls) {
+      if (typeof publicUrl !== "string" || !publicUrl.startsWith(prefix)) continue;
+      const encodedPath = publicUrl.slice(prefix.length);
+      let objectPath;
+      try { objectPath = encodedPath.split("/").map(part => decodeURIComponent(part)).join("/"); }
+      catch { continue; }
+      if (!objectPath || !objectPath.startsWith("offers/" + session.user.id + "/")) continue;
+      try {
+        const response = await fetch(url + "/storage/v1/object/" + bucket + "/" + objectPath.split("/").map(encodeURIComponent).join("/"), {
+          method: "DELETE",
+          headers: authHeaders()
+        });
+        if (!response.ok) console.warn("تعذر تنظيف صورة غير مرتبطة بإعلان:", await response.text());
+      } catch (error) {
+        console.warn("تعذر تنظيف صورة غير مرتبطة بإعلان:", error);
+      }
+    }
+  }
+
   async function getOrCreateCompanyAd(businessName) {
     if (!isAuthenticated()) throw new Error("سجّل الدخول أولًا لإنشاء إعلان الشركة.");
     const name = String(businessName || "").trim();
@@ -278,6 +300,6 @@
     return Array.isArray(rows) ? rows[0] : rows;
   }
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, getMyOffers, getOffers, uploadImages, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail };
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
