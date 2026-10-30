@@ -539,6 +539,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           else d.removeAttribute("open");
         }
       });
+      d.addEventListener("close", () => {
+        const current = new URL(window.location.href);
+        if (current.searchParams.has("offer")) {
+          current.searchParams.delete("offer");
+          window.history.replaceState({}, "", current.pathname + current.search + current.hash);
+        }
+      });
     }
 
     const content = $("detailsContent");
@@ -616,15 +623,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const shareButton = $("shareOfferBtn");
     shareButton?.addEventListener("click", async () => {
-      const shareUrl = "https://layan-eg.com/#offers";
-      const shareData = {title: "LAYAN AQAR | " + o.title, text: "إعلان عقاري على ليان: " + o.title + " — كود الإعلان " + offerCode(o), url: shareUrl};
+      const shareUrl = new URL(window.location.href);
+      if (o.id != null) shareUrl.searchParams.set("offer", String(o.id));
+      else shareUrl.hash = "offers";
+      const shareData = {title: "LAYAN AQAR | " + o.title, text: "إعلان عقاري على ليان: " + o.title + " — كود الإعلان " + offerCode(o), url: shareUrl.toString()};
       try {
         if (navigator.share) await navigator.share(shareData);
         else if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(shareData.text + "\\n" + shareUrl);
+          await navigator.clipboard.writeText(shareData.text + "\\n" + shareUrl.toString());
           setStatus("تم نسخ تفاصيل الإعلان ورابط ليان للمشاركة.");
         } else {
-          window.prompt("انسخ تفاصيل الإعلان ورابط ليان:", shareData.text + "\\n" + shareUrl);
+          window.prompt("انسخ تفاصيل الإعلان ورابط ليان:", shareData.text + "\\n" + shareUrl.toString());
         }
       } catch (error) {
         if (error?.name !== "AbortError") setStatus("تعذرت المشاركة تلقائيًا. يمكنك نسخ رابط ليان ومشاركة كود الإعلان: " + offerCode(o));
@@ -910,11 +919,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderCompanies();
       render();
 
-      setStatus(
-        offers.length
-          ? `تم تحميل ${offers.length} عرض.`
-          : "لا توجد عروض منشورة حاليًا."
-      );
+      const requestedOfferId = new URLSearchParams(window.location.search).get("offer");
+      if (requestedOfferId) {
+        const requestedOffer = offers.find(item => String(item.id) === requestedOfferId);
+        if (requestedOffer) {
+          showDetails(requestedOffer);
+          setStatus("أنت تشاهد تفاصيل الإعلان المطلوب.");
+        } else {
+          setStatus("لم نعثر على هذا الإعلان؛ ربما لم يعد منشورًا.");
+        }
+      } else {
+        setStatus(
+          offers.length
+            ? `تم تحميل ${offers.length} عرض.`
+            : "لا توجد عروض منشورة حاليًا."
+        );
+      }
     } catch (error) {
       console.error("خطأ تحميل العروض:", error);
       offers = [];
