@@ -26,6 +26,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   const statusBox = $("statusMessage");
   const formStatusBox = $("formStatusMessage");
   const photosInput = $("photosInput");
+  // Live financial cross-check helps catch amount-entry mistakes before submission.
+  const financeNote = document.createElement("p");
+  financeNote.className = "layan-finance-check";
+  financeNote.setAttribute("role", "status");
+  financeNote.setAttribute("aria-live", "polite");
+  const remainingField = form?.querySelector('[name="remaining_installments"]');
+  remainingField?.closest("label")?.insertAdjacentElement("afterend", financeNote);
+  const financeFields = ["total_price", "paid_amount", "remaining_installments"].map(name => form?.querySelector('[name="' + name + '"]')).filter(Boolean);
+  const formatFinance = value => new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 0 }).format(value) + " جنيه";
+  function updateFinanceCheck() {
+    if (!financeNote || !form) return;
+    const read = name => Number(form.querySelector('[name="' + name + '"]')?.value || 0);
+    const total = read("total_price"), paid = read("paid_amount"), remaining = read("remaining_installments");
+    const entered = paid + remaining;
+    if (!total && !paid && !remaining) {
+      financeNote.textContent = "أدخل إجمالي السعر والمبلغ المدفوع والمتبقي لمراجعة توافق الأرقام.";
+      financeNote.dataset.state = "neutral";
+      return;
+    }
+    const difference = total - entered;
+    financeNote.textContent = "إجمالي السعر: " + formatFinance(total) + " · المدفوع والمتبقي: " + formatFinance(entered) +
+      (difference > 0 ? " · فرق غير موزع: " + formatFinance(difference) :
+       difference < 0 ? " · تنبيه: المدفوع والمتبقي يتجاوزان إجمالي السعر." : " · الأرقام متوافقة.");
+    financeNote.dataset.state = difference < 0 ? "warning" : difference === 0 ? "ok" : "neutral";
+  }
+  financeFields.forEach(field => field.addEventListener("input", updateFinanceCheck));
+  updateFinanceCheck();
   const photosPreview = document.createElement("div");
   photosPreview.className = "layan-photo-preview";
   photosPreview.setAttribute("aria-live", "polite");
@@ -38,6 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     photosPreview.replaceChildren();
   }
   photosInput?.addEventListener("change", () => {
+    photosInput.setCustomValidity("");
     clearPhotoPreview();
     const selected = Array.from(photosInput.files || []);
     if (!selected.length) return;
@@ -45,12 +73,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name) || file.size > 5 * 1024 * 1024
     );
     if (invalid) {
-      photosPreview.textContent = "تأكد أن كل الصور JPG أو JPEG وألا يتجاوز حجم الصورة 5 ميجابايت.";
+      photosPreview.textContent = "الصورة غير صالحة: " + invalid.name + ". استخدم JPG أو JPEG وبحجم لا يتجاوز 5 ميجابايت للصورة.";
+      photosInput.setCustomValidity("راجع صيغة الصور وحجمها قبل الإرسال.");
       return;
     }
+    photosInput.setCustomValidity("");
+    const totalBytes = selected.reduce((sum, file) => sum + file.size, 0);
     const heading = document.createElement("p");
     heading.className = "layan-photo-preview-title";
-    heading.textContent = "معاينة الصور قبل الإرسال (" + selected.length + ")";
+    heading.textContent = "معاينة الصور (" + selected.length + ") · الحجم الإجمالي " + (totalBytes / (1024 * 1024)).toFixed(2) + " ميجابايت";
     photosPreview.appendChild(heading);
     const grid = document.createElement("div");
     grid.className = "layan-photo-preview-grid";
