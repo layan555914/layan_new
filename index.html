@@ -497,7 +497,8 @@
 
       <label>
         المبلغ المتبقي
-        <input name="remaining_installments" type="number" min="0">
+        <input name="remaining_installments" type="number" min="0" step="0.01" inputmode="decimal">
+        <small>راجع أن مجموع المبلغ المدفوع والمتبقي لا يتجاوز إجمالي السعر.</small>
       </label>
 
       <label>
@@ -576,7 +577,7 @@
 
   <script src="config.js?v=layan-upload-preview-20261030-1"></script>
   <script src="gubabase.js?v=layan-upload-preview-20261030-1"></script>
-  <script src="app.js?v=layan-search-results-reset-20261030-1"></script>
+  <script src="app.js?v=layan-form-checks-20261030-1"></script>
   <script src="buyer.js?v=layan-upload-preview-20261030-1"></script>
   <script src="sponsor.js?v=whatsapp-followup-1"></script>
   <script src="ai.js?v=layan-upload-preview-20261030-1"></script>
