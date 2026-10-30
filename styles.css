@@ -2822,3 +2822,29 @@ footer{border-top:4px solid var(--gold)}
 @media (max-width: 600px) {
   .image-load-fallback { min-height: 190px; }
 }
+
+/* Clear, compact information hierarchy in the user's own offers. */
+.my-offer-card { min-width: 0; }
+.my-offer-meta, .my-offer-location { margin: 5px 0; color: var(--muted); font-size: 12px; }
+.my-offer-location { color: var(--blue); }
+.my-offer-financials {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin: 12px 0;
+}
+.my-offer-financials > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+  padding: 9px 7px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f7f8fa;
+}
+.my-offer-financials span { color: var(--muted); font-size: 11px; }
+.my-offer-financials strong { color: var(--navy); font-size: 13px; overflow-wrap: anywhere; }
+@media (max-width: 420px) {
+  .my-offer-financials { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
