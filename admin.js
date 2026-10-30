@@ -277,6 +277,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!user?.id || user.id !== session.user.id) throw new Error("جلسة الدخول غير صالحة.");
       session.user = user;
       localStorage.setItem(sessionKey, JSON.stringify(session));
+      const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", {method:"POST", body:"{}"});
+      if (adminAllowed !== true) throw new Error("الحساب غير مصرح له بدخول لوحة الإدارة.");
       await loadPending();
     } catch (error) {
       session = null;
