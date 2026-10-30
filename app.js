@@ -820,6 +820,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         heading.textContent = offer.title || "عرض عقاري";
         const meta = document.createElement("p");
         meta.textContent = "رقم العرض: " + offer.id;
+        meta.className = "my-offer-meta";
+        const location = document.createElement("p");
+        location.className = "my-offer-location";
+        location.textContent = [offer.city || "أسيوط", offer.area].filter(Boolean).join(" · ") || "الموقع غير محدد";
+        const financials = document.createElement("div");
+        financials.className = "my-offer-financials";
+        [
+          ["المقدم", offer.down_payment],
+          ["المتبقي", offer.remaining_amount],
+          ["القسط الشهري", offer.monthly_installment]
+        ].forEach(([label, value]) => {
+          if (value === null || value === undefined || value === "") return;
+          const item = document.createElement("div");
+          const caption = document.createElement("span");
+          caption.textContent = label;
+          const amount = document.createElement("strong");
+          amount.textContent = money(value);
+          item.append(caption, amount);
+          financials.appendChild(item);
+        });
         const state = document.createElement("span");
         state.className = "my-offer-state";
         state.textContent = labels[offer.status] || "الحالة: " + (offer.status || "غير محددة");
@@ -828,7 +848,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         date.textContent = parsed && !Number.isNaN(parsed.getTime())
           ? "تاريخ الإرسال: " + parsed.toLocaleDateString("ar-EG")
           : "تاريخ الإرسال غير متاح";
-        card.append(heading, meta, state, date);
+        card.append(heading, meta, location);
+        if (financials.childElementCount) card.appendChild(financials);
+        card.append(state, date);
         if (offer.status === "available") {
           const viewLink = document.createElement("a");
           viewLink.className = "my-offer-view-link";
