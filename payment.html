@@ -4,64 +4,38 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#102746">
-<title>الدفع للإعلانات | LAYAN AQAR</title>
+<title>الإعلانات المميزة | LAYAN AQAR</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#102746;--gold:#d5ad55;--red:#d9233d;--paper:#f5f6f8;--ink:#172335}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Cairo,Arial,sans-serif;line-height:1.8}
+:root{--navy:#102746;--gold:#d5ad55;--paper:#f5f6f8;--ink:#172335}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Cairo,Arial,sans-serif;line-height:1.9}
 header{background:var(--navy);color:#fff;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .brand{color:#fff;text-decoration:none;font-weight:800;letter-spacing:1px;font-size:1.2rem}.brand small{display:block;font-size:.8rem;color:var(--gold);letter-spacing:0}
 header a.back{color:#fff;text-decoration:none;border:1px solid #ffffff66;padding:7px 13px;border-radius:10px}
 main{max-width:760px;margin:32px auto;padding:0 16px}.panel{background:#fff;border:1px solid #e5e8ed;border-radius:20px;padding:clamp(20px,5vw,36px);box-shadow:0 12px 35px #10274612}
 h1{margin:0 0 8px;color:var(--navy);font-size:clamp(1.5rem,4vw,2.1rem)}.intro{color:#5a6676;margin-top:0}
-.payment-card{background:var(--navy);color:white;border-radius:16px;padding:22px;margin:22px 0}.payment-card .label{color:#dbe2ec;font-size:.92rem}.phone{font-size:clamp(1.65rem,5vw,2.2rem);font-weight:800;direction:ltr;display:inline-block;letter-spacing:1px;color:#fff}
-button,.btn{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:11px 16px;text-decoration:none;display:inline-block;font-weight:700}.copy{background:var(--gold);color:var(--navy);margin-inline-start:10px}.whatsapp{background:#147b48;color:white;width:100%;text-align:center;margin-top:12px}.step{display:flex;gap:12px;align-items:flex-start;margin:14px 0}.num{background:#fff0f1;color:var(--red);font-weight:800;border-radius:50%;min-width:34px;height:34px;display:grid;place-items:center}.warning{background:#fff8e7;border-right:4px solid var(--gold);padding:12px 14px;border-radius:8px;margin-top:20px;font-size:.92rem}
-label{display:block;font-weight:700;margin:14px 0 6px}input,select{width:100%;padding:12px;border:1px solid #d4dbe4;border-radius:10px;font:inherit;background:white}small,.muted{color:#667085}.status{min-height:1.5em;font-size:.9rem}
+ul{padding-right:22px}li{margin:8px 0}.btn{font:inherit;border:0;border-radius:10px;padding:12px 18px;text-decoration:none;display:block;text-align:center;font-weight:800;background:#147b48;color:#fff;margin-top:22px}
+.note{background:#fff8e7;border-right:4px solid var(--gold);padding:12px 14px;border-radius:8px;margin-top:20px}
 footer{text-align:center;color:#697386;padding:22px;font-size:.9rem}
 </style>
 </head>
 <body>
-<header><a class="brand" href="./index.html">LAYAN AQAR <small>ليان عقار</small></a><a class="back" href="./index.html#pricing">العودة إلى الباقات</a></header>
+<header><a class="brand" href="./index.html">LAYAN AQAR <small>ليان عقار</small></a><a class="back" href="./index.html">العودة للمنصة</a></header>
 <main><section class="panel">
-<h1>الدفع مقابل إعلانات ليان</h1>
-<p class="intro">أول 30 يومًا من الإطلاق الرسمي مجانية لجميع المستخدمين: الأفراد والشركات العقارية وشركات التشطيب والديكور. صفحة الدفع معروضة للتعريف بالأسعار التي ستبدأ بعد انتهاء الشهر التجريبي، لكن الدفع غير مفعّل حاليًا. لا تحوّل أي مبلغ الآن.</p>
-<label for="plan">الباقة الإعلانية</label>
-<p class="muted">اختر الباقة لمشاهدة تفاصيلها. جميع الأسعار أدناه مستقبلية، والدفع غير متاح خلال الشهر المجاني.</p>
-<select id="plan">
-<option value="إعلان مميز 15 يومًا" data-amount="100">الأفراد: تمييز إعلان واحد — 15 يومًا — 100 جنيه</option>
-<option value="إعلان مميز 30 يومًا" data-amount="200">الأفراد: تمييز إعلان واحد — 30 يومًا — 200 جنيه</option>
-<option value="شركة — باقة أساسية 15 يومًا" data-amount="250">الشركات العقارية: أساسية — 15 يومًا — 250 جنيه</option>
-<option value="شركة — باقة نمو 30 يومًا" data-amount="450">الشركات العقارية: النمو — 30 يومًا — 450 جنيه</option>
-<option value="شركة — باقة شركاء 90 يومًا" data-amount="1200">الشركات العقارية: الشركاء — 90 يومًا — 1200 جنيه</option>
-</select>
-<div id="planDescription" class="warning" aria-live="polite">تمييز إعلان فردي واحد لمدة 15 يومًا لزيادة وضوحه أمام الباحثين عن العقارات.</div>
-<p><strong>المبلغ المطلوب:</strong> <span id="amount">100</span> جنيه مصري</p>
-<div class="warning"><strong>الشهر التجريبي للجميع:</strong> لن يتم استقبال مدفوعات خلال أول 30 يومًا من الإطلاق الرسمي. ستعلن إدارة ليان عن تفعيل الدفع بعد انتهاء الشهر المجاني. الأسعار الظاهرة للتعريف بالباقات المستقبلية فقط.</div>
-<p class="muted">بعد انتهاء الشهر المجاني والإعلان عن بدء الدفع، ستُتاح خطوات التحويل وإرسال الإيصال من هذه الصفحة.</p>
-<label for="customerName">الاسم</label><input id="customerName" autocomplete="name" placeholder="اسم صاحب الإعلان">
-<label for="customerPhone">رقم الموبايل</label><input id="customerPhone" inputmode="tel" autocomplete="tel" placeholder="رقم للتواصل">
-<label for="offerTitle">عنوان الإعلان أو رقم الطلب</label><input id="offerTitle" placeholder="مثال: شقة في أسيوط الجديدة">
-<label for="transactionRef">رقم عملية التحويل (إن توفر)</label><input id="transactionRef" placeholder="اكتب رقم العملية الموجود بالإيصال">
-<button class="whatsapp" id="sendPayment" type="button" disabled>الدفع غير مفعّل خلال الشهر المجاني</button>
-<p class="status" id="status" role="status" aria-live="polite"></p>
-<div class="warning"><strong>تنبيه مهم:</strong> الشهر الأول مجاني لجميع المستخدمين وليس للشركاء فقط. لا تحوّل أي أموال الآن. بعد انتهاء أول 30 يومًا من الإطلاق الرسمي، ستعلن إدارة ليان عن تفعيل الدفع وتبدأ مراجعة التحويلات يدويًا قبل تفعيل أي باقة.</div>
+<h1>الإعلانات المميزة وإعلانات الشركات</h1>
+<p class="intro">تقدم ليان مساحات إعلانية للعقارات المميزة والشركات العقارية وشركات التشطيب والديكور والأثاث والسيراميك والدهانات والخدمات المرتبطة بالعقار.</p>
+<ul>
+<li>إبراز العقارات المميزة أمام الباحثين عن الفرص.</li>
+<li>عرض مشروعات الشركات العقارية وخدماتها.</li>
+<li>التعريف بشركات التشطيب والديكور والموردين.</li>
+<li>مراجعة كل إعلان واعتماده من إدارة ليان قبل النشر.</li>
+</ul>
+<p>المنصة مجانية لتصفح العقارات وإضافة الإعلان العقاري العادي. تفاصيل الإعلانات التجارية والمميزات والمدة والسعر النهائي تُحدد بالتواصل مع إدارة ليان عبر واتساب، ولا تُعرض أسعار الباقات على الموقع.</p>
+<a class="btn" href="https://wa.me/201007044265?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D9%88%D8%B3%D8%B9%D8%B1%20%D8%A7%D9%84%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D8%A7%D9%84%D9%85%D9%85%D9%8A%D8%B2%20%D8%A3%D9%88%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D8%A7%D9%84%D8%B4%D8%B1%D9%83%D8%A9%20%D8%B9%D8%A8%D8%B1%20%D9%84%D9%8A%D8%A7%D9%86" target="_blank" rel="noopener noreferrer">اسأل عن الإعلان والسعر عبر واتساب</a>
+<div class="note">إرسال الاستفسار لا يعني حجز مساحة إعلانية أو استحقاق أي مبلغ. لا تدفع قبل استلام التفاصيل وتأكيدها من إدارة ليان.</div>
 </section></main>
-<footer>LAYAN AQAR — ليان عقار · منصة إعلانات عقارية</footer>
-<script>
-const plan=document.getElementById('plan'), amount=document.getElementById('amount'), status=document.getElementById('status');
-const planDescriptions={
-'إعلان مميز 15 يومًا':'للأفراد: تمييز إعلان واحد لعقار واحد لمدة 15 يومًا ليظهر بشكل أوضح للباحثين. السعر المستقبلي 100 جنيه.',
-'إعلان مميز 30 يومًا':'للأفراد: تمييز إعلان واحد لعقار واحد لمدة 30 يومًا ليظهر بشكل أوضح للباحثين. السعر المستقبلي 200 جنيه.',
-'شركة — باقة أساسية 15 يومًا':'للشركات العقارية: إعلان لمدة 15 يومًا يتيح عرض حتى 3 عقارات في الإعلان الواحد. لشركات التشطيب والديكور: إعلان تعريفي بالنشاط والخدمات وبيانات التواصل. مناسبة للحملات القصيرة. السعر المستقبلي 250 جنيهًا.',
-'شركة — باقة نمو 30 يومًا':'للشركات العقارية: إعلان لمدة 30 يومًا يتيح عرض حتى 3 عقارات في الإعلان الواحد. لشركات التشطيب والديكور: إعلان تعريفي بالنشاط والخدمات وبيانات التواصل، بمدة أطول للتسويق. السعر المستقبلي 450 جنيهًا.',
-'شركة — باقة شركاء 90 يومًا':'للشركات العقارية: إعلان لمدة 90 يومًا يتيح عرض حتى 3 عقارات في الإعلان الواحد. لشركات التشطيب والديكور: إعلان تعريفي بالنشاط والخدمات وبيانات التواصل طوال ثلاثة أشهر. السعر المستقبلي 1200 جنيه.'
-};
-function syncPlan(){const option=plan.options[plan.selectedIndex];amount.textContent=option.dataset.amount;document.getElementById('planDescription').textContent=planDescriptions[option.value]||'الإعلان العادي مجاني للأفراد بعد مراجعة الإدارة.';document.getElementById('sendPayment').disabled=true;document.getElementById('sendPayment').style.opacity='.65';status.textContent='الأسعار للتعريف فقط؛ الدفع غير مفعّل خلال الشهر المجاني.'}
-plan.addEventListener('change',syncPlan);syncPlan();
-
-
-</script>
+<footer>LAYAN AQAR — ليان عقار</footer>
 </body>
 </html>
