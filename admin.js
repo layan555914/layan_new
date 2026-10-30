@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
       companyProfilesList.innerHTML = '<p class="admin-empty">لا توجد طلبات ملفات شركات معلقة.</p>';
       return;
     }
-    companyProfilesList.innerHTML = rows.map(c => '<article class="admin-ad" data-company-profile-id="' + esc(c.id) + '"><div><span class="admin-chip">' + esc(c.category) + '</span><h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p><p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + ' — <strong>الهاتف:</strong> ' + esc(c.phone) + '</p><p><strong>الخدمات:</strong> ' + esc((c.services || []).join("، ")) + '</p><p><strong>المشروعات:</strong> ' + esc((c.projects || []).map(p => p.title).join("، ") || "لم تُضف") + '</p>' + (c.website ? '<p><a href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">الموقع الإلكتروني</a></p>' : '') + (c.logo_url ? '<p><a href="' + esc(c.logo_url) + '" target="_blank" rel="noopener noreferrer">شعار الشركة</a></p>' : '') + '<p><strong>صور الأعمال:</strong> ' + (c.gallery_urls || []).length + '</p>' + (c.gallery_urls || []).map((u,i) => '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">صورة ' + (i+1) + '</a>').join(' · ') + '</div><div class="admin-actions"><button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button><button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>').join("");
+    companyProfilesList.innerHTML = rows.map(c => '<article class="admin-ad" data-company-profile-id="' + esc(c.id) + '"><div><span class="admin-chip">' + esc(c.category) + '</span><h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p><p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + ' — <strong>الهاتف:</strong> ' + esc(c.phone) + '</p><p><strong>الخدمات:</strong> ' + esc((c.services || []).join("، ")) + '</p><p><strong>المشروعات:</strong> ' + esc((c.projects || []).map(p => p.title).join("، ") || "لم تُضف") + '</p>' + (c.website ? '<p><a href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">الموقع الإلكتروني</a></p>' : '') + (c.logo_url ? '<p><a href="' + esc(c.logo_url) + '" target="_blank" rel="noopener noreferrer">شعار الشركة</a></p>' : '') + '<p><strong>صور الأعمال:</strong> ' + (c.gallery_urls || []).length + '</p>' + (c.gallery_urls || []).map((u,i) => '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">صورة ' + (i+1) + '</a>').join(' · ') + '</div><div class="admin-actions"><button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button><button type="button" class="btn btn-outline-dark" data-company-action="request_changes">طلب استكمال البيانات</button><button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>').join("");
   }
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
@@ -218,15 +218,19 @@ document.addEventListener("DOMContentLoaded", () => {
       notes = window.prompt("اكتب سبب رفض ملف الشركة:");
       if (notes === null) return;
       if (notes.trim().length < 3) { setStatus("اكتب سببًا واضحًا للرفض."); return; }
+    } else if (action === "request_changes") {
+      notes = window.prompt("اكتب البيانات أو التعديلات المطلوبة من الشركة:");
+      if (notes === null) return;
+      if (notes.trim().length < 3) { setStatus("اكتب تفاصيل واضحة لاستكمال البيانات."); return; }
     } else if (!window.confirm("اعتماد ملف الشركة ونشره في دليل ليان؟")) return;
     button.disabled = true;
     try {
       await request("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
         method: "PATCH",
         headers: { Prefer: "return=minimal" },
-        body: JSON.stringify({ status: action === "approve" ? "active" : "rejected", admin_notes: notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
+        body: JSON.stringify({ status: action === "approve" ? "active" : action === "request_changes" ? "needs_changes" : "rejected", admin_notes: action === "approve" ? null : notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
       });
-      setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : "تم رفض طلب ملف الشركة.");
+      setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
     finally { button.disabled = false; }
