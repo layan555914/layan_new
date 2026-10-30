@@ -705,7 +705,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <h2>${esc(o.title)}</h2>
       <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
       <div class="details-price-highlight" aria-label="ملخص المبالغ">
-        <div><span>المقدم المطلوب</span><strong>${money(o.down_payment)}</strong></div>
+        <div><span>المقدم المدفوع</span><strong>${money(o.down_payment)}</strong></div>
         <div><span>المتبقي</span><strong>${money(o.remaining_amount)}</strong></div>
       </div>
       <div class="details-info">
