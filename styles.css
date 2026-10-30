@@ -2805,3 +2805,20 @@ footer{border-top:4px solid var(--gold)}
   .offer-card > .offer-image { height: 165px; max-height: 165px; }
   .offer-details { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Fallback appearance when a listing photo is unavailable. */
+.image-load-fallback {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  color: #f0dfb6;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(199,164,94,.24), transparent 36%),
+    linear-gradient(135deg, #0b1b30, #1b416b);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+@media (max-width: 600px) {
+  .image-load-fallback { min-height: 190px; }
+}
