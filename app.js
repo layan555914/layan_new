@@ -426,6 +426,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       return new Date(b.created_at || 0) - new Date(a.created_at || 0);
     });
 
+    const resultsSummary = $("resultsSummary");
+    if (resultsSummary) {
+      const activeFilters = Boolean(search || companyQuery || type || area || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || activeKind);
+      resultsSummary.replaceChildren();
+      const count = document.createElement("strong");
+      count.textContent = String(filtered.length);
+      const label = document.createElement("span");
+      label.textContent = filtered.length === 1 ? "عرض متاح" : "عروض متاحة";
+      const reset = $("resetFiltersBtn");
+      if (reset) reset.hidden = !activeFilters;
+      resultsSummary.append(count, label);
+    }
+
     if (!filtered.length) {
       grid.innerHTML = `
         <div class="empty-state">
@@ -854,6 +867,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  $("resetFiltersBtn")?.addEventListener("click", () => {
+    ["searchInput", "typeFilter", "areaFilter", "downPaymentMaxFilter", "monthlyMaxFilter"].forEach(id => {
+      const field = $(id);
+      if (field) field.value = "";
+    });
+    if ($("sortFilter")) $("sortFilter").value = "newest";
+    activeKind = "";
+    document.querySelectorAll(".category-tile[data-category-kind]").forEach(tile => {
+      tile.classList.remove("active");
+      tile.setAttribute("aria-pressed", "false");
+    });
+    render();
+  });
   $("searchInput")?.addEventListener("input", render);
   $("typeFilter")?.addEventListener("change", render);
   areaFilter?.addEventListener("change", render);
