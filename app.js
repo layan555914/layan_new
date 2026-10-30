@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const selected = Array.from(photosInput.files || []);
     if (!selected.length) return;
     const invalid = selected.find(file =>
-      file.type !== "image/jpeg" || !/\\.jpe?g$/i.test(file.name) || file.size > 5 * 1024 * 1024
+      file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name) || file.size > 5 * 1024 * 1024
     );
     if (invalid) {
       photosPreview.textContent = "تأكد أن كل الصور JPG أو JPEG وألا يتجاوز حجم الصورة 5 ميجابايت.";
