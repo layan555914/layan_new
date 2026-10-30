@@ -21,7 +21,7 @@ async function loadMyProfile(){
   if(c.status==="needs_changes"){status.textContent="طلبت إدارة ليان استكمال البيانات التالية قبل النشر: "+(c.admin_notes||"يرجى مراجعة بيانات الشركة وإكمال الناقص.")+" بعد التعديل أرسل الطلب للمراجعة من جديد.";}
   else if(c.status==="pending"){status.textContent="طلب شركتك قيد المراجعة لدى إدارة ليان.";}
   else if(c.status==="active"){status.textContent="ملف شركتك منشور حاليًا. أي تعديل ترسله سيخضع للمراجعة قبل ظهوره.";}
-  $("companyRegisterOpen").textContent="تحديث ملف شركتك"; $("companyRegisterOpenBottom").textContent="تحديث بيانات الشركة";
+  const needsChanges=c.status==="needs_changes"; $("companyRegisterOpen").textContent=needsChanges?"استكمال البيانات":"تحديث ملف شركتك"; $("companyRegisterOpenBottom").textContent=needsChanges?"استكمال بيانات الشركة":"تحديث بيانات الشركة"; const submitButton=form.querySelector('button[type="submit"]'); if(submitButton)submitButton.textContent=needsChanges?"إرسال البيانات المستكملة للمراجعة":"إرسال للمراجعة";
  }catch(e){console.warn("Company profile lookup:",e)}
 }
 
