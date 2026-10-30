@@ -2701,3 +2701,10 @@ footer{border-top:4px solid var(--gold)}
 .reset-filters-btn { border:1px solid rgba(190,151,76,.55); border-radius:10px; background:transparent; color:var(--navy); padding:8px 12px; font:inherit; font-size:13px; font-weight:800; cursor:pointer; }
 .reset-filters-btn:hover { background:rgba(190,151,76,.12); }
 .reset-filters-btn[hidden] { display:none; }
+
+
+.layan-finance-check { margin: -2px 0 14px; padding: 10px 12px; border-radius: 10px; background: rgba(14,35,64,.055); color: var(--muted); font-size: 12px; line-height: 1.7; }
+.layan-finance-check[data-state="ok"] { background: rgba(36,130,83,.09); color: #246b49; }
+.layan-finance-check[data-state="warning"] { background: rgba(190,55,55,.09); color: #a32f2f; }
+.layan-photo-preview-title { font-size: 12px; font-weight: 800; line-height: 1.7; overflow-wrap: anywhere; }
+#photosInput:invalid { outline: 2px solid rgba(190,55,55,.45); outline-offset: 3px; }
