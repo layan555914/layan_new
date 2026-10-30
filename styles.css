@@ -1307,7 +1307,7 @@ footer {
 /* LAYAN audience, company directory and promotion plans */
 .audience-section,.company-section,.pricing-section{padding:clamp(28px,4vw,48px) clamp(16px,6%,76px)}
 .audience-section,.pricing-section{background:#fff}
-.audience-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.audience-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
 .audience-card{display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:24px;text-align:right;border:1px solid var(--border);border-radius:14px;background:#fff;color:var(--text);box-shadow:var(--shadow);font:inherit;cursor:pointer}
 .audience-card:hover,.audience-card:focus-visible{border-color:var(--gold);outline:2px solid #c5a15d55}
 .audience-card strong{font-size:20px;color:var(--navy)}

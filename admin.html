@@ -15,7 +15,7 @@
 .admin-ad{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:18px 0;border-bottom:1px solid #e5e8ee}
 .admin-ad:last-child{border-bottom:0}.admin-ad h2{margin:8px 0;font-size:20px}.admin-ad p{margin:6px 0;overflow-wrap:anywhere}
 .admin-chip{background:#f7efdE;color:#6f5420;padding:4px 10px;border-radius:20px;font-size:12px}
-.admin-actions{display:flex;flex-direction:column;gap:8px;min-width:190px;justify-content:center}
+.admin-actions{display:flex;flex-direction:column;gap:8px;min-width:190px;justify-content:center}.admin-activation-fields{display:grid;gap:6px}.admin-activation-fields label{display:grid;gap:3px;font-size:12px;font-weight:700}.admin-activation-fields input{width:100%;padding:8px;border:1px solid #cbd3df;border-radius:8px;font:inherit}
 .admin-empty{padding:22px;text-align:center;color:#596779}
 #adminStatus{padding:12px;border-radius:8px;background:#f4f6f9;min-height:24px}
 @media(max-width:640px){.admin-ad{grid-template-columns:1fr}.admin-actions{min-width:0}.admin-head{padding:18px}}
@@ -23,7 +23,7 @@
 </head>
 <body>
 <main class="admin-wrap">
-<header class="admin-head"><h1>إدارة إعلانات LAYAN</h1><p>مراجعة طلبات الشركات واعتماد التجربة المجانية أو رفض الطلب بسبب واضح.</p></header>
+<header class="admin-head"><h1>إدارة إعلانات LAYAN</h1><p>مراجعة طلبات الإعلانات، وتسجيل السعر والمدة المتفق عليهما عبر واتساب قبل التفعيل أو رفض الطلب بسبب واضح.</p></header>
 <section class="admin-panel" id="authPanel">
 <h2>دخول الإدارة</h2><p>استخدم حساب LAYAN المصرّح له. تسجيل الدخول وحده لا يمنح صلاحيات الإدارة.</p>
 <form id="adminLogin" class="admin-form">
@@ -38,5 +38,5 @@
 </section>
 <p id="adminStatus" role="status" aria-live="polite"></p>
 </main>
-<script src="./config.js?v=1"></script><script src="./admin.js?v=5"></script>
+<script src="./config.js?v=1"></script><script src="./admin.js?v=layan-monetization-model-1"></script>
 </body></html>

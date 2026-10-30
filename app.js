@@ -592,9 +592,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const plan = $("promotionPlanSelect")?.value || "standard";
     const note = $("promotionPlanNote");
     if (!note) return;
-    if (plan === "featured_15") note.textContent = 'السعر المستقبلي 100 جنيه لمدة 15 يومًا. التمييز والدفع غير مفعّلين خلال الشهر المجاني؛ لا تحوّل أي مبلغ قبل إعلان ليان رسميًا عن بدء الدفع.';
-    else if (plan === "featured_30") note.textContent = 'السعر المستقبلي 200 جنيه لمدة 30 يومًا. التمييز والدفع غير مفعّلين خلال الشهر المجاني؛ لا تحوّل أي مبلغ قبل إعلان ليان رسميًا عن بدء الدفع.';
-    else note.textContent = "الإعلان العادي مجاني للأفراد بعد مراجعة الإدارة. جميع المستخدمين يستفيدون من أول 30 يومًا مجانًا؛ لا توجد مدفوعات خلال الفترة التجريبية.";
+    const contact = '<a href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D9%88%D8%B3%D8%B9%D8%B1%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D9%84%D9%8A%D8%A7%D9%86" target="_blank" rel="noopener noreferrer">اسأل إدارة ليان عبر واتساب</a>';
+    if (plan === "featured_15" || plan === "featured_30") note.innerHTML = "طلب التمييز اختياري. المميزات والمدة والسعر النهائي يتم تأكيدها عبر واتساب قبل أي اتفاق. " + contact;
+    else note.innerHTML = "الإعلان العقاري العادي مجاني دائمًا، ولا توجد عمولة لليان على البيع أو التنازل. " + contact;
   }
 
   function renderCompanies() {
@@ -1175,7 +1175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (category) category.textContent = row.category || "";
         if (title) title.textContent = row.title || "";
         if (description) description.textContent = row.description || "";
-        if (note) note.textContent = row.is_free_trial ? "مساحة مجانية طوال فترة التجربة — تُضاف بيانات النشاط بعد موافقة صاحبه." : "مساحة تجارية؛ راجع تفاصيل العرض مع المعلن.";
+        if (note) note.textContent = "مساحة إعلانية للشركات — تُضاف بيانات النشاط بعد موافقة صاحبه واعتماد الإعلان من إدارة ليان.";
       });
       const visible = [...section.querySelectorAll("[data-partner-slot]")].some(card => !card.hidden);
       if (!visible) section.hidden = true;

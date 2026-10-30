@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=layan-my-offers-details-20261030-1">
+  <link rel="stylesheet" href="styles.css?v=layan-monetization-model-20261030-1">
   <link rel="stylesheet" href="buyer.css?v=auth-signup-fix-1">
   <link rel="stylesheet" href="sponsor.css?v=auth-signup-fix-1">
   <link rel="stylesheet" href="ai.css?v=auth-signup-fix-1">
@@ -45,6 +45,8 @@
     <nav aria-label="القائمة الرئيسية">
       <a class="active" href="#">الرئيسية</a>
       <a href="#offers">العروض</a>
+      <a href="#companies">الشركات العقارية</a>
+      <a href="#partner-ads">التشطيب والديكور</a>
       <a href="#how">كيف تعمل المنصة؟</a>
     </nav>
 
@@ -91,25 +93,25 @@
     </section>
     <section class="launch-campaign" id="free-launch" aria-labelledby="launchCampaignTitle">
       <div class="launch-campaign-copy">
-        <span class="launch-pill">حملة ما قبل الإطلاق</span>
-        <h2 id="launchCampaignTitle">ابدأ مع ليان مجانًا لمدة 30 يومًا</h2>
-        <p>كل المستخدمين مجانًا خلال أول 30 يومًا من الإطلاق الرسمي: الأفراد، والشركات العقارية، وشركات التشطيب والديكور. استمتعوا بخدمات الإعلانات خلال الشهر التجريبي قبل بدء تحصيل أي رسوم.</p>
-        <small>بعد انتهاء الشهر المجاني، تُفعّل باقات الدفع والأسعار الموضحة أدناه. لا تحوّل أي مبلغ خلال الفترة التجريبية.</small>
+        <span class="launch-pill">ابدأ مجانًا مع ليان</span>
+        <h2 id="launchCampaignTitle">اعرض عقارك مجانًا وابحث عن فرصتك</h2>
+        <p>تصفّح العقارات والعروض مجانًا، وأنشئ حسابك لإضافة إعلانك العادي ومتابعته. ليان لا تحصل على عمولة عند إتمام البيع أو التنازل.</p>
+        <small>الإعلان العادي مجاني. التمييز والإعلانات التجارية خدمات اختيارية، وتُرسل تفاصيلها وأسعارها عبر واتساب بعد التواصل مع الإدارة.</small>
         <div class="launch-actions">
           <a class="btn btn-gold" href="#accounts">اختَر نوع حسابك</a>
           <a class="btn btn-outline" href="#offers">تصفّح العروض</a>
         </div>
       </div>
-      <div class="launch-benefits" aria-label="مزايا الفترة التجريبية">
-        <div><strong>30 يومًا</strong><span>فترة تجريبية مجانية</span></div>
-        <div><strong>3 عروض</strong><span>لكل حساب خلال التجربة</span></div>
-        <div><strong>0 جنيه</strong><span>رسوم تسجيل أساسي</span></div>
+      <div class="launch-benefits" aria-label="مزايا منصة ليان">
+        <div><strong>مجانًا</strong><span>تصفح وإعلان عادي</span></div>
+        <div><strong>بدون عمولة</strong><span>على البيع أو التنازل</span></div>
+        <div><strong>واتساب</strong><span>تفاصيل الإعلانات التجارية</span></div>
       </div>
     </section>
 
     <section class="audience-section" id="accounts">
       <div class="section-heading">
-        <div><span class="eyebrow">ابدأ مع ليان</span><h2>أنت عميل أم شركة عقارية؟</h2>
+        <div><span class="eyebrow">ابدأ مع ليان</span><h2>اختَر نوع حسابك في ليان</h2>
         <p>اختَر المسار المناسب لك للوصول إلى الخدمات الملائمة.</p></div>
       </div>
       <div class="audience-grid">
@@ -120,6 +122,10 @@
         <button class="audience-card" type="button" data-account-type="company">
           <span class="audience-icon" aria-hidden="true">▦</span><strong>شركة عقارية</strong>
           <span>اعرض عقارات الشركة واستكشف باقات التمييز.</span><b>متابعة كشركة</b>
+        </button>
+        <button class="audience-card" type="button" data-open-sponsor-form>
+          <span class="audience-icon" aria-hidden="true">✦</span><strong>شركة تشطيب أو ديكور</strong>
+          <span>اعرض خدماتك ومنتجاتك أمام المهتمين بتجهيز وحداتهم.</span><b>اطلب إعلانًا تجاريًا</b>
         </button>
       </div>
     </section>
@@ -154,61 +160,37 @@
         <article class="pricing-card"><span class="pricing-label">للشركات العقارية</span><h3>وسّع قاعدة عملائك</h3><p>عرّف العملاء بمشروعاتك وعروضك، واطلب خطة مناسبة لحجم نشاطك وطريقة عرض عقاراتك.</p><a class="btn btn-gold" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A8%D8%A7%D9%82%D8%A9%20%D8%AA%D8%B3%D9%88%D9%8A%D9%82%20%D9%84%D8%B4%D8%B1%D9%83%D8%A9%20%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9%20%D9%85%D9%86%20%D9%84%D9%8A%D8%A7%D9%86" target="_blank" rel="noopener noreferrer">اطلب عرضًا للشركات</a></article>
         <article class="pricing-card"><span class="pricing-label">لشركات التشطيب والديكور</span><h3>كن شريكًا في تجهيز البيت</h3><p>عرّف أصحاب الوحدات بخدمات التشطيب والأثاث والسيراميك وغيرها، واستفسر عن المساحات المتاحة للشركاء.</p><a class="btn btn-gold" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D9%86%D8%B6%D9%85%D8%A7%D9%85%20%D9%84%D8%B4%D8%B1%D9%83%D8%A7%D8%A1%20%D9%84%D9%8A%D8%A7%D9%86%20%D9%84%D9%84%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8%20%D9%88%D8%A7%D9%84%D8%AF%D9%8A%D9%83%D9%88%D8%B1" target="_blank" rel="noopener noreferrer">انضم لشركاء ليان</a></article>
       </div>
-      <p class="pricing-note">خلال فترة الإطلاق التجريبية، يمكن للأفراد والشركات طلب الانضمام مجانًا. أي باقات مستقبلية تُعلن بوضوح قبل تفعيلها، ولا يُطلب منك دفع مبلغ قبل تأكيد التفاصيل مع الإدارة.</p>
+      <p class="pricing-note">إضافة الإعلان العقاري العادي مجانية. الإعلانات المميزة وإعلانات الشركات خدمات اختيارية، وتُحدد تفاصيلها وأسعارها بالتواصل مع إدارة ليان عبر واتساب.</p>
     </section>
 
     <section class="partner-ads-section" id="partner-ads" aria-labelledby="partnerAdsTitle">
       <div class="section-heading">
         <div>
-          <span class="eyebrow">مساحات تجارية تجريبية</span>
-          <h2 id="partnerAdsTitle">إعلانات شركاء التشطيب والديكور</h2>
-          <p>أربع مساحات إعلانية مجانية خلال الشهر التجريبي الأول لعرض منتجات الشركات والمحلات ذات الصلة بتجهيز المنزل.</p>
+          <span class="eyebrow">فرص إعلانية للشركات</span>
+          <h2 id="partnerAdsTitle">مساحات إعلانية للشركات والخدمات العقارية</h2>
+          <p>فرص لعرض خدمات الشركات العقارية والتشطيب والديكور والأثاث والسيراميك والدهانات والموردين أمام الباحثين عن عقار وتجهيز منزل.</p>
         </div>
-        <span class="partner-free-note">مجاني خلال الشهر التجريبي الأول</span>
+        <span class="partner-free-note">مساحات إعلانية متاحة</span>
       </div>
       <div class="partner-ads-grid">
         <article class="partner-ad partner-ad-ceramic" data-partner-slot="ceramics">
-          <img class="partner-ad-art" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85" alt="سيراميك وأرضيات داخل منزل" loading="eager">
-          <div class="partner-ad-content">
-            <span class="partner-ad-category">سيراميك وبورسلين</span>
-            <h3>جدّد أرضيات بيتك بذوقك</h3>
-            <p>اعرض تشكيلات السيراميك والبورسلين، ومقاسات البلاط، وخيارات التشطيب المناسبة للشقق والوحدات الجديدة.</p>
-            <small>مساحة تجريبية — أضف اسم المعرض والأسعار الفعلية بعد موافقته.</small>
-            <a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%A7%D8%AF%D8%A9%20%D9%85%D9%86%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D8%A7%D9%84%D8%B3%D9%8A%D8%B1%D8%A7%D9%85%D9%8A%D9%83%20%D8%A7%D9%84%D9%85%D8%AC%D8%A7%D9%86%D9%8A" target="_blank" rel="noopener noreferrer">استفسر عن الإعلان</a>
-          </div>
+          <img class="partner-ad-art" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85" alt="سيراميك وأرضيات داخل منزل" loading="lazy">
+          <div class="partner-ad-content"><span class="partner-ad-category">سيراميك وبورسلين</span><h3>مساحة إعلانية لمعارض السيراميك</h3><p>اعرض تشكيلات السيراميك والبورسلين ومستلزمات تجهيز الوحدات.</p><small>مساحة إعلانية متاحة — لا تمثل شركة بعينها.</small><a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D9%85%D8%B3%D8%A7%D8%AD%D8%A9%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%D9%8A%D8%A9%20%D9%84%D9%85%D8%B9%D8%B1%D8%B6%20%D8%B3%D9%8A%D8%B1%D8%A7%D9%85%D9%8A%D9%83" target="_blank" rel="noopener noreferrer">اطلب تفاصيل المساحة</a></div>
         </article>
         <article class="partner-ad partner-ad-furniture" data-partner-slot="furniture">
-          <img class="partner-ad-art" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85" alt="أثاث غرفة معيشة" loading="eager">
-          <div class="partner-ad-content">
-            <span class="partner-ad-category">أثاث ومفروشات</span>
-            <h3>كمّل بيتك بلمسة مميزة</h3>
-            <p>مساحة لعرض غرف النوم والمعيشة والسفرة والأثاث الجاهز أو التفصيل، مع توضيح الخامات والمقاسات وخيارات التوصيل.</p>
-            <small>مساحة تجريبية — لا تمثل علامة تجارية محددة أو سعرًا معتمدًا.</small>
-            <a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D8%A7%D9%84%D8%A3%D8%AB%D8%A7%D8%AB%20%D8%A7%D9%84%D9%85%D8%AC%D8%A7%D9%86%D9%8A" target="_blank" rel="noopener noreferrer">استفسر عن الإعلان</a>
-          </div>
+          <img class="partner-ad-art" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85" alt="أثاث غرفة معيشة" loading="lazy">
+          <div class="partner-ad-content"><span class="partner-ad-category">أثاث ومفروشات</span><h3>مساحة إعلانية للأثاث والمفروشات</h3><p>عرّف العملاء بمنتجات الأثاث والتجهيز والتفصيل وخيارات التوصيل.</p><small>مساحة إعلانية متاحة — لا تمثل شركة بعينها.</small><a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B3%D8%A7%D8%AD%D8%A9%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%D9%8A%D8%A9%20%D9%84%D9%84%D8%A3%D8%AB%D8%A7%D8%AB%20%D9%88%D8%A7%D9%84%D9%85%D9%81%D8%B1%D9%88%D8%B4%D8%A7%D8%AA" target="_blank" rel="noopener noreferrer">اطلب تفاصيل المساحة</a></div>
         </article>
         <article class="partner-ad partner-ad-curtains" data-partner-slot="curtains">
           <img class="partner-ad-art" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85" alt="ستائر وديكور داخلي" loading="lazy">
-          <div class="partner-ad-content">
-            <span class="partner-ad-category">ستائر ومفروشات</span>
-            <h3>ستائر وتفاصيل تكمل أناقة منزلك</h3>
-            <p>مساحة مخصصة لأقمشة الستائر والتفصيل والتركيب والمفروشات، مع إضافة بيانات النشاط بعد موافقة صاحبه.</p>
-            <small>مساحة تجريبية — ليست شراكة تجارية مؤكدة.</small>
-            <a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D8%A7%D9%84%D8%B3%D8%AA%D8%A7%D8%A6%D8%B1%20%D9%88%D8%A7%D9%84%D9%85%D9%81%D8%B1%D9%88%D8%B4%D8%A7%D8%AA%20%D8%A7%D9%84%D9%85%D8%AC%D8%A7%D9%86%D9%8A" target="_blank" rel="noopener noreferrer">استفسر عن الإعلان</a>
-          </div>
+          <div class="partner-ad-content"><span class="partner-ad-category">تشطيب وديكور</span><h3>مساحة لشركات التشطيب والديكور</h3><p>اعرض أعمالك وخدمات التصميم والتشطيب وتجهيز الوحدات.</p><small>مساحة إعلانية متاحة — لا تمثل شركة بعينها.</small><a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B3%D8%A7%D8%AD%D8%A9%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%D9%8A%D8%A9%20%D9%84%D8%B4%D8%B1%D9%83%D8%A9%20%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8%20%D9%88%D8%AF%D9%8A%D9%83%D9%88%D8%B1" target="_blank" rel="noopener noreferrer">اطلب تفاصيل المساحة</a></div>
         </article>
         <article class="partner-ad partner-ad-paint" data-partner-slot="paint">
           <img class="partner-ad-art" src="https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1200&q=85" alt="دهانات وألوان حوائط" loading="lazy">
-          <div class="partner-ad-content">
-            <span class="partner-ad-category">بويات ودهانات</span>
-            <h3>اختار ألوان بيتك بثقة</h3>
-            <p>مساحة مخصصة للدهانات الداخلية والخارجية وألوان الحوائط، مع إضافة بيانات المحل والمنتجات بعد موافقة صاحبه.</p>
-            <small>مساحة تجريبية — ليست شراكة تجارية مؤكدة.</small>
-            <a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D8%A7%D9%84%D8%A8%D9%88%D9%8A%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%AF%D9%87%D8%A7%D9%86%D8%A7%D8%AA%20%D8%A7%D9%84%D9%85%D8%AC%D8%A7%D9%86%D9%8A" target="_blank" rel="noopener noreferrer">استفسر عن الإعلان</a>
-          </div>
+          <div class="partner-ad-content"><span class="partner-ad-category">بويات ودهانات</span><h3>مساحة إعلانية لمحلات الدهانات</h3><p>اعرض منتجات الدهانات والألوان وخدمات التوريد والتطبيق.</p><small>مساحة إعلانية متاحة — لا تمثل شركة بعينها.</small><a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B3%D8%A7%D8%AD%D8%A9%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%D9%8A%D8%A9%20%D9%84%D9%85%D8%AD%D9%84%20%D8%A8%D9%88%D9%8A%D8%A7%D8%AA%20%D9%88%D8%AF%D9%87%D8%A7%D9%86%D8%A7%D8%AA" target="_blank" rel="noopener noreferrer">اطلب تفاصيل المساحة</a></div>
         </article>
       </div>
-      <p class="partner-ads-disclaimer">هذه نماذج إعلانية تجريبية وليست عروض بيع مؤكدة. النشر التجاري الفعلي وأسماء العلامات التجارية والصور والأسعار تُضاف بعد موافقة أصحابها والتحقق من البيانات. لا توجد رسوم على هذه المساحات خلال فترة التجربة المعلنة.</p>
+      <p class="partner-ads-disclaimer">هذه مساحات وفئات إعلانية وليست إعلانات لشركات بعينها. لا يُنشر اسم شركة أو عرض تجاري إلا بعد تقديمه ومراجعته واعتماده من إدارة ليان. تفاصيل الأسعار والتعاقد عبر واتساب.</p>
     </section>
 
 
@@ -578,9 +560,9 @@
 
   <script src="config.js?v=layan-upload-preview-20261030-1"></script>
   <script src="gubabase.js?v=layan-social-share-20261030-1"></script>
-  <script src="app.js?v=layan-social-share-20261030-1"></script>
+  <script src="app.js?v=layan-monetization-model-20261030-1"></script>
   <script src="buyer.js?v=layan-upload-preview-20261030-1"></script>
-  <script src="sponsor.js?v=whatsapp-followup-1"></script>
+  <script src="sponsor.js?v=layan-monetization-model-20261030-1"></script>
   <script src="ai.js?v=layan-upload-preview-20261030-1"></script>
   <script src="pwa.js" defer></script>
 </body>

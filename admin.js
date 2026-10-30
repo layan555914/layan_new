@@ -90,16 +90,20 @@ document.addEventListener("DOMContentLoaded", () => {
     list.innerHTML = rows.map(ad => '<article class="admin-ad" data-ad-id="' + esc(ad.id) + '">' +
       '<div><span class="admin-chip">' + esc(ad.category) + '</span><h2>' + esc(ad.title) + '</h2>' +
       '<p><strong>النشاط:</strong> ' + esc(ad.business_name) + '</p><p>' + esc(ad.description) + '</p>' +
-      '<p><strong>الهاتف:</strong> ' + esc(ad.contact_phone) + '</p><p><strong>الخطة:</strong> ' + (ad.plan_code === "trial_30" ? "تجربة مجانية 30 يومًا" : esc(ad.plan_code)) + '</p>' +
+      '<p><strong>الهاتف:</strong> ' + esc(ad.contact_phone) + '</p><p><strong>نوع الطلب:</strong> ' + esc(ad.plan_code) + '</p>' +
+      '<p><strong>المدة المطلوبة:</strong> ' + esc(ad.requested_days) + ' يومًا</p>' +
       (ad.image_url ? '<p><a href="' + esc(ad.image_url) + '" target="_blank" rel="noopener noreferrer">عرض صورة الإعلان</a></p>' : '') +
       (ad.target_url ? '<p><a href="' + esc(ad.target_url) + '" target="_blank" rel="noopener noreferrer">رابط النشاط</a></p>' : '') +
-      '</div><div class="admin-actions"><button type="button" class="btn btn-gold" data-action="approve" ' + (ad.plan_code === "trial_30" ? "" : "disabled") + '>اعتماد التجربة المجانية</button>' +
+      '</div><div class="admin-actions">' +
+      '<div class="admin-activation-fields"><label>المدة المتفق عليها (يومًا)<input type="number" min="1" max="365" step="1" value="' + esc(ad.requested_days || 15) + '" data-agreed-days></label>' +
+      '<label>السعر المتفق عليه (جنيه)<input type="number" min="0" step="1" placeholder="اكتب السعر بعد الاتفاق" data-agreed-price></label></div>' +
+      '<button type="button" class="btn btn-gold" data-action="activate">تفعيل بعد تأكيد الاتفاق</button>' +
       '<button type="button" class="btn btn-outline-dark" data-action="reject">رفض الطلب</button></div></article>').join("");
   }
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
     try {
-      const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,requested_price,created_at&status=eq.pending&order=created_at.asc");
+      const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       render(rows);
       setStatus("تم التحقق من الصلاحيات وتحميل طلبات المراجعة.");
     } catch (error) {
@@ -163,10 +167,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const id = card.dataset.adId;
     button.disabled = true;
     try {
-      if (button.dataset.action === "approve") {
-        if (!window.confirm("اعتماد هذا الإعلان وتفعيله مجانًا لمدة 30 يومًا؟")) return;
-        await request("/rest/v1/rpc/layan_approve_free_trial_ad", {method:"POST",body:JSON.stringify({p_ad_id:id})});
-        setStatus("تم اعتماد الإعلان وتفعيل التجربة المجانية لمدة 30 يومًا.");
+      if (button.dataset.action === "activate") {
+        const days = Number(card.querySelector("[data-agreed-days]")?.value);
+        const priceInput = card.querySelector("[data-agreed-price]");
+        const price = Number(priceInput?.value);
+        if (!Number.isInteger(days) || days < 1 || days > 365 || !Number.isFinite(price) || price < 0 || priceInput?.value === "") {
+          throw new Error("اكتب المدة المتفق عليها من 1 إلى 365 يومًا والسعر النهائي بعد التواصل مع الشركة عبر واتساب.");
+        }
+        if (!window.confirm("تأكيد تفعيل الإعلان لمدة " + days + " يومًا بالسعر المتفق عليه " + price + " جنيه؟")) return;
+        await request("/rest/v1/rpc/layan_activate_supplier_ad", {method:"POST",body:JSON.stringify({p_ad_id:id,p_days:days,p_price:price})});
+        setStatus("تم تفعيل الإعلان بعد تسجيل السعر والمدة المتفق عليهما.");
       } else {
         const reason = window.prompt("اكتب سبب رفض الطلب (3 أحرف على الأقل):");
         if (reason === null) return;

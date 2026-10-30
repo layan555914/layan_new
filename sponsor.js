@@ -96,43 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const rows = await api("supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone&status=eq.active&order=created_at.desc&limit=12");
       const approvedAds = Array.isArray(rows) ? rows : [];
-      const demoAds = [
-        {
-          id: "layan-demo-iereny",
-          demo: true,
-          business_name: "Original Iereny — إيريني الأصلي",
-          image_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80",
-          category: "أثاث وموبيليا",
-          title: "جهّز بيتك بعد استلام وحدتك",
-          description: "نموذج تعريفي تجريبي لمعرض أثاث في أسيوط. هذا العرض غير رسمي ولا يعني وجود اتفاق أو موافقة من العلامة التجارية.",
-          target_url: "https://www.originaliereny.com/",
-          contact_phone: "01207180692"
-        },
-        {
-          id: "layan-demo-aldoctor",
-          demo: true,
-          business_name: "AlDoctor Group — مجموعة الدكتور",
-          image_url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80",
-          category: "سيراميك وبورسلين وأدوات صحية",
-          title: "أفكار لتشطيب وحدتك العقارية",
-          description: "نموذج تعريفي تجريبي لخدمات السيراميك والتشطيبات في أسيوط. الإعلان غير رسمي لحين موافقة النشاط التجاري.",
-          target_url: "https://aldoctorgroup.com/",
-          contact_phone: "01226771010"
-        },
-        {
-          id: "layan-demo-jotun",
-          demo: true,
-          business_name: "Jotun — جوتن",
-          image_url: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=900&q=80",
-          category: "دهانات وتشطيبات",
-          title: "اختيارات ألوان وتشطيبات لمنزلك",
-          description: "نموذج تجريبي للتعريف بعلامة الدهانات. ليس إعلانًا معتمدًا من جوتن؛ استخدم الدليل الرسمي للعثور على موزع.",
-          target_url: "https://www.jotun.com/eg-en/industries/dealers/find-a-jotun-dealer",
-          contact_phone: ""
-        }
-      ];
-      // Real, approved ads take priority. Demo cards appear only when no approved ads are available.
-      ads = approvedAds.length ? approvedAds : demoAds;
+      // Only show real advertisements that have been approved by LAYAN administration.
+      ads = approvedAds;
       placeAds();
     } catch (error) {
       console.warn("LAYAN sponsored ads:", error.message);
@@ -178,13 +143,14 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", openForm);
     footer.appendChild(button);
   }
+  document.querySelectorAll("[data-open-sponsor-form]").forEach(button => button.addEventListener("click", openForm));
 
   function buildForm() {
     dialog = document.createElement("dialog");
     dialog.className = "sponsor-dialog";
     dialog.innerHTML =
-      '<div class="sponsor-dialog-head"><h2>اطلب إعلانًا ممولًا</h2><button type="button" class="sponsor-close" aria-label="إغلاق">×</button></div>' +
-      '<p class="sponsor-price-note">أول 30 يومًا من الإطلاق الرسمي مجانية لجميع المستخدمين: الأفراد والشركات العقارية وشركات التشطيب والديكور. الأسعار المدفوعة تبدأ بعد انتهاء الشهر المجاني والإعلان رسميًا عن تفعيل الدفع. إرسال الطلب لا يفرض أي رسوم.</p>' +
+      '<div class="sponsor-dialog-head"><h2>اطلب إعلانًا مميزًا أو إعلان شركة</h2><button type="button" class="sponsor-close" aria-label="إغلاق">×</button></div>' +
+      '<p class="sponsor-price-note">إرسال طلب الإعلان مجاني ولا يعني وجود التزام بالدفع. تحدد إدارة ليان المميزات والمدة والسعر النهائي بعد مراجعة النشاط والتواصل معك عبر واتساب. لا تُعرض أسعار الباقات على المنصة.</p>' +
       '<p>الإعلانات تظهر داخل قائمة العروض العقارية بعد موافقة الإدارة. أرسل بيانات نشاطك للمراجعة.</p>' +
       '<form class="sponsor-form">' +
       '<label>اسم النشاط<input name="business_name" required minlength="2" maxlength="120" autocomplete="organization"></label>' +
@@ -194,9 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
       '<label>رابط صورة الإعلان (اختياري)<input name="image_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رابط صفحة النشاط (اختياري)<input name="target_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
       '<label>رقم التواصل<input name="contact_phone" required minlength="7" maxlength="30" type="tel" autocomplete="tel"></label>' +
-      '<label>الباقة المطلوبة بعد الشهر المجاني<select name="plan_code" required><option value="trial_30">فترة التعريف المجانية — 30 يومًا</option><option value="starter_15">طلب باقة أساسية — 15 يومًا</option><option value="growth_30">طلب باقة نمو — 30 يومًا</option><option value="partner_90">طلب باقة شركاء — 90 يومًا</option></select></label>' +
+      '<label>نوع الإعلان المطلوب<select name="plan_code" required><option value="starter_15">إعلان تجاري — مدة قصيرة</option><option value="growth_30">إعلان تجاري — مدة متوسطة</option><option value="partner_90">شراكة إعلانية — مدة ممتدة</option></select></label>' +
       '<p class="sponsor-plan-note">تفاصيل الباقات يتم إرسالها بعد التواصل مع الإدارة، حسب نوع النشاط ومدة الإعلان. لا يتم تحصيل أي مبلغ من خلال هذا النموذج.</p>' +
-      '<p class="sponsor-plan-note">باقات الشركات العقارية تتيح عرض حتى 3 عقارات في الإعلان الواحد. الشهر الأول مجاني لجميع المستخدمين. الباقات المدفوعة تبدأ بعد انتهاء أول 30 يومًا من الإطلاق الرسمي، وبعد إعلان ليان عن تفعيل الدفع. لا تحوّل أي مبلغ خلال الفترة المجانية.</p>' +
+      '<p class="sponsor-plan-note">يمكن للشركات العقارية طلب عرض مشروعاتها، ويمكن لشركات التشطيب والديكور والموردين عرض خدماتهم ومنتجاتهم. لا يتم نشر الإعلان إلا بعد مراجعة الإدارة والاتفاق على التفاصيل.</p>' +
       '<p class="sponsor-form-status" role="status" aria-live="polite"></p>' +
       '<button class="btn btn-gold" type="submit">إرسال طلب الإعلان</button></form>';
     document.body.appendChild(dialog);
@@ -218,10 +184,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = new FormData(form);
     const plan = String(data.get("plan_code") || "starter_15");
     const planDetails = {
-      trial_30: { days: 30, price: 0 },
-      starter_15: { days: 15, price: 250 },
-      growth_30: { days: 30, price: 450 },
-      partner_90: { days: 90, price: 1200 }
+      starter_15: { days: 15, price: 0 },
+      growth_30: { days: 30, price: 0 },
+      partner_90: { days: 90, price: 0 }
     }[plan];
     if (!planDetails) {
       status.textContent = "اختر باقة صحيحة.";
@@ -256,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    status.textContent = plan === "trial_30" ? "جارٍ إرسال طلب التجربة المجانية للمراجعة..." : "جارٍ إرسال الطلب...";
+    status.textContent = "جارٍ إرسال طلب الإعلان للمراجعة...";
     try {
       await api("supplier_ads", {
         method: "POST",
@@ -268,7 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const title = String(data.get("title") || "").trim();
       const phone = String(data.get("contact_phone") || "").trim();
       const planNames = {
-        trial_30: "فترة التعريف المجانية — 30 يومًا",
         starter_15: "باقة أساسية — 15 يومًا",
         growth_30: "باقة نمو — 30 يومًا",
         partner_90: "باقة شركاء — 90 يومًا"
@@ -280,11 +244,11 @@ document.addEventListener("DOMContentLoaded", () => {
         "عنوان الإعلان: " + title,
         "رقم التواصل: " + phone,
         "الباقة المطلوبة: " + (planNames[plan] || plan),
-        "أرجو تأكيد استلام الطلب وإرسال تفاصيل الباقة قبل أي دفع."
+        "أرجو إرسال مميزات الإعلان والسعر النهائي والمدة المقترحة عبر واتساب قبل تأكيد أي اتفاق أو دفع."
       ].join("\n");
       const whatsappUrl = "https://wa.me/201007044265?text=" + encodeURIComponent(message);
       form.reset();
-      status.innerHTML = "تم حفظ طلبك في ليان للمراجعة. الشهر الأول مجاني، ولا يتم تحصيل أي مبلغ الآن. <a class=\"sponsor-whatsapp-followup\" href=\"" + whatsappUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\">اضغط هنا لمتابعة الطلب عبر واتساب</a>";
+      status.innerHTML = "تم حفظ طلبك للمراجعة. تواصل مع إدارة ليان لمعرفة مميزات الإعلان والسعر النهائي قبل تأكيد الحجز. <a class=\"sponsor-whatsapp-followup\" href=\"" + whatsappUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\">متابعة الطلب عبر واتساب</a>";
     } catch (error) {
       status.textContent = error.message || "تعذر إرسال الطلب. حاول مرة أخرى.";
     } finally {
