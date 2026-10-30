@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
   const key = config.SUPABASE_PUBLISHABLE_KEY || "";
   const list = document.getElementById("pendingAds");
+  const propertyDocsList = document.getElementById("pendingPropertyDocuments");
   const status = document.getElementById("adminStatus");
   const login = document.getElementById("adminLogin");
   const email = document.getElementById("adminEmail");
@@ -100,12 +101,43 @@ document.addEventListener("DOMContentLoaded", () => {
       '<button type="button" class="btn btn-gold" data-action="activate">تفعيل بعد تأكيد الاتفاق</button>' +
       '<button type="button" class="btn btn-outline-dark" data-action="reject">رفض الطلب</button></div></article>').join("");
   }
+  async function loadPendingPropertyDocuments() {
+    if (!propertyDocsList) return;
+    propertyDocsList.innerHTML = '<p class="admin-empty">جارٍ تحميل مستندات العقارات...</p>';
+    try {
+      const rows = await request("/rest/v1/property_offers?select=id,title,developer_name,project_name,document_urls,created_at&status=eq.pending&order=created_at.asc");
+      if (!Array.isArray(rows) || !rows.length) {
+        propertyDocsList.innerHTML = '<p class="admin-empty">لا توجد مستندات عقارات معلقة للمراجعة حاليًا.</p>';
+        return;
+      }
+      const cards = [];
+      for (const offer of rows) {
+        const docs = Array.isArray(offer.document_urls) ? offer.document_urls : [];
+        const links = [];
+        for (const path of docs) {
+          if (typeof path !== "string" || !path.startsWith("documents/")) continue;
+          const response = await fetch(base + "/storage/v1/object/sign/layan-property-documents/" + path.split("/").map(encodeURIComponent).join("/"), {
+            method:"POST",headers:{apikey:key,Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({expiresIn:600})
+          });
+          const result = await response.json().catch(()=>({}));
+          if (!response.ok || !result.signedURL) continue;
+          const href = result.signedURL.startsWith("http") ? result.signedURL : base + "/storage/v1" + result.signedURL;
+          links.push('<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">فتح مستند خاص</a>');
+        }
+        cards.push('<article class="admin-ad"><div><h3>'+esc(offer.title)+'</h3><p><strong>المطور:</strong> '+esc(offer.developer_name || "غير مسجل")+'</p><p><strong>المشروع:</strong> '+esc(offer.project_name || "غير مسجل")+'</p><p><strong>المستندات:</strong> '+links.length+' من '+docs.length+'</p>'+ (links.length ? links.join(" · ") : '<span>تعذر إنشاء روابط العرض المؤقتة.</span>') +'</div></article>');
+      }
+      propertyDocsList.innerHTML = cards.join("");
+    } catch (error) {
+      propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
+    }
+  }
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
     try {
       const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       render(rows);
-      setStatus("تم التحقق من الصلاحيات وتحميل طلبات المراجعة.");
+      await loadPendingPropertyDocuments();
+      setStatus("تم التحقق من الصلاحيات وتحميل طلبات المراجعة ومستندات العقارات.");
     } catch (error) {
       list.innerHTML = "";
       setStatus(/غير مصرح|permission|row-level|policy|401|403/i.test(error.message)

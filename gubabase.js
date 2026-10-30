@@ -160,7 +160,7 @@
   async function getOffers() {
     const fields = [
       "id","title","governorate","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price",
-      "down_payment","paid_amount","remaining_amount","assignment_fee",
+      "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_name","contact_phone","created_at"
     ].join(",");
@@ -225,6 +225,39 @@
     }
   }
 
+  async function uploadPropertyDocuments(files) {
+    if (!isAuthenticated()) throw new Error("سجّل الدخول أولًا قبل رفع مستندات العقار.");
+    const uploaded = [];
+    for (const file of files || []) {
+      if (!["application/pdf","image/jpeg","image/png"].includes(file.type)) throw new Error("المستندات المسموحة PDF أو JPG أو PNG فقط.");
+      if (file.size < 8 || file.size > 10 * 1024 * 1024) throw new Error("حجم كل مستند يجب ألا يتجاوز 10 ميجابايت.");
+      const head = new Uint8Array(await file.slice(0,8).arrayBuffer());
+      const validPdf = file.type === "application/pdf" && head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46;
+      const validJpeg = file.type === "image/jpeg" && head[0] === 0xFF && head[1] === 0xD8 && head[2] === 0xFF;
+      const validPng = file.type === "image/png" && head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4E && head[3] === 0x47;
+      if (!validPdf && !validJpeg && !validPng) throw new Error("محتوى أحد الملفات لا يطابق نوع المستند المسموح.");
+      const ext = file.type === "application/pdf" ? "pdf" : file.type === "image/png" ? "png" : "jpg";
+      const safeName = String(file.name || "document").replace(/[^a-zA-Z0-9._-]/g,"_").slice(0,70).replace(/\.[^.]+$/,"") + "." + ext;
+      const uid = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2);
+      const path = "documents/" + session.user.id + "/" + uid + "-" + safeName;
+      const response = await fetch(url + "/storage/v1/object/layan-property-documents/" + path.split("/").map(encodeURIComponent).join("/"), {
+        method:"POST", headers:{...authHeaders(),"Content-Type":file.type,"x-upsert":"false"}, body:file
+      });
+      if (!response.ok) throw new Error("فشل رفع مستند العقار: " + await response.text());
+      uploaded.push(path);
+    }
+    return uploaded;
+  }
+  async function deleteUploadedPropertyDocuments(paths) {
+    if (!isAuthenticated() || !Array.isArray(paths)) return;
+    for (const path of paths) {
+      if (typeof path !== "string" || !path.startsWith("documents/" + session.user.id + "/")) continue;
+      try {
+        const response = await fetch(url + "/storage/v1/object/layan-property-documents/" + path.split("/").map(encodeURIComponent).join("/"), {method:"DELETE",headers:authHeaders()});
+        if (!response.ok) console.warn("تعذر حذف مستند مؤقت:", await response.text());
+      } catch (error) { console.warn("تعذر حذف مستند مؤقت:", error); }
+    }
+  }
   async function getOrCreateCompanyAd(businessName) {
     if (!isAuthenticated()) throw new Error("سجّل الدخول أولًا لإنشاء إعلان الشركة.");
     const name = String(businessName || "").trim();
@@ -285,6 +318,8 @@
       assignment_fee_percentage: Number(offer.assignment_fee_percentage ?? offer.transfer_fee_percentage ?? 0),
       discount_amount: Number(offer.discount_amount || 0),
       developer_name: offer.developer_name || null,
+      project_name: offer.project_name || null,
+      document_urls: Array.isArray(offer.document_urls) ? offer.document_urls : [],
       contact_name: offer.contact_name || null,
       discount_percent: Number(offer.discount_percent || 0),
       contact_phone: offer.contact_phone || null,
@@ -300,6 +335,6 @@
     return Array.isArray(rows) ? rows[0] : rows;
   }
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail };
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();

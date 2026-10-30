@@ -414,10 +414,12 @@
         </select>
       </label>
       <label id="companyNameField" hidden>
-        اسم الشركة العقارية
-        <input name="developer_name" id="companyNameInput" type="text" placeholder="اكتب اسم الشركة">
-        <small>يمكن ربط حتى 3 عقارات بإعلان الشركة الواحد. أضف العقارات بالتتابع مع كتابة اسم الشركة نفسه؛ قاعدة البيانات تمنع تجاوز 3 عقارات في الإعلان الواحد.</small>
+        اسم الشركة صاحبة الإعلان
+        <input name="company_business_name" id="companyNameInput" type="text" placeholder="اكتب اسم الشركة العقارية">
+        <small>يمكن ربط حتى 3 عقارات بإعلان الشركة الواحد.</small>
       </label>
+      <label>اسم الشركة المطورة / المطور العقاري<input name="developer_name" type="text" maxlength="160" placeholder="اسم المطور أو الشركة المطورة"></label>
+      <label>اسم المشروع أو الكمبوند<input name="project_name" type="text" maxlength="160" placeholder="اسم المشروع أو الكمبوند"></label>
       <label>
         عنوان العرض
         <input name="title" type="text" required>
@@ -468,15 +470,9 @@
         <input name="total_price" type="number" min="0" required>
       </label>
 
-      <label>
-        المقدم
-        <input name="down_payment" type="number" min="0">
-      </label>
+      <label>المقدم المدفوع عند التعاقد<input name="down_payment" type="number" min="0"><small>قيمة الدفعة الأولى التي دفعها المالك عند الحجز أو التعاقد.</small></label>
 
-      <label>
-        المبلغ المدفوع
-        <input name="paid_amount" type="number" min="0">
-      </label>
+      <label>إجمالي المدفوع حتى الآن (شامل المقدم)<input name="paid_amount" type="number" min="0"><small>إجمالي ما سدده المالك للمطور حتى اليوم، ويشمل المقدم أعلاه.</small></label>
 
       <label>
         المبلغ المتبقي
@@ -542,10 +538,13 @@
         <small id="promotionPlanNote">الإعلان العادي مجاني. لطلب تمييز الإعلان لمدة 15 أو 30 يومًا، اضغط على الرابط لمعرفة المميزات والسعر قبل التأكيد: <a href="https://wa.me/201007044265?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A8%D8%A7%D9%82%D8%A7%D8%AA%20%D8%AA%D9%85%D9%8A%D9%8A%D8%B2%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D9%84%D9%8A%D8%A7%D9%86%20%D9%84%D9%85%D8%AF%D8%A9%2015%20%D9%8A%D9%88%D9%85%D9%8B%D8%A7%20%D9%8830%20%D9%8A%D9%88%D9%85%D9%8B%D8%A7.%20%D9%85%D9%86%20%D9%81%D8%B6%D9%84%D9%83%D9%85%20%D8%A3%D8%B1%D8%B3%D9%84%D9%88%D8%A7%20%D9%85%D9%85%D9%8A%D8%B2%D8%A7%D8%AA%20%D9%83%D9%84%20%D8%A8%D8%A7%D9%82%D8%A9%20%D9%88%D8%A7%D9%84%D8%B3%D8%B9%D8%B1%20%D9%82%D8%A8%D9%84%20%D8%A3%D9%86%20%D8%A3%D8%A4%D9%83%D8%AF%20%D8%A7%D9%84%D8%B7%D9%84%D8%A8." target="_blank" rel="noopener noreferrer">اعرف مميزات الباقات وسعرها على واتساب</a>. لا تدفع قبل استلام السعر وتأكيده من الإدارة.</small>
       </label>
 
+      <label>مستندات العقار (اختياري)
+        <input id="documentsInput" name="documents" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" multiple>
+        <small>عقد التخصيص أو البيع، إيصالات السداد، وموافقة المطور إن وجدت. PDF أو JPG أو PNG، بحد أقصى 10 ميجابايت للملف. المستندات خاصة ولا تظهر للزوار.</small>
+      </label>
       <label>
         صور الوحدة
-        <input
-          id="photosInput"
+        <input id="photosInput"
           name="photos"
           type="file"
           accept=".jpg,.jpeg,image/jpeg"
@@ -559,8 +558,8 @@
   </dialog>
 
   <script src="config.js?v=layan-upload-preview-20261030-1"></script>
-  <script src="gubabase.js?v=layan-social-share-20261030-1"></script>
-  <script src="app.js?v=layan-monetization-model-20261030-1"></script>
+  <script src="gubabase.js?v=layan-private-documents-20261030-1"></script>
+  <script src="app.js?v=layan-private-documents-20261030-1"></script>
   <script src="buyer.js?v=layan-upload-preview-20261030-1"></script>
   <script src="sponsor.js?v=layan-monetization-model-20261030-1"></script>
   <script src="ai.js?v=layan-upload-preview-20261030-1"></script>
