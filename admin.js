@@ -259,12 +259,29 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.getElementById("reloadPending").addEventListener("click", loadPending);
   document.getElementById("adminLogout").addEventListener("click", async () => {
-    try { if (session?.access_token) await request("/auth/v1/logout", {method:"POST"}); } catch (_) {}
+    try { if (session?.access_token) await fetch(base + "/auth/v1/logout", {method:"POST", headers:{apikey:key, Authorization:"Bearer "+session.access_token}}); } catch (_) {}
     session = null;
     localStorage.removeItem(sessionKey);
     showState(false);
     setStatus("تم تسجيل الخروج.");
   });
-  showState(Boolean(session?.access_token && session?.user?.id));
-  if (session?.access_token) loadPending();
+  // Never reveal the administration panel from a locally cached token alone.
+  showState(false);
+  async function verifyAndLoadAdmin() {
+    if (!session?.access_token || !session?.user?.id) return;
+    try {
+      const response = await fetch(base + "/auth/v1/user", {headers:{apikey:key, Authorization:"Bearer "+session.access_token}});
+      const user = response.ok ? await response.json() : null;
+      if (!user?.id || user.id !== session.user.id) throw new Error("جلسة الدخول غير صالحة.");
+      session.user = user;
+      localStorage.setItem(sessionKey, JSON.stringify(session));
+      await loadPending();
+    } catch (error) {
+      session = null;
+      localStorage.removeItem(sessionKey);
+      showState(false);
+      setStatus("يلزم تسجيل الدخول والتحقق من صلاحية الإدارة مرة أخرى.");
+    }
+  }
+  if (session?.access_token) verifyAndLoadAdmin();
 });
