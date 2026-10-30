@@ -712,6 +712,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p><span>المدينة / المركز</span><strong>${esc(o.city || "أسيوط")}</strong></p>
         <p><span>المنطقة</span><strong>${esc(o.area || "غير محدد")}</strong></p>
         ${o.developer_name ? `<p><span>المطور العقاري</span><strong>${esc(o.developer_name)}</strong></p>` : ""}
+        ${o.project_name ? `<p><span>المشروع / الكمبوند</span><strong>${esc(o.project_name)}</strong></p>` : ""}
         ${o.area_m2 ? `<p><span>المساحة</span><strong>${esc(o.area_m2)} م²</strong></p>` : ""}
         ${o.bedrooms ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
         ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
