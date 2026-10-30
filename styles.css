@@ -2630,3 +2630,18 @@ footer{border-top:4px solid var(--gold)}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}
 }
+
+
+/* Property details image gallery */
+.details-gallery{margin:0 0 18px}
+.details-gallery-main{position:relative;min-height:190px;background:#0b1d35;border-radius:15px;overflow:hidden}
+.details-gallery-main .details-image{display:block;width:100%;height:clamp(220px,42vw,430px);max-height:430px;object-fit:contain;background:#0b1d35;border-radius:15px}
+.gallery-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:40px;height:40px;border:1px solid #ffffff70;border-radius:50%;background:#071629cc;color:#fff;font-size:27px;line-height:1}
+.gallery-prev{right:12px}.gallery-next{left:12px}
+.gallery-counter{position:absolute;bottom:12px;left:12px;padding:4px 10px;border-radius:20px;background:#071629d9;color:#fff;font-size:12px;direction:ltr}
+.details-thumbnails{display:flex;gap:9px;overflow-x:auto;padding:10px 2px 3px}
+.details-thumb{flex:0 0 76px;width:76px;height:62px;padding:2px;border:2px solid transparent;border-radius:10px;background:#fff;overflow:hidden}
+.details-thumb.active{border-color:var(--gold)}
+.details-thumb img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}
+.details-placeholder{height:230px;display:grid;place-items:center;border-radius:15px;margin-bottom:18px}
+@media(max-width:600px){.gallery-arrow{width:35px;height:35px}.details-thumb{flex-basis:66px;width:66px;height:56px}}
