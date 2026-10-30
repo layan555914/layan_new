@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!propertyDocsList) return;
     propertyDocsList.innerHTML = '<p class="admin-empty">جارٍ تحميل مستندات العقارات...</p>';
     try {
-      const rows = await request("/rest/v1/rpc/layan_admin_pending_property_documents", {method:"POST",body:"{}"});
+      const rows = await request("/rest/v1/property_offers?select=id,title,developer_name,project_name,document_urls,created_at&status=eq.pending&order=created_at.asc");
       if (!Array.isArray(rows) || !rows.length) {
         propertyDocsList.innerHTML = '<p class="admin-empty">لا توجد مستندات عقارات معلقة للمراجعة حاليًا.</p>';
         return;
