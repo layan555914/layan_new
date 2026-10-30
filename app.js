@@ -454,6 +454,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (sort === "price-asc") return num(a.total_price) - num(b.total_price);
       if (sort === "price-desc") return num(b.total_price) - num(a.total_price);
       if (sort === "paid-asc") return num(a.paid_amount || a.down_payment) - num(b.paid_amount || b.down_payment);
+      if (sort === "monthly-asc") {
+        const av = num(a.monthly_installment), bv = num(b.monthly_installment);
+        if (!av && bv) return 1;
+        if (av && !bv) return -1;
+        return av - bv;
+      }
       return new Date(b.created_at || 0) - new Date(a.created_at || 0);
     });
 
