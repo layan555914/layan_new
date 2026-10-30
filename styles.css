@@ -2675,3 +2675,7 @@ footer{border-top:4px solid var(--gold)}
 .my-offer-card p,.my-offer-card small { margin: 0; color: var(--muted); font-size: 12px; }
 .my-offer-state { justify-self: start; padding: 5px 10px; border-radius: 999px; background: #f5edda; color: var(--navy); font-size: 12px; font-weight: 800; }
 #loadMyOffersBtn:disabled { opacity: .65; cursor: wait; }
+
+.my-offer-view-link { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 12px; border-radius: 10px; background: var(--navy); color: #fff; text-decoration: none; font-size: 13px; font-weight: 800; }
+.my-offer-view-link:hover { filter: brightness(1.12); }
+.my-offer-private-note { color: var(--muted); line-height: 1.6; }
