@@ -2693,3 +2693,11 @@ footer{border-top:4px solid var(--gold)}
 .details-price-highlight span { color: var(--muted); font-size: 13px; }
 .details-price-highlight strong { color: var(--navy); font-size: clamp(16px, 3.6vw, 21px); overflow-wrap: anywhere; }
 @media (max-width: 420px) { .details-price-highlight { gap: 8px; } .details-price-highlight > div { padding: 11px 9px; } }
+
+
+.results-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin: 12px 0 16px; min-height: 38px; }
+.results-summary { display:flex; align-items:baseline; gap:6px; margin:0; color:var(--muted); font-size:14px; }
+.results-summary strong { color:var(--navy); font-size:22px; font-weight:900; }
+.reset-filters-btn { border:1px solid rgba(190,151,76,.55); border-radius:10px; background:transparent; color:var(--navy); padding:8px 12px; font:inherit; font-size:13px; font-weight:800; cursor:pointer; }
+.reset-filters-btn:hover { background:rgba(190,151,76,.12); }
+.reset-filters-btn[hidden] { display:none; }
