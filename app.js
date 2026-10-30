@@ -26,6 +26,48 @@ document.addEventListener("DOMContentLoaded", async () => {
   const statusBox = $("statusMessage");
   const formStatusBox = $("formStatusMessage");
   const photosInput = $("photosInput");
+  const photosPreview = document.createElement("div");
+  photosPreview.className = "layan-photo-preview";
+  photosPreview.setAttribute("aria-live", "polite");
+  photosPreview.setAttribute("aria-label", "معاينة صور الوحدة المختارة");
+  photosInput?.closest("label")?.appendChild(photosPreview);
+  let previewObjectUrls = [];
+  function clearPhotoPreview() {
+    previewObjectUrls.forEach(url => URL.revokeObjectURL(url));
+    previewObjectUrls = [];
+    photosPreview.replaceChildren();
+  }
+  photosInput?.addEventListener("change", () => {
+    clearPhotoPreview();
+    const selected = Array.from(photosInput.files || []);
+    if (!selected.length) return;
+    const invalid = selected.find(file =>
+      file.type !== "image/jpeg" || !/\\.jpe?g$/i.test(file.name) || file.size > 5 * 1024 * 1024
+    );
+    if (invalid) {
+      photosPreview.textContent = "تأكد أن كل الصور JPG أو JPEG وألا يتجاوز حجم الصورة 5 ميجابايت.";
+      return;
+    }
+    const heading = document.createElement("p");
+    heading.className = "layan-photo-preview-title";
+    heading.textContent = "معاينة الصور قبل الإرسال (" + selected.length + ")";
+    photosPreview.appendChild(heading);
+    const grid = document.createElement("div");
+    grid.className = "layan-photo-preview-grid";
+    selected.forEach((file, index) => {
+      const url = URL.createObjectURL(file);
+      previewObjectUrls.push(url);
+      const figure = document.createElement("figure");
+      const image = document.createElement("img");
+      image.src = url;
+      image.alt = "صورة الوحدة " + (index + 1);
+      const caption = document.createElement("figcaption");
+      caption.textContent = file.name;
+      figure.append(image, caption);
+      grid.appendChild(figure);
+    });
+    photosPreview.appendChild(grid);
+  });
   const areaFilter = $("areaFilter");
   // Instagram does not accept a website URL as a direct feed-post share.
   // Open Instagram directly and copy the official LAYAN URL for pasting into a bio, story, or DM.
@@ -854,6 +896,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       await api.createOffer(offer);
 
       form.reset();
+      clearPhotoPreview();
       closeDialog();
       setStatus(offer.featured_requested
         ? "تم إرسال العرض وطلب الإعلان المميز للمراجعة. الدفع الإلكتروني غير مفعّل حاليًا؛ لا تحوّل أي مبلغ قبل إعلان وسيلة دفع رسمية من إدارة ليان. لن يظهر الإعلان كمميز إلا بعد تأكيد الدفع من الإدارة."
