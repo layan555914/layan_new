@@ -55,35 +55,8 @@
     return data;
   }
 
-  // Handle the access token returned in the URL after a Supabase email-confirmation link.
-  // The app uses the REST Auth API directly, so it must process this callback itself.
-  async function restoreConfirmedEmailSession() {
-    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-    const accessToken = hash.get("access_token");
-    const refreshToken = hash.get("refresh_token");
-    const authType = hash.get("type");
-    if (!accessToken || !refreshToken || !["signup", "magiclink", "recovery"].includes(authType || "")) return;
-    try {
-      const response = await fetch(url + "/auth/v1/user", {
-        headers: { apikey: key, Authorization: "Bearer " + accessToken }
-      });
-      const user = await readResponse(response);
-      if (!user?.id) throw new Error("تعذر استعادة جلسة الحساب بعد تأكيد البريد.");
-      saveSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-        token_type: "bearer",
-        expires_at: Number(hash.get("expires_at")) || Math.floor(Date.now() / 1000) + (Number(hash.get("expires_in")) || 3600),
-        user
-      });
-      // Remove authentication tokens from the address bar after storing the session.
-      history.replaceState(null, document.title, window.location.pathname + window.location.search);
-      window.dispatchEvent(new CustomEvent("layan:auth-ready"));
-    } catch (error) {
-      console.error("LAYAN: تعذر استعادة جلسة تأكيد البريد:", error);
-    }
-  }
-  restoreConfirmedEmailSession();
+  // A single callback handler below processes signup, magic-link, and recovery returns.
+  // Keeping one handler avoids racing two requests against the same one-time auth token.
   function normalizeEmail(email) { return String(email || "").trim().toLowerCase(); }
   async function signUp(email, password) {
     const cleanEmail = normalizeEmail(email);
