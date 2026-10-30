@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const key = config.SUPABASE_PUBLISHABLE_KEY || "";
   const list = document.getElementById("pendingAds");
   const propertyDocsList = document.getElementById("pendingPropertyDocuments");
+  const companyProfilesList = document.getElementById("pendingCompanyProfiles");
   const status = document.getElementById("adminStatus");
   const login = document.getElementById("adminLogin");
   const email = document.getElementById("adminEmail");
@@ -131,15 +132,27 @@ document.addEventListener("DOMContentLoaded", () => {
       propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
     }
   }
+  async function loadPendingCompanyProfiles() {
+    if (!companyProfilesList) return;
+    companyProfilesList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات ملفات الشركات...</p>';
+    const rows = await request("/rest/v1/company_profiles?select=id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,created_at&status=eq.pending&order=created_at.asc");
+    if (!Array.isArray(rows) || !rows.length) {
+      companyProfilesList.innerHTML = '<p class="admin-empty">لا توجد طلبات ملفات شركات معلقة.</p>';
+      return;
+    }
+    companyProfilesList.innerHTML = rows.map(c => '<article class="admin-ad" data-company-profile-id="' + esc(c.id) + '"><div><span class="admin-chip">' + esc(c.category) + '</span><h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p><p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + ' — <strong>الهاتف:</strong> ' + esc(c.phone) + '</p><p><strong>الخدمات:</strong> ' + esc((c.services || []).join("، ")) + '</p><p><strong>المشروعات:</strong> ' + esc((c.projects || []).map(p => p.title).join("، ") || "لم تُضف") + '</p>' + (c.website ? '<p><a href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">الموقع الإلكتروني</a></p>' : '') + (c.logo_url ? '<p><a href="' + esc(c.logo_url) + '" target="_blank" rel="noopener noreferrer">شعار الشركة</a></p>' : '') + '<p><strong>صور الأعمال:</strong> ' + (c.gallery_urls || []).length + '</p>' + (c.gallery_urls || []).map((u,i) => '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">صورة ' + (i+1) + '</a>').join(' · ') + '</div><div class="admin-actions"><button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button><button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>').join("");
+  }
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
     try {
       const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       render(rows);
+      await loadPendingCompanyProfiles();
       await loadPendingPropertyDocuments();
-      setStatus("تم التحقق من الصلاحيات وتحميل طلبات المراجعة ومستندات العقارات.");
+      setStatus("تم التحقق من الصلاحيات وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
     } catch (error) {
       list.innerHTML = "";
+      if (companyProfilesList) companyProfilesList.innerHTML = "";
       setStatus(/غير مصرح|permission|row-level|policy|401|403/i.test(error.message)
         ? "هذا الحساب غير مخوّل للإدارة. يلزم إضافة معرّف حسابك إلى قائمة مديري LAYAN من لوحة Supabase الآمنة."
         : error.message);
@@ -191,6 +204,30 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       setStatus("تعذر تسجيل الدخول: " + error.message);
     } finally { button.disabled = false; }
+  });
+  companyProfilesList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-company-action]");
+    const card = event.target.closest("[data-company-profile-id]");
+    if (!button || !card) return;
+    const action = button.dataset.companyAction;
+    const id = card.dataset.companyProfileId;
+    let notes = null;
+    if (action === "reject") {
+      notes = window.prompt("اكتب سبب رفض ملف الشركة:");
+      if (notes === null) return;
+      if (notes.trim().length < 3) { setStatus("اكتب سببًا واضحًا للرفض."); return; }
+    } else if (!window.confirm("اعتماد ملف الشركة ونشره في دليل ليان؟")) return;
+    button.disabled = true;
+    try {
+      await request("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ status: action === "approve" ? "active" : "rejected", admin_notes: notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
+      });
+      setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : "تم رفض طلب ملف الشركة.");
+      await loadPending();
+    } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
+    finally { button.disabled = false; }
   });
   list.addEventListener("click", async event => {
     const button = event.target.closest("button[data-action]");
