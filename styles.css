@@ -2522,3 +2522,111 @@ p,small,label,input,select,textarea,button,a,.offer-details{
 @media(max-width:700px){
   .filters .smart-filter-field{grid-column:1 / -1}
 }
+
+
+/* LAYAN AQAR — premium marketplace refinement (keeps existing app behavior intact) */
+.topbar{
+  position:sticky;top:0;backdrop-filter:blur(14px);
+  box-shadow:0 8px 28px rgba(5,20,38,.16);
+  padding-block:12px;gap:12px 22px
+}
+.brand-logo{filter:drop-shadow(0 3px 8px rgba(0,0,0,.18))}
+.topbar nav a{padding:9px 12px;border-radius:10px;transition:background .2s,color .2s}
+.topbar nav a:hover,.topbar nav a.active{background:rgba(255,255,255,.09);color:var(--gold-light)}
+.top-actions .btn{border-radius:12px;min-height:44px}
+.hero{
+  isolation:isolate;min-height:390px;display:flex;align-items:center;
+  background:
+    linear-gradient(90deg,rgba(7,22,41,.97) 0%,rgba(12,34,59,.91) 53%,rgba(14,43,72,.74) 100%),
+    url("layan_premium_apartment.jpg") center 48%/cover no-repeat,
+    linear-gradient(125deg,#0b1d35,#173d68 65%,#102746);
+  border-bottom-width:4px
+}
+.hero::before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse at 82% 20%,rgba(197,161,93,.18),transparent 35%)
+}
+.hero-content{max-width:760px;padding-block:12px}
+.hero .eyebrow{display:inline-flex;padding:7px 13px;border:1px solid rgba(234,217,178,.35);border-radius:30px;background:rgba(255,255,255,.06);letter-spacing:.08em}
+.hero h1{font-size:clamp(36px,6vw,62px);margin:12px 0 8px;text-shadow:0 4px 22px rgba(0,0,0,.2)}
+.hero-content>p{max-width:680px;color:#e4ebf3;font-size:clamp(15px,1.6vw,18px)}
+.hero-actions{gap:12px;margin-top:24px}
+.hero-actions .btn{min-height:48px;padding-inline:24px;border-radius:13px}
+.section-heading h2,.category-explorer-intro h2{letter-spacing:-.035em}
+.category-explorer{background:linear-gradient(180deg,#fff 0%,#f3f6fa 100%)}
+.category-tile{border-radius:18px;box-shadow:0 10px 28px rgba(16,39,70,.07)}
+.category-tile-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#f8f2e5,#fff);color:#9b7638}
+.category-tile strong{font-size:18px}
+.category-trust-strip{border:1px solid rgba(197,161,93,.35);border-radius:18px;box-shadow:0 10px 28px rgba(16,39,70,.05)}
+.offers-section{padding-top:clamp(38px,5vw,64px);padding-bottom:clamp(38px,5vw,64px)}
+.offers-section .section-heading{margin-bottom:22px}
+.filters{
+  padding:16px;border:1px solid var(--border);border-radius:18px;
+  background:#fff;box-shadow:0 12px 32px rgba(16,39,70,.07);gap:12px
+}
+.filters input,.filters select,.smart-filter-field input{
+  min-height:46px;border-radius:11px;border-color:#dce3ec;background:#fbfcfe
+}
+.filters input:focus,.filters select:focus,.smart-filter-field input:focus{
+  outline:3px solid rgba(197,161,93,.18);border-color:var(--gold)
+}
+.offers-grid{gap:22px}
+.offer-card{
+  padding:0;overflow:hidden;border-radius:18px;border-color:#e4e9f0;
+  box-shadow:0 10px 28px rgba(16,39,70,.07);display:flex;flex-direction:column
+}
+.offer-card:hover{transform:translateY(-5px);box-shadow:0 18px 38px rgba(16,39,70,.13)}
+.offer-image{width:100%;height:218px;object-fit:cover;display:block;background:#e9edf2}
+.offer-image-placeholder{
+  display:grid;place-items:center;color:#d5bd8c;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(135deg,#0b1d35,#24486b)
+}
+.offer-card-content{padding:18px;display:flex;flex:1;flex-direction:column}
+.offer-card h3{font-size:19px;margin:8px 0}
+.offer-code{font-size:11px!important;color:#7b8796!important}
+.offer-type,.featured-badge{border-radius:30px;padding:5px 10px;font-size:11px;align-self:flex-start}
+.offer-type{background:#f4efe4;color:#82632d}
+.featured-badge{background:#fff4d9;color:#8a6423}
+.offer-location{color:#718096;font-size:13px}
+.offer-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0}
+.offer-details>div{padding:10px;border:1px solid #e9edf2;border-radius:11px;background:#f8fafc}
+.offer-details span{display:block;color:#778496;font-size:11px}
+.offer-details strong{display:block;color:var(--navy);font-size:13px;margin-top:3px}
+.details-button{
+  margin-top:auto;width:100%;min-height:46px;border:0;border-radius:11px;
+  background:var(--navy);color:#fff;font-weight:800;transition:background .2s,transform .2s
+}
+.details-button:hover{background:#1b4268;transform:translateY(-1px)}
+.empty-state{grid-column:1/-1;padding:34px 20px;border:1px dashed #cbd5e1;border-radius:16px;background:#fff;text-align:center}
+.calculator-card,.how-card,.company-card{border-radius:18px;box-shadow:0 10px 28px rgba(16,39,70,.06)}
+footer{border-top:4px solid var(--gold)}
+@media(max-width:900px){
+ .topbar{position:relative}
+ .hero{min-height:350px}
+ .offers-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+ .topbar{padding:10px 14px}
+ .topbar nav{order:3;width:100%;justify-content:center;gap:5px}
+ .topbar nav a{font-size:12px;padding:7px 9px}
+ .brand-logo{max-width:48px}
+ .top-actions{gap:7px}
+ .top-actions .btn{padding:8px 11px;font-size:12px}
+ .hero{min-height:370px;padding:42px 18px;background-position:center,62% center,center}
+ .hero-content>p{font-size:14px}
+ .hero-actions .btn{flex:1;padding-inline:12px}
+ .category-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .category-tile{min-height:184px;padding:16px 14px}
+ .category-tile strong{font-size:16px}
+ .category-tile>span:not(.category-tile-icon){font-size:12px}
+ .category-tile b{font-size:11px}
+ .category-trust-strip{padding:16px;gap:10px}
+ .filters{padding:12px;border-radius:14px}
+ .offers-grid{grid-template-columns:1fr;gap:16px}
+ .offer-image{height:220px}
+ .offer-card-content{padding:15px}
+ .offer-details{gap:7px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}
+}
