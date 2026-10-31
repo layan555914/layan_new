@@ -609,7 +609,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const plan = $("promotionPlanSelect")?.value || "standard";
     const note = $("promotionPlanNote");
     if (!note) return;
-    const contact = '<a href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D9%88%D8%B3%D8%B9%D8%B1%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D9%84%D9%8A%D8%A7%D9%86" target="_blank" rel="noopener noreferrer">اسأل إدارة أسيوط عقار عبر واتساب</a>';
+    const contact = '<a href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D9%88%D8%B3%D8%B9%D8%B1%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20%D8%B9%D9%82%D8%A7%D8%B1" target="_blank" rel="noopener noreferrer">اسأل إدارة أسيوط عقار عبر واتساب</a>';
     if (plan === "featured_15" || plan === "featured_30") note.innerHTML = "طلب التمييز اختياري. المميزات والمدة والسعر النهائي يتم تأكيدها عبر واتساب قبل أي اتفاق. " + contact;
     else note.innerHTML = "الإعلان العقاري العادي مجاني دائمًا، ولا توجد عمولة لأسيوط عقار على البيع أو التنازل. " + contact;
   }
