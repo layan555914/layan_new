@@ -15,7 +15,7 @@ where status = 'active';
 
 revoke all on public.company_profiles from anon, authenticated;
 grant insert, update on public.company_profiles to authenticated;
-grant select (id, owner_id, status) on public.company_profiles to authenticated;
+grant select (id, status) on public.company_profiles to authenticated;
 grant select (id, company_name, category, description, services, city, address, phone, whatsapp, website, logo_url, gallery_urls, projects, status) on public.company_profiles to anon, authenticated;
 grant select on public.company_profiles_public to anon, authenticated;
 
