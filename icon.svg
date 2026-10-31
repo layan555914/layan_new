@@ -1,7 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="100" fill="#102746"/>
-  <path d="M105 130h44v210h150v42H105z" fill="#ead9b2"/>
-  <path d="M213 130h44v210h150v42H213z" fill="#c5a15d" opacity=".95"/>
-  <path d="M112 390h288" stroke="#a93636" stroke-width="18" stroke-linecap="round"/>
-  <text x="256" y="455" font-family="Arial,sans-serif" font-size="42" font-weight="700" text-anchor="middle" fill="#fff">LAYAN</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="أسيوط عقار">
+  <defs>
+    <linearGradient id="navy" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#142d4d"/><stop offset="1" stop-color="#07172d"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5d98d"/><stop offset="1" stop-color="#bd8b2e"/></linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="104" fill="url(#navy)"/>
+  <path d="M72 354V218h54v136M139 354V160h62v194M216 354V202h54v152M285 354V128h67v226M367 354V238h70v116" fill="none" stroke="url(#gold)" stroke-width="17" stroke-linejoin="round"/>
+  <path d="M65 374h382" stroke="#fff" stroke-width="12" stroke-linecap="round" opacity=".9"/>
+  <path d="M65 402c65-28 124-28 190 0s125 28 192 0" fill="none" stroke="#1476b8" stroke-width="20" stroke-linecap="round"/>
+  <path d="M256 58 438 224h-66L256 120 140 224H74z" fill="none" stroke="#fff" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M405 78c-24 0-43 19-43 43 0 31 43 76 43 76s43-45 43-76c0-24-19-43-43-43z" fill="#c91625"/>
+  <path d="M389 123h32v27h-32zM405 111v39" stroke="#fff" stroke-width="7" fill="none"/>
+  <path d="M95 436h322" stroke="url(#gold)" stroke-width="10" stroke-linecap="round"/>
 </svg>
