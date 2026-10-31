@@ -3090,3 +3090,11 @@ body{background:#f4f6fa;color:#10264c}
 .land-details-fields[hidden]{display:none}
 .land-details-fields legend{font-weight:800;color:#17345f;padding:0 8px}
 @media(max-width:640px){.land-details-fields{grid-template-columns:1fr}}
+
+
+/* Batch 1: quick search stays in normal document flow on every viewport. */
+.design-hero{display:flex;flex-direction:column;align-items:stretch;gap:22px;padding-bottom:40px}
+.design-hero-search{position:relative;inset:auto;bottom:auto;left:auto;right:auto;z-index:3;width:100%;margin:8px 0 0;box-sizing:border-box}
+.design-benefits{padding-top:24px}
+@media(max-width:900px){.design-hero{padding-bottom:32px}.design-hero-search{bottom:auto;left:auto;right:auto;margin-top:8px}.design-benefits{padding-top:24px}}
+@media(max-width:560px){.design-hero{padding-bottom:28px}.design-hero-search{bottom:auto;left:auto;right:auto;margin-top:8px}.design-benefits{padding-top:18px}}
