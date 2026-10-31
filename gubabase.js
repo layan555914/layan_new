@@ -191,7 +191,7 @@
   }
   async function getMyOffers() {
     if (!isAuthenticated()) return [];
-    const rows = await request("property_offers?select=id,status,title,created_at&owner_id=eq." +
+    const rows = await request("property_offers?select=id,status,title,city,area,down_payment,remaining_amount,monthly_installment,created_at&owner_id=eq." +
       encodeURIComponent(session.user.id) + "&order=created_at.desc");
     return Array.isArray(rows) ? rows : [];
   }
