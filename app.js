@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll("[data-category-kind]").forEach((tile) => {
     tile.addEventListener("click", () => {
       activeKind = tile.dataset.categoryKind || "";
+      activeDealKind = "";
       const typeFilter = $("typeFilter");
       const areaFilter = $("areaFilter");
       if (typeFilter) typeFilter.value = "";
@@ -494,7 +495,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return (!search || normalizedText.includes(search)) &&
         (!companyQuery || normalizeSearch(o.developer_name).includes(companyQuery)) &&
         (!type || normalizeSearch(o.property_type) === type) &&
-        (!area || normalizeSearch(o.area) === area) &&
+        (!area || normalizeSearch(o.area) === area || normalizeSearch(o.city) === area) &&
         (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
         (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
         (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String([o.listing_purpose, o.title, o.description].join(" ")).includes(dealKind));
