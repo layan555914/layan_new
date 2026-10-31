@@ -4,8 +4,10 @@ const $=id=>document.getElementById(id),grid=$("marketplaceListings"),count=$("m
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=v=>{try{const u=new URL(String(v||""));return ["https:","http:"].includes(u.protocol)?u.href:""}catch(_){return ""}};
 const session=()=>window.LAYAN_SUPABASE?.getSession?.()||null;
+const requestedCategory=new URLSearchParams(location.search).get("category")||"";
 
 const categoryFields=$("marketplaceCategoryFields");
+if(requestedCategory&&Array.from(filter?.options||[]).some(option=>option.value===requestedCategory)){if(filter)filter.value=requestedCategory;const categoryInput=form?.querySelector('[name="category"]');if(categoryInput)categoryInput.value=requestedCategory;}
 const categorySpecs={
 "سوق العقارات":[["نوع العقار","property_kind","select","شقة|فيلا|محل تجاري|مكتب|عيادة|مخزن|مبنى"],["الغرض","purpose","select","بيع|إيجار"],["المساحة بالمتر","area_m2","number"],["عدد الغرف","bedrooms","number"],["عدد الحمامات","bathrooms","number"],["التشطيب","finishing","text"]],
 "التنازلات العقارية":[["اسم المطور","developer","text"],["اسم المشروع","project","text"],["المقدم المطلوب","required_down_payment","number"],["المبلغ المدفوع","paid_amount","number"],["المتبقي","remaining_amount","number"],["القسط الشهري","monthly_installment","number"],["رسوم التنازل","assignment_fee","number"],["الخصم المتاح","discount","number"]],
