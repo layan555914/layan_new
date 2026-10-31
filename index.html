@@ -77,7 +77,7 @@
           <select id="heroTypeFilter">
             <option value="">كل الوحدات</option>
             <option value="شقة">شقة</option><option value="فيلا">فيلا</option>
-            <option value="محل">محل تجاري</option><option value="أرض">أرض</option>
+            <option value="محل">محل تجاري</option><option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option><option value="أرض تنازل">أرض تنازل</option>
             <option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option>
           </select>
         </label>
@@ -252,6 +252,21 @@
           <b>شوف العقارات الطبية ←</b>
         </button>
       </div>
+
+      <div class="land-market-grid" aria-label="أقسام الأراضي">
+        <article class="land-market-card">
+          <span class="land-market-icon" aria-hidden="true">▱</span>
+          <div><span class="eyebrow">سوق الأراضي</span><h3>أراضٍ مطروحة للبناء</h3>
+          <p>أراضٍ للبيع المباشر في أسيوط ومراكزها، مع توضيح المساحة والسعر والموقع وجهة الولاية واشتراطات البناء المتاحة.</p></div>
+          <button class="btn btn-outline" type="button" data-category-kind="أراضي مطروحة للبناء">تصفح أراضي البناء</button>
+        </article>
+        <article class="land-market-card">
+          <span class="land-market-icon" aria-hidden="true">⇄</span>
+          <div><span class="eyebrow">سوق التنازلات</span><h3>أراضي للتنازل</h3>
+          <p>أراضٍ مخصصة أو محجوزة يرغب أصحابها في التنازل عنها، مع بيانات المدفوع والمتبقي والأقساط ورسوم التنازل وشروط الجهة المختصة.</p></div>
+          <button class="btn btn-outline" type="button" data-category-kind="أراضي التنازلات">تصفح أراضي التنازلات</button>
+        </article>
+      </div>
       <div class="category-trust-strip">
         <span class="trust-mark" aria-hidden="true">✓</span>
         <div><strong>تنازل بدون عمولة لليان</strong><p>ليان لا تحصل على عمولة عند إتمام التنازل. راجع المقدم والمبلغ المتبقي والأقساط ورسوم التنازل التي يحددها المطوّر قبل الاتفاق.</p></div>
@@ -285,7 +300,7 @@
           <option value="عيادة طبية">عيادة طبية</option>
           <option value="مخزن">مخزن</option>
           <option value="معرض">معرض</option>
-          <option value="أرض">أرض</option>
+          <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option><option value="أرض تنازل">أرض تنازل</option>
         </select>
 
         <select id="areaFilter" aria-label="تصفية حسب المنطقة">
@@ -462,13 +477,15 @@
           <option value="عيادة طبية">عيادة طبية</option>
           <option value="مخزن">مخزن</option>
           <option value="معرض">معرض</option>
-          <option value="أرض">أرض</option>
+          <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option>
+          <option value="أرض تنازل">أرض تنازل</option>
         </select>
       </label>
 
       <label>
         المدينة / المركز
-        <input name="city" type="text" placeholder="مثال: مدينة أسيوط أو القوصية">
+        <input name="city" type="text" list="asyut-centers" placeholder="اختر أو اكتب المدينة / المركز" autocomplete="address-level2">
+        <datalist id="asyut-centers"><option value="مدينة أسيوط"><option value="أسيوط الجديدة"><option value="ديروط"><option value="القوصية"><option value="منفلوط"><option value="أبنوب"><option value="الفتح"><option value="ساحل سليم"><option value="البداري"><option value="أبو تيج"><option value="صدفا"><option value="الغنايم"></datalist>
       </label>
 
       <label>
