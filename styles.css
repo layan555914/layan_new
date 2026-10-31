@@ -3098,3 +3098,8 @@ body{background:#f4f6fa;color:#10264c}
 .design-benefits{padding-top:24px}
 @media(max-width:900px){.design-hero{padding-bottom:32px}.design-hero-search{bottom:auto;left:auto;right:auto;margin-top:8px}.design-benefits{padding-top:24px}}
 @media(max-width:560px){.design-hero{padding-bottom:28px}.design-hero-search{bottom:auto;left:auto;right:auto;margin-top:8px}.design-benefits{padding-top:18px}}
+
+
+/* Batch 1: explicit readable login action colors in the final header state. */
+.topbar .top-actions .btn-outline{color:#102746!important;background:#fff!important;border:1px solid #102746!important}
+.topbar .top-actions .btn-outline:hover,.topbar .top-actions .btn-outline:focus-visible{color:#fff!important;background:#102746!important;border-color:#102746!important}
