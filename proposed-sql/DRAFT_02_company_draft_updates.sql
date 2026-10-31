@@ -1,5 +1,5 @@
 -- ============================================================================
--- DRAFT FOR REVIEW — NOT EXECUTED — NOT FINAL — UNTESTED
+-- APPLIED TO PRODUCTION on 2026-10-31 as layan_company_profiles_pending_update_20261031
 -- نموذج "النسخة المقترحة": تعديلات مالك الملف المنشور تُحفظ في pending_update، وتبقى النسخة العامة
 -- كما هي حتى تعتمدها الإدارة عبر الدالة layan_review_company_profile.
 -- يعتمد على: DRAFT_01 (أو ما يكافئه في القاعدة الحية)، ووجود الدالة public.layan_is_admin().
