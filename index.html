@@ -493,6 +493,7 @@
         <input name="title" type="text" required>
       </label>
 
+      <label>نوع الإعلان<select name="listing_purpose" id="listingPurpose" required><option value="تنازل">تنازل عقاري</option><option value="بيع">بيع مباشر</option><option value="إيجار">إيجار</option></select></label>
       <label>
         نوع العقار
         <select name="property_type" required>
@@ -525,6 +526,12 @@
         <input name="area_m2" type="number" min="0" step="0.1" inputmode="decimal">
       </label>
 
+      <fieldset class="land-details-fields" id="landDetailsFields" hidden><legend>بيانات الأرض (إن كان الإعلان عن أرض)</legend>
+        <label>جهة الولاية / التخصيص<input name="land_ownership_authority" maxlength="180" placeholder="مثال: جهاز مدينة / جمعية / هيئة"></label>
+        <label>اشتراطات وتراخيص البناء<textarea name="land_permit_details" rows="2" maxlength="800"></textarea></label>
+        <label>المرافق المتاحة<input name="land_utilities" maxlength="180" placeholder="مياه، كهرباء، صرف، غاز..."></label>
+        <label>تصنيف / استخدام الأرض<input name="land_zoning" maxlength="180" placeholder="سكني، تجاري، إداري..."></label>
+      </fieldset>
       <label>
         عدد غرف النوم
         <input name="bedrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
