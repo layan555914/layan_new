@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const key = config.SUPABASE_PUBLISHABLE_KEY || "";
   const list = document.getElementById("pendingAds");
   const propertyDocsList = document.getElementById("pendingPropertyDocuments");
-  const companyProfilesList = document.getElementById("pendingCompanyProfiles");\n  const marketplaceList = document.getElementById("pendingMarketplaceListings");
+  const companyProfilesList = document.getElementById("pendingCompanyProfiles");
+  const marketplaceList = document.getElementById("pendingMarketplaceListings");
   const status = document.getElementById("adminStatus");
   const login = document.getElementById("adminLogin");
   const email = document.getElementById("adminEmail");
@@ -196,7 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     marketplaceList.innerHTML = rows.map(row => '<article class="admin-ad" data-marketplace-id="' + esc(row.id) + '"><div><span class="admin-chip">' + esc(row.category) + ' · ' + esc(row.listing_type) + '</span><h2>' + esc(row.title) + '</h2><p>' + esc(row.description) + '</p><p><strong>الموقع:</strong> ' + esc(row.city) + (row.area ? ' — ' + esc(row.area) : '') + '</p><p><strong>السعر:</strong> ' + (row.price === null ? 'عند التواصل' : esc(row.price) + ' جنيه ' + esc(row.price_period || '')) + '</p><p><strong>الهاتف:</strong> ' + esc(row.contact_phone) + (row.whatsapp ? ' · واتساب: ' + esc(row.whatsapp) : '') + '</p>' + (Array.isArray(row.image_urls) ? row.image_urls.map((u,i)=>linkHtml(u,'صورة '+(i+1))).join(' · ') : '') + '</div><div class="admin-actions"><button type="button" class="btn btn-gold" data-marketplace-action="approve">اعتماد ونشر</button><button type="button" class="btn btn-outline-dark" data-marketplace-action="reject">رفض الطلب</button></div></article>').join("");
   }
-\n  async function loadPending() {
+
+  async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
     try {
       // Fail closed: password authentication is not proof of administrator authorization.
@@ -323,7 +325,23 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
     finally { button.disabled = false; }
   });
-  marketplaceList?.addEventListener("click", async event => {\n    const button = event.target.closest("button[data-marketplace-action]");\n    const card = event.target.closest("[data-marketplace-id]");\n    if (!button || !card) return;\n    const action = button.dataset.marketplaceAction;\n    let notes = null;\n    if (action === "reject") { notes = window.prompt("اكتب سبب رفض الإعلان:"); if (notes === null) return; if (notes.trim().length < 3) { setStatus("اكتب سببًا واضحًا للرفض."); return; } }\n    else if (!window.confirm("اعتماد هذا الإعلان ونشره للزوار؟")) return;\n    button.disabled = true;\n    try {\n      await request("/rest/v1/marketplace_listings?id=eq." + encodeURIComponent(card.dataset.marketplaceId) + "&status=eq.pending", {method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({status:action==="approve"?"approved":"rejected",admin_notes:action==="approve"?null:notes,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id})});\n      setStatus(action==="approve"?"تم اعتماد إعلان سوق الخدمات ونشره.":"تم رفض إعلان سوق الخدمات.");\n      await loadPending();\n    } catch (error) { setStatus(error.message || "تعذر تحديث حالة الإعلان."); }\n    finally { button.disabled = false; }\n  });\n  list.addEventListener("click", async event => {
+  marketplaceList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-marketplace-action]");
+    const card = event.target.closest("[data-marketplace-id]");
+    if (!button || !card) return;
+    const action = button.dataset.marketplaceAction;
+    let notes = null;
+    if (action === "reject") { notes = window.prompt("اكتب سبب رفض الإعلان:"); if (notes === null) return; if (notes.trim().length < 3) { setStatus("اكتب سببًا واضحًا للرفض."); return; } }
+    else if (!window.confirm("اعتماد هذا الإعلان ونشره للزوار؟")) return;
+    button.disabled = true;
+    try {
+      await request("/rest/v1/marketplace_listings?id=eq." + encodeURIComponent(card.dataset.marketplaceId) + "&status=eq.pending", {method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({status:action==="approve"?"approved":"rejected",admin_notes:action==="approve"?null:notes,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id})});
+      setStatus(action==="approve"?"تم اعتماد إعلان سوق الخدمات ونشره.":"تم رفض إعلان سوق الخدمات.");
+      await loadPending();
+    } catch (error) { setStatus(error.message || "تعذر تحديث حالة الإعلان."); }
+    finally { button.disabled = false; }
+  });
+  list.addEventListener("click", async event => {
     const button = event.target.closest("button[data-action]");
     const card = event.target.closest("[data-ad-id]");
     if (!button || !card) return;
