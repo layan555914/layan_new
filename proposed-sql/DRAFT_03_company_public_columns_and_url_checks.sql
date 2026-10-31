@@ -1,5 +1,5 @@
 -- ============================================================================
--- REVIEWED STAGING-TESTED DRAFT — DO NOT APPLY TO PRODUCTION WITHOUT APPROVAL
+-- APPLIED TO PRODUCTION on 2026-10-31 as layan_company_profiles_scoped_read_20261031
 -- Public reads use a dedicated view; authenticated users cannot SELECT internal
 -- columns directly. Owners and admins retrieve scoped records through guarded RPCs.
 -- This replaces the earlier DRAFT_03 that left full SELECT granted to authenticated.
