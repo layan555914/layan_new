@@ -151,12 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
     companyProfilesList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات ملفات الشركات...</p>';
     let rows;
     try {
-      // Newer schema (draft updates). Falls back to the legacy query if the columns do not exist yet.
-      rows = await request("/rest/v1/company_profiles?select=" + COMPANY_COLS + ",status,pending_update,update_status&or=(status.eq.pending,and(status.eq.active,update_status.eq.pending))&order=created_at.asc");
+      // Scoped SECURITY DEFINER RPC returns the review queue only after checking layan_is_admin().
+      rows = await request("/rest/v1/rpc/layan_admin_list_company_profiles", { method: "POST", body: "{}" });
       companyDraftSupported = true;
-    } catch (_) {
+    } catch (error) {
       companyDraftSupported = false;
-      rows = await request("/rest/v1/company_profiles?select=" + COMPANY_COLS + "&status=eq.pending&order=created_at.asc");
+      throw new Error("تعذر تحميل طلبات الشركات عبر قناة الإدارة الآمنة: " + (error.message || "تحقق من تطبيق تحديث قاعدة البيانات."));
     }
     if (!Array.isArray(rows) || !rows.length) {
       companyProfilesList.innerHTML = '<p class="admin-empty">لا توجد طلبات ملفات شركات معلقة.</p>';
@@ -299,10 +299,10 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         const done = await request("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
           method: "PATCH",
-          headers: { Prefer: "return=representation" },
+          headers: { Prefer: "return=minimal" },
           body: JSON.stringify({ status: action === "approve" ? "active" : action === "request_changes" ? "needs_changes" : "rejected", admin_notes: action === "approve" ? null : notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
         });
-        if (!Array.isArray(done) || !done.length) throw new Error("لم يتغير أي طلب: قد تكون حالته تغيّرت أو لا تسمح الصلاحيات بالتعديل. حدّث القائمة وحاول مرة أخرى.");
+
       }
       setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
       await loadPending();
