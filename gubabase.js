@@ -184,7 +184,7 @@
       "id","title","governorate","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price",
       "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
-      "status","featured_requested","is_featured","featured_until","promotion_status","contact_name","contact_phone","created_at"
+      "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","created_at"
     ].join(",");
     const rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
     return Array.isArray(rows) ? rows : [];
