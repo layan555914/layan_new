@@ -12,9 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const password = document.getElementById("adminPassword");
   const authPanel = document.getElementById("authPanel");
   const reviewPanel = document.getElementById("reviewPanel");
-  // Persist the admin session across tabs and browser restarts; refresh it when needed.
+  // Admin session lives in sessionStorage only (cleared when the tab/browser closes) to limit token exposure; legacy localStorage copy is removed.
   const sessionKey = "layanSupabaseSession";
-  const readSession = () => { try { return JSON.parse(localStorage.getItem(sessionKey) || "null"); } catch (_) { return null; } };
+  try { localStorage.removeItem(sessionKey); } catch (_) {}
+  const readSession = () => { try { return JSON.parse(sessionStorage.getItem(sessionKey) || "null"); } catch (_) { return null; } };
   let session = readSession();
   const setStatus = message => { status.textContent = message || ""; };
   async function ensureFreshSession() {
@@ -23,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (expiresAt > Math.floor(Date.now() / 1000) + 60) return;
     if (!session.refresh_token) {
       session = null;
-      localStorage.removeItem(sessionKey);
+      sessionStorage.removeItem(sessionKey);
       showState(false);
       throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
     }
@@ -38,10 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
       try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
       if (!response.ok || !data?.access_token || !data?.user) throw new Error("refresh failed");
       session = { access_token: data.access_token, refresh_token: data.refresh_token || session.refresh_token, expires_at: data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600), user: data.user };
-      localStorage.setItem(sessionKey, JSON.stringify(session));
+      sessionStorage.setItem(sessionKey, JSON.stringify(session));
     } catch (_) {
       session = null;
-      localStorage.removeItem(sessionKey);
+      sessionStorage.removeItem(sessionKey);
       showState(false);
       throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
     }
@@ -84,6 +85,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function esc(value) {
     return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch]);
   }
+  // Only http/https links are ever rendered as clickable; anything else (javascript:, data:, ...) is disabled.
+  const safeUrl = value => { try { const u = new URL(String(value || "")); return ["https:", "http:"].includes(u.protocol) ? u.href : ""; } catch (_) { return ""; } };
+  const linkHtml = (url, label) => {
+    if (!url) return "";
+    const s = safeUrl(url);
+    return s ? '<a href="' + esc(s) + '" target="_blank" rel="noopener noreferrer">' + label + '</a>'
+             : '<span class="admin-chip">رابط غير آمن تم تعطيله (' + label + ')</span>';
+  };
   function render(rows) {
     if (!Array.isArray(rows) || !rows.length) {
       list.innerHTML = '<p class="admin-empty">لا توجد إعلانات قيد المراجعة حاليًا.</p>';
@@ -94,8 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
       '<p><strong>النشاط:</strong> ' + esc(ad.business_name) + '</p><p>' + esc(ad.description) + '</p>' +
       '<p><strong>الهاتف:</strong> ' + esc(ad.contact_phone) + '</p><p><strong>نوع الطلب:</strong> ' + 'طلب إعلان مخصص' + '</p>' +
       '<p><strong>المدة:</strong> ' + (Number(ad.requested_days) > 0 ? esc(ad.requested_days) + ' يومًا (مبدئية)' : 'تُحدد بعد الاتفاق') + '</p>' +
-      (ad.image_url ? '<p><a href="' + esc(ad.image_url) + '" target="_blank" rel="noopener noreferrer">عرض صورة الإعلان</a></p>' : '') +
-      (ad.target_url ? '<p><a href="' + esc(ad.target_url) + '" target="_blank" rel="noopener noreferrer">رابط النشاط</a></p>' : '') +
+      (ad.image_url ? '<p>' + linkHtml(ad.image_url, 'عرض صورة الإعلان') + '</p>' : '') +
+      (ad.target_url ? '<p>' + linkHtml(ad.target_url, 'رابط النشاط') + '</p>' : '') +
       '</div><div class="admin-actions">' +
       '<div class="admin-activation-fields"><label>المدة المتفق عليها (يومًا)<input type="number" min="1" max="365" step="1" value="' + esc(ad.requested_days > 0 ? ad.requested_days : "") + '" data-agreed-days></label>' +
       '<label>السعر المتفق عليه (جنيه)<input type="number" min="0" step="1" placeholder="اكتب السعر بعد الاتفاق" data-agreed-price></label></div>' +
@@ -124,7 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           const result = await response.json().catch(()=>({}));
           if (!response.ok || !result.signedURL) continue;
-          const href = result.signedURL.startsWith("http") ? result.signedURL : base + "/storage/v1" + result.signedURL;
+          const href = safeUrl(result.signedURL.startsWith("http") ? result.signedURL : base + "/storage/v1" + result.signedURL);
+          if (!href) continue;
           links.push('<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">فتح مستند خاص</a>');
         }
         cards.push('<article class="admin-ad"><div><h3>'+esc(offer.title)+'</h3><p><strong>المطور:</strong> '+esc(offer.developer_name || "غير مسجل")+'</p><p><strong>المشروع:</strong> '+esc(offer.project_name || "غير مسجل")+'</p><p><strong>المستندات:</strong> '+links.length+' من '+docs.length+'</p>'+ (links.length ? links.join(" · ") : '<span>تعذر إنشاء روابط العرض المؤقتة.</span>') +'</div></article>');
@@ -134,15 +144,46 @@ document.addEventListener("DOMContentLoaded", () => {
       propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
     }
   }
+  const COMPANY_COLS = "id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,created_at";
+  let companyDraftSupported = false;
   async function loadPendingCompanyProfiles() {
     if (!companyProfilesList) return;
     companyProfilesList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات ملفات الشركات...</p>';
-    const rows = await request("/rest/v1/company_profiles?select=id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,created_at&status=eq.pending&order=created_at.asc");
+    let rows;
+    try {
+      // Newer schema (draft updates). Falls back to the legacy query if the columns do not exist yet.
+      rows = await request("/rest/v1/company_profiles?select=" + COMPANY_COLS + ",status,pending_update,update_status&or=(status.eq.pending,and(status.eq.active,update_status.eq.pending))&order=created_at.asc");
+      companyDraftSupported = true;
+    } catch (_) {
+      companyDraftSupported = false;
+      rows = await request("/rest/v1/company_profiles?select=" + COMPANY_COLS + "&status=eq.pending&order=created_at.asc");
+    }
     if (!Array.isArray(rows) || !rows.length) {
       companyProfilesList.innerHTML = '<p class="admin-empty">لا توجد طلبات ملفات شركات معلقة.</p>';
       return;
     }
-    companyProfilesList.innerHTML = rows.map(c => '<article class="admin-ad" data-company-profile-id="' + esc(c.id) + '"><div class="company-review-details" data-company-details hidden><span class="admin-chip">' + esc(c.category) + '</span><h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p><p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + ' — <strong>الهاتف:</strong> ' + esc(c.phone) + '</p><p><strong>الخدمات:</strong> ' + esc((c.services || []).join("، ")) + '</p><p><strong>المشروعات:</strong> ' + esc((c.projects || []).map(p => p.title).join("، ") || "لم تُضف") + '</p>' + (c.website ? '<p><a href="' + esc(c.website) + '" target="_blank" rel="noopener noreferrer">الموقع الإلكتروني</a></p>' : '') + (c.logo_url ? '<p><a href="' + esc(c.logo_url) + '" target="_blank" rel="noopener noreferrer">شعار الشركة</a></p>' : '') + '<p><strong>صور الأعمال:</strong> ' + (c.gallery_urls || []).length + '</p>' + (c.gallery_urls || []).map((u,i) => '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">صورة ' + (i+1) + '</a>').join(' · ') + '</div><div class="admin-actions"><button type="button" class="btn btn-outline-dark" data-company-action="review" aria-expanded="false">مراجعة البيانات</button><button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button><button type="button" class="btn btn-outline-dark" data-company-action="request_changes">طلب استكمال البيانات</button><button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>').join("");
+    companyProfilesList.innerHTML = rows.map(row => {
+      const isUpdate = companyDraftSupported && row.status === "active" && row.update_status === "pending" && row.pending_update && typeof row.pending_update === "object";
+      const c = isUpdate ? Object.assign({}, row, row.pending_update) : row;
+      const services = Array.isArray(c.services) ? c.services : [];
+      const projects = Array.isArray(c.projects) ? c.projects : [];
+      const gallery = Array.isArray(c.gallery_urls) ? c.gallery_urls : [];
+      return '<article class="admin-ad" data-company-profile-id="' + esc(row.id) + '" data-company-kind="' + (isUpdate ? "update" : "new") + '">' +
+        '<div class="company-review-details" data-company-details hidden>' +
+        '<span class="admin-chip">' + esc(c.category) + '</span> <span class="admin-chip">' + (isUpdate ? "طلب تعديل على ملف منشور — النسخة المنشورة ما زالت ظاهرة" : "طلب جديد أو إعادة إرسال") + '</span>' +
+        '<h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p>' +
+        '<p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + (c.address ? ' — <strong>العنوان:</strong> ' + esc(c.address) : '') + '</p>' +
+        '<p><strong>الهاتف:</strong> ' + esc(c.phone) + (c.whatsapp ? ' — <strong>واتساب:</strong> ' + esc(c.whatsapp) : '') + '</p>' +
+        '<p><strong>الخدمات:</strong> ' + esc(services.join("، ")) + '</p>' +
+        '<p><strong>المشروعات:</strong> ' + esc(projects.map(p => (p && p.title) || "").filter(Boolean).join("، ") || "لم تُضف") + '</p>' +
+        (c.website ? '<p>' + linkHtml(c.website, 'الموقع الإلكتروني') + '</p>' : '') +
+        (c.logo_url ? '<p>' + linkHtml(c.logo_url, 'شعار الشركة') + '</p>' : '') +
+        '<p><strong>صور الأعمال:</strong> ' + gallery.length + '</p>' + gallery.map((u, i) => linkHtml(u, 'صورة ' + (i + 1))).join(' · ') +
+        '</div><div class="admin-actions"><button type="button" class="btn btn-outline-dark" data-company-action="review" aria-expanded="false">مراجعة البيانات</button>' +
+        '<button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button>' +
+        '<button type="button" class="btn btn-outline-dark" data-company-action="request_changes">طلب استكمال البيانات</button>' +
+        '<button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>';
+    }).join("");
   }
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
@@ -151,6 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Check the protected server-side allowlist before requesting any review data or signing documents.
       const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", { method: "POST", body: "{}" });
       if (adminAllowed !== true) {
+        session = null;
+        sessionStorage.removeItem(sessionKey);
         showState(false);
         list.innerHTML = "";
         if (companyProfilesList) companyProfilesList.innerHTML = "";
@@ -217,7 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (!data?.access_token || !data?.user?.id) throw new Error("لم يتم إنشاء جلسة دخول صالحة.");
       session = {access_token:data.access_token,refresh_token:data.refresh_token || null,expires_at:data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600),user:data.user};
-      localStorage.setItem(sessionKey, JSON.stringify(session));
+      sessionStorage.setItem(sessionKey, JSON.stringify(session));
       showState(false);
       await loadPending();
     } catch (error) {
@@ -247,14 +290,20 @@ document.addEventListener("DOMContentLoaded", () => {
       notes = window.prompt("اكتب البيانات أو التعديلات المطلوبة من الشركة:");
       if (notes === null) return;
       if (notes.trim().length < 3) { setStatus("اكتب تفاصيل واضحة لاستكمال البيانات."); return; }
-    } else if (!window.confirm("اعتماد ملف الشركة ونشره في دليل ليان؟")) return;
+    } else if (!window.confirm(card.dataset.companyKind === "update" ? "اعتماد التعديلات وتحديث النسخة العامة لملف الشركة؟" : "اعتماد ملف الشركة ونشره في دليل ليان؟")) return;
     button.disabled = true;
     try {
-      await request("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
-        method: "PATCH",
-        headers: { Prefer: "return=minimal" },
-        body: JSON.stringify({ status: action === "approve" ? "active" : action === "request_changes" ? "needs_changes" : "rejected", admin_notes: action === "approve" ? null : notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
-      });
+      if (card.dataset.companyKind === "update") {
+        // Draft update on a published profile: server-side function (admin-only) merges or rejects it.
+        await request("/rest/v1/rpc/layan_review_company_profile", { method: "POST", body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes }) });
+      } else {
+        const done = await request("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
+          method: "PATCH",
+          headers: { Prefer: "return=representation" },
+          body: JSON.stringify({ status: action === "approve" ? "active" : action === "request_changes" ? "needs_changes" : "rejected", admin_notes: action === "approve" ? null : notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
+        });
+        if (!Array.isArray(done) || !done.length) throw new Error("لم يتغير أي طلب: قد تكون حالته تغيّرت أو لا تسمح الصلاحيات بالتعديل. حدّث القائمة وحاول مرة أخرى.");
+      }
       setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
@@ -292,7 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("adminLogout").addEventListener("click", async () => {
     try { if (session?.access_token) await fetch(base + "/auth/v1/logout", {method:"POST", headers:{apikey:key, Authorization:"Bearer "+session.access_token}}); } catch (_) {}
     session = null;
-    localStorage.removeItem(sessionKey);
+    sessionStorage.removeItem(sessionKey);
     showState(false);
     setStatus("تم تسجيل الخروج.");
   });
@@ -305,13 +354,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const user = response.ok ? await response.json() : null;
       if (!user?.id || user.id !== session.user.id) throw new Error("جلسة الدخول غير صالحة.");
       session.user = user;
-      localStorage.setItem(sessionKey, JSON.stringify(session));
+      sessionStorage.setItem(sessionKey, JSON.stringify(session));
       const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", {method:"POST", body:"{}"});
       if (adminAllowed !== true) throw new Error("الحساب غير مصرح له بدخول لوحة الإدارة.");
       await loadPending();
     } catch (error) {
       session = null;
-      localStorage.removeItem(sessionKey);
+      sessionStorage.removeItem(sessionKey);
       showState(false);
       setStatus("يلزم تسجيل الدخول والتحقق من صلاحية الإدارة مرة أخرى.");
     }
