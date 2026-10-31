@@ -29,7 +29,7 @@ $function$;
 
 -- حارس: ما يستطيع المالك تغييره فعلياً (لا يؤثر على الأدمن ولا على التنفيذ من SQL Editor)
 create or replace function public.guard_company_owner_update()
-returns trigger language plpgsql set search_path = '' as $
+returns trigger language plpgsql set search_path = '' as $function$
 declare k text;
 begin
   if auth.uid() is null or public.layan_is_admin() then return new; end if;
@@ -76,7 +76,7 @@ create policy "Owners can edit own pending company profiles" on public.company_p
 
 -- دالة الإدارة: اعتماد / طلب استكمال / رفض لتعديل مقترح على ملف منشور
 create or replace function public.layan_review_company_profile(p_id uuid, p_action text, p_notes text default null)
-returns void language plpgsql security definer set search_path = '' as $
+returns void language plpgsql security definer set search_path = '' as $function$
 declare r public.company_profiles; d jsonb;
 begin
   if not public.layan_is_admin() then raise exception 'غير مسموح' using errcode = '42501'; end if;
