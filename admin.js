@@ -112,6 +112,16 @@ document.addEventListener("DOMContentLoaded", () => {
       '<button type="button" class="btn btn-gold" data-action="activate">تفعيل بعد تأكيد الاتفاق</button>' +
       '<button type="button" class="btn btn-outline-dark" data-action="reject">رفض الطلب</button></div></article>').join("");
   }
+  async function loadPendingPropertyOffers() {
+    const target = document.getElementById("pendingPropertyOffers");
+    if (!target) return;
+    target.innerHTML = '<p class="admin-empty">جارٍ تحميل تفاصيل التنازلات والعقارات...</p>';
+    try {
+      const rows = await request("/rest/v1/property_offers?select=id,title,property_type,listing_purpose,city,area,area_m2,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,assignment_fee,discount_amount,developer_name,project_name,contact_name,contact_phone,description,verification_status,developer_approval_status,verification_notes,created_at&status=eq.pending&order=created_at.asc");
+      if (!Array.isArray(rows) || !rows.length) { target.innerHTML = '<p class="admin-empty">لا توجد إعلانات عقارية معلقة.</p>'; return; }
+      target.innerHTML = rows.map(x => '<article class="admin-ad"><div><span class="admin-chip">' + esc(x.property_type || "عقار") + ' · ' + esc(x.listing_purpose || "بيع") + '</span><h2>' + esc(x.title) + '</h2><p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + '</p><p><strong>المساحة:</strong> ' + (x.area_m2 == null ? "غير محددة" : esc(x.area_m2) + " م²") + '</p><p><strong>السعر:</strong> ' + Number(x.total_price || 0).toLocaleString("ar-EG") + ' جنيه · <strong>المقدم:</strong> ' + Number(x.down_payment || 0).toLocaleString("ar-EG") + ' جنيه · <strong>المدفوع:</strong> ' + Number(x.paid_amount || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>المتبقي:</strong> ' + Number(x.remaining_amount || 0).toLocaleString("ar-EG") + ' جنيه · <strong>القسط:</strong> ' + Number(x.monthly_installment || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>رسوم التنازل:</strong> ' + Number(x.assignment_fee || 0).toLocaleString("ar-EG") + ' جنيه · <strong>الخصم:</strong> ' + Number(x.discount_amount || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>المطور/المشروع:</strong> ' + esc(x.developer_name || "غير مسجل") + ' / ' + esc(x.project_name || "غير مسجل") + '</p><p><strong>صاحب الإعلان:</strong> ' + esc(x.contact_name || "غير مسجل") + ' · ' + esc(x.contact_phone || "لا يوجد هاتف") + '</p><p>' + esc(x.description || "") + '</p><p><strong>حالة التحقق:</strong> ' + esc(x.verification_status || "غير محددة") + ' · <strong>موافقة المطور:</strong> ' + esc(x.developer_approval_status || "غير محددة") + '</p>' + (x.verification_notes ? '<p class="admin-chip">' + esc(x.verification_notes) + '</p>' : '') + '<p class="admin-empty">عرض ومراجعة فقط. اعتماد أو رفض هذه الإعلانات غير متاح من اللوحة حاليًا حتى لا نتجاوز صلاحيات قاعدة البيانات.</p></div></article>').join("");
+    } catch (error) { target.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل الإعلانات العقارية.") + '</p>'; }
+  }
   async function loadPendingPropertyDocuments() {
     if (!propertyDocsList) return;
     propertyDocsList.innerHTML = '<p class="admin-empty">جارٍ تحميل مستندات العقارات...</p>';
@@ -221,6 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
       render(rows);
       await loadPendingCompanyProfiles();
       await loadPendingMarketplaceListings();
+      await loadPendingPropertyOffers();
       await loadPendingPropertyDocuments();
       showState(true);
       setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
