@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const rows = await request("/rest/v1/property_offers?select=id,title,property_type,listing_purpose,city,area,area_m2,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,assignment_fee,discount_amount,developer_name,project_name,contact_name,contact_phone,description,verification_status,developer_approval_status,verification_notes,created_at&status=eq.pending&order=created_at.asc");
       if (!Array.isArray(rows) || !rows.length) { target.innerHTML = '<p class="admin-empty">لا توجد إعلانات عقارية معلقة.</p>'; return; }
-      target.innerHTML = rows.map(x => '<article class="admin-ad"><div><span class="admin-chip">' + esc(x.property_type || "عقار") + ' · ' + esc(x.listing_purpose || "بيع") + '</span><h2>' + esc(x.title) + '</h2><p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + '</p><p><strong>المساحة:</strong> ' + (x.area_m2 == null ? "غير محددة" : esc(x.area_m2) + " م²") + '</p><p><strong>السعر:</strong> ' + Number(x.total_price || 0).toLocaleString("ar-EG") + ' جنيه · <strong>المقدم:</strong> ' + Number(x.down_payment || 0).toLocaleString("ar-EG") + ' جنيه · <strong>المدفوع:</strong> ' + Number(x.paid_amount || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>المتبقي:</strong> ' + Number(x.remaining_amount || 0).toLocaleString("ar-EG") + ' جنيه · <strong>القسط:</strong> ' + Number(x.monthly_installment || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>رسوم التنازل:</strong> ' + Number(x.assignment_fee || 0).toLocaleString("ar-EG") + ' جنيه · <strong>الخصم:</strong> ' + Number(x.discount_amount || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>المطور/المشروع:</strong> ' + esc(x.developer_name || "غير مسجل") + ' / ' + esc(x.project_name || "غير مسجل") + '</p><p><strong>صاحب الإعلان:</strong> ' + esc(x.contact_name || "غير مسجل") + ' · ' + esc(x.contact_phone || "لا يوجد هاتف") + '</p><p>' + esc(x.description || "") + '</p><p><strong>حالة التحقق:</strong> ' + esc(x.verification_status || "غير محددة") + ' · <strong>موافقة المطور:</strong> ' + esc(x.developer_approval_status || "غير محددة") + '</p>' + (x.verification_notes ? '<p class="admin-chip">' + esc(x.verification_notes) + '</p>' : '') + '<p class="admin-empty">عرض ومراجعة فقط. اعتماد أو رفض هذه الإعلانات غير متاح من اللوحة حاليًا حتى لا نتجاوز صلاحيات قاعدة البيانات.</p></div></article>').join("");
+      target.innerHTML = rows.map(x => '<article class="admin-ad" data-property-offer-id="' + esc(x.id) + '"><div><span class="admin-chip">' + esc(x.property_type || "عقار") + ' · ' + esc(x.listing_purpose || "بيع") + '</span><h2>' + esc(x.title) + '</h2><p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + '</p><p><strong>المساحة:</strong> ' + (x.area_m2 == null ? "غير محددة" : esc(x.area_m2) + " م²") + '</p><p><strong>السعر:</strong> ' + Number(x.total_price || 0).toLocaleString("ar-EG") + ' جنيه · <strong>المقدم:</strong> ' + Number(x.down_payment || 0).toLocaleString("ar-EG") + ' جنيه · <strong>المدفوع:</strong> ' + Number(x.paid_amount || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>المتبقي:</strong> ' + Number(x.remaining_amount || 0).toLocaleString("ar-EG") + ' جنيه · <strong>القسط:</strong> ' + Number(x.monthly_installment || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>رسوم التنازل:</strong> ' + Number(x.assignment_fee || 0).toLocaleString("ar-EG") + ' جنيه · <strong>الخصم:</strong> ' + Number(x.discount_amount || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>المطور/المشروع:</strong> ' + esc(x.developer_name || "غير مسجل") + ' / ' + esc(x.project_name || "غير مسجل") + '</p><p><strong>صاحب الإعلان:</strong> ' + esc(x.contact_name || "غير مسجل") + ' · ' + esc(x.contact_phone || "لا يوجد هاتف") + '</p><p>' + esc(x.description || "") + '</p><p><strong>حالة التحقق:</strong> ' + esc(x.verification_status || "غير محددة") + ' · <strong>موافقة المطور:</strong> ' + esc(x.developer_approval_status || "غير محددة") + '</p>' + (x.verification_notes ? '<p class="admin-chip">' + esc(x.verification_notes) + '</p>' : '') + '<div class="admin-actions"><button type="button" class="btn btn-gold" data-property-action="approve">اعتماد ونشر</button><button type="button" class="btn btn-outline-dark" data-property-action="reject">رفض مع السبب</button></div></div></article>').join("");
     } catch (error) { target.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل الإعلانات العقارية.") + '</p>'; }
   }
   async function loadPendingPropertyDocuments() {
@@ -335,6 +335,29 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
     finally { button.disabled = false; }
+  });
+  document.getElementById("pendingPropertyOffers")?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-property-action]");
+    const card = event.target.closest("[data-property-offer-id]");
+    if (!button || !card) return;
+    const action = button.dataset.propertyAction;
+    let notes = null;
+    if (action === "reject") {
+      notes = window.prompt("اكتب سبب رفض الإعلان (3 أحرف على الأقل):");
+      if (notes === null) return;
+      if (notes.trim().length < 3) { setStatus("اكتب سببًا واضحًا للرفض."); return; }
+    } else if (!window.confirm("اعتماد الإعلان ونشره للزوار؟")) return;
+    button.disabled = true;
+    try {
+      await request("/rest/v1/rpc/layan_admin_review_property_offer", {
+        method: "POST",
+        body: JSON.stringify({ p_id: Number(card.dataset.propertyOfferId), p_action: action, p_notes: notes })
+      });
+      setStatus(action === "approve" ? "تم اعتماد الإعلان ونشره." : "تم رفض الإعلان وتسجيل السبب.");
+      await loadPending();
+    } catch (error) {
+      setStatus(error.message || "تعذر تنفيذ مراجعة الإعلان.");
+    } finally { button.disabled = false; }
   });
   marketplaceList?.addEventListener("click", async event => {
     const button = event.target.closest("button[data-marketplace-action]");
