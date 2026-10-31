@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     event.preventDefault();
     try {
       await navigator.share({
-        title: "ASYUT AQAR | أسيوط عقار عقار",
+        title: "ASYUT AQAR | أسيوط عقار",
         text: "اكتشف عروض التنازل العقاري على منصة أسيوط عقار",
         url: "https://layan-eg.com/"
       });
