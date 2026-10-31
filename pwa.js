@@ -11,7 +11,7 @@
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js", { scope: "./" })
-        .catch(error => console.error("LAYAN: تعذر تفعيل وضع التطبيق:", error));
+        .catch(error => console.error("ASYUT AQAR: تعذر تفعيل وضع التطبيق:", error));
     });
   }
 
@@ -41,8 +41,8 @@
     }
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
     alert(isIOS
-      ? "لتثبيت ليان: اضغط زر المشاركة في المتصفح، ثم اختر «إضافة إلى الشاشة الرئيسية»."
-      : "لتثبيت ليان: افتح قائمة المتصفح ⋮ ثم اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».");
+      ? "لتثبيت أسيوط عقار: اضغط زر المشاركة في المتصفح، ثم اختر «إضافة إلى الشاشة الرئيسية»."
+      : "لتثبيت أسيوط عقار: افتح قائمة المتصفح ⋮ ثم اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».");
   });
 
   dismissButton?.addEventListener("click", () => {
