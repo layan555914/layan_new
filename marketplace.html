@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102746">
+<meta name="description" content="سوق الخدمات والمشروعات والإيجارات في محافظة أسيوط على منصة أسيوط عقار">
+<title>سوق الخدمات | أسيوط عقار</title>
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./marketplace.css?v=marketplace-hub-1">
+<link rel="stylesheet" href="./marketplace-page.css?v=marketplace-page-1">
+</head>
+<body>
+<header class="topbar">
+<a class="brand" href="./"><img src="./icon.svg" alt="شعار أسيوط عقار" class="brand-logo"><span><strong>ASYUT AQAR</strong><small>أسيوط عقار</small></span></a>
+<nav aria-label="القائمة الرئيسية"><a href="./">الرئيسية</a><a class="active" href="./marketplace.html">سوق الخدمات</a><a href="./companies.html">دليل الشركات</a></nav>
+<div class="top-actions"><a class="btn btn-outline" href="./">العودة للرئيسية</a><a class="btn btn-gold" href="./#accounts">تسجيل الدخول</a></div>
+</header>
+<main class="marketplace-page">
+<section class="marketplace-page-hero"><span class="eyebrow">ASYUT AQAR MARKETPLACE</span><h1>سوق أسيوط للخدمات والعقارات</h1><p>اكتشف الخدمات والمشروعات والإيجارات ومقدمي الخدمات في محافظة أسيوط. كل إعلان جديد يخضع لمراجعة الإدارة قبل ظهوره للزوار.</p><button class="btn btn-gold" id="openListingForm" type="button">أضف إعلانًا أو خدمة مجانًا</button></section>
+<section class="marketplace-page-listings">
+<div class="marketplace-page-heading"><div><span class="eyebrow">دليل العروض والخدمات</span><h2>الإعلانات المعتمدة</h2><p id="marketplaceCount" role="status">جارٍ تحميل الإعلانات...</p></div>
+<select id="marketplaceCategoryFilter" aria-label="تصفية حسب القسم"><option value="">كل الأقسام</option>
+<option>سوق العقارات</option><option>التنازلات العقارية</option><option>أراضي للبيع</option><option>أراضي التنازلات</option><option>إيجار يومي ومفروش</option><option>الشركات والمكاتب العقارية</option><option>مواد البناء والتشطيب</option><option>الأثاث والفرش وتجهيز الوحدات</option><option>المشروعات والمطورون العقاريون</option><option>الصيانة وإدارة العقارات</option><option>الاستشارات والخدمات العقارية</option></select></div>
+<div id="marketplaceListings" class="marketplace-listings-grid" aria-live="polite"><p>جارٍ تحميل الإعلانات المعتمدة...</p></div>
+</section>
+<section class="marketplace-page-note"><strong>الإعلان العادي مجاني للأفراد.</strong><span>لا توجد عمولة على البيع أو التنازل. الإعلانات المميزة والخدمات التجارية اختيارية وتُوضح تفاصيلها وأسعارها قبل أي دفع.</span></section>
+</main>
+<dialog id="marketplaceListingDialog" class="marketplace-form-dialog">
+<div class="marketplace-form-head"><h2>إضافة إعلان أو خدمة</h2><button type="button" id="closeListingForm" aria-label="إغلاق">×</button></div>
+<p class="marketplace-form-note">إرسال الإعلان مجاني. سيظهر بعد مراجعة الإدارة واعتماده. لا تضع بيانات حساسة أو مستندات شخصية في الوصف.</p>
+<form id="marketplaceListingForm">
+<label>القسم *<select name="category" required><option value="">اختر القسم</option><option>سوق العقارات</option><option>التنازلات العقارية</option><option>أراضي للبيع</option><option>أراضي التنازلات</option><option>إيجار يومي ومفروش</option><option>الشركات والمكاتب العقارية</option><option>مواد البناء والتشطيب</option><option>الأثاث والفرش وتجهيز الوحدات</option><option>المشروعات والمطورون العقاريون</option><option>الصيانة وإدارة العقارات</option><option>الاستشارات والخدمات العقارية</option></select></label>
+<label>نوع الإعلان<select name="listing_type"><option>خدمة</option><option>عقار للبيع</option><option>تنازل</option><option>إيجار يومي</option><option>إيجار أسبوعي</option><option>إيجار شهري</option><option>مشروع عقاري</option><option>منتج أو توريد</option></select></label>
+<label>عنوان الإعلان *<input name="title" required minlength="4" maxlength="180"></label>
+<label>وصف الإعلان *<textarea name="description" required minlength="20" maxlength="3000" rows="4"></textarea></label>
+<div class="marketplace-form-row"><label>المدينة / المركز *<input name="city" required value="أسيوط" maxlength="100"></label><label>المنطقة<input name="area" maxlength="120"></label></div>
+<div class="marketplace-form-row"><label>نوع العقار (إن وجد)<input name="property_type" maxlength="100"></label><label>السعر بالجنيه (اختياري)<input name="price" type="number" min="0" step="0.01"></label></div>
+<label>مدة السعر (اختياري)<select name="price_period"><option value="">غير محدد</option><option>لليوم</option><option>للأسبوع</option><option>للشهر</option><option>للوحدة</option><option>للمتر</option><option>للاتفاق</option></select></label>
+<div class="marketplace-form-row"><label>رقم التواصل *<input name="contact_phone" required type="tel" minlength="7" maxlength="30"></label><label>واتساب (اختياري)<input name="whatsapp" type="tel" maxlength="30"></label></div>
+<label>رابط صورة الإعلان (اختياري)<input name="image_url" type="url" placeholder="https://"></label>
+<p id="marketplaceFormStatus" role="status" aria-live="polite"></p>
+<button class="btn btn-gold full-width" type="submit">إرسال للمراجعة مجانًا</button>
+</form></dialog>
+<script src="./config.js"></script><script src="./gubabase.js"></script><script src="./marketplace.js?v=marketplace-listings-1"></script>
+</body></html>
