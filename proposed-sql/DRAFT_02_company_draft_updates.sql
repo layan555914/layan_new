@@ -19,13 +19,13 @@ alter table public.company_profiles add constraint company_profiles_pending_upda
   check (pending_update is null or (jsonb_typeof(pending_update) = 'object' and length(pending_update::text) <= 20000));
 
 create or replace function public.layan_is_http_url(u text) returns boolean
-language sql immutable set search_path = public as $fn$
+language sql immutable set search_path = public as $function$
   select u is null or u = '' or u ~* '^https?://[^[:space:]]+$'
-$fn$;
+$function$;
 create or replace function public.layan_all_http_urls(arr text[]) returns boolean
-language sql immutable set search_path = public as $fn$
+language sql immutable set search_path = public as $function$
   select coalesce(bool_and(public.layan_is_http_url(x)), true) from unnest(arr) as x
-$fn$;
+$function$;
 
 -- حارس: ما يستطيع المالك تغييره فعلياً (لا يؤثر على الأدمن ولا على التنفيذ من SQL Editor)
 create or replace function public.guard_company_owner_update()
@@ -62,7 +62,7 @@ begin
     new.pending_update := null; new.update_status := null; new.update_notes := null;
   end if;
   return new;
-end $fn$;
+end $function$;
 drop trigger if exists company_profiles_guard_owner on public.company_profiles;
 create trigger company_profiles_guard_owner before update on public.company_profiles
   for each row execute function public.guard_company_owner_update();
@@ -111,7 +111,7 @@ begin
   else
     raise exception 'إجراء غير صالح';
   end if;
-end $fn$;
+end $function$;
 revoke all on function public.layan_review_company_profile(uuid, text, text) from public, anon;
 grant execute on function public.layan_review_company_profile(uuid, text, text) to authenticated;
 
