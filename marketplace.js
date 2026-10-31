@@ -22,7 +22,19 @@ const categorySpecs={
 function renderCategoryFields(){
  const category=form?.querySelector('[name="category"]')?.value||"";
  const specs=categorySpecs[category]||[];
- categoryFields.innerHTML=specs.length?'<h3>تفاصيل خاصة بالقسم</h3>'+specs.map(([label,name,type,opts])=>'<label>'+label+(type==="select"?'<select name="detail_'+name+'"><option value="">اختر</option>'+opts.split("|").map(v=>'<option>'+esc(v)+'</option>').join("")+'</select>':'<input name="detail_'+name+'" type="'+type+'" '+(type==="number"?'min="0" step="0.01"':'maxlength="240"')+'></label>').join(""):'<p>اختر القسم لإظهار البيانات المناسبة لنوع إعلانك.</p>';
+ if(!categoryFields)return;
+ if(!specs.length){categoryFields.innerHTML='<p>اختر القسم لإظهار البيانات المناسبة لنوع إعلانك.</p>';return;}
+ const fields=specs.map(function(spec){
+  const label=spec[0],name=spec[1],type=spec[2],opts=spec[3]||"";
+  let control="";
+  if(type==="select"){
+   control='<select name="detail_'+name+'"><option value="">اختر</option>'+opts.split("|").map(v=>'<option>'+esc(v)+'</option>').join("")+'</select>';
+  }else{
+   control='<input name="detail_'+name+'" type="'+type+'" '+(type==="number"?'min="0" step="0.01"':'maxlength="240"')+'>';
+  }
+  return '<label>'+label+control+'</label>';
+ }).join("");
+ categoryFields.innerHTML='<h3>تفاصيل خاصة بالقسم</h3>'+fields;
 }
 form?.querySelector('[name="category"]')?.addEventListener("change",renderCategoryFields);
 document.querySelectorAll("[data-market-category]").forEach(tile=>tile.addEventListener("click",()=>{filter.value=tile.dataset.marketCategory;render();document.querySelector(".marketplace-page-listings")?.scrollIntoView({behavior:"smooth"});}));
