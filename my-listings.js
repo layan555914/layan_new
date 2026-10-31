@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded",async()=>{
 "use strict";
-const $=id=>document.getElementById(id),grid=$("myListingsGrid"),status=$("myListingsStatus");
+const $=id=>document.getElementById(id),grid=$("myListingsGrid"),propertyGrid=$("myPropertyOffersGrid"),status=$("myListingsStatus");
 const cfg=window.LAYAN_CONFIG||{},base=String(cfg.SUPABASE_URL||"").replace(/\/$/,""),key=cfg.SUPABASE_PUBLISHABLE_KEY||"";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const auth=window.LAYAN_SUPABASE;
