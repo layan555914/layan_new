@@ -3066,3 +3066,13 @@ body{background:#f4f6fa;color:#10264c}
  .design-benefits strong{font-size:12px}
  .design-benefits small{font-size:10px}
 }
+
+/* Land marketplace expansion — Assiut-only phase */
+.land-market-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:24px 0}
+.land-market-card{display:flex;align-items:flex-start;gap:16px;padding:22px;border:1px solid #dce4ef;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(9,34,76,.06)}
+.land-market-icon{flex:0 0 48px;width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:#eaf2ff;color:#0648b8;font-size:27px;font-weight:900}
+.land-market-card>div{flex:1;min-width:0}
+.land-market-card h3{margin:4px 0 8px;color:#102b59;font-size:20px}
+.land-market-card p{margin:0;color:#5b6880;line-height:1.8;font-size:14px}
+.land-market-card .btn{flex:0 0 auto;align-self:center}
+@media(max-width:720px){.land-market-grid{grid-template-columns:1fr}.land-market-card{padding:16px;gap:12px;flex-wrap:wrap}.land-market-card .btn{width:100%}}

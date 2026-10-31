@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const $ = (id) => document.getElementById(id);
   // Category cards filter offers by broad use, not by an exact property subtype.
-  document.querySelectorAll(".category-tile[data-category-kind]").forEach((tile) => {
+  document.querySelectorAll("[data-category-kind]").forEach((tile) => {
     tile.addEventListener("click", () => {
       activeKind = tile.dataset.categoryKind || "";
       const typeFilter = $("typeFilter");
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (typeFilter) typeFilter.value = "";
       if (areaFilter) areaFilter.value = "";
       $("searchInput") && ($("searchInput").value = "");
-      document.querySelectorAll(".category-tile[data-category-kind]").forEach((item) => {
+      document.querySelectorAll("[data-category-kind]").forEach((item) => {
         item.classList.toggle("active", item === tile);
         item.setAttribute("aria-pressed", item === tile ? "true" : "false");
       });
@@ -355,6 +355,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (category === "تجاري") return has("تجار", "محل", "معرض", "مخزن", "مول", "كافيه", "مطعم", "مكتب تجاري", "commercial");
     if (category === "إداري") return has("اداري", "مكتب", "مقر", "مبني اداري", "office", "administrative");
     if (category === "طبي") return has("طبي", "عياده", "عيادات", "مركز طبي", "مستشفي", "medical", "clinic");
+    if (category === "أراضي مطروحة للبناء") return has("أرض مطروحة للبناء", "أراضي مطروحة للبناء", "أرض بناء", "أراضي بناء");
+    if (category === "أراضي التنازلات") return has("أرض تنازل", "أراضي التنازلات", "أرض للتنازل", "أراضي للتنازل");
     return false;
   }
 
@@ -985,7 +987,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     if ($("sortFilter")) $("sortFilter").value = "newest";
     activeKind = "";
-    document.querySelectorAll(".category-tile[data-category-kind]").forEach(tile => {
+    document.querySelectorAll("[data-category-kind]").forEach(tile => {
       tile.classList.remove("active");
       tile.setAttribute("aria-pressed", "false");
     });
