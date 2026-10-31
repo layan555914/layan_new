@@ -3085,3 +3085,8 @@ body{background:#f4f6fa;color:#10264c}
 .deal-purpose-card span{color:#64738a;font-size:13px;line-height:1.7}
 .deal-purpose-card:hover,.deal-purpose-card.active{border-color:#d5a13e;box-shadow:0 9px 24px rgba(9,34,76,.12);transform:translateY(-2px)}
 @media(max-width:720px){.deal-purpose-grid{grid-template-columns:1fr}.deal-purpose-card{min-height:84px;padding:15px}}
+
+.land-details-fields{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border:1px solid #d8e0eb;border-radius:14px;padding:16px;margin:8px 0 16px}
+.land-details-fields[hidden]{display:none}
+.land-details-fields legend{font-weight:800;color:#17345f;padding:0 8px}
+@media(max-width:640px){.land-details-fields{grid-template-columns:1fr}}
