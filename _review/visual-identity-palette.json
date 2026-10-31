@@ -1,0 +1,29 @@
+{
+  "brand": "LAYAN AQAR",
+  "direction": "B + restrained C accent",
+  "logo": {
+    "black": "#010106",
+    "royalBlue": "#0044CA",
+    "electricBlue": "#029EF8",
+    "cyan": "#24C7FD",
+    "red": "#C8000C",
+    "white": "#ECEDF0",
+    "silver": "#BDC3D3"
+  },
+  "tokens": {
+    "page": "#F4F7FC",
+    "surface": "#FFFFFF",
+    "text": "#0A1020",
+    "muted": "#4A5568",
+    "border": "#DCE4F2",
+    "primary": "#0044CA",
+    "link": "#0069B8",
+    "danger": "#C8000C"
+  },
+  "fonts": {
+    "headings": "Cairo",
+    "body": "IBM Plex Sans Arabic"
+  },
+  "logoFileUnchanged": true,
+  "productionDeployment": false
+}
