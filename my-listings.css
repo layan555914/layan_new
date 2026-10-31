@@ -2,3 +2,5 @@
 .my-listings-section-title{color:#102746;margin:30px 0 14px;font-size:1.25rem}
 
 .my-listings-section-title{color:#102746;margin:30px 0 14px;font-size:1.25rem}
+
+.my-listing-detail-chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.my-listing-detail-chips span{display:inline-flex;padding:6px 9px;border-radius:999px;background:#f3f1eb;border:1px solid #e5dfd1;font-size:.85rem;color:#26364b}
