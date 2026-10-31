@@ -355,6 +355,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (category === "تجاري") return has("تجار", "محل", "معرض", "مخزن", "مول", "كافيه", "مطعم", "مكتب تجاري", "commercial");
     if (category === "إداري") return has("اداري", "مكتب", "مقر", "مبني اداري", "office", "administrative");
     if (category === "طبي") return has("طبي", "عياده", "عيادات", "مركز طبي", "مستشفي", "medical", "clinic");
+    if (category === "أراضي مطروحة للبناء") return has("أرض مطروحة للبناء", "أراضي مطروحة للبناء", "أرض بناء", "أراضي بناء");
+    if (category === "أراضي التنازلات") return has("أرض تنازل", "أراضي التنازلات", "أرض للتنازل", "أراضي للتنازل");
     return false;
   }
 
