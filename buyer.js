@@ -72,8 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return {property_type:String(d.get("property_type")||"أي نوع"), area:String(d.get("area")||"").trim(), max_total_price:Number(d.get("max_total_price")||0), max_upfront:Number(d.get("max_upfront")||0), max_monthly_installment:Number(d.get("max_monthly_installment")||0), min_bedrooms:Number(d.get("min_bedrooms")||0), notes:String(d.get("notes")||"").trim(), notifications_enabled:d.get("notifications_enabled")==="on"};
   };
   function matches(o,p) {
-    if (p.property_type!=="أي نوع" && o.property_type!==p.property_type) return false;
-    if (p.area && !String(o.area||"").toLocaleLowerCase().includes(p.area.toLocaleLowerCase())) return false;
+    const isLand = ["أرض","أرض مطروحة للبناء","أرض تنازل"].includes(o.property_type);
+    if (p.property_type!=="أي نوع" && (p.property_type==="أرض" ? !isLand : o.property_type!==p.property_type)) return false;
+    if (p.area) { const location = [o.city,o.area,o.governorate].filter(Boolean).join(" ").toLocaleLowerCase(); if (!location.includes(p.area.toLocaleLowerCase())) return false; }
     if (p.max_total_price>0 && Number(o.total_price||0)>p.max_total_price) return false;
     const upfront = Number(o.paid_amount||0)+Number(o.assignment_fee||0);
     if (p.max_upfront>0 && upfront>p.max_upfront) return false;
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (notify && saved.notifications_enabled) {
         const fresh=matched.filter(o=>!knownMatches.has(String(o.id)));
         if (fresh.length && knownMatches.size && "Notification" in window && Notification.permission==="granted") {
-          new Notification("ليان عقار: ظهر عرض مناسب لك", {body:fresh.length===1?fresh[0].title:"ظهر "+fresh.length+" عروض تناسب طلبك", icon:"./assets/icon-192.png", tag:"layan-buyer-match"});
+          new Notification("ليان عقار: ظهر عرض مناسب لك", {body:fresh.length===1?fresh[0].title:"ظهر "+fresh.length+" عروض تناسب طلبك", icon:"./icon.svg", tag:"layan-buyer-match"});
         }
       }
       knownMatches=new Set(matched.map(o=>String(o.id)));
