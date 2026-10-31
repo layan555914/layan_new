@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const session = api?.getSession?.();
     if (!session?.access_token) {
       answer.className = "layan-ai-answer layan-ai-error";
-      answer.textContent = "سجّل الدخول أولًا لاستخدام مساعد ليان.";
+      answer.textContent = "سجّل الدخول أولًا لاستخدام مساعد أسيوط عقار.";
       document.getElementById("loginBtn")?.click();
       return;
     }
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
       answer.textContent = error.message || "حدث خطأ مؤقت. حاول مرة أخرى.";
     } finally {
       send.disabled = false;
-      send.textContent = "اسأل ليان";
+      send.textContent = "اسأل أسيوط عقار";
     }
   });
 });
