@@ -337,6 +337,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let offers = [];
   let activeKind = "";
+  let activeDealKind = "";
   let selectedAccountType = "individual";
   let selectedPromotionDuration = 15;
   const LAYAN_PHONE = "201007044265";
@@ -446,9 +447,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!areaFilter) return;
 
     const previous = areaFilter.value;
-    const areas = [...new Set(
-      offers.map((o) => o.area.trim()).filter(Boolean)
-    )].sort((a, b) => a.localeCompare(b, "ar"));
+    const assiutCenters = ["مدينة أسيوط", "أسيوط الجديدة", "ديروط", "القوصية", "منفلوط", "أبنوب", "الفتح", "ساحل سليم", "البداري", "أبو تيج", "صدفا", "الغنايم"];
+    const areas = [...new Set([...assiutCenters, ...offers.map((o) => String(o.area || "").trim()).filter(Boolean), ...offers.map((o) => String(o.city || "").trim()).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "ar"));
 
     areaFilter.innerHTML =
       '<option value="">كل المناطق</option>' +
@@ -478,6 +478,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const area = normalizeSearch(areaFilter?.value || "");
     const downPaymentMaxRaw = $("downPaymentMaxFilter")?.value ?? "";
     const monthlyMaxRaw = $("monthlyMaxFilter")?.value ?? "";
+    const dealKind = activeDealKind;
     const downPaymentMax = downPaymentMaxRaw.trim() === "" ? null : num(downPaymentMaxRaw);
     const monthlyMax = monthlyMaxRaw.trim() === "" ? null : num(monthlyMaxRaw);
     const sort = $("sortFilter")?.value || "newest";
@@ -496,7 +497,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!area || normalizeSearch(o.area) === area) &&
         (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
         (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
-        (!activeKind || categoryMatches(o, activeKind));
+        (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String([o.listing_purpose, o.title, o.description].join(" ")).includes(dealKind));
     });
 
     filtered.sort((a, b) => {
@@ -518,7 +519,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const resultsSummary = $("resultsSummary");
     if (resultsSummary) {
-      const activeFilters = Boolean(search || companyQuery || type || area || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || activeKind);
+      const activeFilters = Boolean(search || companyQuery || type || area || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || activeKind || activeDealKind);
       resultsSummary.replaceChildren();
       const count = document.createElement("strong");
       count.textContent = String(filtered.length);
@@ -980,6 +981,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { activeDealKind = button.dataset.dealKind || ""; activeKind = ""; render(); $("offers")?.scrollIntoView({behavior:"smooth",block:"start"}); }));
   $("resetFiltersBtn")?.addEventListener("click", () => {
     ["searchInput", "typeFilter", "areaFilter", "downPaymentMaxFilter", "monthlyMaxFilter"].forEach(id => {
       const field = $(id);
@@ -987,6 +989,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     if ($("sortFilter")) $("sortFilter").value = "newest";
     activeKind = "";
+    activeDealKind = "";
     document.querySelectorAll("[data-category-kind]").forEach(tile => {
       tile.classList.remove("active");
       tile.setAttribute("aria-pressed", "false");
