@@ -181,7 +181,7 @@
   }
   async function getOffers() {
     const fields = [
-      "id","title","governorate","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price",
+      "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price",
       "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","created_at"
@@ -323,6 +323,11 @@
       owner_id: session.user.id,
       ...(offer.company_ad_id ? { company_ad_id: offer.company_ad_id } : {}),
       title: offer.title,
+      listing_purpose: offer.listing_purpose || "تنازل",
+      land_ownership_authority: offer.land_ownership_authority || null,
+      land_permit_details: offer.land_permit_details || null,
+      land_utilities: offer.land_utilities || null,
+      land_zoning: offer.land_zoning || null,
       governorate: "أسيوط",
       city: offer.city || null,
       area: offer.area || null,
