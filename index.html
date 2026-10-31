@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="styles.css?v=asyut-aqar-brand-20261031-1">
   <link rel="stylesheet" href="buyer.css?v=auth-signup-fix-1">
   <link rel="stylesheet" href="sponsor.css?v=auth-signup-fix-1">
-  <link rel="stylesheet" href="ai.css?v=auth-signup-fix-1">\n  <link rel="stylesheet" href="companies.css?v=company-directory-1">
+  <link rel="stylesheet" href="ai.css?v=auth-signup-fix-1">\n  <link rel="stylesheet" href="companies.css?v=company-directory-1">\n  <link rel="stylesheet" href="marketplace.css?v=marketplace-hub-1">
 </head>
 <body>
   <div class="install-app-banner" id="installAppBanner" hidden>
@@ -45,7 +45,7 @@
     <nav aria-label="القائمة الرئيسية">
       <a class="active" href="#">الرئيسية</a>
       <a href="#offers">العروض</a>
-      <a href="./companies.html">دليل الشركات</a>
+      <a href="./companies.html">دليل الشركات</a>\n      <a href="#services">الخدمات</a>
       <a href="#partner-ads">التشطيب والديكور</a>
       <a href="#how">كيف تعمل المنصة؟</a>
     </nav>
@@ -177,8 +177,7 @@
 
     <section class="company-section" id="companies">
       <div class="section-heading"><div><span class="eyebrow">دليل الشركات</span><h2>ابحث عن شركة عقارية</h2>
-      <p>اكتشف ملفات الشركات المعتمدة ومشروعاتها وخدماتها وأعمالها السابقة.</p></div></div>
-      <p><a class="btn btn-gold" href="./companies.html">افتح دليل الشركات والملفات التعريفية</a></p>\n      <div class="company-search">
+      <p>اكتشف ملفات الشركات المعتمدة ومشروعاتها وخدماتها وأعمالها السابقة.</p></div></div>      <p><a class="btn btn-gold" href="./companies.html">افتح دليل الشركات والملفات التعريفية</a></p>\n      <div class="company-search">
         <input id="companySearchInput" type="search" placeholder="ابحث باسم الشركة..." aria-label="البحث باسم الشركة">
         <button class="btn btn-gold" id="companySearchBtn" type="button">بحث عن شركة</button>
       </div>
@@ -230,7 +229,33 @@
     </section>
 
 
-    <section class="category-explorer" id="property-types" aria-labelledby="propertyTypesTitle">
+
+    <section class="marketplace-hub" id="services" aria-labelledby="marketplaceTitle">
+      <div class="marketplace-heading">
+        <span class="eyebrow">سوق أسيوط للخدمات العقارية</span>
+        <h2 id="marketplaceTitle">كل ما تحتاجه لعقارك في مكان واحد</h2>
+        <p>من البحث عن العقار إلى التجهيز والصيانة والاستشارات، اكتشف الأقسام ومقدمي الخدمات في محافظة أسيوط.</p>
+      </div>
+      <div class="marketplace-grid">
+        <a class="marketplace-card" href="#offers"><span>⌂</span><strong>سوق العقارات</strong><small>شقق، فلل، محلات، مكاتب، عيادات، مخازن ومبانٍ</small><b>تصفح العقارات ←</b></a>
+        <a class="marketplace-card" href="#offers"><span>⇄</span><strong>التنازلات العقارية</strong><small>المقدم والمدفوع والمتبقي والأقساط ورسوم التنازل</small><b>تصفح التنازلات ←</b></a>
+        <a class="marketplace-card" href="#offers"><span>▱</span><strong>أراضي للبيع</strong><small>أراضٍ سكنية وتجارية وزراعية حسب الاستخدام</small><b>تصفح الأراضي ←</b></a>
+        <a class="marketplace-card" href="#offers"><span>⇆</span><strong>أراضي التنازلات</strong><small>تخصيصات وتعاقدات مع توضيح المستحقات والشروط</small><b>تصفح أراضي التنازلات ←</b></a>
+        <a class="marketplace-card" href="#offers"><span>▣</span><strong>إيجار يومي ومفروش</strong><small>يومي وأسبوعي وشهري مع السعر والتوافر والتجهيزات</small><b>استكشف الإيجارات ←</b></a>
+        <a class="marketplace-card" href="./companies.html"><span>▦</span><strong>الشركات والمكاتب العقارية</strong><small>شركات التسويق والتطوير والمكاتب والوسطاء والمسوقون</small><b>دليل الشركات ←</b></a>
+        <a class="marketplace-card" href="./companies.html"><span>▧</span><strong>مواد البناء والتشطيب</strong><small>سيراميك وبورسلين ودهانات وأدوات صحية ومطابخ وألوميتال</small><b>مقدمو خدمات التشطيب ←</b></a>
+        <a class="marketplace-card" href="./companies.html"><span>▤</span><strong>الأثاث والفرش والتجهيز</strong><small>أثاث ومفروشات وأجهزة وتجهيز الوحدات</small><b>دليل الموردين ←</b></a>
+        <a class="marketplace-card" href="./companies.html"><span>⌂</span><strong>المشروعات والمطورون</strong><small>صفحات المشروعات والمطورين والمواقع والوحدات وأنظمة السداد</small><b>اكتشف الشركات والمشروعات ←</b></a>
+        <a class="marketplace-card" href="./companies.html"><span>⚒</span><strong>الصيانة وإدارة العقارات</strong><small>كهرباء وسباكة وتكييف ونظافة وصيانة وإدارة وحدات</small><b>ابحث عن مقدم خدمة ←</b></a>
+        <a class="marketplace-card" href="./companies.html"><span>⚖</span><strong>الاستشارات والخدمات العقارية</strong><small>استشارات هندسية وقانونية وعقود ومعاينات وخدمات الشراء والبيع</small><b>دليل الخدمات ←</b></a>
+      </div>
+      <div class="marketplace-join">
+        <div><strong>هل تقدم خدمة أو تدير شركة في أسيوط؟</strong><p>أنشئ ملفًا تعريفيًا مجانيًا وأرسل بيانات نشاطك للمراجعة. لا يظهر الملف للزوار قبل اعتماد الإدارة.</p></div>
+        <a class="btn btn-gold" href="./companies.html">سجّل شركتك أو خدمتك</a>
+      </div>
+      <p class="marketplace-note">الأقسام العقارية مرتبطة بالعروض المنشورة. دليل مقدمي الخدمات والمشروعات يخضع لمراجعة الإدارة، وتُضاف الإعلانات التجارية الممولة بشكل واضح بعد الموافقة.</p>
+    </section>
+\n    <section class="category-explorer" id="property-types" aria-labelledby="propertyTypesTitle">
       <div class="category-explorer-intro">
         <span class="eyebrow">اكتشف عقارك</span>
         <h2 id="propertyTypesTitle">بتدور على عقار من أي نوع؟</h2>
@@ -357,8 +382,7 @@
       <div class="results-toolbar">
         <p id="resultsSummary" class="results-summary" role="status" aria-live="polite"></p>
         <button id="resetFiltersBtn" class="reset-filters-btn" type="button" hidden>مسح الفلاتر</button>
-      </div>
-      <div id="statusMessage" role="status" aria-live="polite"></div>
+      </div>      <div id="statusMessage" role="status" aria-live="polite"></div>
 
       <div class="offers-grid" id="offersGrid">
         <!-- يعرض app.js العروض هنا -->
@@ -537,8 +561,7 @@
         <input name="bedrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
       </label>
 
-      <label>
-        عدد الحمامات
+      <label>        عدد الحمامات
         <input name="bathrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
       </label>
 
