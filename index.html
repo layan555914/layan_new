@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=layan-premium-home-20261031-1">
+  <link rel="stylesheet" href="styles.css?v=layan-full-marketplace-20261031-1">
   <link rel="stylesheet" href="buyer.css?v=auth-signup-fix-1">
   <link rel="stylesheet" href="sponsor.css?v=auth-signup-fix-1">
   <link rel="stylesheet" href="ai.css?v=auth-signup-fix-1">\n  <link rel="stylesheet" href="companies.css?v=company-directory-1">
@@ -83,10 +83,20 @@
         </label>
         <label>المنطقة
           <select id="heroAreaFilter">
-            <option value="">كل مناطق أسيوط</option>
-            <option value="أسيوط">مدينة أسيوط</option>
+            <option value="">كل مناطق أسيوط ومراكزها</option>
+            <option value="مدينة أسيوط">مدينة أسيوط</option>
             <option value="أسيوط الجديدة">أسيوط الجديدة</option>
             <option value="الهضبة">الهضبة</option>
+            <option value="ديروط">ديروط</option>
+            <option value="القوصية">القوصية</option>
+            <option value="منفلوط">منفلوط</option>
+            <option value="أبنوب">أبنوب</option>
+            <option value="الفتح">الفتح</option>
+            <option value="ساحل سليم">ساحل سليم</option>
+            <option value="البداري">البداري</option>
+            <option value="أبو تيج">أبو تيج</option>
+            <option value="صدفا">صدفا</option>
+            <option value="الغنايم">الغنايم</option>
           </select>
         </label>
         <label>أقصى مقدم (جنيه)
@@ -226,6 +236,11 @@
         <h2 id="propertyTypesTitle">بتدور على عقار من أي نوع؟</h2>
         <p>اختار القسم المناسب، وشوف العروض المنشورة فيه مباشرة.</p>
       </div>
+      <div class="deal-purpose-grid" aria-label="نوع المعاملة العقارية">
+        <button class="deal-purpose-card" type="button" data-deal-kind="بيع"><strong>عقارات للبيع</strong><span>وحدات سكنية وتجارية وإدارية وطبية للبيع</span></button>
+        <button class="deal-purpose-card" type="button" data-deal-kind="إيجار"><strong>عقارات للإيجار</strong><span>ابحث عن وحدة مناسبة للسكن أو النشاط</span></button>
+        <button class="deal-purpose-card" type="button" data-deal-kind="تنازل"><strong>قسم التنازلات</strong><span>وحدات ومحلات وأراضٍ للتنازل واستكمال الأقساط</span></button>
+      </div>
       <div class="category-tiles">
         <button class="category-tile" type="button" data-category-kind="سكني" aria-label="عرض العقارات السكنية">
           <span class="category-tile-icon" aria-hidden="true">⌂</span>
@@ -279,7 +294,7 @@
         <div>
           <span class="eyebrow">فرص عقارية</span>
           <h2>قائمة العروض</h2>
-          <p>تصفح الوحدات العقارية المتاحة للتنازل.</p>
+          <p>تصفح عقارات أسيوط للبيع والإيجار والتنازل، واختر نوع الفرصة المناسبة لك.</p>
         </div>
       </div>
 
@@ -304,7 +319,19 @@
         </select>
 
         <select id="areaFilter" aria-label="تصفية حسب المنطقة">
-          <option value="">كل المناطق</option>
+          <option value="">كل مناطق محافظة أسيوط</option>
+          <option value="مدينة أسيوط">مدينة أسيوط</option>
+          <option value="أسيوط الجديدة">أسيوط الجديدة</option>
+          <option value="ديروط">ديروط</option>
+          <option value="القوصية">القوصية</option>
+          <option value="منفلوط">منفلوط</option>
+          <option value="أبنوب">أبنوب</option>
+          <option value="الفتح">الفتح</option>
+          <option value="ساحل سليم">ساحل سليم</option>
+          <option value="البداري">البداري</option>
+          <option value="أبو تيج">أبو تيج</option>
+          <option value="صدفا">صدفا</option>
+          <option value="الغنايم">الغنايم</option>
         </select>
 
         <label class="smart-filter-field">أقصى مقدم (جنيه)
@@ -466,6 +493,7 @@
         <input name="title" type="text" required>
       </label>
 
+      <label>نوع الإعلان<select name="listing_purpose" id="listingPurpose" required><option value="تنازل">تنازل عقاري</option><option value="بيع">بيع مباشر</option><option value="إيجار">إيجار</option></select></label>
       <label>
         نوع العقار
         <select name="property_type" required>
@@ -498,6 +526,12 @@
         <input name="area_m2" type="number" min="0" step="0.1" inputmode="decimal">
       </label>
 
+      <fieldset class="land-details-fields" id="landDetailsFields" hidden><legend>بيانات الأرض (إن كان الإعلان عن أرض)</legend>
+        <label>جهة الولاية / التخصيص<input name="land_ownership_authority" maxlength="180" placeholder="مثال: جهاز مدينة / جمعية / هيئة"></label>
+        <label>اشتراطات وتراخيص البناء<textarea name="land_permit_details" rows="2" maxlength="800"></textarea></label>
+        <label>المرافق المتاحة<input name="land_utilities" maxlength="180" placeholder="مياه، كهرباء، صرف، غاز..."></label>
+        <label>تصنيف / استخدام الأرض<input name="land_zoning" maxlength="180" placeholder="سكني، تجاري، إداري..."></label>
+      </fieldset>
       <label>
         عدد غرف النوم
         <input name="bedrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
@@ -634,7 +668,7 @@
 </script>
   <script src="config.js?v=layan-upload-preview-20261030-1"></script>
   <script src="gubabase.js?v=layan-contact-consent-1"></script>
-  <script src="app.js?v=layan-contact-consent-1"></script>
+  <script src="app.js?v=layan-full-marketplace-20261031-1"></script>
   <script src="buyer.js?v=layan-upload-preview-20261030-1"></script>
   <script src="sponsor.js?v=commercial-ads-separated-1"></script>
   <script src="ai.js?v=layan-upload-preview-20261030-1"></script>

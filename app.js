@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll("[data-category-kind]").forEach((tile) => {
     tile.addEventListener("click", () => {
       activeKind = tile.dataset.categoryKind || "";
+      activeDealKind = "";
       const typeFilter = $("typeFilter");
       const areaFilter = $("areaFilter");
       if (typeFilter) typeFilter.value = "";
@@ -337,6 +338,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let offers = [];
   let activeKind = "";
+  let activeDealKind = "";
   let selectedAccountType = "individual";
   let selectedPromotionDuration = 15;
   const LAYAN_PHONE = "201007044265";
@@ -419,6 +421,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     return {
       ...row,
       title: row.title || "عرض عقاري",
+      listing_purpose: row.listing_purpose || "تنازل",
+      land_ownership_authority: row.land_ownership_authority || "",
+      land_permit_details: row.land_permit_details || "",
+      land_utilities: row.land_utilities || "",
+      land_zoning: row.land_zoning || "",
       city: row.city || "",
       area: row.area || "",
       area_m2: num(row.area_m2),
@@ -446,9 +453,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!areaFilter) return;
 
     const previous = areaFilter.value;
-    const areas = [...new Set(
-      offers.map((o) => o.area.trim()).filter(Boolean)
-    )].sort((a, b) => a.localeCompare(b, "ar"));
+    const assiutCenters = ["مدينة أسيوط", "أسيوط الجديدة", "ديروط", "القوصية", "منفلوط", "أبنوب", "الفتح", "ساحل سليم", "البداري", "أبو تيج", "صدفا", "الغنايم"];
+    const areas = [...new Set([...assiutCenters, ...offers.map((o) => String(o.area || "").trim()).filter(Boolean), ...offers.map((o) => String(o.city || "").trim()).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "ar"));
 
     areaFilter.innerHTML =
       '<option value="">كل المناطق</option>' +
@@ -478,6 +484,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const area = normalizeSearch(areaFilter?.value || "");
     const downPaymentMaxRaw = $("downPaymentMaxFilter")?.value ?? "";
     const monthlyMaxRaw = $("monthlyMaxFilter")?.value ?? "";
+    const dealKind = activeDealKind;
     const downPaymentMax = downPaymentMaxRaw.trim() === "" ? null : num(downPaymentMaxRaw);
     const monthlyMax = monthlyMaxRaw.trim() === "" ? null : num(monthlyMaxRaw);
     const sort = $("sortFilter")?.value || "newest";
@@ -493,10 +500,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       return (!search || normalizedText.includes(search)) &&
         (!companyQuery || normalizeSearch(o.developer_name).includes(companyQuery)) &&
         (!type || normalizeSearch(o.property_type) === type) &&
-        (!area || normalizeSearch(o.area) === area) &&
+        (!area || normalizeSearch(o.area) === area || normalizeSearch(o.city) === area) &&
         (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
         (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
-        (!activeKind || categoryMatches(o, activeKind));
+        (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String(o.listing_purpose || "تنازل") === dealKind);
     });
 
     filtered.sort((a, b) => {
@@ -518,7 +525,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const resultsSummary = $("resultsSummary");
     if (resultsSummary) {
-      const activeFilters = Boolean(search || companyQuery || type || area || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || activeKind);
+      const activeFilters = Boolean(search || companyQuery || type || area || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || activeKind || activeDealKind);
       resultsSummary.replaceChildren();
       const count = document.createElement("strong");
       count.textContent = String(filtered.length);
@@ -556,7 +563,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
           <div class="offer-card-content">
             ${o.is_featured && (!o.featured_until || new Date(o.featured_until) > new Date()) ? '<span class="featured-badge">★ عرض مميز</span>' : ''}
-            <span class="offer-type">${esc(o.property_type)}</span>
+            <span class="offer-type">${esc(o.property_type)} · ${esc(o.listing_purpose)}</span>
             <p class="offer-code">كود الإعلان:
               <strong>${esc(offerCode(o))}</strong>
             </p>
@@ -722,6 +729,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p><span>المنطقة</span><strong>${esc(o.area || "غير محدد")}</strong></p>
         ${o.developer_name ? `<p><span>المطور العقاري</span><strong>${esc(o.developer_name)}</strong></p>` : ""}
         ${o.project_name ? `<p><span>المشروع / الكمبوند</span><strong>${esc(o.project_name)}</strong></p>` : ""}
+        ${o.land_ownership_authority ? `<p><span>جهة الولاية / التخصيص</span><strong>${esc(o.land_ownership_authority)}</strong></p>` : ""}
+        ${o.land_permit_details ? `<p><span>اشتراطات البناء</span><strong>${esc(o.land_permit_details)}</strong></p>` : ""}
+        ${o.land_utilities ? `<p><span>المرافق</span><strong>${esc(o.land_utilities)}</strong></p>` : ""}
+        ${o.land_zoning ? `<p><span>استخدام الأرض</span><strong>${esc(o.land_zoning)}</strong></p>` : ""}
         ${o.area_m2 ? `<p><span>المساحة</span><strong>${esc(o.area_m2)} م²</strong></p>` : ""}
         ${o.bedrooms ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
         ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
@@ -730,7 +741,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p><span>إجمالي المدفوع حتى الآن (شامل المقدم)</span><strong>${money(o.paid_amount)}</strong></p>
         <p><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></p>
         ${o.monthly_installment ? `<p><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></p>` : ""}
-        <p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>
+        ${o.listing_purpose === "تنازل" ? `<p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>` : ""}
         ${o.discount_amount ? `<p><span>قيمة الخصم</span><strong>${money(o.discount_amount)}</strong></p>` : ""}
         ${o.discount_percent ? `<p><span>نسبة الخصم</span><strong>${esc(o.discount_percent)}٪</strong></p>` : ""}
       </div>
@@ -980,6 +991,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { activeDealKind = button.dataset.dealKind || ""; activeKind = ""; render(); $("offers")?.scrollIntoView({behavior:"smooth",block:"start"}); }));
+  const listingPurpose = form?.querySelector('[name="listing_purpose"]');
+  const landDetails = $("landDetailsFields");
+  const updateLandFields = () => { if (landDetails) landDetails.hidden = !String(form?.querySelector('[name="property_type"]')?.value || "").includes("أرض"); };
+  form?.querySelector('[name="property_type"]')?.addEventListener("change", updateLandFields);
+  updateLandFields();
   $("resetFiltersBtn")?.addEventListener("click", () => {
     ["searchInput", "typeFilter", "areaFilter", "downPaymentMaxFilter", "monthlyMaxFilter"].forEach(id => {
       const field = $(id);
@@ -987,6 +1004,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     if ($("sortFilter")) $("sortFilter").value = "newest";
     activeKind = "";
+    activeDealKind = "";
     document.querySelectorAll("[data-category-kind]").forEach(tile => {
       tile.classList.remove("active");
       tile.setAttribute("aria-pressed", "false");
@@ -1030,6 +1048,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const offer = {
       title: value("title"),
+      listing_purpose: value("listing_purpose") || "تنازل",
+      land_ownership_authority: value("land_ownership_authority"),
+      land_permit_details: value("land_permit_details"),
+      land_utilities: value("land_utilities"),
+      land_zoning: value("land_zoning"),
       governorate: "أسيوط",
       city: value("city"),
       area: value("area"),

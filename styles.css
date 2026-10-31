@@ -3076,3 +3076,12 @@ body{background:#f4f6fa;color:#10264c}
 .land-market-card p{margin:0;color:#5b6880;line-height:1.8;font-size:14px}
 .land-market-card .btn{flex:0 0 auto;align-self:center}
 @media(max-width:720px){.land-market-grid{grid-template-columns:1fr}.land-market-card{padding:16px;gap:12px;flex-wrap:wrap}.land-market-card .btn{width:100%}}
+
+
+/* LAYAN marketplace purpose cards and Assiut-wide filters */
+.deal-purpose-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0}
+.deal-purpose-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:112px;padding:19px;border:1px solid #dce4ef;border-radius:16px;background:#fff;color:#102b59;text-align:right;cursor:pointer;box-shadow:0 7px 20px rgba(9,34,76,.06);transition:transform .18s,border-color .18s,box-shadow .18s}
+.deal-purpose-card strong{font-size:18px;font-weight:900}
+.deal-purpose-card span{color:#64738a;font-size:13px;line-height:1.7}
+.deal-purpose-card:hover,.deal-purpose-card.active{border-color:#d5a13e;box-shadow:0 9px 24px rgba(9,34,76,.12);transform:translateY(-2px)}
+@media(max-width:720px){.deal-purpose-grid{grid-template-columns:1fr}.deal-purpose-card{min-height:84px;padding:15px}}
