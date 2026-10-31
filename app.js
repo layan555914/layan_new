@@ -421,6 +421,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     return {
       ...row,
       title: row.title || "عرض عقاري",
+      listing_purpose: row.listing_purpose || "تنازل",
+      land_ownership_authority: row.land_ownership_authority || "",
+      land_permit_details: row.land_permit_details || "",
+      land_utilities: row.land_utilities || "",
+      land_zoning: row.land_zoning || "",
       city: row.city || "",
       area: row.area || "",
       area_m2: num(row.area_m2),
@@ -558,7 +563,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
           <div class="offer-card-content">
             ${o.is_featured && (!o.featured_until || new Date(o.featured_until) > new Date()) ? '<span class="featured-badge">★ عرض مميز</span>' : ''}
-            <span class="offer-type">${esc(o.property_type)}</span>
+            <span class="offer-type">${esc(o.property_type)} · ${esc(o.listing_purpose)}</span>
             <p class="offer-code">كود الإعلان:
               <strong>${esc(offerCode(o))}</strong>
             </p>
@@ -724,6 +729,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p><span>المنطقة</span><strong>${esc(o.area || "غير محدد")}</strong></p>
         ${o.developer_name ? `<p><span>المطور العقاري</span><strong>${esc(o.developer_name)}</strong></p>` : ""}
         ${o.project_name ? `<p><span>المشروع / الكمبوند</span><strong>${esc(o.project_name)}</strong></p>` : ""}
+        ${o.land_ownership_authority ? `<p><span>جهة الولاية / التخصيص</span><strong>${esc(o.land_ownership_authority)}</strong></p>` : ""}
+        ${o.land_permit_details ? `<p><span>اشتراطات البناء</span><strong>${esc(o.land_permit_details)}</strong></p>` : ""}
+        ${o.land_utilities ? `<p><span>المرافق</span><strong>${esc(o.land_utilities)}</strong></p>` : ""}
+        ${o.land_zoning ? `<p><span>استخدام الأرض</span><strong>${esc(o.land_zoning)}</strong></p>` : ""}
         ${o.area_m2 ? `<p><span>المساحة</span><strong>${esc(o.area_m2)} م²</strong></p>` : ""}
         ${o.bedrooms ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
         ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
@@ -732,7 +741,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p><span>إجمالي المدفوع حتى الآن (شامل المقدم)</span><strong>${money(o.paid_amount)}</strong></p>
         <p><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></p>
         ${o.monthly_installment ? `<p><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></p>` : ""}
-        <p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>
+        ${o.listing_purpose === "تنازل" ? `<p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>` : ""}
         ${o.discount_amount ? `<p><span>قيمة الخصم</span><strong>${money(o.discount_amount)}</strong></p>` : ""}
         ${o.discount_percent ? `<p><span>نسبة الخصم</span><strong>${esc(o.discount_percent)}٪</strong></p>` : ""}
       </div>
