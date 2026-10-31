@@ -1,4 +1,4 @@
-const CACHE_NAME = "layan-aqar-shell-v58";
+const CACHE_NAME = "asyut-aqar-shell-v59";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -20,7 +20,7 @@ const APP_SHELL = [
   "./manifest.json",
   "./pwa.js",
   "./icon.svg",
-  "./file_000000004bbc821184c084bfa178e416.jpg"
+  "./icon.svg"
 ];
 
 self.addEventListener("install", event => {
