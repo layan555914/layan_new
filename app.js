@@ -498,7 +498,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!area || normalizeSearch(o.area) === area || normalizeSearch(o.city) === area) &&
         (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
         (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
-        (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String([o.listing_purpose, o.title, o.description].join(" ")).includes(dealKind));
+        (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String(o.listing_purpose || "تنازل") === dealKind);
     });
 
     filtered.sort((a, b) => {
@@ -983,6 +983,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { activeDealKind = button.dataset.dealKind || ""; activeKind = ""; render(); $("offers")?.scrollIntoView({behavior:"smooth",block:"start"}); }));
+  const listingPurpose = form?.querySelector('[name="listing_purpose"]');
+  const landDetails = $("landDetailsFields");
+  const updateLandFields = () => { if (landDetails) landDetails.hidden = !String(form?.querySelector('[name="property_type"]')?.value || "").includes("أرض"); };
+  form?.querySelector('[name="property_type"]')?.addEventListener("change", updateLandFields);
+  updateLandFields();
   $("resetFiltersBtn")?.addEventListener("click", () => {
     ["searchInput", "typeFilter", "areaFilter", "downPaymentMaxFilter", "monthlyMaxFilter"].forEach(id => {
       const field = $(id);
@@ -1034,6 +1039,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const offer = {
       title: value("title"),
+      listing_purpose: value("listing_purpose") || "تنازل",
+      land_ownership_authority: value("land_ownership_authority"),
+      land_permit_details: value("land_permit_details"),
+      land_utilities: value("land_utilities"),
+      land_zoning: value("land_zoning"),
       governorate: "أسيوط",
       city: value("city"),
       area: value("area"),
