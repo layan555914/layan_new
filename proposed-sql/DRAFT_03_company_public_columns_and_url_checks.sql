@@ -7,7 +7,7 @@
 begin;
 
 create or replace view public.company_profiles_public
-with (security_barrier = true) as
+with (security_invoker = true, security_barrier = true) as
 select id, company_name, category, description, services, city, address, phone,
        whatsapp, website, logo_url, gallery_urls, projects
 from public.company_profiles
@@ -16,6 +16,7 @@ where status = 'active';
 revoke all on public.company_profiles from anon, authenticated;
 grant insert, update on public.company_profiles to authenticated;
 grant select (id, owner_id, status) on public.company_profiles to authenticated;
+grant select (id, company_name, category, description, services, city, address, phone, whatsapp, website, logo_url, gallery_urls, projects, status) on public.company_profiles to anon, authenticated;
 grant select on public.company_profiles_public to anon, authenticated;
 
 create or replace function public.layan_get_my_company_profile()
