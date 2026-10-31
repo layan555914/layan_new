@@ -1,5 +1,5 @@
 -- ============================================================================
--- DRAFT FOR REVIEW — NOT EXECUTED — NOT FINAL
+-- APPLIED TO PRODUCTION on 2026-10-31 as layan_company_profiles_resubmit_20261031
 -- يعالج تعارض needs_changes: القيد الحالي في الهجرة لا يسمح بها، وسياسة التعديل لا تسمح للمالك
 -- بالتعديل من needs_changes أو rejected.
 -- قبل أي تنفيذ: قارنه بنتائج الاستعلامات الحية (pg_policies / pg_constraint). قد تكون القاعدة الحية
