@@ -208,6 +208,8 @@ document.addEventListener("DOMContentLoaded", () => {
         showState(false);
         list.innerHTML = "";
         if (companyProfilesList) companyProfilesList.innerHTML = "";
+      if (marketplaceList) marketplaceList.innerHTML = "";
+        if (marketplaceList) marketplaceList.innerHTML = "";
         if (propertyDocsList) propertyDocsList.innerHTML = "";
         setStatus("هذا الحساب غير مخوّل بدخول لوحة إدارة LAYAN. يمكنك متابعة ملف شركتك من صفحة دليل الشركات.");
         return false;
@@ -216,6 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       render(rows);
       await loadPendingCompanyProfiles();
+      await loadPendingMarketplaceListings();
       await loadPendingPropertyDocuments();
       showState(true);
       setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
