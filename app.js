@@ -1056,6 +1056,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       image_urls: []
     };
 
+    if (offer.contact_phone && !data.get("contact_consent")) {
+      setStatus("لنشر رقم التواصل داخل الإعلان يجب الموافقة صراحةً على نشره. اترك الرقم فارغًا إن لم ترغب في نشره.");
+      return;
+    }
+
     if (selectedAccountType === "company" && !offer.company_business_name) {
       setStatus("اكتب اسم الشركة صاحبة الإعلان.");
       return;
