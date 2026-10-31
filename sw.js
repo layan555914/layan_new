@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v59";
+const CACHE_NAME = "asyut-aqar-shell-v60";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -34,7 +34,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key.startsWith("layan-aqar-shell-") && key !== CACHE_NAME).map(key => caches.delete(key))))
+      .then(keys => Promise.all(keys.filter(key => (key.startsWith("layan-aqar-shell-") || key.startsWith("asyut-aqar-shell-")) && key !== CACHE_NAME).map(key => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
