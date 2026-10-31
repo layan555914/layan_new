@@ -9,3 +9,5 @@
 .marketplace-category-fields h3,.marketplace-category-fields p{grid-column:1/-1;margin:0;color:#102746}
 .marketplace-category-fields label{display:grid;gap:6px;font-weight:600}
 .marketplace-category-fields input,.marketplace-category-fields select{width:100%;padding:11px;border:1px solid #cbd3df;border-radius:9px;font:inherit}
+
+.marketplace-detail-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.marketplace-detail-chip{font-size:12px;color:#43536a;background:#f2f5f9;border-radius:20px;padding:5px 9px}
