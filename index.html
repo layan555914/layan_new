@@ -86,7 +86,7 @@
             <option value="">كل مناطق أسيوط</option>
             <option value="أسيوط">مدينة أسيوط</option>
             <option value="أسيوط الجديدة">أسيوط الجديدة</option>
-            <option value="الهضبة">الهضبة</option>
+            <option value="الهضبة">الهضبة</option><option value="مدينة أسيوط">مدينة أسيوط</option><option value="أسيوط الجديدة">أسيوط الجديدة</option><option value="ديروط">ديروط</option><option value="القوصية">القوصية</option><option value="منفلوط">منفلوط</option><option value="أبنوب">أبنوب</option><option value="الفتح">الفتح</option><option value="ساحل سليم">ساحل سليم</option><option value="البداري">البداري</option><option value="أبو تيج">أبو تيج</option><option value="صدفا">صدفا</option><option value="الغنايم">الغنايم</option>
           </select>
         </label>
         <label>أقصى مقدم (جنيه)
@@ -226,6 +226,11 @@
         <h2 id="propertyTypesTitle">بتدور على عقار من أي نوع؟</h2>
         <p>اختار القسم المناسب، وشوف العروض المنشورة فيه مباشرة.</p>
       </div>
+      <div class="deal-purpose-grid" aria-label="نوع المعاملة العقارية">
+        <button class="deal-purpose-card" type="button" data-deal-kind="بيع"><strong>عقارات للبيع</strong><span>وحدات سكنية وتجارية وإدارية وطبية للبيع</span></button>
+        <button class="deal-purpose-card" type="button" data-deal-kind="إيجار"><strong>عقارات للإيجار</strong><span>ابحث عن وحدة مناسبة للسكن أو النشاط</span></button>
+        <button class="deal-purpose-card" type="button" data-deal-kind="تنازل"><strong>قسم التنازلات</strong><span>وحدات ومحلات وأراضٍ للتنازل واستكمال الأقساط</span></button>
+      </div>
       <div class="category-tiles">
         <button class="category-tile" type="button" data-category-kind="سكني" aria-label="عرض العقارات السكنية">
           <span class="category-tile-icon" aria-hidden="true">⌂</span>
@@ -279,7 +284,7 @@
         <div>
           <span class="eyebrow">فرص عقارية</span>
           <h2>قائمة العروض</h2>
-          <p>تصفح الوحدات العقارية المتاحة للتنازل.</p>
+          <p>تصفح عقارات أسيوط للبيع والإيجار والتنازل، واختر نوع الفرصة المناسبة لك.</p>
         </div>
       </div>
 
@@ -304,7 +309,19 @@
         </select>
 
         <select id="areaFilter" aria-label="تصفية حسب المنطقة">
-          <option value="">كل المناطق</option>
+          <option value="">كل مناطق محافظة أسيوط</option>
+          <option value="مدينة أسيوط">مدينة أسيوط</option>
+          <option value="أسيوط الجديدة">أسيوط الجديدة</option>
+          <option value="ديروط">ديروط</option>
+          <option value="القوصية">القوصية</option>
+          <option value="منفلوط">منفلوط</option>
+          <option value="أبنوب">أبنوب</option>
+          <option value="الفتح">الفتح</option>
+          <option value="ساحل سليم">ساحل سليم</option>
+          <option value="البداري">البداري</option>
+          <option value="أبو تيج">أبو تيج</option>
+          <option value="صدفا">صدفا</option>
+          <option value="الغنايم">الغنايم</option>
         </select>
 
         <label class="smart-filter-field">أقصى مقدم (جنيه)
