@@ -9,7 +9,6 @@ const APP_SHELL = [
   "./marketplace.js",
   "./company.html",
   "./companies.css",
-  "./marketplace.css",
   "./companies.js",
   "./company-profile.js",
   "./styles.css",
