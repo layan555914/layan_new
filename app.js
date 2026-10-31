@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!image.classList.contains("offer-image") && !image.classList.contains("details-image")) return;
     const fallback = document.createElement("div");
     fallback.className = "offer-image offer-image-placeholder image-load-fallback";
-    fallback.textContent = "LAYAN AQAR";
+    fallback.textContent = "ASYUT AQAR";
     fallback.setAttribute("role", "img");
     fallback.setAttribute("aria-label", "صورة العقار غير متاحة");
     image.replaceWith(fallback);
@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     event.preventDefault();
     try {
       await navigator.share({
-        title: "LAYAN AQAR | ليان عقار",
-        text: "اكتشف عروض التنازل العقاري على منصة ليان",
+        title: "ASYUT AQAR | أسيوط عقار",
+        text: "اكتشف عروض التنازل العقاري على منصة أسيوط عقار",
         url: "https://layan-eg.com/"
       });
     } catch (error) {
@@ -148,12 +148,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(siteUrl);
-        alert("تم نسخ رابط ليان: " + siteUrl + "\nالصقه داخل إنستجرام في الرسالة أو النبذة أو القصة.");
+        alert("تم نسخ رابط أسيوط عقار: " + siteUrl + "\nالصقه داخل إنستجرام في الرسالة أو النبذة أو القصة.");
       } else {
-        window.prompt("انسخ رابط ليان والصقه في إنستجرام:", siteUrl);
+        window.prompt("انسخ رابط أسيوط عقار والصقه في إنستجرام:", siteUrl);
       }
     } catch {
-      window.prompt("انسخ رابط ليان والصقه في إنستجرام:", siteUrl);
+      window.prompt("انسخ رابط أسيوط عقار والصقه في إنستجرام:", siteUrl);
     }
   });
 
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     authDialog.id = "authDialog";
     authDialog.className = "details-dialog auth-dialog";
     authDialog.innerHTML = `
-      <div class="details-dialog-header"><h2 id="authTitle">تسجيل الدخول إلى ليان</h2><button type="button" id="closeAuthDialog" aria-label="إغلاق">×</button></div>
+      <div class="details-dialog-header"><h2 id="authTitle">تسجيل الدخول إلى أسيوط عقار</h2><button type="button" id="closeAuthDialog" aria-label="إغلاق">×</button></div>
       <p class="auth-intro">أنشئ حسابًا مجانيًا أو سجّل الدخول لإضافة عروضك ومتابعتها.</p>
       <form id="authForm" class="auth-form">
         <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const forgotButton = authDialog.querySelector("#forgotPasswordBtn");
     const paintMode = () => {
       resendButton.hidden = true;
-      title.textContent = mode === "login" ? "تسجيل الدخول إلى ليان" : "إنشاء حساب مجاني";
+      title.textContent = mode === "login" ? "تسجيل الدخول إلى أسيوط عقار" : "إنشاء حساب مجاني";
       submit.textContent = mode === "login" ? "تسجيل الدخول" : "إنشاء الحساب";
       toggle.textContent = mode === "login" ? "ليس لديك حساب؟ أنشئ حسابًا" : "لديك حساب بالفعل؟ سجّل الدخول";
       password.autocomplete = mode === "login" ? "current-password" : "new-password";
@@ -275,12 +275,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
           const result = await api.signUp(email, pass);
           if (result.needsEmailConfirmation) {
-            status.textContent = "تم إنشاء الحساب بنجاح. افتح رسالة تأكيد البريد واضغط رابط التأكيد، ثم ارجع إلى منصة ليان وسجّل الدخول. لو لم تصلك الرسالة، راجع مجلد الرسائل غير المرغوب فيها أو اضغط «إعادة إرسال رسالة التأكيد».";
+            status.textContent = "تم إنشاء الحساب بنجاح. افتح رسالة تأكيد البريد واضغط رابط التأكيد، ثم ارجع إلى منصة أسيوط عقار وسجّل الدخول. لو لم تصلك الرسالة، راجع مجلد الرسائل غير المرغوب فيها أو اضغط «إعادة إرسال رسالة التأكيد».";
             resendButton.hidden = false;
           } else {
             status.textContent = "تم إنشاء الحساب وتسجيل الدخول.";
             updateAuthButton();
-            window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك في ليان."); }, 450);
+            window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك في أسيوط عقار."); }, 450);
           }
         }
       } catch (error) {
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   window.addEventListener("layan:auth-ready", () => {
     updateAuthButton();
-    setStatus("تم تأكيد بريدك الإلكتروني وتسجيل دخولك بنجاح. أهلًا بك في ليان.");
+    setStatus("تم تأكيد بريدك الإلكتروني وتسجيل دخولك بنجاح. أهلًا بك في أسيوط عقار.");
   });
   function openAuth(mode = "login") {
     const d = ensureAuthDialog();
@@ -558,7 +558,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                    alt="${esc(o.title)}"
                    loading="lazy">`
               : `<div class="offer-image offer-image-placeholder">
-                   LAYAN AQAR
+                   ASYUT AQAR
                  </div>`
           }
           <div class="offer-card-content">
@@ -609,9 +609,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const plan = $("promotionPlanSelect")?.value || "standard";
     const note = $("promotionPlanNote");
     if (!note) return;
-    const contact = '<a href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D9%88%D8%B3%D8%B9%D8%B1%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D9%84%D9%8A%D8%A7%D9%86" target="_blank" rel="noopener noreferrer">اسأل إدارة ليان عبر واتساب</a>';
+    const contact = '<a href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D9%88%D8%B3%D8%B9%D8%B1%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D9%84%D9%8A%D8%A7%D9%86" target="_blank" rel="noopener noreferrer">اسأل إدارة أسيوط عقار عبر واتساب</a>';
     if (plan === "featured_15" || plan === "featured_30") note.innerHTML = "طلب التمييز اختياري. المميزات والمدة والسعر النهائي يتم تأكيدها عبر واتساب قبل أي اتفاق. " + contact;
-    else note.innerHTML = "الإعلان العقاري العادي مجاني دائمًا، ولا توجد عمولة لليان على البيع أو التنازل. " + contact;
+    else note.innerHTML = "الإعلان العقاري العادي مجاني دائمًا، ولا توجد عمولة لأسيوط عقار على البيع أو التنازل. " + contact;
   }
 
   function renderCompanies() {
@@ -713,7 +713,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
           ${galleryImages.length > 1 ? `<div class="details-thumbnails">${galleryImages.map((url,index)=>`<button type="button" class="details-thumb ${index===0?"active":""}" data-gallery-index="${index}" aria-label="عرض الصورة ${index+1}" aria-pressed="${index===0?"true":"false"}"><img src="${esc(url)}" alt=""></button>`).join("")}</div>` : ""}
         </div>`
-      : `<div class="offer-image offer-image-placeholder details-placeholder">LAYAN AQAR</div>`;
+      : `<div class="offer-image offer-image-placeholder details-placeholder">ASYUT AQAR</div>`;
 
     content.innerHTML = `
       ${galleryMarkup}
@@ -747,17 +747,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
       <p>${esc(o.description || "لا يوجد وصف إضافي.")}</p>
       <h3>تواصل مباشرة مع صاحب الإعلان</h3>
-      <p>ليان منصة إعلانات فقط؛ التواصل والاتفاق يتمان مباشرة بين المعلن والمهتم بالعقار.</p>
+      <p>أسيوط عقار منصة إعلانات فقط؛ التواصل والاتفاق يتمان مباشرة بين المعلن والمهتم بالعقار.</p>
       <div class="details-contact">
         ${o.contact_phone ? `<a class="btn btn-gold" href="tel:${esc(String(o.contact_phone).replace(/[^0-9+]/g, ""))}">اتصال بصاحب الإعلان</a>
         <a class="btn btn-dark" target="_blank" rel="noopener noreferrer"
-          href="https://wa.me/${String(o.contact_phone).replace(/[^0-9]/g, "").replace(/^0/, "2")}?text=${encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + o.title + " - كود " + offerCode(o) + "، من منصة LAYAN AQAR.")}">واتساب صاحب الإعلان</a>` : `<p class="details-warning">لم يضف صاحب الإعلان رقم تواصل؛ يمكنك الرجوع لاحقًا أو اختيار عرض آخر.</p>`}
+          href="https://wa.me/${String(o.contact_phone).replace(/[^0-9]/g, "").replace(/^0/, "2")}?text=${encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + o.title + " - كود " + offerCode(o) + "، من منصة ASYUT AQAR.")}">واتساب صاحب الإعلان</a>` : `<p class="details-warning">لم يضف صاحب الإعلان رقم تواصل؛ يمكنك الرجوع لاحقًا أو اختيار عرض آخر.</p>`}
       </div>
       <p class="details-warning">تحقق من العقد والمستندات وموافقة المطوّر قبل دفع أي مبلغ.</p>
       <div class="details-actions">
         <button type="button" class="btn btn-outline-dark" id="shareOfferBtn">مشاركة الإعلان</button>
         <a class="btn btn-outline-dark" id="reportOfferBtn" target="_blank" rel="noopener noreferrer"
-          href="https://wa.me/201007044265?text=${encodeURIComponent("أرغب في الإبلاغ عن إعلان على LAYAN AQAR: " + o.title + " - كود الإعلان " + offerCode(o))}">الإبلاغ عن الإعلان</a>
+          href="https://wa.me/201007044265?text=${encodeURIComponent("أرغب في الإبلاغ عن إعلان على ASYUT AQAR: " + o.title + " - كود الإعلان " + offerCode(o))}">الإبلاغ عن الإعلان</a>
       </div>
     `;
 
@@ -788,17 +788,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       const shareUrl = new URL(window.location.href);
       if (o.id != null) shareUrl.searchParams.set("offer", String(o.id));
       else shareUrl.hash = "offers";
-      const shareData = {title: "LAYAN AQAR | " + o.title, text: "إعلان عقاري على ليان: " + o.title + " — كود الإعلان " + offerCode(o), url: shareUrl.toString()};
+      const shareData = {title: "ASYUT AQAR | " + o.title, text: "إعلان عقاري على أسيوط عقار: " + o.title + " — كود الإعلان " + offerCode(o), url: shareUrl.toString()};
       try {
         if (navigator.share) await navigator.share(shareData);
         else if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(shareData.text + "\\n" + shareUrl.toString());
-          setStatus("تم نسخ تفاصيل الإعلان ورابط ليان للمشاركة.");
+          setStatus("تم نسخ تفاصيل الإعلان ورابط أسيوط عقار للمشاركة.");
         } else {
-          window.prompt("انسخ تفاصيل الإعلان ورابط ليان:", shareData.text + "\\n" + shareUrl.toString());
+          window.prompt("انسخ تفاصيل الإعلان ورابط أسيوط عقار:", shareData.text + "\\n" + shareUrl.toString());
         }
       } catch (error) {
-        if (error?.name !== "AbortError") setStatus("تعذرت المشاركة تلقائيًا. يمكنك نسخ رابط ليان ومشاركة كود الإعلان: " + offerCode(o));
+        if (error?.name !== "AbortError") setStatus("تعذرت المشاركة تلقائيًا. يمكنك نسخ رابط أسيوط عقار ومشاركة كود الإعلان: " + offerCode(o));
       }
     });
 
@@ -921,7 +921,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("loginBtn")?.addEventListener("click", async () => {
     const api = window.LAYAN_SUPABASE;
     if (api?.isAuthenticated()) {
-      if (!window.confirm("هل تريد تسجيل الخروج من حساب ليان؟")) return;
+      if (!window.confirm("هل تريد تسجيل الخروج من حساب أسيوط عقار؟")) return;
       try { await api.signOut(); updateAuthButton(); setStatus("تم تسجيل الخروج."); }
       catch (error) { setStatus(friendlyAuthError(error.message)); }
     } else openAuth("login");
@@ -1175,7 +1175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       clearPhotoPreview();
       closeDialog();
       setStatus(offer.featured_requested
-        ? "تم إرسال العرض وطلب الإعلان المميز للمراجعة. الدفع الإلكتروني غير مفعّل حاليًا؛ لا تحوّل أي مبلغ قبل إعلان وسيلة دفع رسمية من إدارة ليان. لن يظهر الإعلان كمميز إلا بعد تأكيد الدفع من الإدارة."
+        ? "تم إرسال العرض وطلب الإعلان المميز للمراجعة. الدفع الإلكتروني غير مفعّل حاليًا؛ لا تحوّل أي مبلغ قبل إعلان وسيلة دفع رسمية من إدارة أسيوط عقار. لن يظهر الإعلان كمميز إلا بعد تأكيد الدفع من الإدارة."
         : selectedAccountType === "company"
           ? "تم إرسال العقار للمراجعة وربطه بإعلان الشركة. يمكنك إضافة عقارين آخرين كحد أقصى إلى إعلان الشركة نفسه باستخدام اسم الشركة ذاته. قاعدة البيانات تمنع إضافة عقار رابع إلى الإعلان الواحد."
           : "تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
@@ -1228,7 +1228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (category) category.textContent = row.category || "";
         if (title) title.textContent = row.title || "";
         if (description) description.textContent = row.description || "";
-        if (note) note.textContent = "مساحة إعلانية للشركات — تُضاف بيانات النشاط بعد موافقة صاحبه واعتماد الإعلان من إدارة ليان.";
+        if (note) note.textContent = "مساحة إعلانية للشركات — تُضاف بيانات النشاط بعد موافقة صاحبه واعتماد الإعلان من إدارة أسيوط عقار.";
       });
       const visible = [...section.querySelectorAll("[data-partner-slot]")].some(card => !card.hidden);
       if (!visible) section.hidden = true;
@@ -1286,7 +1286,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (event.detail?.success) {
       updateAuthButton();
       if (continueCompanyRegistration()) return;
-      setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في ليان.");
+      setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في أسيوط عقار.");
     } else if (event.detail?.message) {
       setStatus("تعذر إكمال تأكيد البريد. جرّب فتح رابط التأكيد مرة أخرى أو سجّل الدخول بعد التأكيد.");
       console.warn("LAYAN auth callback:", event.detail.message);
