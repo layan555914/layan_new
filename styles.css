@@ -2997,3 +2997,72 @@ footer{border-top:4px solid var(--gold)}
   #detailsDialog .details-contact,
   #detailsDialog .details-actions { grid-template-columns: 1fr; }
 }
+
+
+
+/* LAYAN AQAR premium home refresh — 31 Oct 2026 */
+:root{--layan-navy:#071f49;--layan-navy-2:#0c2d61;--layan-gold:#e5aa3b;--layan-red:#e50919}
+body{background:#f4f6fa;color:#10264c}
+.topbar{background:linear-gradient(110deg,#061b40,#0a2b5d);border-bottom:1px solid rgba(229,170,59,.35);box-shadow:0 8px 26px rgba(4,22,54,.18);padding:12px clamp(16px,4vw,54px);gap:20px}
+.topbar nav a{color:#fff;font-weight:700}
+.topbar nav a:hover,.topbar nav a.active{color:#f4bd54}
+.brand-logo{object-fit:contain;border-radius:0;background:transparent}
+.brand strong{color:#fff;letter-spacing:1.4px}
+.brand small{color:#f0bd60}
+.top-actions .btn-outline{border-color:#fff;color:#fff}
+.top-actions .btn-gold,.hero-actions .btn-gold{background:linear-gradient(135deg,#f2c15e,#d99827);color:#10264c;border:0}
+.btn-red{background:linear-gradient(135deg,#f01422,#c90012);color:#fff;border:0}
+.design-hero{position:relative;isolation:isolate;min-height:360px;padding:64px clamp(22px,6vw,88px) 92px;display:flex;align-items:center;overflow:visible;background:linear-gradient(90deg,rgba(4,24,59,.96) 0%,rgba(5,31,73,.86) 43%,rgba(5,31,73,.16) 100%),url('./layan_apartment.jpg') center 48%/cover no-repeat}
+.design-hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(0deg,rgba(3,20,49,.32),transparent 45%)}
+.design-hero::after{display:none}
+.design-hero-content{position:relative;z-index:1;max-width:760px;margin:0;color:#fff;text-align:right}
+.design-hero-content .eyebrow{color:#f0bd60;font-weight:800;letter-spacing:2px}
+.design-hero-content h1{font-size:clamp(36px,5vw,66px);line-height:1.25;font-weight:900;color:#fff;margin:12px 0 14px}
+.design-hero-content h1 span{color:#f01422}
+.design-hero-lead{font-size:clamp(19px,2.3vw,28px);font-weight:800;color:#fff;margin:0 0 10px}
+.design-hero-sub{font-size:16px;line-height:1.9;color:rgba(255,255,255,.88);max-width:640px}
+.design-hero .hero-actions{margin-top:22px}
+.design-hero .hero-actions .btn{min-height:48px;padding:0 24px}
+.design-hero .hero-actions .btn-outline{border:1px solid rgba(255,255,255,.85);color:#fff;background:rgba(4,24,59,.28)}
+.design-hero-search{position:absolute;z-index:3;bottom:-48px;left:clamp(16px,7vw,110px);right:clamp(16px,7vw,110px);display:grid;grid-template-columns:1fr 1fr 1fr auto;align-items:end;gap:14px;padding:18px 20px;background:#fff;border:1px solid #e6eaf1;border-radius:18px;box-shadow:0 14px 36px rgba(7,31,73,.18)}
+.design-hero-search label{display:grid;gap:7px;color:#132b54;font-size:14px;font-weight:800}
+.design-hero-search select,.design-hero-search input{width:100%;height:44px;border:1px solid #d6dce6;border-radius:11px;background:#fff;padding:0 13px;color:#14294b;font:inherit;outline:none}
+.design-hero-search select:focus,.design-hero-search input:focus{border-color:#d9a13b;box-shadow:0 0 0 3px rgba(229,170,59,.16)}
+.design-search-button{height:46px;min-width:160px;border-radius:11px;font-weight:900;font-size:16px}
+.design-search-button span{font-size:24px;vertical-align:-2px;margin-right:5px}
+.design-benefits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:76px clamp(18px,5vw,70px) 24px;background:linear-gradient(180deg,#e9eef7,#f4f6fa)}
+.design-benefits>div{display:grid;grid-template-columns:44px 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:12px 16px;border-left:1px solid #c5cede}
+.design-benefits>div:last-child{border-left:0}
+.design-benefits>div>span{grid-row:1/3;width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:#102f61;color:#f4bd54;font-size:22px;font-weight:900}
+.design-benefits strong{font-size:15px;color:#102a56}
+.design-benefits small{font-size:12px;color:#61708a}
+.section-heading h2,.offers-section .section-heading h2{color:#0a2856}
+.offers-section,.category-explorer,.calculator-section,.how-section{scroll-margin-top:24px}
+.offers-section{padding-top:34px}
+.filters{border:1px solid #e2e7ef;border-radius:16px;background:#fff;box-shadow:0 8px 24px rgba(7,31,73,.07);padding:16px}
+.offer-card{border:1px solid #e3e8f0;box-shadow:0 7px 20px rgba(9,34,76,.08);border-radius:16px;overflow:hidden}
+.offer-card .btn-dark{background:#0b2857;border-color:#0b2857}
+@media(max-width:900px){
+ .topbar{gap:10px;padding:12px 16px}
+ .design-hero{min-height:340px;padding:44px 24px 100px;background-position:58% center}
+ .design-hero-search{grid-template-columns:repeat(2,minmax(0,1fr));bottom:-86px;left:16px;right:16px;gap:10px;padding:14px}
+ .design-search-button{width:100%}
+ .design-benefits{padding-top:112px;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .design-benefits>div:nth-child(2){border-left:0}
+}
+@media(max-width:560px){
+ .topbar{padding:10px 12px}
+ .topbar nav{gap:10px;overflow-x:auto;white-space:nowrap}
+ .design-hero{min-height:390px;padding:40px 18px 128px;background-position:60% center}
+ .design-hero-content h1{font-size:36px}
+ .design-hero-sub{font-size:14px}
+ .design-hero-search{grid-template-columns:1fr 1fr;bottom:-112px;left:10px;right:10px;padding:12px;gap:9px}
+ .design-hero-search label{font-size:12px}
+ .design-hero-search select,.design-hero-search input{height:40px;font-size:13px}
+ .design-search-button{grid-column:1/-1;height:42px}
+ .design-benefits{padding:136px 10px 18px;gap:6px}
+ .design-benefits>div{padding:8px 6px;grid-template-columns:34px 1fr;column-gap:7px}
+ .design-benefits>div>span{width:32px;height:32px;font-size:17px}
+ .design-benefits strong{font-size:12px}
+ .design-benefits small{font-size:10px}
+}
