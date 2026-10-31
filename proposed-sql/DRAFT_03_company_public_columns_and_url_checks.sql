@@ -14,9 +14,25 @@ from public.company_profiles
 where status = 'active';
 
 revoke all on public.company_profiles from anon, authenticated;
+-- Remove older column-level grants too; table-level REVOKE does not remove them.
+do $revoke_columns$
+declare c record;
+begin
+  for c in
+    select column_name
+    from information_schema.columns
+    where table_schema = 'public' and table_name = 'company_profiles'
+  loop
+    execute format(
+      'revoke select (%I) on table public.company_profiles from anon, authenticated',
+      c.column_name
+    );
+  end loop;
+end
+$revoke_columns$;
 grant insert, update on public.company_profiles to authenticated;
-grant select (id, status) on public.company_profiles to authenticated;
-grant select (id, company_name, category, description, services, city, address, phone, whatsapp, website, logo_url, gallery_urls, projects, status) on public.company_profiles to anon, authenticated;
+grant select (id, company_name, category, description, services, city, address, phone, whatsapp, website, logo_url, gallery_urls, projects, status)
+  on public.company_profiles to anon, authenticated;
 grant select on public.company_profiles_public to anon, authenticated;
 
 create or replace function public.layan_get_my_company_profile()
