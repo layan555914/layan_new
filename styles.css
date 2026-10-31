@@ -2997,3 +2997,28 @@ footer{border-top:4px solid var(--gold)}
   #detailsDialog .details-contact,
   #detailsDialog .details-actions { grid-template-columns: 1fr; }
 }
+
+
+/* LAYAN AQAR — Visual identity preview: original logo palette, proposal B + red diagonal accent */
+:root{--navy:#010106;--blue:#0044CA;--gold:#0044CA;--gold-light:#DCEBFF;--red:#C8000C;--white:#fff;--bg:#F4F7FC;--text:#0A1020;--muted:#4A5568;--border:#DCE4F2;--shadow:0 14px 36px rgba(1,1,6,.08);--layan-electric:#029EF8;--layan-cyan:#24C7FD;--layan-red:#C8000C}
+html,body{background:var(--bg);color:var(--text)}body{font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif}
+h1,h2,h3,h4,.brand small,.topbar nav,.btn,.eyebrow{font-family:"Cairo","IBM Plex Sans Arabic",Tahoma,Arial,sans-serif}
+.topbar{background:#010106;color:#fff;border-bottom:3px solid #0044CA;box-shadow:0 5px 22px rgba(1,1,6,.12)}
+.topbar nav a{color:#E8EDF7}.topbar nav a:hover,.topbar nav a.active{color:#24C7FD}
+.brand small{color:#BDC3D3}.brand-logo{background:#010106}
+.btn-gold,.company-contact-primary{background:#0044CA!important;color:#fff!important;border-color:#0044CA!important}
+.btn-gold:hover,.company-contact-primary:hover{background:#0038A8!important}
+.btn-dark{background:#010106;color:#fff}.btn-outline{border-color:#ffffff80;color:#fff}.btn-outline-dark{border-color:#0044CA;color:#0044CA}
+.hero{color:#fff;background:linear-gradient(115deg,#010106 0%,#07152D 72%,#0044CA 145%);border-bottom:4px solid #0044CA}
+.hero::after{width:300px;height:210px;left:-85px;bottom:-112px;border:0;border-radius:0;transform:rotate(-35deg);background:linear-gradient(135deg,transparent 0 38%,#6C0109 38% 52%,#C8000C 52% 68%,transparent 68%);opacity:.82;box-shadow:none}
+.hero .eyebrow{color:#24C7FD}.hero h1 span{color:#24C7FD}.hero-content>p:last-child{color:#E4EAF4}
+.section-heading h2,.how-section>h2,.offer-card h3,.steps h3,.dialog-head h2{color:#010106}
+input:focus,select:focus,textarea:focus{border-color:#0044CA;box-shadow:0 0 0 3px rgba(0,68,202,.14)}
+.category{color:#0044CA}.category.active,.category:hover{background:#0044CA;border-color:#0044CA;color:#fff}
+.offer-card,.search-panel,.steps article,.how-section{background:#fff;border-color:#DCE4F2}
+.offer-card p:nth-of-type(n+2){color:#0069B8}.steps article>b{color:#0044CA}
+.status-message{border-right-color:#C8000C;background:#FFF4F4;color:#7B1018}
+footer{background:#010106;border-top:3px solid #0044CA;color:#fff}footer p{color:#BDC3D3}
+#offerDialog{border-color:#0044CA}.close-btn{background:#C8000C}
+.form-note{border-right:3px solid #0044CA;background:#EEF5FF;color:#173B78}
+@media(max-width:600px){.topbar nav a{padding:7px 4px}.hero::after{opacity:.48}}
