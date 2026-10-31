@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded",()=>{"use strict";
 const cfg=window.LAYAN_CONFIG||{},base=String(cfg.SUPABASE_URL||"").replace(/\/$/,""),key=cfg.SUPABASE_PUBLISHABLE_KEY||"";
 const $=id=>document.getElementById(id),grid=$("marketplaceListings"),count=$("marketplaceCount"),filter=$("marketplaceCategoryFilter"),dialog=$("marketplaceListingDialog"),form=$("marketplaceListingForm"),status=$("marketplaceFormStatus");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;
-function whatsappNumber(value){let n=String(value||"").replace(/[^0-9]/g,"");if(n.startsWith("00"))n=n.slice(2);if(n.startsWith("0"))n="20"+n.slice(1);else if(n.startsWith("1")&&n.length===10)n="20"+n;return /^20\\d{10}$/.test(n)?n:(n.length>=8&&n.length<=15?n:"");}","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function whatsappNumber(value){let n=String(value||"").replace(/[^0-9]/g,"");if(n.startsWith("00"))n=n.slice(2);if(n.startsWith("0"))n="20"+n.slice(1);else if(n.startsWith("1")&&n.length===10)n="20"+n;return /^20\d{10}$/.test(n)?n:(n.length>=8&&n.length<=15?n:"");}","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=v=>{try{const u=new URL(String(v||""));return ["https:","http:"].includes(u.protocol)?u.href:""}catch(_){return ""}};
 const session=()=>window.LAYAN_SUPABASE?.getSession?.()||null;
 const requestedCategory=new URLSearchParams(location.search).get("category")||"";
