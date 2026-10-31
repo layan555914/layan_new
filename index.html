@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=layan-monetization-model-20261030-1">
+  <link rel="stylesheet" href="styles.css?v=layan-premium-home-20261031-1">
   <link rel="stylesheet" href="buyer.css?v=auth-signup-fix-1">
   <link rel="stylesheet" href="sponsor.css?v=auth-signup-fix-1">
   <link rel="stylesheet" href="ai.css?v=auth-signup-fix-1">\n  <link rel="stylesheet" href="companies.css?v=company-directory-1">
@@ -61,20 +61,45 @@
   </header>
 
   <main>
-    <section class="hero">
-      <div class="hero-content">
-        <span class="eyebrow">LAYAN AQAR</span>
-        <h1>ليان عقار</h1>
-        <p>للتنازلات والفرص العقارية في محافظة أسيوط</p>
-        <p>اكتشف الفرص العقارية وتواصل مباشرة مع صاحب الإعلان. ليان منصة إعلانات تربط المعلن بالمهتم دون وساطة.</p>
-
+    <section class="hero design-hero" aria-labelledby="heroTitle">
+      <div class="hero-content design-hero-content">
+        <span class="eyebrow">LAYAN AQAR · أسيوط</span>
+        <h1 id="heroTitle">فرصتك العقارية <span>تبدأ من هنا</span></h1>
+        <p class="design-hero-lead">منصة ليان عقار للتنازلات والفرص العقارية في أسيوط</p>
+        <p class="design-hero-sub">اكتشف العروض المنشورة، راجع التفاصيل، وتواصل مباشرة مع صاحب الإعلان دون وساطة أو عمولة لليان.</p>
         <div class="hero-actions">
           <a class="btn btn-gold" href="#offers">تصفح العروض</a>
-          <button class="btn btn-outline" id="addOfferBtn" type="button">
-            أضف عرضك
-          </button>
+          <button class="btn btn-outline" id="addOfferBtn" type="button">اعرض وحدتك</button>
         </div>
       </div>
+      <form class="design-hero-search" id="heroQuickSearch" role="search" aria-label="بحث سريع عن العقارات">
+        <label>نوع العقار
+          <select id="heroTypeFilter">
+            <option value="">كل الوحدات</option>
+            <option value="شقة">شقة</option><option value="فيلا">فيلا</option>
+            <option value="محل">محل تجاري</option><option value="أرض">أرض</option>
+            <option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option>
+          </select>
+        </label>
+        <label>المنطقة
+          <select id="heroAreaFilter">
+            <option value="">كل مناطق أسيوط</option>
+            <option value="أسيوط">مدينة أسيوط</option>
+            <option value="أسيوط الجديدة">أسيوط الجديدة</option>
+            <option value="الهضبة">الهضبة</option>
+          </select>
+        </label>
+        <label>أقصى مقدم (جنيه)
+          <input id="heroBudgetFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 300000">
+        </label>
+        <button class="btn btn-red design-search-button" type="submit">ابحث الآن <span aria-hidden="true">⌕</span></button>
+      </form>
+    </section>
+    <section class="design-benefits" aria-label="مزايا منصة ليان">
+      <div><span aria-hidden="true">✓</span><strong>تواصل مباشر</strong><small>مع صاحب الإعلان</small></div>
+      <div><span aria-hidden="true">⌂</span><strong>عروض عقارية</strong><small>في محافظة أسيوط</small></div>
+      <div><span aria-hidden="true">◇</span><strong>بدون عمولة لليان</strong><small>لا رسوم على إتمام التنازل</small></div>
+      <div><span aria-hidden="true">▣</span><strong>تفاصيل واضحة</strong><small>المقدم والمتبقي والأقساط</small></div>
     </section>
 
 
@@ -563,6 +588,33 @@
     </form>
   </dialog>
 
+<script>
+(() => {
+  const form = document.getElementById("heroQuickSearch");
+  if (!form) return;
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    const type = document.getElementById("heroTypeFilter")?.value || "";
+    const area = document.getElementById("heroAreaFilter")?.value || "";
+    const budget = document.getElementById("heroBudgetFilter")?.value || "";
+    const typeField = document.getElementById("typeFilter");
+    const areaField = document.getElementById("areaFilter");
+    const searchField = document.getElementById("searchInput");
+    const budgetField = document.getElementById("downPaymentMaxFilter");
+    if (typeField) typeField.value = type;
+    if (budgetField) budgetField.value = budget;
+    if (areaField) {
+      const match = [...areaField.options].find(option => option.value === area);
+      areaField.value = match ? area : "";
+    }
+    if (searchField) searchField.value = area && (!areaField || areaField.value !== area) ? area : "";
+    [typeField, areaField, budgetField].forEach(field => field?.dispatchEvent(new Event("change", {bubbles:true})));
+    budgetField?.dispatchEvent(new Event("input", {bubbles:true}));
+    document.getElementById("searchBtn")?.click();
+    document.getElementById("offers")?.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+})();
+</script>
   <script src="config.js?v=layan-upload-preview-20261030-1"></script>
   <script src="gubabase.js?v=layan-contact-consent-1"></script>
   <script src="app.js?v=layan-contact-consent-1"></script>
