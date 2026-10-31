@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded",()=>{"use strict";
-const cfg=window.LAYAN_CONFIG||{},base=String(cfg.SUPABASE_URL||"").replace(/\/$/,""),key=cfg.SUPABASE_PUBLISHABLE_KEY||"";
+const cfg=window.ASYUT AQAR_CONFIG||{},base=String(cfg.SUPABASE_URL||"").replace(/\/$/,""),key=cfg.SUPABASE_PUBLISHABLE_KEY||"";
 const $=id=>document.getElementById(id),grid=$("companyDirectoryGrid"),count=$("companyDirectoryCount"),dialog=$("companyRegisterDialog"),form=$("companyRegisterForm"),status=$("companyRegisterStatus");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=v=>{try{const u=new URL(String(v||""));return ["https:","http:"].includes(u.protocol)?u.href:""}catch(_){return ""}};
-function session(){return window.LAYAN_SUPABASE?.getSession?.()||null}
-async function verifiedSession(){const auth=window.LAYAN_SUPABASE;if(!auth?.requireAuthenticated)throw Error("تعذر تحميل نظام تسجيل الدخول. حدّث الصفحة وحاول مرة أخرى.");return await auth.requireAuthenticated()}
+function session(){return window.ASYUT AQAR_SUPABASE?.getSession?.()||null}
+async function verifiedSession(){const auth=window.ASYUT AQAR_SUPABASE;if(!auth?.requireAuthenticated)throw Error("تعذر تحميل نظام تسجيل الدخول. حدّث الصفحة وحاول مرة أخرى.");return await auth.requireAuthenticated()}
 async function api(path,options={}){if(!base||!key)throw Error("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");const s=session();const r=await fetch(base+"/rest/v1/"+path,{...options,headers:{apikey:key,Authorization:"Bearer "+(s?.access_token||key),"Content-Type":"application/json",...(options.headers||{})}});const raw=await r.text();let d=null;try{d=raw?JSON.parse(raw):null}catch(_){}if(!r.ok)throw Error(d?.message||d?.details||"تعذر تنفيذ الطلب.");return d}
 let companies=[],existingProfileId=null,existingStatus=null,supportsDraft=false,submissionSaved=false;
 function card(c){const logo=safeUrl(c.logo_url);const href="./company.html?id="+encodeURIComponent(c.id);const services=Array.isArray(c.services)?c.services.slice(0,3):[];return '<article class="company-directory-card"><a href="'+href+'"><div class="company-card-cover">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="lazy">':esc(c.company_name.slice(0,1)))+'</div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a></article>'}
