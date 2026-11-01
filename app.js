@@ -534,6 +534,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String(o.listing_purpose || "تنازل") === dealKind);
     });
 
+    window.dispatchEvent(new CustomEvent("layan-offers-rendered", { detail: { offers: filtered } }));
+
     filtered.sort((a, b) => {
       const aFeatured = a.is_featured && (!a.featured_until || new Date(a.featured_until) > new Date());
       const bFeatured = b.is_featured && (!b.featured_until || new Date(b.featured_until) > new Date());
@@ -1005,6 +1007,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   dialog?.addEventListener("click", (event) => {
     if (event.target === dialog) closeDialog();
+  });
+
+  window.addEventListener("layan-open-offer", event => {
+    const id = String(event.detail?.id ?? "");
+    const offer = offers.find(item => String(item.id) === id);
+    if (offer) showDetails(offer);
   });
 
   grid?.addEventListener("click", (event) => {
