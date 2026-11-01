@@ -2782,3 +2782,46 @@ a:focus-visible,button:focus-visible{
   .hero{background-position:center !important}
   .filters .smart-filter-field{grid-column:1/-1}
 }
+
+
+/* CTA contrast fix: keep buttons legible on dark header and hero surfaces. */
+.topbar .top-actions .btn-outline,
+.topbar .top-actions #adminDashboardLink,
+.topbar .top-actions #loginBtn {
+  color: #fff !important;
+  background: rgba(255,255,255,.10) !important;
+  border: 1px solid #ead9b2 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.topbar .top-actions .btn-outline:hover,
+.topbar .top-actions #adminDashboardLink:hover,
+.topbar .top-actions #loginBtn:hover {
+  color: #102746 !important;
+  background: #ead9b2 !important;
+}
+.topbar .top-actions #addOfferTop {
+  color: #102746 !important;
+  background: linear-gradient(135deg,#f3e4bf,#c5a15d) !important;
+  border: 1px solid #ead9b2 !important;
+  box-shadow: 0 4px 12px rgba(197,161,93,.28);
+}
+.design-hero .hero-actions #addOfferBtn,
+.design-hero .hero-actions .btn-outline {
+  color: #102746 !important;
+  background: linear-gradient(135deg,#fffdf8,#ead9b2) !important;
+  border: 2px solid #ead9b2 !important;
+  box-shadow: 0 5px 16px rgba(0,0,0,.20);
+  font-weight: 800;
+}
+.design-hero .hero-actions #addOfferBtn:hover,
+.design-hero .hero-actions .btn-outline:hover {
+  color: #fff !important;
+  background: #173d68 !important;
+  border-color: #fff !important;
+}
+.design-hero .hero-actions a.btn-gold {
+  color: #102746 !important;
+  background: linear-gradient(135deg,#f3e4bf,#c5a15d) !important;
+  border: 1px solid #ead9b2 !important;
+  box-shadow: 0 5px 16px rgba(0,0,0,.18);
+}
