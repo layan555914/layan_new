@@ -3395,3 +3395,16 @@ a:focus-visible,button:focus-visible{
   .compare-dialog{width:calc(100% - 12px);max-height:calc(100dvh - 18px);padding:12px;border-radius:15px}
   .compare-table{min-width:590px}
 }
+
+
+/* Dedicated property URL CTA on listing cards */
+#offersGrid .details-button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+}
+#offersGrid .details-button:focus-visible{
+  outline:3px solid var(--gold);
+  outline-offset:3px;
+}
