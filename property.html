@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102746">
+  <meta name="description" content="تفاصيل إعلان عقاري على منصة أسيوط عقار.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ASYUT AQAR | أسيوط عقار">
+  <meta property="og:title" content="تفاصيل العقار | أسيوط عقار">
+  <meta property="og:description" content="شاهد تفاصيل العقار وصوره وبيانات التواصل على منصة أسيوط عقار.">
+  <meta property="og:url" content="https://layan-eg.com/property.html">
+  <link rel="canonical" href="https://layan-eg.com/property.html">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./property.css">
+  <title>تفاصيل العقار | أسيوط عقار</title>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="العودة إلى الصفحة الرئيسية لأسيوط عقار">
+      <img src="./icon.svg" alt="شعار أسيوط عقار" class="brand-logo">
+      <span><strong>ASYUT AQAR</strong><small>أسيوط عقار</small></span>
+    </a>
+    <nav aria-label="التنقل الرئيسي">
+      <a href="./">الرئيسية</a>
+      <a class="active" href="./#offers">العقارات</a>
+      <a href="./marketplace.html">سوق الخدمات</a>
+      <a href="./companies.html">الشركات</a>
+    </nav>
+    <div class="top-actions">
+      <a class="btn btn-outline" href="./#offers">تصفح العقارات</a>
+      <a class="btn btn-gold" href="./#offerForm">أضف إعلانك</a>
+    </div>
+  </header>
+
+  <main class="property-page-shell">
+    <div class="property-breadcrumbs"><a href="./">الرئيسية</a><span>›</span><a href="./#offers">العقارات</a><span>›</span><span>تفاصيل الإعلان</span></div>
+    <div id="propertyDetailsRoot" aria-live="polite">
+      <section class="property-state"><h1>جارٍ فتح الإعلان</h1><p>لحظات ويتم تحميل تفاصيل العقار.</p></section>
+    </div>
+  </main>
+  <div id="propertyToast" class="property-state" role="status" aria-live="polite" hidden style="position:fixed;z-index:50;bottom:90px;right:50%;transform:translateX(50%);width:min(440px,calc(100% - 24px));padding:12px"></div>
+  <footer class="property-page-footer"><a href="./">ASYUT AQAR | أسيوط عقار</a> — منصة إعلانات عقارية تربط المعلن بالمهتم مباشرة.</footer>
+
+  <script src="./config.js"></script>
+  <script src="./property.js" defer></script>
+</body>
+</html>
