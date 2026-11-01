@@ -75,13 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadAds() {
     if (!base || !key) return;
     try {
-      const rows = await api("supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone&status=eq.active&order=created_at.desc&limit=12");
+      const rows = await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12");
       const approvedAds = Array.isArray(rows) ? rows : [];
-      // Only show real advertisements that have been approved by LAYAN administration.
+      // Only show real advertisements that have been approved by ASYUT AQAR administration.
       ads = approvedAds;
       placeAds();
     } catch (error) {
-      console.warn("LAYAN sponsored ads:", error.message);
+      console.warn("ASYUT AQAR sponsored ads:", error.message);
     }
   }
 
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function openForm() {
     const session = getSession();
     if (!session?.access_token || !session?.user?.id) {
-      window.alert("سجّل الدخول إلى حساب ليان أولًا، ثم اطلب إعلانك الممول.");
+      window.alert("سجّل الدخول إلى حساب أسيوط عقار أولًا، ثم اطلب إعلانك الممول.");
       document.getElementById("loginBtn")?.click();
       return;
     }
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "sponsor-footer-link";
-    button.textContent = "سوّق منتجاتك لعملاء ليان";
+    button.textContent = "سوّق منتجاتك لعملاء أسيوط عقار";
     button.addEventListener("click", openForm);
     footer.appendChild(button);
   }
@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dialog.className = "sponsor-dialog";
     dialog.innerHTML =
       '<div class="sponsor-dialog-head"><h2>اطلب إعلانًا مميزًا أو إعلان شركة</h2><button type="button" class="sponsor-close" aria-label="إغلاق">×</button></div>' +
-      '<p class="sponsor-price-note">إرسال طلب الإعلان مجاني ولا يعني وجود التزام بالدفع. تحدد إدارة ليان المميزات والمدة والسعر النهائي بعد مراجعة النشاط والتواصل معك عبر واتساب. لا تُعرض أسعار الباقات على المنصة.</p>' +
+      '<p class="sponsor-price-note">إرسال طلب الإعلان مجاني ولا يعني وجود التزام بالدفع. تحدد إدارة أسيوط عقار المميزات والمدة والسعر النهائي بعد مراجعة النشاط والتواصل معك عبر واتساب. لا تُعرض أسعار الباقات على المنصة.</p>' +
       '<p>الإعلانات تظهر داخل قائمة العروض العقارية بعد موافقة الإدارة. أرسل بيانات نشاطك للمراجعة.</p>' +
       '<form class="sponsor-form">' +
       '<label>اسم النشاط<input name="business_name" required minlength="2" maxlength="120" autocomplete="organization"></label>' +
@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const title = String(data.get("title") || "").trim();
       const phone = String(data.get("contact_phone") || "").trim();
       const message = [
-        "مرحبًا، أرسلت طلب إعلان إلى منصة LAYAN AQAR وأريد متابعة الطلب.",
+        "مرحبًا، أرسلت طلب إعلان إلى منصة أسيوط عقار وأريد متابعة الطلب.",
         "اسم النشاط: " + businessName,
         "المجال: " + category,
         "عنوان الإعلان: " + title,
@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ].join("\n");
       const whatsappUrl = "https://wa.me/201007044265?text=" + encodeURIComponent(message);
       form.reset();
-      status.innerHTML = "تم حفظ طلبك للمراجعة. تواصل مع إدارة ليان لمعرفة مميزات الإعلان والسعر النهائي قبل تأكيد الحجز. <a class=\"sponsor-whatsapp-followup\" href=\"" + whatsappUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\">متابعة الطلب عبر واتساب</a>";
+      status.innerHTML = "تم حفظ طلبك للمراجعة. تواصل مع إدارة أسيوط عقار لمعرفة مميزات الإعلان والسعر النهائي قبل تأكيد الحجز. <a class=\"sponsor-whatsapp-followup\" href=\"" + whatsappUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\">متابعة الطلب عبر واتساب</a>";
     } catch (error) {
       status.textContent = error.message || "تعذر إرسال الطلب. حاول مرة أخرى.";
     } finally {
