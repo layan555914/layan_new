@@ -270,6 +270,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         if (mode === "login") {
           await api.signIn(email, pass);
+          window.dispatchEvent(new CustomEvent("layan-auth-state-changed", { detail: { authenticated: true } }));
           status.textContent = "تم تسجيل الدخول بنجاح.";
           updateAuthButton();
           window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك، يمكنك الآن إضافة عرضك."); }, 450);
@@ -281,6 +282,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           } else {
             status.textContent = "تم إنشاء الحساب وتسجيل الدخول.";
             updateAuthButton();
+            window.dispatchEvent(new CustomEvent("layan-auth-state-changed", { detail: { authenticated: true } }));
             window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك في أسيوط عقار."); }, 450);
           }
         }
@@ -955,7 +957,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const api = window.LAYAN_SUPABASE;
     if (api?.isAuthenticated()) {
       if (!window.confirm("هل تريد تسجيل الخروج من حساب أسيوط عقار؟")) return;
-      try { await api.signOut(); updateAuthButton(); setStatus("تم تسجيل الخروج."); }
+      try { await api.signOut(); updateAuthButton(); window.dispatchEvent(new CustomEvent("layan-auth-state-changed", { detail: { authenticated: false } })); setStatus("تم تسجيل الخروج."); }
       catch (error) { setStatus(friendlyAuthError(error.message)); }
     } else openAuth("login");
   });
