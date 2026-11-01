@@ -419,7 +419,28 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         body: JSON.stringify({ p_id: Number(card.dataset.propertyOfferId), p_action: action, p_notes: notes })
       });
-      setStatus(action === "approve" ? "تم اعتماد الإعلان ونشره." : "تم رفض الإعلان وتسجيل السبب.");
+      let pushStatus = "";
+      if (action === "approve") {
+        try {
+          session = await auth.requireAuthenticated();
+          const pushResponse = await fetch(base + "/functions/v1/asyut-push", {
+            method: "POST",
+            headers: { apikey: key, Authorization: "Bearer " + session.access_token, "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "send_offer_push", offer_id: Number(card.dataset.propertyOfferId) })
+          });
+          const pushData = await pushResponse.json().catch(() => ({}));
+          if (pushResponse.ok) {
+            pushStatus = pushData.sent > 0 ? " تم إرسال تنبيه إلى " + pushData.sent + " جهاز." : " تم حفظ التنبيه للمشترين المطابقين؛ لا توجد أجهزة مفعّلة حاليًا.";
+          } else {
+            console.warn("Push notification dispatch failed:", pushData.error || pushResponse.status);
+            pushStatus = " تعذر إرسال إشعارات الهاتف، لكن تم نشر الإعلان بنجاح.";
+          }
+        } catch (pushError) {
+          console.warn("Push notification dispatch error:", pushError);
+          pushStatus = " تعذر إرسال إشعارات الهاتف، لكن تم نشر الإعلان بنجاح.";
+        }
+      }
+      setStatus(action === "approve" ? "تم اعتماد الإعلان ونشره." + pushStatus : "تم رفض الإعلان وتسجيل السبب.");
       await loadPending();
     } catch (error) {
       setStatus(error.message || "تعذر تنفيذ مراجعة الإعلان.");
