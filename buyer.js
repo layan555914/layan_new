@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function render(rows,p) {
     count.textContent = rows.length + " عرض";
     if (!rows.length) { cards.innerHTML='<div class="buyer-empty">مفيش عرض مطابق لكل الشروط حاليًا. جرّب توسّع الميزانية أو تغيّر المنطقة.</div>'; return; }
-    cards.innerHTML=rows.map(o=>`<article class="buyer-match-card"><span class="buyer-match-type">${esc(o.property_type||"عقار")}</span><h4>${esc(o.title||"عرض عقاري")}</h4><p>📍 ${esc(o.area||o.governorate||"أسيوط")}</p><div class="buyer-match-price"><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></div><div class="buyer-match-price"><span>المدفوع + رسوم التنازل</span><strong>${money(Number(o.paid_amount||0)+Number(o.assignment_fee||0))}</strong></div>${Number(o.monthly_installment||0)>0?`<div class="buyer-match-price"><span>القسط الشهري المسجل</span><strong>${money(o.monthly_installment)}</strong></div>`:""}<a class="btn btn-gold" href="#offers" data-buyer-title="${esc(o.title||"عرض عقاري")}">شوف العرض في القائمة</a></article>`).join("");
+    cards.innerHTML=rows.map(o=>`<article class="buyer-match-card"><span class="buyer-match-type">${esc(o.property_type||"عقار")}</span><h4>${esc(o.title||"عرض عقاري")}</h4><p>📍 ${esc([o.city||o.governorate,o.area].filter(Boolean).join(" · ")||"أسيوط")}</p><div class="buyer-match-price"><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></div><div class="buyer-match-price"><span>المدفوع + رسوم التنازل</span><strong>${money(Number(o.paid_amount||0)+Number(o.assignment_fee||0))}</strong></div>${Number(o.monthly_installment||0)>0?`<div class="buyer-match-price"><span>القسط الشهري المسجل</span><strong>${money(o.monthly_installment)}</strong></div>`:""}<a class="btn btn-gold" href="./?offer=${encodeURIComponent(o.id)}" data-buyer-title="${esc(o.title||"عرض عقاري")}">شوف العرض في القائمة</a></article>`).join("");
   }
   let saved = null;
   let knownMatches = new Set();
@@ -129,9 +129,15 @@ document.addEventListener("DOMContentLoaded", () => {
     catch(error){alertCount.textContent="تعذر تحميل التنبيهات: "+(error.message||"");}
   }
   async function loadOffers() {
-    return await request("/rest/v1/property_offers?select=id,title,governorate,city,area,latitude,longitude,property_type,total_price,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc", {
+    const rows = await request("/rest/v1/property_offers?select=id,title,governorate,city,area,latitude,longitude,property_type,total_price,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc", {
       headers: { Authorization: "Bearer " + (config?.SUPABASE_PUBLISHABLE_KEY || "") }
     });
+    const hints=document.getElementById("buyerAreaHints");
+    if(hints) {
+      const areas=[...new Set((Array.isArray(rows)?rows:[]).map(row=>String(row.area||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
+      hints.innerHTML=areas.map(area=>'<option value="'+esc(area)+'"></option>').join("");
+    }
+    return rows;
   }
   async function refreshMatches(notify=false) {
     if (!saved || checkInProgress) return;
