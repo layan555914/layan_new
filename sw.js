@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v94-favorites-account-sync-20261102";
+const CACHE_NAME = "asyut-aqar-shell-v95-location-alerts-20261102";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,6 +7,8 @@ const APP_SHELL = [
   "./admin-entry.js",
   "./companies.html",
   "./marketplace.html",
+  "./favorites.html",
+  "./favorites.js",
   "./marketplace.css",
   "./marketplace-page.css",
   "./marketplace.js",
