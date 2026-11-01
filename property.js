@@ -29,8 +29,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (_) { return ""; }
   };
   const money = value => {
+    if (value === null || value === undefined || value === "") return "غير محدد";
     const amount = Number(value);
-    if (!Number.isFinite(amount) || amount <= 0) return "غير محدد";
+    if (!Number.isFinite(amount)) return "غير محدد";
     return new Intl.NumberFormat("ar-EG", {maximumFractionDigits:0}).format(amount) + " جنيه";
   };
   const valueOrUnknown = value => value === null || value === undefined || value === "" ? "غير محدد" : String(value);
@@ -105,7 +106,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("إجمالي المدفوع", money(row.paid_amount)),
       makeFact("القسط الشهري", row.monthly_installment ? money(row.monthly_installment) : ""),
       makeFact("رسوم التنازل", purpose.includes("تنازل") ? (Number(row.assignment_fee) > 0 ? money(row.assignment_fee) : "تحدد من الجهة المختصة") : ""),
-      makeFact("الخصم المعلن", Number(row.discount_amount) > 0 ? money(row.discount_amount) : ""),
+      makeFact("قيمة الخصم", Number(row.discount_amount) > 0 ? money(row.discount_amount) : ""),
+      makeFact("نسبة الخصم", Number(row.discount_percent) > 0 ? Number(row.discount_percent) + "٪" : ""),
       makeFact("جهة الولاية / التخصيص", row.land_ownership_authority),
       makeFact("اشتراطات البناء", row.land_permit_details),
       makeFact("المرافق", row.land_utilities),
@@ -146,6 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <p class="property-contact-note">التواصل والاتفاق يتمان مباشرة بين صاحب الإعلان والمهتم بالعقار. لا تفرض المنصة عمولة على إتمام الصفقة.</p>
           <div class="property-footer-actions">
             <button class="property-action property-action-outline" type="button" id="sharePropertyBtn">مشاركة الإعلان</button>
+            <a class="property-action property-action-outline" href="https://wa.me/201007044265?text=${encodeURIComponent("أرغب في الإبلاغ عن إعلان على أسيوط عقار: " + title + " — كود " + offerCode(row))}" target="_blank" rel="noopener noreferrer">الإبلاغ عن الإعلان</a>
             <a class="property-action property-action-outline" href="./#offers">العودة إلى العقارات</a>
           </div>
         </aside>
@@ -156,6 +159,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
     `;
 
+    root.querySelector("#propertyMainImage")?.addEventListener("error", event => {
+      const placeholder = document.createElement("span");
+      placeholder.className = "property-gallery-empty";
+      placeholder.textContent = "ASYUT AQAR";
+      event.currentTarget.replaceWith(placeholder);
+    });
+    root.querySelectorAll(".property-gallery-thumbs img").forEach(image => {
+      image.addEventListener("error", () => image.closest("button")?.remove());
+    });
     root.querySelectorAll("[data-property-image]").forEach(button => {
       button.addEventListener("click", () => {
         const index = Number(button.dataset.propertyImage);
@@ -189,8 +201,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       toast.hidden = false;
       window.setTimeout(() => { toast.hidden = true; }, 2800);
     }
-    document.getElementById("propertyToast")?.removeAttribute("hidden");
-    document.getElementById("propertyToast")?.setAttribute("hidden", "");
   }
 
   async function loadProperty() {
