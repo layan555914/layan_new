@@ -45,15 +45,11 @@
     </a>
 
     <nav aria-label="القائمة الرئيسية">
-      <a class="active" href="#">الرئيسية</a>
-      <a href="#offers">العروض</a>
-      <a href="./companies.html">دليل الشركات</a>
+      <a class="active" href="./" aria-current="page">الرئيسية</a>
+      <a href="#offers">العقارات</a>
       <a href="./marketplace.html">سوق الخدمات</a>
-      <a href="./favorites.html">مفضلتي</a>
-      <a href="#services">الخدمات</a>
-      <a href="#partner-ads">التشطيب والديكور</a>
-      <a href="#how">كيف تعمل المنصة؟</a>
-    <a href="./favorites.html" data-mobile-favorites>★ مفضلتي</a>
+      <a href="./companies.html">الشركات</a>
+      <a href="./favorites.html">المفضلة</a>
     </nav>
 
     <div class="top-actions">
@@ -72,14 +68,20 @@
       <div class="hero-content design-hero-content">
         <span class="eyebrow">ASYUT AQAR · أسيوط</span>
         <h1 id="heroTitle">فرصتك العقارية <span>تبدأ من هنا</span></h1>
-        <p class="design-hero-lead">منصة أسيوط عقار للتنازلات والفرص العقارية في أسيوط</p>
-        <p class="design-hero-sub">اكتشف العروض المنشورة، راجع التفاصيل، وتواصل مباشرة مع صاحب الإعلان دون وساطة أو عمولة لأسيوط عقار.</p>
+        <p class="design-hero-lead">كل فرص أسيوط العقارية في مكان واحد</p>
+        <p class="design-hero-sub">ابحث عن شقة أو محل أو أرض للبيع والإيجار والتنازل. قارن المقدم والمدفوع والمتبقي والأقساط، ثم تواصل مباشرة مع صاحب الإعلان. لا عمولة على إتمام البيع أو التنازل.</p>
         <div class="hero-actions">
           <a class="btn btn-gold" href="#offers">تصفح العروض</a>
           <button class="btn btn-outline" id="addOfferBtn" type="button">اعرض وحدتك</button>
         </div>
       </div>
       <form class="design-hero-search" id="heroQuickSearch" role="search" aria-label="بحث سريع عن العقارات">
+        <label>نوع المعاملة
+          <select id="heroPurposeFilter">
+            <option value="">بيع أو إيجار أو تنازل</option>
+            <option value="بيع">بيع</option><option value="إيجار">إيجار</option><option value="تنازل">تنازل</option>
+          </select>
+        </label>
         <label>نوع العقار
           <select id="heroTypeFilter">
             <option value="">كل الوحدات</option>
@@ -106,8 +108,8 @@
             <option value="الغنايم">الغنايم</option>
           </select>
         </label>
-        <label>أقصى مقدم (جنيه)
-          <input id="heroBudgetFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 300000">
+        <label>أقصى سعر معلن (جنيه)
+          <input id="heroBudgetFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 1500000">
         </label>
         <button class="btn btn-red design-search-button" type="submit">ابحث الآن <span aria-hidden="true">⌕</span></button>
       </form>
@@ -473,9 +475,10 @@
   </main>
 
   <nav class="mobile-nav" aria-label="التنقل السريع">
-    <a href="#" aria-label="الرئيسية"><span>⌂</span><small>الرئيسية</small></a>
-    <a href="#offers" aria-label="العروض"><span>▦</span><small>العروض</small></a>
-    <a href="#companies" aria-label="الشركات"><span>♙</span><small>الشركات</small></a>
+    <a href="./" aria-label="الرئيسية"><span>⌂</span><small>الرئيسية</small></a>
+    <a href="#offers" aria-label="العقارات"><span>▦</span><small>العقارات</small></a>
+    <a href="./marketplace.html" aria-label="سوق الخدمات"><span>◇</span><small>الخدمات</small></a>
+    <a href="./favorites.html" aria-label="المفضلة"><span>☆</span><small>المفضلة</small></a>
     <button type="button" id="mobileAddOfferBtn" aria-label="إضافة عرض"><span>＋</span><small>أضف عرضك</small></button>
   </nav>
 
