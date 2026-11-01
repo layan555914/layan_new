@@ -148,9 +148,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const fresh=baselineReady ? matched.filter(o=>!knownMatches.has(String(o.id))) : [];
       if (notify && saved.notifications_enabled && fresh.length) {
         const api=authService();
-        try { await api?.addBuyerAlerts?.(fresh); await loadAlerts(); }
+        let insertedAlerts=[];
+        try { insertedAlerts=await api?.addBuyerAlerts?.(fresh)||[]; await loadAlerts(); }
         catch(error) { status.textContent="تعذر حفظ التنبيه داخل حسابك: "+(error.message||""); }
-        if ("Notification" in window && Notification.permission==="granted") {
+        if (insertedAlerts.length && "Notification" in window && Notification.permission==="granted") {
           try {
             new Notification("أسيوط عقار: ظهر عرض مناسب لك", {
               body:fresh.length===1?fresh[0].title:"ظهر "+fresh.length+" عروض تناسب طلبك",
