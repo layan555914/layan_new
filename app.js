@@ -119,9 +119,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   const areaFilter = $("areaFilter");
   // Instagram does not accept a website URL as a direct feed-post share.
-  // Open Instagram directly and copy the official LAYAN URL for pasting into a bio, story, or DM.
+  // Open Instagram directly and copy the official ASYUT AQAR URL for pasting into a bio, story, or DM.
   // Prefer the Android/iOS native share sheet so Facebook can open in its installed app.
-  // This shares the LAYAN platform homepage, not an individual property listing.
+  // This shares the ASYUT AQAR platform homepage, not an individual property listing.
   const facebookShareLink = document.querySelector(".social-facebook");
   facebookShareLink?.addEventListener("click", async (event) => {
     if (!navigator.share) return; // Keep the standard Facebook sharer as a fallback.
@@ -467,7 +467,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function render() {
     if (!grid) {
-      console.error("LAYAN: العنصر offersGrid غير موجود في index.html");
+      console.error("ASYUT AQAR: العنصر offersGrid غير موجود في index.html");
       return;
     }
 
@@ -1233,7 +1233,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const visible = [...section.querySelectorAll("[data-partner-slot]")].some(card => !card.hidden);
       if (!visible) section.hidden = true;
     } catch (error) {
-      console.warn("LAYAN partner ad slots:", error.message);
+      console.warn("ASYUT AQAR partner ad slots:", error.message);
     }
   }
 
@@ -1289,7 +1289,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في أسيوط عقار.");
     } else if (event.detail?.message) {
       setStatus("تعذر إكمال تأكيد البريد. جرّب فتح رابط التأكيد مرة أخرى أو سجّل الدخول بعد التأكيد.");
-      console.warn("LAYAN auth callback:", event.detail.message);
+      console.warn("ASYUT AQAR auth callback:", event.detail.message);
     }
   });
   updateAuthButton();
