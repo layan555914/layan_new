@@ -9,7 +9,7 @@
   let leafletPromise = null;
   let map = null;
   let markerLayer = null;
-  let lastOffers = [];
+  let lastOffers = Array.isArray(window.LAYAN_FILTERED_PROPERTY_OFFERS) ? window.LAYAN_FILTERED_PROPERTY_OFFERS : [];
   const validCoordinates = offer => {
     const lat = Number(offer.latitude), lng = Number(offer.longitude);
     return offer.latitude !== null && offer.longitude !== null &&
