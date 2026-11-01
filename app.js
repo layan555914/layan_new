@@ -393,7 +393,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   function favoriteIds() { try { return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]").map(String)); } catch (_) { return new Set(); } }
-  function toggleFavorite(id) { const ids=favoriteIds(), key=String(id); ids.has(key)?ids.delete(key):ids.add(key); try{localStorage.setItem(FAVORITES_KEY,JSON.stringify([...ids]));}catch(_){} render(); }
+  async function toggleFavorite(id) {
+    const ids=favoriteIds(), key=String(id), wasSaved=ids.has(key);
+    wasSaved ? ids.delete(key) : ids.add(key);
+    try{localStorage.setItem(FAVORITES_KEY,JSON.stringify([...ids]));}catch(_){}
+    render();
+    const api=window.LAYAN_SUPABASE;
+    if(api?.isAuthenticated?.()){
+      try { wasSaved ? await api.removeFavoriteOffer(key) : await api.addFavoriteOffer(key); }
+      catch(error){ console.warn("تعذر مزامنة المفضلة مع الحساب:",error); }
+    }
+  }
   function renderPagination(total) { const box=$("offersPagination"); if(!box)return; const pages=Math.max(1,Math.ceil(total/OFFERS_PER_PAGE)); offersPage=Math.min(Math.max(1,offersPage),pages); box.hidden=total<=OFFERS_PER_PAGE; if(box.hidden){box.replaceChildren();return;} box.innerHTML='<button type="button" data-page-nav="prev" '+(offersPage===1?'disabled':'')+'>السابق</button><span>صفحة '+offersPage+' من '+pages+'</span><button type="button" data-page-nav="next" '+(offersPage===pages?'disabled':'')+'>التالي</button>'; }
 
   function setStatus(message) {
@@ -1297,6 +1307,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   $("offersPagination")?.addEventListener("click", event => { const button=event.target.closest("[data-page-nav]"); if(!button||button.disabled)return; offersPage+=button.dataset.pageNav==="next"?1:-1; render(); $("offers")?.scrollIntoView({behavior:"smooth",block:"start"}); });
   $("offersGrid")?.addEventListener("click", event => { const button=event.target.closest("[data-favorite-id]"); if(button) toggleFavorite(button.dataset.favoriteId); });
+
+  async function syncFavoritesToAccount() {
+    const api=window.LAYAN_SUPABASE;
+    if(!api?.isAuthenticated?.()) return;
+    try {
+      const merged=[...new Set([...favoriteIds(),...(await api.getFavoriteOfferIds())])];
+      await api.syncFavoriteOffers(merged);
+      localStorage.setItem(FAVORITES_KEY,JSON.stringify(merged));
+    } catch(error) { console.warn("تعذر مزامنة المفضلة:",error); }
+  }
+  syncFavoritesToAccount();
 
   window.addEventListener("layan-auth-callback", event => {
     if (event.detail?.success) {
