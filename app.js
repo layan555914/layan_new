@@ -534,6 +534,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String(o.listing_purpose || "تنازل") === dealKind);
     });
 
+    window.LAYAN_FILTERED_PROPERTY_OFFERS = filtered;
     window.dispatchEvent(new CustomEvent("layan-offers-rendered", { detail: { offers: filtered } }));
 
     filtered.sort((a, b) => {
