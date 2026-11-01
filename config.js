@@ -1,6 +1,6 @@
-
-// ASYUT AQAR — isolated Supabase project (separate from the legacy LAYAN database).
+// ASYUT AQAR — production Supabase project.
+// Publishable key only; never place service-role or secret keys in browser code.
 window.LAYAN_CONFIG = {
-  SUPABASE_URL: "https://wisnmlbefdrkcbbqvdlg.supabase.co",
-  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_Witds4WbdcsSIgfCx1NcOA__lasXKhk"
+  SUPABASE_URL: "https://ebyhwqkmhxbgocngpqfe.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_8PlFI202E-pIZRAG61L2sA_aSoJ3Qwt"
 };
