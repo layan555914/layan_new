@@ -409,12 +409,12 @@
       price_snapshot: Number(o.total_price || 0)
     }));
     if (!payload.length) return [];
-    await request("buyer_offer_alerts?on_conflict=user_id,offer_id", {
+    const inserted = await request("buyer_offer_alerts?on_conflict=user_id,offer_id", {
       method: "POST",
-      headers: { Prefer: "resolution=ignore-duplicates,return=minimal" },
+      headers: { Prefer: "resolution=ignore-duplicates,return=representation" },
       body: JSON.stringify(payload)
     });
-    return getBuyerAlerts(20);
+    return Array.isArray(inserted) ? inserted : [];
   }
   async function markBuyerAlertsRead() {
     if (!isAuthenticated()) return false;
