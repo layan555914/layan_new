@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v96-interactive-map-20261102";
+const CACHE_NAME = "asyut-aqar-shell-v97-background-push-map-20261102";
 const APP_SHELL = [
   "./",
   "./index.html",
