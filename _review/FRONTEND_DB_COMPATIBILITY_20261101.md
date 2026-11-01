@@ -1,0 +1,49 @@
+# ASYUT AQAR — Frontend / Database Compatibility Audit
+Date: 2026-11-01
+Repository: layan555914/layan_new
+Branch: restore/asyut-aqar-full-platform-20261101
+Production Supabase project: ebyhwqkmhxbgocngpqfe
+
+## Scope
+Read-only inspection of the restoration branch and production database. No SQL, schema, RLS, Auth, storage, DNS, deployment, or merge changes were made.
+
+## Confirmed findings
+
+### 1. Company profile page calls a missing RPC
+- `companies.js` calls `/rest/v1/rpc/layan_get_my_company_profile` to load the signed-in user's company profile.
+- A direct catalog lookup in production for `layan_get_my_company_profile` returned no function in any schema.
+- The function therefore needs to be reconciled before the company profile workflow can be considered functional. Do not create a replacement until its expected return shape and authorization rules are reviewed against `companies.js`, `company_profiles`, and the existing private admin functions.
+
+### 2. Limit-enforcement functions are present, but no public-table triggers were found
+- Production has functions named `enforce_company_property_ad_limit` and `enforce_layan_offer_limit`.
+- The production trigger inventory for schema `public` returned no rows.
+- Frontend code submits company property ads directly to `company_property_ads` and property offers directly to `property_offers`.
+- This means the existence of the functions alone does not establish that limits are enforced. Verify intended trigger wiring or another server-side enforcement path before release. Do not attach triggers without reviewing function definitions and expected business rules.
+
+### 3. Data tables are currently empty
+- `marketplace_categories`: 11 rows.
+- `marketplace_listings`, `property_offers`, `buyer_preferences`, `supplier_ads`, `partner_ad_slots`, `company_property_ads`, `company_profiles`, and `promotion_payments`: 0 rows at the time of this audit.
+- This is a live database observation, not evidence that historical records never existed.
+
+### 4. Marketplace listing flow matches its table at a high level
+- `marketplace.js` writes `owner_id, category, listing_type, title, description, city, area, property_type, price, price_period, contact_phone, whatsapp, image_urls, details, status` to `marketplace_listings`.
+- The inspected production table contains these columns with compatible broad types (`image_urls text[]`, `details jsonb`, status default pending).
+- The public marketplace query reads approved listings; RLS policies restrict anonymous reads to approved rows and owner/admin access is separately scoped.
+
+### 5. Production views found
+- `company_profiles_public`: exposes selected fields for active company profiles.
+- `public_active_supplier_ads`: exposes selected fields for active supplier ads.
+- Their definitions were inspected; no changes were made.
+
+## Release blockers / next checks
+1. Reconcile or implement the missing `layan_get_my_company_profile` RPC only after confirming the frontend's expected payload and safe owner-scoped access.
+2. Review definitions and intended use of both limit-enforcement functions; verify whether triggers are missing or another secure server-side mechanism is intended.
+3. Complete a field-by-field audit of every form and admin action against production schema and RLS.
+4. Run browser end-to-end tests for signup/login, company profile submission/editing, property offers, marketplace listings, approvals, and buyer preferences.
+5. Keep PR #30 in draft and do not merge or publish until the original logo, migration history, Pages source, and release checks are resolved.
+
+## Explicitly not done
+- No production SQL or DDL.
+- No changes to Auth users, passwords, permissions, RLS policies, or storage.
+- No DNS or domain changes.
+- No deployment and no PR merge.
