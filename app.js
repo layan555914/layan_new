@@ -1397,7 +1397,31 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   $("offersPagination")?.addEventListener("click", event => { const button=event.target.closest("[data-page-nav]"); if(!button||button.disabled)return; offersPage+=button.dataset.pageNav==="next"?1:-1; render(); $("offers")?.scrollIntoView({behavior:"smooth",block:"start"}); });
-  $("offersGrid")?.addEventListener("click", event => { const button=event.target.closest("[data-favorite-id]"); if(button) toggleFavorite(button.dataset.favoriteId); });
+  $("offersGrid")?.addEventListener("click", event => {
+    const compareButton = event.target.closest("[data-compare-id]");
+    if (compareButton) { toggleCompare(compareButton.dataset.compareId); return; }
+    const favoriteButton = event.target.closest("[data-favorite-id]");
+    if (favoriteButton) toggleFavorite(favoriteButton.dataset.favoriteId);
+  });
+  $("openCompareBtn")?.addEventListener("click", openPropertyComparison);
+  $("clearCompareBtn")?.addEventListener("click", () => { localStorage.removeItem(COMPARE_KEY); updateCompareTray(); });
+  $("closeCompareDialog")?.addEventListener("click", () => $("compareDialog")?.close());
+  $("compareTableWrap")?.addEventListener("click", event => {
+    const removeButton = event.target.closest("[data-remove-compare]");
+    if (removeButton) {
+      toggleCompare(removeButton.dataset.removeCompare);
+      $("compareDialog")?.close();
+      openPropertyComparison();
+      return;
+    }
+    const detailsButton = event.target.closest("[data-open-compare-offer]");
+    if (detailsButton) {
+      const offer = offers.find(item => String(item.id) === String(detailsButton.dataset.openCompareOffer));
+      $("compareDialog")?.close();
+      if (offer) showDetails(offer);
+    }
+  });
+  updateCompareTray();
 
   async function syncFavoritesToAccount() {
     const api=window.LAYAN_SUPABASE;
