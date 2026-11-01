@@ -2,7 +2,7 @@
 -- Target: production project ebyhwqkmhxbgocngpqfe
 -- IMPORTANT: review only. This file is not applied to production by this commit.
 -- Prerequisites verified against the current production catalog on 2026-11-01:
---   public.enforce_layan_offer_limit()
+--   public.enforce_layan_offer_limit() (reviewed but intentionally not wired)
 --   public.enforce_company_property_ad_limit()
 --   public.guard_property_offer_promotion()
 --   public.guard_company_owner_update()
@@ -37,17 +37,18 @@ with check (
   )
 );
 
--- 2) Wire existing guards to their intended events.
+-- 2) Wire only the company-ad limit and promotion-state guards.
+-- The account-wide offer cap is intentionally excluded until plan semantics
+-- are confirmed; see note below.
 -- Names are prefixed to make BEFORE INSERT trigger execution order explicit.
 drop trigger if exists a_property_offer_promotion_guard on public.property_offers;
 create trigger a_property_offer_promotion_guard
 before insert on public.property_offers
 for each row execute function public.guard_property_offer_promotion();
 
-drop trigger if exists b_property_offer_owner_limit on public.property_offers;
-create trigger b_property_offer_owner_limit
-before insert on public.property_offers
-for each row execute function public.enforce_layan_offer_limit();
+-- NOT wired here: enforce_layan_offer_limit() currently caps every owner at
+-- three offers forever, regardless of plan_code/trial expiry. The product rules
+-- and plan-aware enforcement must be confirmed before enabling this limit.
 
 drop trigger if exists c_property_offer_company_limit on public.property_offers;
 create trigger c_property_offer_company_limit
@@ -77,3 +78,10 @@ commit;
 -- order by c.relname,t.tgname;
 -- select policyname,cmd,qual,with_check from pg_policies
 -- where schemaname='public' and tablename='company_profiles';
+
+-- Additional release blocker found during constraint review:
+-- company_profiles has no UNIQUE(owner_id) constraint/index. The UI currently
+-- models one company profile per signed-in owner, but the database does not
+-- enforce that assumption. Do not add UNIQUE(owner_id) until the product owner
+-- confirms whether one account may register multiple companies and duplicate
+-- existing records have been checked.
