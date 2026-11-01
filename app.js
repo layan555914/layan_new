@@ -619,6 +619,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pageRows=filtered.slice((offersPage-1)*OFFERS_PER_PAGE,offersPage*OFFERS_PER_PAGE);
     renderPagination(filtered.length);
     const favorites=favoriteIds();
+    updateCompareTray();
     grid.innerHTML = pageRows.map((o) => {
       const index = offers.indexOf(o);
       const image = o.image_urls[0];
@@ -661,6 +662,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
             <div class="offer-card-actions">
               <button type="button" class="favorite-button ${favorite ? "is-favorite" : ""}" data-favorite-id="${esc(o.id)}" aria-pressed="${favorite}" aria-label="${favorite ? "إزالة من المفضلة" : "حفظ في المفضلة"}">${favorite ? "★ محفوظ" : "☆ حفظ"}</button>
+              <button type="button" class="compare-card-button" data-compare-id="${esc(o.id)}" aria-pressed="false">＋ قارن</button>
               <button type="button" class="details-button" data-offer-index="${index}">عرض التفاصيل</button>
             </div>
           </div>
