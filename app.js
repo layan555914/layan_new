@@ -407,6 +407,35 @@ document.addEventListener("DOMContentLoaded", async () => {
       catch(error){ console.warn("تعذر مزامنة المفضلة مع الحساب:",error); }
     }
   }
+  const COMPARE_KEY = "asyutAqarCompareOffers";
+  function compareIds() { try { const v=JSON.parse(localStorage.getItem(COMPARE_KEY)||"[]"); return Array.isArray(v)?[...new Set(v.map(String))].slice(0,3):[]; } catch (_) { return []; } }
+  function updateCompareTray() {
+    const tray=$("compareTray"), count=$("compareTrayCount"), open=$("openCompareBtn"); if(!tray||!count||!open)return;
+    const ids=compareIds(); tray.hidden=ids.length===0; count.textContent=ids.length+" من 3 عقارات محددة"; open.disabled=ids.length<2;
+    document.querySelectorAll("[data-compare-id]").forEach(button=>{const yes=ids.includes(String(button.dataset.compareId));button.classList.toggle("is-compared",yes);button.setAttribute("aria-pressed",String(yes));button.textContent=yes?"✓ تمت الإضافة":"＋ قارن";});
+  }
+  function toggleCompare(id) {
+    const key=String(id),ids=compareIds();
+    if(ids.includes(key)) localStorage.setItem(COMPARE_KEY,JSON.stringify(ids.filter(x=>x!==key)));
+    else { if(ids.length>=3){setStatus("يمكنك مقارنة 3 عقارات فقط. أزل أحد الاختيارات أولًا.");return;} localStorage.setItem(COMPARE_KEY,JSON.stringify([...ids,key]));setStatus("تمت إضافة العقار للمقارنة."); }
+    updateCompareTray();
+  }
+  function compareValue(value,kind) {
+    if(value===null||value===undefined||value==="")return "غير متاح";
+    if(kind==="money")return Number(value)>0?money(value):"غير محدد";
+    if(kind==="area")return Number(value)>0?Number(value).toLocaleString("ar-EG")+" م²":"غير متاح";
+    if(kind==="count")return Number(value)>0?Number(value).toLocaleString("ar-EG"):"غير متاح";
+    return esc(value);
+  }
+  function openPropertyComparison() {
+    const selected=compareIds().map(id=>offers.find(o=>String(o.id)===id)).filter(Boolean); if(selected.length<2)return;
+    const rows=[["نوع المعاملة",o=>compareValue(o.listing_purpose||"تنازل")],["نوع العقار",o=>compareValue(o.property_type)],["المدينة / المركز",o=>compareValue(o.city)],["الحي / المنطقة",o=>compareValue(o.area)],["السعر المعلن",o=>compareValue(o.total_price,"money")],["المقدم",o=>compareValue(o.down_payment,"money")],["إجمالي المدفوع",o=>compareValue(o.paid_amount,"money")],["المبلغ المتبقي",o=>compareValue(o.remaining_amount,"money")],["القسط الشهري",o=>compareValue(o.monthly_installment,"money")],["رسوم التنازل",o=>compareValue(o.assignment_fee,"money")],["المساحة",o=>compareValue(o.area_m2,"area")],["غرف النوم",o=>compareValue(o.bedrooms,"count")],["الحمامات",o=>compareValue(o.bathrooms,"count")],["المطور / الشركة",o=>compareValue(o.developer_name)],["كود الإعلان",o=>compareValue(offerCode(o))]];
+    const wrap=$("compareTableWrap"); if(!wrap)return;
+    const head="<table class=compare-table><thead><tr><th>بيانات المقارنة</th>"+selected.map(o=>"<th><div class=compare-property-head><strong>"+esc(o.title)+"</strong><small>"+esc(offerCode(o))+"</small><button type=button data-remove-compare="+esc(o.id)+">إزالة</button></div></th>").join("")+"</tr></thead><tbody>";
+    const body=rows.map(r=>"<tr><th scope=row>"+r[0]+"</th>"+selected.map(o=>"<td>"+r[1](o)+"</td>").join("")+"</tr>").join("");
+    const tail="<tr><th>تفاصيل الإعلان</th>"+selected.map(o=>"<td><button type=button class=compare-details-btn data-open-compare-offer="+esc(o.id)+">عرض التفاصيل</button></td>").join("")+"</tr></tbody></table>";
+    wrap.innerHTML=head+body+tail; const dialog=$("compareDialog"); if(dialog&&!dialog.open)dialog.showModal();
+  }
   function renderPagination(total) { const box=$("offersPagination"); if(!box)return; const pages=Math.max(1,Math.ceil(total/OFFERS_PER_PAGE)); offersPage=Math.min(Math.max(1,offersPage),pages); box.hidden=total<=OFFERS_PER_PAGE; if(box.hidden){box.replaceChildren();return;} box.innerHTML='<button type="button" data-page-nav="prev" '+(offersPage===1?'disabled':'')+'>السابق</button><span>صفحة '+offersPage+' من '+pages+'</span><button type="button" data-page-nav="next" '+(offersPage===pages?'disabled':'')+'>التالي</button>'; }
 
   function setStatus(message) {
