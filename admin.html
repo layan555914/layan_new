@@ -19,7 +19,7 @@
 .admin-ad:last-child{border-bottom:0}.admin-ad h2{margin:8px 0;font-size:20px}.admin-ad p{margin:6px 0;overflow-wrap:anywhere}
 .admin-chip{background:#f7efdE;color:#6f5420;padding:4px 10px;border-radius:20px;font-size:12px}
 .admin-actions{display:flex;flex-direction:column;gap:8px;min-width:190px;justify-content:center}.admin-activation-fields{display:grid;gap:6px}.admin-activation-fields label{display:grid;gap:3px;font-size:12px;font-weight:700}.admin-activation-fields input{width:100%;padding:8px;border:1px solid #cbd3df;border-radius:8px;font:inherit}
-.admin-empty{padding:22px;text-align:center;color:#596779}
+.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.admin-stat{padding:16px;border:1px solid #d8dee8;border-radius:12px;background:#f8fafc}.admin-stat strong{display:block;font-size:26px;color:#102746}.admin-stat span{font-size:12px;color:#596779}@media(max-width:700px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr)}}.admin-empty{padding:22px;text-align:center;color:#596779}
 #adminStatus{padding:12px;border-radius:8px;background:#f4f6f9;min-height:24px}
 @media(max-width:640px){.admin-ad{grid-template-columns:1fr}.admin-actions{min-width:0}.admin-head{padding:18px}}
 </style>
@@ -27,6 +27,12 @@
 <body>
 <main class="admin-wrap">
 <header class="admin-head"><h1>إدارة أسيوط عقار</h1><p>لوحة مراجعة الإعلانات والشركات والخدمات. لا تُنشر الطلبات إلا بعد مراجعة الإدارة، ولا توجد عمولة على البيع أو التنازل.</p></header>
+<section class="admin-panel admin-stats" id="adminStats" hidden aria-label="ملخص الإدارة">
+<div class="admin-stat"><strong id="statPendingProperties">—</strong><span>عقارات قيد المراجعة</span></div>
+<div class="admin-stat"><strong id="statPendingMarketplace">—</strong><span>إعلانات سوق معلقة</span></div>
+<div class="admin-stat"><strong id="statPendingCompanies">—</strong><span>طلبات شركات معلقة</span></div>
+<div class="admin-stat"><strong id="statApprovedMarketplace">—</strong><span>إعلانات سوق منشورة</span></div>
+</section>
 <section class="admin-panel" id="authPanel">
 <h2>دخول الإدارة</h2><p>استخدم حساب الإدارة المصرّح له. تسجيل الدخول وحده لا يمنح صلاحيات الإدارة.</p>
 <form id="adminLogin" class="admin-form">
