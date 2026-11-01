@@ -59,3 +59,14 @@ The definitions of the four guard/limit functions were read:
 Because the public trigger inventory is empty, none of these trigger functions is currently wired to a table event in `public`. The frontend directly inserts into the relevant tables, so the intended server-side protections cannot be assumed to execute. This is a confirmed release blocker requiring reviewed trigger definitions and tests, not a change to apply blindly.
 
 The missing company-profile RPC also affects more than prefill: `companies.js` uses its result to retain the existing profile ID/status and determine whether to submit a safe `pending_update` draft. If lookup fails, an existing company owner may be treated like a first-time submitter. Verify duplicate prevention and the owner-scoped lookup design before restoring this workflow.
+
+
+## Company-profile duplicate and submission-safety checks
+- Production has a non-unique index on `company_profiles.owner_id`, but no UNIQUE(owner_id) constraint. Multiple company profiles per owner are therefore not prevented at database level.
+- The current company registration UI is structured around a single existing profile per signed-in owner. This mismatch must be resolved as a product/data rule before adding a unique constraint; no constraint was added.
+- Updated `companies.js` so the owner-scoped lookup is completed before allowing a submission. If the lookup fails, the page displays an error and blocks a new profile insert rather than silently treating the owner as a first-time registrant.
+- The account-wide offer-limit trigger is deliberately excluded from the proposed SQL. Its existing function caps all offers for an owner at three indefinitely; it does not check plan code or trial expiry. Do not activate it until the commercial/trial rule is confirmed.
+- The company-ad property cap remains proposed only for offers linked to a company ad (`company_ad_id`); it is distinct from the account-wide cap.
+
+## Branding asset check
+Two candidate logo images were found in the Library. One is labeled `أسيوط عقار: أفق معماري أنيق` and contains “LAYAN AQAR” beneath the Arabic name; the other is labeled `شعار أسيوط العقاري الفاخر` and contains “ASYUT AQAR”. They are different images. Neither was copied into the repository or substituted for `icon.svg`, because the exact approved original logo has not been unambiguously confirmed.
