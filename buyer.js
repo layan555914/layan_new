@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </section>
         </div>
       </div>
-      <p class="buyer-privacy-note">بيانات الميزانية والاحتياج خاصة بحسابك ولا تظهر لأصحاب الإعلانات. المطابقة استرشادية؛ راجع تفاصيل العرض وتحقق من الالتزامات قبل الاتفاق.</p>
+      <p class="buyer-privacy-note">بيانات الميزانية والاحتياج خاصة بحسابك ولا تظهر لأصحاب الإعلانات. نفحص العروض الجديدة أثناء فتح المنصة، ويمكن إظهار إشعار المتصفح بعد السماح به؛ التنبيه عند إغلاق التطبيق غير مفعّل بعد. المطابقة استرشادية؛ راجع تفاصيل العرض وتحقق من الالتزامات قبل الاتفاق.</p>
     </div>`;
   const offersSection = document.getElementById("offers");
   if (offersSection) offersSection.parentNode.insertBefore(root, document.getElementById("calculator") || offersSection.nextSibling);
