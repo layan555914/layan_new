@@ -1059,7 +1059,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const advancedFilters = $("advancedPropertyFilters");
     const advancedToggle = $("toggleAdvancedFilters");
     if (advancedFilters) advancedFilters.hidden = true;
-    if (advancedToggle) advancedToggle.setAttribute("aria-expanded", "false");
+    if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = "＋ فلاتر إضافية"; }
     activeKind = "";
     activeDealKind = "";
     document.querySelectorAll("[data-category-kind]").forEach(tile => {
