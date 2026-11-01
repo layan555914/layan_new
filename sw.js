@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v91-shared-auth-20261101";
+const CACHE_NAME = "asyut-aqar-shell-v92-favorites-pagination-20261101";
 const APP_SHELL = [
   "./",
   "./index.html",
