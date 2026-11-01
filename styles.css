@@ -2045,485 +2045,6 @@ a:focus-visible, button:focus-visible { outline:3px solid #c7a45e; outline-offse
 }
 
 
-/* LAYAN AQAR refresh: sky blue + gold + red; keep the original logo untouched */
-:root{
-  --navy:#168fc4;
-  --blue:#0879ad;
-  --gold:#c7a45e;
-  --gold-light:#f0dfb6;
-  --red:#b8323a;
-  --text:#183447;
-  --muted:#647b8b;
-  --bg:#f3faff;
-  --border:#d9eaf3;
-  --shadow:0 14px 36px rgba(8,121,173,.12);
-}
-body{background:#f3faff;color:#183447}
-.topbar{background:#0879ad;border-bottom:3px solid #c7a45e}
-.brand small,.topbar nav a:hover,.topbar nav a.active{color:#fff0c8}
-.btn-dark{background:#0879ad;color:#fff;border-color:#0879ad}
-.btn-dark:hover{background:#06658f}
-.hero{
- background:
-  radial-gradient(ellipse at 12% 18%,rgba(199,164,94,.22),transparent 38%),
-  radial-gradient(ellipse at 90% 100%,rgba(184,50,58,.13),transparent 35%),
-  linear-gradient(125deg,#075b83 0%,#0879ad 58%,#35b3df 100%);
- border-bottom:5px solid #c7a45e
-}
-.section-heading h2,.how-section>h2,.offer-card h3,.offer-details strong,
-.pricing-label,.pricing-price{color:#0879ad}
-.category.active,.category:hover{background:#0879ad;border-color:#c7a45e}
-.offer-card,#offersGrid .offer-card{box-shadow:0 8px 24px rgba(8,121,173,.09)}
-.offer-card:hover,#offersGrid .offer-card:hover{box-shadow:0 16px 34px rgba(8,121,173,.16)}
-input:focus,select:focus,textarea:focus{border-color:#35a9d4;box-shadow:0 0 0 3px rgba(53,169,212,.18)}
-footer{background:#064d70;border-top:3px solid #c7a45e}
-
-/* Partner ads: full-width cards and prominent images, including small phones */
-#partner-ads.partner-ads-section{width:min(1240px,calc(100% - 24px))!important;max-width:1240px!important;margin:32px auto!important;padding:clamp(14px,2.5vw,28px)!important;box-sizing:border-box!important;background:#f0f9fe;border:1px solid #d6edf8;border-radius:22px}
-#partner-ads .partner-ads-grid{display:grid!important;width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:22px!important}
-#partner-ads .partner-ad{display:flex!important;flex-direction:column!important;width:100%!important;min-width:0!important;overflow:hidden!important;border:1px solid #d7eaf3!important;border-radius:18px!important;background:#fff!important;box-shadow:0 10px 26px rgba(8,121,173,.11)!important}
-#partner-ads img.partner-ad-art{display:block!important;width:100%!important;height:clamp(220px,26vw,320px)!important;min-height:220px!important;max-height:none!important;object-fit:cover!important;object-position:center!important;flex:0 0 auto!important}
-#partner-ads .partner-ad-content{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;box-sizing:border-box!important;padding:20px!important}
-#partner-ads .partner-ad-content .btn{margin-top:auto!important}
-#partner-ads .partner-ad-category{color:#0879ad;font-weight:800}
-@media(max-width:600px){
- #partner-ads.partner-ads-section{width:calc(100% - 16px)!important;padding:12px!important;border-radius:16px!important}
- #partner-ads .partner-ads-grid{grid-template-columns:minmax(0,1fr)!important;gap:16px!important}
- #partner-ads img.partner-ad-art{height:240px!important;min-height:240px!important}
- #partner-ads .partner-ad-content{padding:16px!important}
- #partner-ads .partner-ad-content h3{font-size:18px!important}
- #partner-ads .partner-ad-content p{font-size:14px!important}
-}
-
-
-/* Complete LAYAN AQAR visual refresh — ocean waves, sky blue, gold and red */
-:root{
- --navy:#073b5b;--blue:#0788bd;--sky:#35bde9;--gold:#d4ad62;--gold-light:#f8e7b8;
- --red:#bf2028;--white:#fff;--bg:#f2faff;--text:#123b57;--muted:#54758a;
- --border:#d4eaf5;--shadow:0 12px 32px rgba(7,83,121,.12)
-}
-body{background:linear-gradient(180deg,#eefaff 0%,#fff 42%,#f0faff 100%);color:var(--text)}
-.topbar{background:rgba(240,250,255,.97)!important;color:var(--navy)!important;border-bottom:2px solid var(--gold)!important;box-shadow:0 4px 20px rgba(4,70,103,.08)}
-.topbar nav a,.topbar .brand strong,.topbar .brand small{color:var(--navy)}
-.topbar nav a.active,.topbar nav a:hover{background:#dff5ff;color:#056d9e;border-radius:10px}
-.brand-logo{object-fit:contain}
-.btn{border-radius:10px;font-weight:800;transition:transform .18s ease,box-shadow .18s ease}
-.btn:hover{transform:translateY(-1px)}
-.btn-gold{background:linear-gradient(135deg,#f4d88e,#cda34e)!important;color:#073b5b!important;border:1px solid #cda34e!important}
-.btn-dark{background:#0788bd!important;border-color:#0788bd!important;color:#fff!important}
-.btn-outline{border:1px solid #168dbb;color:#0875a3}
-.hero{position:relative;isolation:isolate;overflow:hidden;min-height:360px;padding:clamp(52px,8vw,100px) clamp(18px,7vw,90px)!important;background:linear-gradient(90deg,rgba(226,247,255,.35),rgba(231,248,255,.8)),url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=85') center 52%/cover no-repeat!important;border-bottom:5px solid var(--gold)!important}
-.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(242,251,255,.12),rgba(230,248,255,.78));z-index:-1}
-.hero-content{position:relative;max-width:1180px;margin:auto}
-.hero h1,.hero p,.hero .eyebrow{color:#073b5b;text-shadow:0 1px 8px rgba(255,255,255,.35)}
-.hero h1{font-size:clamp(34px,5vw,58px)}
-.hero .eyebrow{color:#087eb0;font-weight:900}
-.hero-actions .btn-outline{background:rgba(255,255,255,.72);color:#073b5b;border-color:#fff}
-main>section:not(.hero){position:relative}
-.section-heading h2,.how-section>h2{color:#087eaf}
-.section-heading .eyebrow,.eyebrow{color:#0788bd}
-.search-panel,.filters,.company-search,.buyer-preference-form,.buyer-match-results,.pricing-card,.audience-card,.offer-card,.how-card,.steps article,.company-grid>*{border-color:var(--border);box-shadow:var(--shadow);border-radius:18px}
-.category,.category-tile{border-radius:15px}
-.category.active,.category:hover,.category-tile:hover{background:#0788bd!important;color:#fff;border-color:var(--gold)}
-.offer-card h3,.offer-details strong,.pricing-price,.pricing-label{color:#087eaf}
-.offer-card img,.offer-image,.offer-card .offer-photo{object-fit:cover}
-.launch-campaign{background:linear-gradient(120deg,#075879,#0788bd 72%,#39bce5)!important;border:1px solid #6bc9e9!important;border-radius:24px!important;color:#fff!important}
-.launch-campaign h2,.launch-campaign p,.launch-campaign small,.launch-campaign .launch-pill{color:#fff}
-.launch-benefits>div{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.28);border-radius:14px}
-.audience-card{background:linear-gradient(180deg,#fff,#f0faff)!important}
-.audience-card b{background:#0788bd;color:#fff;border-radius:9px;padding:9px 12px}
-.pricing-card-featured{border:2px solid var(--gold)!important;transform:translateY(-3px)}
-.layan-ai-section{background:linear-gradient(125deg,#064b70,#0788bd)!important;border:1px solid #48b8dc!important;border-radius:22px!important;box-shadow:var(--shadow)}
-.layan-ai-section h2,.layan-ai-section p,.layan-ai-section .layan-ai-head p{color:#fff}
-.layan-ai-tabs button[aria-pressed=true]{background:var(--gold)!important;color:#073b5b!important}
-#partner-ads.partner-ads-section{background:linear-gradient(180deg,#eaf8ff,#fff)!important;border:1px solid #cceaf7!important;border-radius:24px!important}
-#partner-ads .partner-ad{border-radius:18px!important;border-color:#d1eaf5!important;box-shadow:0 12px 28px rgba(7,83,121,.12)!important}
-#partner-ads img.partner-ad-art{object-fit:cover!important}
-#partner-ads .partner-ad-content .btn{background:#0788bd!important;color:#fff!important;border-color:#0788bd!important}
-footer,.footer{background:linear-gradient(110deg,#052f4b,#075b80 65%,#087eaa)!important;border-top:4px solid var(--gold)!important;color:#fff!important}
-footer p,footer a,.footer p,.footer a{color:#fff}
-.status-message{border-right-color:var(--gold);background:#fff9e9}
-input:focus,select:focus,textarea:focus{border-color:#32b7e3;box-shadow:0 0 0 3px rgba(50,183,227,.2)}
-a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
-@media(max-width:700px){
- .topbar{gap:10px}
- .hero{min-height:300px;padding:42px 18px!important;background-position:center!important}
- .hero h1{font-size:34px}
- .hero p{max-width:100%}
- .pricing-card-featured{transform:none}
- #partner-ads .partner-ad{border-radius:15px!important}
-}
-@media(prefers-reduced-motion:reduce){.btn{transition:none}}
-
-
-/* Requested polish: paid/remaining figures in sky blue, and a brighter ocean hero */
-.offer-details>div,
-.offer-details > div,
-.details-info p,
-.offer-details .detail-item{
- background:linear-gradient(135deg,#eaf8ff,#d8f3ff)!important;
- border:1px solid #a9e1f5!important;
- border-radius:10px!important;
-}
-.offer-details span,.details-info span{color:#32718d!important}
-.offer-details strong,.details-info strong,
-.offer-details [class*="paid"],.offer-details [class*="remaining"],
-.details-info [class*="paid"],.details-info [class*="remaining"]{
- color:#0788bd!important;
-}
-.hero{
- background:
-  linear-gradient(90deg,rgba(231,249,255,.14),rgba(230,249,255,.28)),
-  url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90') center 52%/cover no-repeat!important;
-}
-.hero:before{
- background:
-  radial-gradient(ellipse at 78% 20%,rgba(255,255,255,.32),transparent 42%),
-  linear-gradient(90deg,rgba(220,247,255,.06),rgba(224,248,255,.34))!important;
-}
-.hero h1,.hero p,.hero .eyebrow{ text-shadow:0 1px 10px rgba(255,255,255,.7)!important }
-@media(max-width:700px){
- .hero{background-position:center!important}
-}
-
-
-/* Final typography and contrast polish */
-.hero{
- background:
-  linear-gradient(100deg,rgba(3,66,100,.68),rgba(5,107,151,.54)),
-  url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90') center 52%/cover no-repeat!important;
-}
-.hero:before{
- background:linear-gradient(90deg,rgba(3,54,83,.16),rgba(2,77,113,.22))!important;
-}
-.hero h1,.hero p,.hero .eyebrow,.hero-content p{
- color:#fff!important;
- text-shadow:0 2px 8px rgba(0,35,57,.75)!important;
-}
-.hero .eyebrow{color:#ffe3a0!important}
-.brand strong{
- display:block!important;
- font-size:clamp(25px,2.7vw,34px)!important;
- line-height:1.12!important;
- letter-spacing:.07em!important;
- font-weight:900!important;
- color:#07527b!important;
-}
-.brand small{
- display:block!important;
- margin-top:3px!important;
- font-size:12px!important;
- line-height:1.35!important;
- font-weight:600!important;
- letter-spacing:0!important;
- color:#3287aa!important;
-}
-h1,h2,h3,h4,.section-heading h2,.offer-card h3{
- font-family:"Cairo","IBM Plex Sans Arabic",Tahoma,Arial,sans-serif!important;
- letter-spacing:-.02em!important;
-}
-p,button,a,label,input,select,textarea,.offer-details,.pricing-card{
- font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif;
-}
-@media(max-width:600px){
- .brand strong{font-size:24px!important}
- .brand small{font-size:11px!important}
- .hero{background-position:center!important}
-}
-
-
-/* Header brand hierarchy: English name prominent, Arabic subtitle smaller */
-.topbar .brand>span>strong,
-.brand>span>strong{
- font-size:clamp(28px,3vw,36px)!important;
- line-height:1.05!important;
- font-weight:900!important;
- letter-spacing:.08em!important;
-}
-.topbar .brand>span>small,
-.brand>span>small{
- font-size:10px!important;
- line-height:1.25!important;
- margin-top:2px!important;
- font-weight:600!important;
-}
-@media(max-width:600px){
- .topbar .brand>span>strong,.brand>span>strong{font-size:25px!important}
- .topbar .brand>span>small,.brand>span>small{font-size:9px!important}
-}
-
-
-/* LAYAN AQAR — Semsar-inspired clean property marketplace polish.
-   Inspired by modern real-estate listing layouts; preserves LAYAN name and original logo. */
-:root{
- --market-primary:#087fae;
- --market-primary-dark:#075477;
- --market-accent:#d2ad62;
- --market-red:#bd3038;
- --market-ink:#18384c;
- --market-muted:#6a8292;
- --market-line:#dceaf1;
- --market-surface:#ffffff;
- --market-soft:#f2f9fc;
-}
-body{
- color:var(--market-ink);
- background:#f5fafc;
- font-family:"Cairo","IBM Plex Sans Arabic",Tahoma,Arial,sans-serif;
-}
-h1,h2,h3,h4,.section-heading h2,.offer-card h3{
- font-family:"Cairo","IBM Plex Sans Arabic",Tahoma,Arial,sans-serif!important;
- font-weight:800!important;
- letter-spacing:-.025em!important;
- line-height:1.45;
-}
-p,small,label,input,select,textarea,button,a,.offer-details{
- font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif;
-}
-.topbar{
- background:rgba(255,255,255,.98)!important;
- color:var(--market-primary-dark)!important;
- border-bottom:3px solid var(--market-accent)!important;
- box-shadow:0 5px 22px rgba(7,84,119,.09)!important;
-}
-.topbar nav a{color:#31596d!important;font-weight:700}
-.topbar nav a:hover,.topbar nav a.active{
- color:var(--market-primary)!important;
- background:#e7f6fc;
- border-radius:9px;
-}
-.topbar .brand strong,.brand strong{color:var(--market-primary-dark)!important}
-.topbar .brand small,.brand small{color:#53849b!important}
-.hero{
- background:
-  linear-gradient(90deg,rgba(4,58,86,.76),rgba(5,111,151,.48)),
-  url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90') center 52%/cover no-repeat!important;
- border-bottom:4px solid var(--market-accent)!important;
-}
-.hero:before{
- background:linear-gradient(90deg,rgba(2,43,65,.2),rgba(4,84,119,.18))!important;
-}
-.hero h1,.hero p,.hero .eyebrow,.hero-content p{
- color:#fff!important;
- text-shadow:0 2px 9px rgba(0,28,43,.65)!important;
-}
-.hero .eyebrow{color:#ffe5a8!important;font-weight:800}
-.hero h1{font-size:clamp(30px,4.4vw,50px)!important;line-height:1.35!important}
-.search-panel,.filters{
- background:#fff!important;
- border:1px solid var(--market-line)!important;
- border-radius:16px!important;
- box-shadow:0 12px 32px rgba(7,84,119,.10)!important;
-}
-input,select,textarea{
- border:1px solid #d5e5ed;
- border-radius:10px;
- background:#fff;
-}
-input:focus,select:focus,textarea:focus{
- border-color:#39a9d2!important;
- box-shadow:0 0 0 3px rgba(57,169,210,.17)!important;
-}
-.section-heading h2,.how-section>h2{color:var(--market-primary-dark)!important}
-.section-heading{margin-bottom:24px}
-.category{
- background:#fff;
- color:#31596d;
- border:1px solid #dceaf1;
- border-radius:999px;
- font-weight:700;
- transition:background .18s ease,border-color .18s ease,color .18s ease;
-}
-.category.active,.category:hover,.category-tile:hover{
- background:var(--market-primary)!important;
- border-color:var(--market-accent)!important;
- color:#fff!important;
-}
-#offersGrid .offer-card,.offer-card{
- border:1px solid var(--market-line)!important;
- border-radius:17px!important;
- background:#fff!important;
- box-shadow:0 8px 25px rgba(7,84,119,.075)!important;
- overflow:hidden;
-}
-#offersGrid .offer-card:hover,.offer-card:hover{
- border-color:#b8deed!important;
- box-shadow:0 16px 34px rgba(7,84,119,.14)!important;
-}
-.offer-card h3{color:var(--market-primary-dark)!important;font-size:20px!important}
-.offer-card-content{padding:20px}
-.offer-type{
- color:#075477!important;
- background:#fff4d9!important;
- border:1px solid #efdfb7!important;
- border-radius:999px!important;
- font-weight:800!important;
-}
-.offer-details{gap:9px!important}
-.offer-details>div{
- background:linear-gradient(135deg,#effaff,#e1f5fc)!important;
- border:1px solid #ccebf6!important;
- border-radius:11px!important;
- padding:12px!important;
-}
-.offer-details span{color:#527d91!important;font-size:12px!important}
-.offer-details strong{color:#087fae!important;font-weight:900!important}
-.btn{font-weight:800!important;border-radius:10px!important}
-.btn-dark{
- background:var(--market-primary)!important;
- border-color:var(--market-primary)!important;
- color:#fff!important;
-}
-.btn-dark:hover{background:var(--market-primary-dark)!important}
-.btn-gold{
- background:linear-gradient(135deg,#f4d991,#d2ad62)!important;
- border-color:#c49b4a!important;
- color:#17384b!important;
-}
-.close-btn,#closeDialog{background:var(--market-red)!important}
-.how-section{background:#f0f8fc!important;border-top:1px solid var(--market-line)!important}
-.how-card,.steps article{
- background:#fff!important;
- border:1px solid var(--market-line)!important;
- border-radius:15px!important;
- box-shadow:0 7px 20px rgba(7,84,119,.05);
-}
-.how-card h3,.steps h3{color:var(--market-primary-dark)!important}
-.steps article>b{color:var(--market-red)!important}
-#partner-ads.partner-ads-section{
- background:linear-gradient(180deg,#eaf7fc,#fff)!important;
- border-color:#d4eaf4!important;
-}
-#partner-ads .partner-ad{
- border:1px solid #d9eaf1!important;
- border-radius:16px!important;
-}
-footer,.footer{
- background:linear-gradient(110deg,#063b58,#075f83 70%,#087fae)!important;
- border-top:4px solid var(--market-accent)!important;
-}
-@media(max-width:700px){
- .hero h1{font-size:clamp(28px,8vw,36px)!important}
- .offer-card-content{padding:15px!important}
- .offer-card h3{font-size:18px!important}
-}
-
-
-/* User-requested final corrections: darker ocean hero, smaller Arabic brand line, English LAYAN more prominent, paid/remaining boxes clear */
-.hero{
-  background:
-    linear-gradient(100deg,rgba(2,35,57,.78),rgba(3,62,91,.70)),
-    url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=2200&q=90') center 52%/cover no-repeat!important;
-}
-.hero:before{
-  background:linear-gradient(90deg,rgba(1,29,47,.22),rgba(2,51,77,.30))!important;
-}
-.hero h1,.hero p,.hero .eyebrow,.hero-content p{
-  color:#fff!important;
-  text-shadow:0 2px 8px rgba(0,20,34,.8)!important;
-}
-.hero .eyebrow{color:#ffe5a8!important}
-
-/* Paid and remaining amounts: darker, readable pale-blue tiles */
-.offer-details > div{
-  background:linear-gradient(135deg,#d9f2ff,#c5eaff)!important;
-  border:1px solid #8fd1ed!important;
-}
-.offer-details span{color:#315e75!important;font-size:12px!important;font-weight:600!important}
-.offer-details strong{color:#075477!important;font-size:17px!important;font-weight:900!important}
-.offer-details [class*="paid"],.offer-details [class*="remaining"]{color:#075477!important}
-
-/* English brand is the main word; Arabic subtitle deliberately smaller */
-.topbar .brand>span>strong,.brand>span>strong{
-  font-size:clamp(29px,3.2vw,38px)!important;
-  line-height:1.05!important;
-  font-weight:900!important;
-  letter-spacing:.09em!important;
-}
-.topbar .brand>span>small,.brand>span>small{
-  font-size:9px!important;
-  line-height:1.2!important;
-  margin-top:3px!important;
-  font-weight:600!important;
-}
-h1,h2,h3,h4,.section-heading h2,.offer-card h3{
-  font-family:"Cairo",Tahoma,Arial,sans-serif!important;
-  font-weight:800!important;
-  letter-spacing:-.02em!important;
-}
-p,small,label,input,select,textarea,button,a,.offer-details{
-  font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif!important;
-}
-@media(max-width:600px){
-  .topbar .brand>span>strong,.brand>span>strong{font-size:26px!important}
-  .topbar .brand>span>small,.brand>span>small{font-size:8px!important}
-  .offer-details strong{font-size:15px!important}
-  .hero{background-position:center!important}
-}
-
-
-/* Exact correction requested:
-   Ocean-wave hero: ENGLISH LAYAN AQAR larger, Arabic "ليان عقار" smaller.
-   Main top header: English brand slightly smaller, Arabic brand line larger. */
-.hero .hero-content > .eyebrow{
-  display:block!important;
-  font-size:clamp(34px,5vw,52px)!important;
-  line-height:1.12!important;
-  font-weight:900!important;
-  letter-spacing:.08em!important;
-  margin:0 0 8px!important;
-}
-.hero .hero-content > h1{
-  font-size:clamp(22px,3vw,30px)!important;
-  line-height:1.35!important;
-  font-weight:700!important;
-  margin:6px 0 12px!important;
-}
-.topbar .brand>span>strong{
-  font-size:clamp(23px,2.4vw,30px)!important;
-  line-height:1.1!important;
-  letter-spacing:.06em!important;
-}
-.topbar .brand>span>small{
-  font-size:clamp(13px,1.5vw,16px)!important;
-  line-height:1.3!important;
-  font-weight:700!important;
-}
-@media(max-width:600px){
-  .hero .hero-content > .eyebrow{font-size:36px!important}
-  .hero .hero-content > h1{font-size:23px!important}
-  .topbar .brand>span>strong{font-size:22px!important}
-  .topbar .brand>span>small{font-size:14px!important}
-}
-
-
-/* LAYAN smart search: clear, mobile-friendly budget filters */
-.filters .smart-filter-field{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  min-width:0;
-  color:var(--navy);
-  font-size:12px;
-  font-weight:800;
-}
-.filters .smart-filter-field input{
-  width:100%;
-  min-width:0;
-  min-height:44px;
-  border:1px solid #cbd8e6;
-  border-radius:9px;
-  background:#f8fbff;
-}
-.filters .smart-filter-field input:focus{
-  border-color:#0788bd;
-  box-shadow:0 0 0 3px #0788bd20;
-}
-@media(max-width:700px){
-  .filters .smart-filter-field{grid-column:1 / -1}
-}
-
-
 /* LAYAN AQAR — premium marketplace refinement (keeps existing app behavior intact) */
 .topbar{
   position:sticky;top:0;backdrop-filter:blur(14px);
@@ -3137,4 +2658,127 @@ body{background:#f4f6fa;color:#10264c}
   border-color:#d4a84f!important;
   outline:3px solid rgba(16,39,70,.28);
   outline-offset:2px;
+}
+
+
+/* ASYUT AQAR — single unified navy, gold and red design system */
+:root{
+  --navy:#102746 !important;
+  --blue:#173d68 !important;
+  --gold:#c5a15d !important;
+  --gold-light:#ead9b2 !important;
+  --red:#a93636 !important;
+  --white:#ffffff !important;
+  --bg:#f3f6fa !important;
+  --text:#1b2c42 !important;
+  --muted:#718096 !important;
+  --border:#e1e7ef !important;
+  --shadow:0 12px 32px rgba(16,39,70,.09) !important;
+}
+html,body{
+  color:var(--text);
+  background:var(--bg);
+  font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif !important;
+}
+h1,h2,h3,h4,.section-heading h2,.offer-card h3{
+  color:var(--navy);
+  font-family:"Cairo","IBM Plex Sans Arabic",Tahoma,Arial,sans-serif !important;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+p,small,label,input,select,textarea,button,a,.offer-details{
+  font-family:"IBM Plex Sans Arabic","Cairo",Tahoma,Arial,sans-serif !important;
+}
+.topbar{
+  background:var(--navy) !important;
+  color:#fff !important;
+  border-bottom:3px solid var(--gold) !important;
+}
+.topbar nav a,.topbar .brand strong,.topbar .brand small{color:#fff !important}
+.topbar .brand small{color:var(--gold-light) !important}
+.topbar nav a:hover,.topbar nav a.active{
+  color:var(--navy) !important;
+  background:var(--gold-light) !important;
+  border-radius:9px;
+}
+.btn-dark,.details-button{
+  background:var(--navy) !important;
+  border-color:var(--navy) !important;
+  color:#fff !important;
+}
+.btn-dark:hover,.details-button:hover{background:var(--blue) !important}
+.btn-gold{
+  background:linear-gradient(135deg,#f0dfb6,#c5a15d) !important;
+  border-color:var(--gold) !important;
+  color:var(--navy) !important;
+}
+.btn-outline{
+  border-color:var(--gold) !important;
+  color:var(--navy) !important;
+}
+.hero{
+  background:
+    linear-gradient(90deg,rgba(7,22,41,.94),rgba(16,39,70,.78)),
+    url("layan_premium_apartment.jpg") center 48%/cover no-repeat !important;
+  border-bottom:4px solid var(--gold) !important;
+}
+.hero h1,.hero p,.hero .eyebrow,.hero-content p{
+  color:#fff !important;
+  text-shadow:0 2px 8px rgba(0,0,0,.35) !important;
+}
+.hero .eyebrow{color:var(--gold-light) !important}
+.section-heading h2,.how-section>h2,.offer-card h3,.offer-details strong,
+.pricing-label,.pricing-price{color:var(--navy) !important}
+.category.active,.category:hover,.category-tile:hover{
+  background:var(--navy) !important;
+  border-color:var(--gold) !important;
+  color:#fff !important;
+}
+.offer-card,.search-panel,.filters,.how-card,.steps article{
+  border-color:var(--border);
+  box-shadow:var(--shadow);
+}
+.offer-details>div{
+  background:linear-gradient(135deg,#fffdf8,#f7f1e5) !important;
+  border:1px solid #e8d7b2 !important;
+  border-radius:11px;
+}
+.offer-details span,.details-info span{color:#68778a !important}
+.offer-details strong,.details-info strong{color:var(--navy) !important}
+.offer-type,.featured-badge{
+  background:#f7f0e2 !important;
+  color:#765a27 !important;
+  border:1px solid #e8d7b2 !important;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--gold) !important;
+  box-shadow:0 0 0 3px rgba(197,161,93,.2) !important;
+  outline:none;
+}
+footer,.footer{
+  background:var(--navy) !important;
+  border-top:4px solid var(--gold) !important;
+  color:#fff !important;
+}
+footer p,footer a,.footer p,.footer a{color:#fff !important}
+.status-message{border-right-color:var(--gold)}
+.filters .smart-filter-field{
+  display:flex;flex-direction:column;gap:6px;min-width:0;
+  color:var(--navy);font-size:12px;font-weight:800;
+}
+.filters .smart-filter-field input{
+  width:100%;min-width:0;min-height:44px;
+  border:1px solid var(--border);border-radius:9px;background:#fff;
+}
+.filters .smart-filter-field input:focus{
+  border-color:var(--gold) !important;
+  box-shadow:0 0 0 3px rgba(197,161,93,.2) !important;
+}
+a:focus-visible,button:focus-visible{
+  outline:3px solid var(--gold) !important;outline-offset:3px;
+}
+@media(max-width:700px){
+  .topbar{background:var(--navy) !important}
+  .hero{background-position:center !important}
+  .filters .smart-filter-field{grid-column:1/-1}
 }
