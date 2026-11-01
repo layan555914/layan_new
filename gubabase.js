@@ -361,7 +361,36 @@
     });
     return Array.isArray(rows) ? rows[0] : rows;
   }
+  async function getFavoriteOfferIds() {
+    if (!isAuthenticated()) return [];
+    const rows = await request("user_favorite_offers?select=offer_id&user_id=eq." + encodeURIComponent(session.user.id) + "&order=created_at.desc");
+    return Array.isArray(rows) ? rows.map(row => String(row.offer_id)) : [];
+  }
+  async function addFavoriteOffer(offerId) {
+    if (!isAuthenticated()) return false;
+    const rows = await request("user_favorite_offers", {
+      method: "POST",
+      headers: { Prefer: "return=representation,resolution=ignore-duplicates" },
+      body: JSON.stringify({ user_id: session.user.id, offer_id: Number(offerId) })
+    });
+    return Array.isArray(rows) ? Boolean(rows[0]) || true : true;
+  }
+  async function removeFavoriteOffer(offerId) {
+    if (!isAuthenticated()) return false;
+    await request("user_favorite_offers?user_id=eq." + encodeURIComponent(session.user.id) + "&offer_id=eq." + encodeURIComponent(offerId), {
+      method: "DELETE",
+      headers: { Prefer: "return=minimal" }
+    });
+    return true;
+  }
+  async function syncFavoriteOffers(offerIds) {
+    if (!isAuthenticated()) return [];
+    const ids = [...new Set((offerIds || []).map(v => Number(v)).filter(Number.isFinite))];
+    for (const offerId of ids) await addFavoriteOffer(offerId);
+    return getFavoriteOfferIds();
+  }
+
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail };
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
