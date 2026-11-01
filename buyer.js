@@ -194,6 +194,67 @@ document.addEventListener("DOMContentLoaded", () => {
       status.textContent=permission==="granted"?"تم السماح بإشعارات المتصفح. ستصل عند اكتشاف عرض مناسب أثناء فتح المنصة.":"لم يتم السماح بالإشعارات؛ ستظل التنبيهات محفوظة داخل حسابك.";
     } catch(error) { status.textContent="تعذر طلب إذن الإشعارات من المتصفح."; }
   });
+  const pushSubscribeButton=$("buyerPushSubscribe");
+  const pushUnsubscribeButton=$("buyerPushUnsubscribe");
+  function decodeVapidKey(value) {
+    const padding="=".repeat((4-value.length%4)%4);
+    const raw=atob((value+padding).replace(/-/g,"+").replace(/_/g,"/"));
+    return Uint8Array.from(raw,char=>char.charCodeAt(0));
+  }
+  async function invokePush(action,extra={}) {
+    const session=await requireSession();
+    const response=await fetch(apiBase()+"/functions/v1/asyut-push",{method:"POST",headers:{apikey:config?.SUPABASE_PUBLISHABLE_KEY||"",Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action,...extra})});
+    const raw=await response.text();let data={};try{data=raw?JSON.parse(raw):{}}catch(_){}
+    if(!response.ok)throw new Error(data.error||data.message||"تعذر الاتصال بخدمة إشعارات الهاتف.");
+    return data;
+  }
+  async function refreshPushButtons() {
+    if(!pushSubscribeButton||!pushUnsubscribeButton)return;
+    pushSubscribeButton.hidden=false;pushUnsubscribeButton.hidden=true;
+    if(!("serviceWorker" in navigator)||!("PushManager" in window)||!("Notification" in window)){pushSubscribeButton.disabled=true;pushSubscribeButton.textContent="إشعارات الهاتف غير مدعومة في هذا المتصفح";return;}
+    pushSubscribeButton.disabled=false;pushSubscribeButton.textContent="تفعيل إشعارات الهاتف حتى عند إغلاق التطبيق";
+    if(!auth())return;
+    try {
+      const registration=await navigator.serviceWorker.ready;
+      const subscription=await registration.pushManager.getSubscription();
+      if(!subscription)return;
+      const session=await requireSession();
+      const rows=await request("/rest/v1/buyer_push_subscriptions?select=id&user_id=eq."+encodeURIComponent(session.user.id)+"&endpoint=eq."+encodeURIComponent(subscription.endpoint)+"&limit=1");
+      if(Array.isArray(rows)&&rows.length){pushSubscribeButton.hidden=true;pushUnsubscribeButton.hidden=false;}
+      else pushSubscribeButton.textContent="ربط إشعارات هذا الجهاز بحسابك";
+    } catch(error){console.warn("تعذر فحص اشتراك الإشعارات:",error);}
+  }
+  pushSubscribeButton.addEventListener("click",async()=>{
+    if(!auth()){status.textContent="سجّل الدخول أولًا لتفعيل إشعارات حسابك.";document.getElementById("loginBtn")?.click();return;}
+    if(!window.isSecureContext||!("serviceWorker" in navigator)||!("PushManager" in window)||!("Notification" in window)){status.textContent="إشعارات الهاتف تتطلب متصفحًا يدعم Push واتصال HTTPS. جرّب تثبيت المنصة من Chrome.";return;}
+    pushSubscribeButton.disabled=true;status.textContent="جارٍ إعداد إشعارات الهاتف...";
+    try {
+      const permission=await Notification.requestPermission();
+      if(permission!=="granted")throw new Error("لم تسمح بإشعارات المتصفح. فعّل الإذن من إعدادات الموقع ثم حاول مجددًا.");
+      const configData=await invokePush("get_public_key");
+      if(!configData.publicKey)throw new Error("لم يصل مفتاح التفعيل من خادم الإشعارات.");
+      const registration=await navigator.serviceWorker.ready;
+      let subscription=await registration.pushManager.getSubscription();
+      if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:decodeVapidKey(configData.publicKey)});
+      await invokePush("save_subscription",{subscription:subscription.toJSON()});
+      status.textContent="تم ربط هذا الجهاز بحسابك. ستصلك تنبيهات العروض المطابقة حتى عند إغلاق المنصة، بحسب دعم المتصفح ونظام الهاتف.";
+      await refreshPushButtons();
+    } catch(error){status.textContent=error.message||"تعذر تفعيل إشعارات الهاتف.";}
+    finally{pushSubscribeButton.disabled=false;}
+  });
+  pushUnsubscribeButton.addEventListener("click",async()=>{
+    if(!auth()){status.textContent="سجّل الدخول لإدارة إشعارات حسابك.";return;}
+    pushUnsubscribeButton.disabled=true;
+    try {
+      const registration=await navigator.serviceWorker.ready;
+      const subscription=await registration.pushManager.getSubscription();
+      if(subscription){await invokePush("delete_subscription",{endpoint:subscription.endpoint});await subscription.unsubscribe();}
+      status.textContent="تم إيقاف إشعارات هذا الجهاز لهذا الحساب.";
+      await refreshPushButtons();
+    } catch(error){status.textContent=error.message||"تعذر إيقاف إشعارات الهاتف.";}
+    finally{pushUnsubscribeButton.disabled=false;}
+  });
+  refreshPushButtons();
   cards.addEventListener("click",e=>{
     const a=e.target.closest("[data-buyer-title]"); if(!a) return;
     const offersGrid=document.getElementById("offersGrid");
@@ -206,6 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
     catch(error) { status.textContent="تعذر تحديث حالة التنبيهات."; }
   });
   async function reloadBuyerAccountState() {
+    refreshPushButtons();
     baselineReady=false;
     knownMatches=new Set();
     saved=null;
@@ -221,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   window.addEventListener("layan-auth-state-changed",event=>{
     if(event.detail?.authenticated) reloadBuyerAccountState();
-    else { saved=null; baselineReady=false; knownMatches=new Set(); loginNote.hidden=false; renderAlerts([]); }
+    else { saved=null; baselineReady=false; knownMatches=new Set(); loginNote.hidden=false; renderAlerts([]); refreshPushButtons(); }
   });
   window.addEventListener("layan-auth-callback",event=>{
     if(event.detail?.success) reloadBuyerAccountState();
