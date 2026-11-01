@@ -601,6 +601,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </p>
             <h3>${esc(o.title)}</h3>
             <p class="offer-location">${esc([o.city, o.area].filter(Boolean).join(" · ") || "أسيوط")}</p>
+            ${o.latitude != null && o.longitude != null ? `<a class="offer-map-link" href="https://www.google.com/maps?q=${encodeURIComponent(Number(o.latitude)+","+Number(o.longitude))}" target="_blank" rel="noopener noreferrer">عرض موقع العقار على الخريطة</a>` : ""}
             ${(o.area_m2 || o.bedrooms || o.bathrooms) ? `<p class="offer-specs">${o.area_m2 ? `المساحة ${esc(o.area_m2)} م²` : ""}${o.bedrooms ? ` · غرف ${esc(o.bedrooms)}` : ""}${o.bathrooms ? ` · حمامات ${esc(o.bathrooms)}` : ""}</p>` : ""}
             <div class="offer-details">
               <div><span>السعر الإجمالي</span>
@@ -758,6 +759,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="details-info">
         <p><span>المدينة / المركز</span><strong>${esc(o.city || "أسيوط")}</strong></p>
         <p><span>المنطقة</span><strong>${esc(o.area || "غير محدد")}</strong></p>
+        ${o.latitude != null && o.longitude != null ? `<p><span>موقع العقار</span><strong><a href="https://www.google.com/maps?q=${encodeURIComponent(Number(o.latitude)+","+Number(o.longitude))}" target="_blank" rel="noopener noreferrer">فتح الموقع على الخريطة</a></strong></p>` : ""}
         ${o.developer_name ? `<p><span>المطور العقاري</span><strong>${esc(o.developer_name)}</strong></p>` : ""}
         ${o.project_name ? `<p><span>المشروع / الكمبوند</span><strong>${esc(o.project_name)}</strong></p>` : ""}
         ${o.land_ownership_authority ? `<p><span>جهة الولاية / التخصيص</span><strong>${esc(o.land_ownership_authority)}</strong></p>` : ""}
@@ -1088,6 +1090,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       governorate: "أسيوط",
       city: value("city"),
       area: value("area"),
+      latitude: value("latitude") === "" ? null : Number(value("latitude")),
+      longitude: value("longitude") === "" ? null : Number(value("longitude")),
       area_m2: amount("area_m2"),
       bedrooms: Math.floor(amount("bedrooms")),
       bathrooms: Math.floor(amount("bathrooms")),
@@ -1112,6 +1116,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       is_featured: false,
       image_urls: []
     };
+
+    const hasLatitude = value("latitude") !== "";
+    const hasLongitude = value("longitude") !== "";
+    if (hasLatitude !== hasLongitude) {
+      setStatus("أدخل خط العرض وخط الطول معًا، أو اترك الاثنين فارغين.");
+      return;
+    }
+    if (hasLatitude && (!Number.isFinite(offer.latitude) || offer.latitude < -90 || offer.latitude > 90 ||
+        !Number.isFinite(offer.longitude) || offer.longitude < -180 || offer.longitude > 180)) {
+      setStatus("إحداثيات الموقع غير صحيحة. راجع خط العرض والطول.");
+      return;
+    }
 
     if (offer.contact_phone && !data.get("contact_consent")) {
       setStatus("لنشر رقم التواصل داخل الإعلان يجب الموافقة صراحةً على نشره. اترك الرقم فارغًا إن لم ترغب في نشره.");
