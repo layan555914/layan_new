@@ -14,8 +14,18 @@ document.addEventListener("DOMContentLoaded", () => {
           <label>إيه نوع العقار اللي بتدور عليه؟
             <select name="property_type" required><option value="أي نوع">أي نوع</option><option value="شقة">شقة</option><option value="فيلا">فيلا</option><option value="محل">محل تجاري</option><option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option><option value="مخزن">مخزن</option><option value="معرض">معرض</option><option value="أرض">أرض</option></select>
           </label>
-          <label>المنطقة المفضلة
-            <input name="area" type="text" maxlength="100" placeholder="مثال: أسيوط الجديدة (اختياري)">
+          <label>المدينة / المركز
+            <select name="city">
+              <option value="">كل مدن ومراكز أسيوط</option>
+              <option value="مدينة أسيوط">مدينة أسيوط</option><option value="أسيوط الجديدة">أسيوط الجديدة</option>
+              <option value="ديروط">ديروط</option><option value="القوصية">القوصية</option><option value="منفلوط">منفلوط</option>
+              <option value="أبنوب">أبنوب</option><option value="الفتح">الفتح</option><option value="ساحل سليم">ساحل سليم</option>
+              <option value="البداري">البداري</option><option value="أبو تيج">أبو تيج</option><option value="صدفا">صدفا</option><option value="الغنايم">الغنايم</option>
+            </select>
+          </label>
+          <label>الحي / المنطقة المفضلة
+            <input name="area" type="text" maxlength="100" list="buyerAreaHints" placeholder="اكتب اسم الحي أو المنطقة (اختياري)">
+            <datalist id="buyerAreaHints"></datalist>
           </label>
           <label>أقصى سعر إجمالي تقدر عليه (جنيه)
             <input name="max_total_price" type="number" min="0" step="1000" inputmode="decimal" placeholder="اتركه 0 لو مش شرط">
@@ -75,11 +85,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   const values = () => {
     const d = new FormData(form);
-    return {property_type:String(d.get("property_type")||"أي نوع"), area:String(d.get("area")||"").trim(), max_total_price:Number(d.get("max_total_price")||0), max_upfront:Number(d.get("max_upfront")||0), max_monthly_installment:Number(d.get("max_monthly_installment")||0), min_bedrooms:Number(d.get("min_bedrooms")||0), notes:String(d.get("notes")||"").trim(), notifications_enabled:d.get("notifications_enabled")==="on"};
+    return {property_type:String(d.get("property_type")||"أي نوع"), city:String(d.get("city")||"").trim(), area:String(d.get("area")||"").trim(), max_total_price:Number(d.get("max_total_price")||0), max_upfront:Number(d.get("max_upfront")||0), max_monthly_installment:Number(d.get("max_monthly_installment")||0), min_bedrooms:Number(d.get("min_bedrooms")||0), notes:String(d.get("notes")||"").trim(), notifications_enabled:d.get("notifications_enabled")==="on"};
   };
+  const normalizeLocation = value => String(value||"").trim().toLocaleLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/[\u064B-\u065F\u0670]/g,"").replace(/[ـ]/g,"").replace(/\s+/g," ");
   function matches(o,p) {
     if (p.property_type!=="أي نوع" && o.property_type!==p.property_type) return false;
-    if (p.area && !String(o.area||"").toLocaleLowerCase().includes(p.area.toLocaleLowerCase())) return false;
+    if (p.city && normalizeLocation(o.city)!==normalizeLocation(p.city)) return false;
+    if (p.area && !normalizeLocation(o.area).includes(normalizeLocation(p.area))) return false;
     if (p.max_total_price>0 && Number(o.total_price||0)>p.max_total_price) return false;
     const upfront = Number(o.paid_amount||0)+Number(o.assignment_fee||0);
     if (p.max_upfront>0 && upfront>p.max_upfront) return false;
@@ -97,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let knownMatches = new Set();
   let checkInProgress = false;
   async function loadOffers() {
-    return await request("/rest/v1/property_offers?select=id,title,governorate,area,property_type,total_price,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc", {
+    return await request("/rest/v1/property_offers?select=id,title,governorate,city,area,latitude,longitude,property_type,total_price,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc", {
       headers: { Authorization: "Bearer " + (config?.SUPABASE_PUBLISHABLE_KEY || "") }
     });
   }
@@ -124,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!current) return;
     try {
       const s=await requireSession();
-      const rows=await request("/rest/v1/buyer_preferences?select=property_type,area,max_total_price,max_upfront,max_monthly_installment,min_bedrooms,notes,notifications_enabled&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=1");
+      const rows=await request("/rest/v1/buyer_preferences?select=property_type,city,area,max_total_price,max_upfront,max_monthly_installment,min_bedrooms,notes,notifications_enabled&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=1");
       if (!Array.isArray(rows)||!rows.length) return;
       saved=rows[0];
       for (const [k,v] of Object.entries(saved)) { const el=form.elements.namedItem(k); if (el) { if (el.type==="checkbox") el.checked=Boolean(v); else el.value=v ?? ""; } }
