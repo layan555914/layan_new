@@ -14,7 +14,9 @@ async function load(){try{companies=await api("company_profiles_public?select=id
 async function loadMyProfile(){
  let s;try{s=await verifiedSession()}catch(_){return}
  try{
-  const rows=await api("rpc/layan_get_my_company_profile",{method:"POST",body:"{}"});
+  // Read only this signed-in owner's row; RLS scopes the query to auth.uid().
+  // This avoids depending on a missing SECURITY DEFINER RPC.
+  const rows=await api("company_profiles?select=id,owner_id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,status,admin_notes,reviewed_at,reviewed_by,pending_update,update_status,update_notes&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=1");
   const c=rows?.[0]; if(!c)return; existingProfileId=c.id; existingStatus=c.status; supportsDraft=Object.prototype.hasOwnProperty.call(c,"pending_update");
   const draft=(supportsDraft&&c.pending_update&&typeof c.pending_update==="object")?c.pending_update:null; const src=draft?{...c,...draft}:c;
   const values={company_name:src.company_name,category:src.category,description:src.description,services:(src.services||[]).join("، "),city:src.city,address:src.address||"",phone:src.phone,whatsapp:src.whatsapp||"",website:src.website||"",logo_url:src.logo_url||"",gallery_urls:(src.gallery_urls||[]).join("\n"),projects:(src.projects||[]).map(p=>(p.title||"")+" — "+(p.description||"")).join("\n")};
