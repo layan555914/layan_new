@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const d = new FormData(form);
     return {property_type:String(d.get("property_type")||"أي نوع"), city:String(d.get("city")||"").trim(), area:String(d.get("area")||"").trim(), max_total_price:Number(d.get("max_total_price")||0), max_upfront:Number(d.get("max_upfront")||0), max_monthly_installment:Number(d.get("max_monthly_installment")||0), min_bedrooms:Number(d.get("min_bedrooms")||0), notes:String(d.get("notes")||"").trim(), notifications_enabled:d.get("notifications_enabled")==="on"};
   };
-  const normalizeLocation = value => String(value||"").trim().toLocaleLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/[\u064B-\u065F\u0670]/g,"").replace(/[ـ]/g,"").replace(/\s+/g," ");
+  const normalizeLocation = value => String(value||"").trim().toLocaleLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/^مدينه\s+/,"").replace(/[\u064B-\u065F\u0670]/g,"").replace(/[ـ]/g,"").replace(/\s+/g," ");
   function matches(o,p) {
     if (p.property_type!=="أي نوع" && o.property_type!==p.property_type) return false;
     if (p.city && normalizeLocation(o.city)!==normalizeLocation(p.city)) return false;
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     const hints=document.getElementById("buyerAreaHints");
     if(hints) {
-      const areas=[...new Set((Array.isArray(rows)?rows:[]).map(row=>String(row.area||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ar"));
+      const areas=[...new Set(["الهضبة",...(Array.isArray(rows)?rows:[]).map(row=>String(row.area||"").trim()).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,"ar"));
       hints.innerHTML=areas.map(area=>'<option value="'+esc(area)+'"></option>').join("");
     }
     return rows;
