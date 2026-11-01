@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v95-location-alerts-20261102";
+const CACHE_NAME = "asyut-aqar-shell-v96-interactive-map-20261102";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -26,6 +26,7 @@ const APP_SHELL = [
   "./config.js",
   "./gubabase.js",
   "./app.js",
+  "./map.js",
   "./buyer.js",
   "./sponsor.js",
   "./ai.js",
