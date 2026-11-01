@@ -349,7 +349,12 @@
           <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option><option value="أرض تنازل">أرض تنازل</option>
         </select>
 
-        <select id="areaFilter" aria-label="تصفية حسب المنطقة">
+        <select id="cityFilter" aria-label="تصفية حسب المدينة أو المركز">
+          <option value="">كل مدن ومراكز أسيوط</option>
+        </select>
+
+        <select id="areaFilter" aria-label="تصفية حسب الحي أو المنطقة">
+          <option value="">كل الأحياء والمناطق</option>
           <option value="">كل مناطق محافظة أسيوط</option>
           <option value="مدينة أسيوط">مدينة أسيوط</option>
           <option value="أسيوط الجديدة">أسيوط الجديدة</option>
@@ -545,8 +550,23 @@
 
       <label>
         المنطقة
-        <input name="area" type="text" placeholder="اسم الحي أو المنطقة">
+        <input name="area" type="text" list="asyut-neighborhoods" placeholder="اسم الحي أو المنطقة">
+        <datalist id="asyut-neighborhoods"></datalist>
       </label>
+
+      <details class="location-coordinates">
+        <summary>إضافة موقع العقار للخريطة (اختياري)</summary>
+        <p class="form-help">أدخل إحداثيات العقار من خرائط Google إن كانت متاحة. لا تدخل موقعك الشخصي؛ المطلوب موقع الوحدة نفسها.</p>
+        <div class="form-row">
+          <label>خط العرض (Latitude)
+            <input name="latitude" type="number" min="-90" max="90" step="0.0000001" inputmode="decimal" placeholder="مثال: 27.18">
+          </label>
+          <label>خط الطول (Longitude)
+            <input name="longitude" type="number" min="-180" max="180" step="0.0000001" inputmode="decimal" placeholder="مثال: 31.18">
+          </label>
+        </div>
+        <p class="form-help">اترك الحقلين فارغين لو مش متأكد من الإحداثيات.</p>
+      </details>
 
       <label>
         مساحة الوحدة (م²)
