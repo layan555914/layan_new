@@ -313,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await auth.resetPasswordForEmail(recoveryEmail);
       setStatus("لو البريد مسجل في المنصة، ستصلك رسالة استعادة. افتح أحدث رسالة من Supabase واضغط الرابط، ثم عيّن كلمة مرور جديدة. راجع الرسائل غير المرغوب فيها أيضًا.");
     } catch (error) {
-      setStatus("تعذر إرسال رابط الاستعادة: " + error.message + " إذا ظهر خطأ في الرابط المسموح، يلزم إضافة https://layan-eg.com/reset-password.html إلى إعدادات Redirect URLs في Supabase.");
+      setStatus("تعذر إرسال رابط الاستعادة: " + error.message + " إذا ظهر خطأ في الرابط المسموح، يلزم إضافة https://layan-eg.com/reset-password.html إلى قائمة Redirect URLs في Supabase Auth. أضف رابط الإنتاج ورابط المعاينة الذي تستخدمه.");
     } finally {
       link.style.pointerEvents = "";
     }
