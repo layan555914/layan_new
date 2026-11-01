@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       activeDealKind = "";
       const typeFilter = $("typeFilter");
       const areaFilter = $("areaFilter");
+  const cityFilter = $("cityFilter");
       if (typeFilter) typeFilter.value = "";
       if (areaFilter) areaFilter.value = "";
       $("searchInput") && ($("searchInput").value = "");
@@ -467,19 +468,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function updateAreaFilter() {
-    if (!areaFilter) return;
-
-    const previous = areaFilter.value;
     const assiutCenters = ["مدينة أسيوط", "أسيوط الجديدة", "ديروط", "القوصية", "منفلوط", "أبنوب", "الفتح", "ساحل سليم", "البداري", "أبو تيج", "صدفا", "الغنايم"];
-    const areas = [...new Set([...assiutCenters, ...offers.map((o) => String(o.area || "").trim()).filter(Boolean), ...offers.map((o) => String(o.city || "").trim()).filter(Boolean)])].sort((a, b) => a.localeCompare(b, "ar"));
-
-    areaFilter.innerHTML =
-      '<option value="">كل المناطق</option>' +
-      areas.map((area) =>
-        `<option value="${esc(area)}">${esc(area)}</option>`
-      ).join("");
-
-    if (areas.includes(previous)) areaFilter.value = previous;
+    if (cityFilter) {
+      const previousCity = cityFilter.value;
+      const cities = [...new Set([...assiutCenters, ...offers.map(o => String(o.city || "").trim()).filter(Boolean)])];
+      cityFilter.innerHTML = '<option value="">كل مدن ومراكز أسيوط</option>' + cities.map(city => '<option value="' + esc(city) + '">' + esc(city) + '</option>').join("");
+      if (cities.includes(previousCity)) cityFilter.value = previousCity;
+    }
+    if (areaFilter) {
+      const previousArea = areaFilter.value;
+      const areas = [...new Set(offers.map(o => String(o.area || "").trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b,"ar"));
+      areaFilter.innerHTML = '<option value="">كل الأحياء والمناطق</option>' + areas.map(area => '<option value="' + esc(area) + '">' + esc(area) + '</option>').join("");
+      if (areas.includes(previousArea)) areaFilter.value = previousArea;
+    }
+    const areaHints = $("asyut-neighborhoods");
+    if (areaHints) {
+      const areas = [...new Set(offers.map(o => String(o.area || "").trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b,"ar"));
+      areaHints.innerHTML = areas.map(area => '<option value="' + esc(area) + '"></option>').join("");
+    }
   }
 
   function render() {
@@ -498,6 +504,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/\s+/g, " ");
     const search = normalizeSearch($("searchInput")?.value || "");
     const type = normalizeSearch($("typeFilter")?.value || "");
+    const city = normalizeSearch(cityFilter?.value || "");
     const area = normalizeSearch(areaFilter?.value || "");
     const downPaymentMaxRaw = $("downPaymentMaxFilter")?.value ?? "";
     const monthlyMaxRaw = $("monthlyMaxFilter")?.value ?? "";
@@ -517,7 +524,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       return (!search || normalizedText.includes(search)) &&
         (!companyQuery || normalizeSearch(o.developer_name).includes(companyQuery)) &&
         (!type || normalizeSearch(o.property_type) === type) &&
-        (!area || normalizeSearch(o.area) === area || normalizeSearch(o.city) === area) &&
+        (!city || normalizeSearch(o.city) === city) &&
+        (!area || normalizeSearch(o.area) === area) &&
         (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
         (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
         (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String(o.listing_purpose || "تنازل") === dealKind);
@@ -542,7 +550,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const resultsSummary = $("resultsSummary");
     if (resultsSummary) {
-      const activeFilters = Boolean(search || companyQuery || type || area || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || activeKind || activeDealKind);
+      const activeFilters = Boolean(search || companyQuery || type || city || area || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || activeKind || activeDealKind);
       resultsSummary.replaceChildren();
       const count = document.createElement("strong");
       count.textContent = String(filtered.length);
@@ -1021,7 +1029,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   form?.querySelector('[name="property_type"]')?.addEventListener("change", updateLandFields);
   updateLandFields();
   $("resetFiltersBtn")?.addEventListener("click", () => {
-    ["searchInput", "typeFilter", "areaFilter", "downPaymentMaxFilter", "monthlyMaxFilter"].forEach(id => {
+    ["searchInput", "typeFilter", "cityFilter", "areaFilter", "downPaymentMaxFilter", "monthlyMaxFilter"].forEach(id => {
       const field = $(id);
       if (field) field.value = "";
     });
@@ -1036,6 +1044,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   $("searchInput")?.addEventListener("input", render);
   $("typeFilter")?.addEventListener("change", render);
+  cityFilter?.addEventListener("change", render);
   areaFilter?.addEventListener("change", render);
   $("sortFilter")?.addEventListener("change", render);
   $("downPaymentMaxFilter")?.addEventListener("input", render);
