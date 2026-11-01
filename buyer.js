@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </label>
           <div class="buyer-notify-choice"><label><input name="notifications_enabled" type="checkbox" checked> نبّهني لما يظهر عرض مناسب وأنا فاتح المنصة</label></div>
           <button class="btn btn-gold" type="submit">احفظ طلبي وابحث عن المناسب</button>
-          <button class="btn btn-outline-dark" id="buyerNotificationPermission" type="button">تفعيل إشعارات المتصفح</button>
+          <button class="btn btn-outline-dark" id="buyerPushSubscribe" type="button">تفعيل إشعارات الهاتف حتى عند إغلاق التطبيق</button><button class="btn btn-outline-dark" id="buyerPushUnsubscribe" type="button" hidden>إيقاف إشعارات هذا الجهاز</button><p class="buyer-push-help">يتطلب HTTPS وموافقة المتصفح. على بعض الهواتف يلزم تثبيت أسيوط عقار على الشاشة الرئيسية.</p>
           <p id="buyerMatchStatus" role="status" aria-live="polite"></p>
         </form>
         <div class="buyer-match-results">
@@ -151,15 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let insertedAlerts=[];
         try { insertedAlerts=await api?.addBuyerAlerts?.(fresh)||[]; await loadAlerts(); }
         catch(error) { status.textContent="تعذر حفظ التنبيه داخل حسابك: "+(error.message||""); }
-        if (insertedAlerts.length && "Notification" in window && Notification.permission==="granted") {
-          try {
-            new Notification("أسيوط عقار: ظهر عرض مناسب لك", {
-              body:fresh.length===1?fresh[0].title:"ظهر "+fresh.length+" عروض تناسب طلبك",
-              icon:"./icon.svg",
-              tag:"asyut-aqar-buyer-match-"+String(fresh[0].id)
-            });
-          } catch(error) { console.warn("تعذر عرض إشعار المتصفح:",error); }
-        }
+        if (insertedAlerts.length) await loadAlerts();
       }
       knownMatches=new Set(matched.map(o=>String(o.id)));
       baselineReady=true;
