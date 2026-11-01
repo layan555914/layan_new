@@ -544,6 +544,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (!filtered.length) {
+      renderPagination(0);
       grid.innerHTML = `
         <div class="empty-state">
           <h3>لا توجد عروض منشورة حاليًا</h3>
