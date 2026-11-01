@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const propertyDocsList = document.getElementById("pendingPropertyDocuments");
   const companyProfilesList = document.getElementById("pendingCompanyProfiles");
   const marketplaceList = document.getElementById("pendingMarketplaceListings");
+  const companyAdsList = document.getElementById("pendingCompanyAds");
+  const adSlotsList = document.getElementById("pendingAdSlots");
+  const usersList = document.getElementById("adminUsers");
   const status = document.getElementById("adminStatus");
   const login = document.getElementById("adminLogin");
   const email = document.getElementById("adminEmail");
@@ -208,6 +211,66 @@ document.addEventListener("DOMContentLoaded", () => {
     marketplaceList.innerHTML = rows.map(row => '<article class="admin-ad" data-marketplace-id="' + esc(row.id) + '"><div><span class="admin-chip">' + esc(row.category) + ' · ' + esc(row.listing_type) + '</span><h2>' + esc(row.title) + '</h2><p>' + esc(row.description) + '</p><p><strong>الموقع:</strong> ' + esc(row.city) + (row.area ? ' — ' + esc(row.area) : '') + '</p><p><strong>السعر:</strong> ' + (row.price === null ? 'عند التواصل' : esc(row.price) + ' جنيه ' + esc(row.price_period || '')) + '</p><p><strong>الهاتف:</strong> ' + esc(row.contact_phone) + (row.whatsapp ? ' · واتساب: ' + esc(row.whatsapp) : '') + '</p>' + (row.details && typeof row.details === 'object' ? '<p><strong>تفاصيل القسم:</strong> ' + Object.entries(row.details).filter(([,v])=>String(v||'').trim()).map(([k,v])=>esc(k.replace(/_/g,' '))+': '+esc(v)).join(' · ') + '</p>' : '') + (Array.isArray(row.image_urls) ? row.image_urls.map((u,i)=>linkHtml(u,'صورة '+(i+1))).join(' · ') : '') + '</div><div class="admin-actions"><button type="button" class="btn btn-gold" data-marketplace-action="approve">اعتماد ونشر</button><button type="button" class="btn btn-outline-dark" data-marketplace-action="reject">رفض الطلب</button></div></article>').join("");
   }
 
+
+  async function loadPendingCompanyAds() {
+    if (!companyAdsList) return;
+    companyAdsList.innerHTML = '<p class="admin-empty">جارٍ تحميل إعلانات الشركات...</p>';
+    try {
+      const rows = await request("/rest/v1/company_property_ads?select=id,business_name,plan_code,status,starts_at,ends_at,created_at&status=eq.pending&order=created_at.asc");
+      if (!Array.isArray(rows) || !rows.length) {
+        companyAdsList.innerHTML = '<p class="admin-empty">لا توجد طلبات إعلانات شركات معلّقة.</p>';
+        return;
+      }
+      companyAdsList.innerHTML = rows.map(row =>
+        '<article class="admin-ad" data-company-ad-id="' + esc(row.id) + '"><div><span class="admin-chip">' + esc(row.plan_code) + '</span><h2>' + esc(row.business_name) + '</h2><p>تاريخ الطلب: ' + esc(new Date(row.created_at).toLocaleString("ar-EG")) + '</p></div><div class="admin-actions"><button type="button" class="btn btn-gold" data-company-ad-action="activate">تفعيل 30 يومًا</button><button type="button" class="btn btn-outline-dark" data-company-ad-action="reject">رفض الطلب</button></div></article>'
+      ).join("");
+    } catch (error) {
+      companyAdsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل إعلانات الشركات.") + '</p>';
+    }
+  }
+
+  async function loadPendingAdSlots() {
+    if (!adSlotsList) return;
+    adSlotsList.innerHTML = '<p class="admin-empty">جارٍ تحميل المساحات الإعلانية...</p>';
+    try {
+      const rows = await request("/rest/v1/partner_ad_slots?select=id,slot_key,category,title,description,is_free_trial,status,display_order&order=display_order.asc");
+      if (!Array.isArray(rows) || !rows.length) {
+        adSlotsList.innerHTML = '<p class="admin-empty">لا توجد مساحات إعلانية مسجلة.</p>';
+        return;
+      }
+      adSlotsList.innerHTML = rows.map(row =>
+        '<article class="admin-ad" data-ad-slot-id="' + esc(row.id) + '"><div><span class="admin-chip">' + esc(row.category) + '</span><h2>' + esc(row.title) + '</h2><p>' + esc(row.description || "") + '</p><p>المعرّف: ' + esc(row.slot_key) + ' · الحالة: ' + (row.status === "active" ? "مفعّلة" : "متوقفة") + (row.is_free_trial ? " · تجربة مجانية" : "") + '</p></div><div class="admin-actions"><button type="button" class="btn btn-outline-dark" data-slot-action="' + (row.status === "active" ? "disable" : "enable") + '">' + (row.status === "active" ? "إيقاف المساحة" : "تفعيل المساحة") + '</button></div></article>'
+      ).join("");
+    } catch (error) {
+      adSlotsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل المساحات الإعلانية.") + '</p>';
+    }
+  }
+
+  async function loadAdminUsers() {
+    if (!usersList) return;
+    usersList.innerHTML = '<p class="admin-empty">جارٍ تحميل حسابات المستخدمين...</p>';
+    try {
+      await ensureFreshSession();
+      const response = await fetch(base + "/functions/v1/asyut-admin", {
+        method: "POST",
+        headers: { apikey: key, Authorization: "Bearer " + session.access_token, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "list_users", page: 1, perPage: 100 })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "تعذر تحميل حسابات المستخدمين.");
+      const rows = Array.isArray(data.users) ? data.users : [];
+      if (!rows.length) {
+        usersList.innerHTML = '<p class="admin-empty">لا توجد حسابات مسجلة في قاعدة البيانات.</p>';
+        return;
+      }
+      usersList.innerHTML = '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="text-align:right;padding:10px">البريد الإلكتروني</th><th style="text-align:right;padding:10px">تاريخ التسجيل</th><th style="text-align:right;padding:10px">آخر دخول</th><th style="text-align:right;padding:10px">تأكيد البريد</th><th style="text-align:right;padding:10px">الحالة</th></tr></thead><tbody>' +
+        rows.map(user => '<tr><td style="padding:10px;border-top:1px solid #e5e8ee">' + esc(user.email || "—") + '</td><td style="padding:10px;border-top:1px solid #e5e8ee">' + esc(user.created_at ? new Date(user.created_at).toLocaleString("ar-EG") : "—") + '</td><td style="padding:10px;border-top:1px solid #e5e8ee">' + esc(user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString("ar-EG") : "لم يسجل دخولًا") + '</td><td style="padding:10px;border-top:1px solid #e5e8ee">' + (user.email_confirmed_at ? "مؤكد" : "غير مؤكد") + '</td><td style="padding:10px;border-top:1px solid #e5e8ee">' + (user.banned_until ? "موقوف مؤقتًا" : "نشط") + '</td></tr>').join("") +
+        '</tbody></table></div><p class="admin-empty">يتم عرض أول 100 حساب. لا تتوفر من هذه الشاشة إجراءات حذف أو تغيير كلمات المرور.</p>';
+    } catch (error) {
+      usersList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل حسابات المستخدمين.") + '</p>';
+    }
+  }
+
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
     try {
@@ -233,6 +296,9 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadPendingMarketplaceListings();
       await loadPendingPropertyOffers();
       await loadPendingPropertyDocuments();
+      await loadPendingCompanyAds();
+      await loadPendingAdSlots();
+      await loadAdminUsers();
       showState(true);
       setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
       return true;
@@ -375,6 +441,46 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة الإعلان."); }
     finally { button.disabled = false; }
   });
+
+  companyAdsList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-company-ad-action]");
+    const card = event.target.closest("[data-company-ad-id]");
+    if (!button || !card) return;
+    const action = button.dataset.companyAdAction;
+    if (!window.confirm(action === "activate" ? "تفعيل إعلان هذه الشركة لمدة 30 يومًا؟" : "تأكيد رفض طلب إعلان الشركة؟")) return;
+    button.disabled = true;
+    try {
+      const now = new Date();
+      const patch = action === "activate"
+        ? { status: "active", starts_at: now.toISOString(), ends_at: new Date(now.getTime() + 30 * 86400000).toISOString(), updated_at: now.toISOString() }
+        : { status: "rejected", updated_at: now.toISOString() };
+      await request("/rest/v1/company_property_ads?id=eq." + encodeURIComponent(card.dataset.companyAdId) + "&status=eq.pending", {
+        method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify(patch)
+      });
+      setStatus(action === "activate" ? "تم تفعيل إعلان الشركة لمدة 30 يومًا." : "تم رفض طلب إعلان الشركة.");
+      await loadPending();
+    } catch (error) { setStatus(error.message || "تعذر تحديث إعلان الشركة."); }
+    finally { button.disabled = false; }
+  });
+
+  adSlotsList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-slot-action]");
+    const card = event.target.closest("[data-ad-slot-id]");
+    if (!button || !card) return;
+    const action = button.dataset.slotAction;
+    if (!window.confirm(action === "enable" ? "تفعيل هذه المساحة الإعلانية؟" : "إيقاف هذه المساحة الإعلانية؟")) return;
+    button.disabled = true;
+    try {
+      await request("/rest/v1/partner_ad_slots?id=eq." + encodeURIComponent(card.dataset.adSlotId), {
+        method: "PATCH", headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ status: action === "enable" ? "active" : "inactive" })
+      });
+      setStatus(action === "enable" ? "تم تفعيل المساحة الإعلانية." : "تم إيقاف المساحة الإعلانية.");
+      await loadPendingAdSlots();
+    } catch (error) { setStatus(error.message || "تعذر تحديث المساحة الإعلانية."); }
+    finally { button.disabled = false; }
+  });
+
   list.addEventListener("click", async event => {
     const button = event.target.closest("button[data-action]");
     const card = event.target.closest("[data-ad-id]");
