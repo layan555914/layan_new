@@ -16,37 +16,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const password = document.getElementById("adminPassword");
   const authPanel = document.getElementById("authPanel");
   const reviewPanel = document.getElementById("reviewPanel");
-  // Admin session lives in sessionStorage only (cleared when the tab/browser closes) to limit token exposure; legacy localStorage copy is removed.
-  const sessionKey = "layanSupabaseSession";
-  try { localStorage.removeItem(sessionKey); } catch (_) {}
-  const readSession = () => { try { return JSON.parse(sessionStorage.getItem(sessionKey) || "null"); } catch (_) { return null; } };
-  let session = readSession();
+  // The admin page uses the same verified Supabase session as every other platform page.
+  const auth = window.LAYAN_SUPABASE;
+  let session = auth?.getSession?.() || null;
   const setStatus = message => { status.textContent = message || ""; };
   async function ensureFreshSession() {
-    if (!session?.access_token) return;
+    if (!session?.access_token) session = auth?.getSession?.() || null;
+    if (!session?.access_token) throw new Error("سجّل الدخول إلى حساب الإدارة أولًا.");
     const expiresAt = Number(session.expires_at || 0);
     if (expiresAt > Math.floor(Date.now() / 1000) + 60) return;
-    if (!session.refresh_token) {
-      session = null;
-      sessionStorage.removeItem(sessionKey);
-      showState(false);
-      throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
-    }
     try {
-      const response = await fetch(base + "/auth/v1/token?grant_type=refresh_token", {
-        method: "POST",
-        headers: { apikey: key, "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh_token: session.refresh_token })
-      });
-      const raw = await response.text();
-      let data = null;
-      try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
-      if (!response.ok || !data?.access_token || !data?.user) throw new Error("refresh failed");
-      session = { access_token: data.access_token, refresh_token: data.refresh_token || session.refresh_token, expires_at: data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600), user: data.user };
-      sessionStorage.setItem(sessionKey, JSON.stringify(session));
+      if (!auth?.requireAuthenticated) throw new Error("خدمة التحقق من الجلسة غير جاهزة.");
+      session = await auth.requireAuthenticated();
     } catch (_) {
       session = null;
-      sessionStorage.removeItem(sessionKey);
       showState(false);
       throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
     }
@@ -279,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", { method: "POST", body: "{}" });
       if (adminAllowed !== true) {
         session = null;
-        sessionStorage.removeItem(sessionKey);
+
         showState(false);
         list.innerHTML = "";
         if (companyProfilesList) companyProfilesList.innerHTML = "";
@@ -326,15 +309,8 @@ document.addEventListener("DOMContentLoaded", () => {
     link.style.pointerEvents = "none";
     setStatus("جارٍ إرسال رابط استعادة كلمة المرور إلى بريدك...");
     try {
-      const response = await fetch(base + "/auth/v1/recover?redirect_to=" + encodeURIComponent("https://layan-eg.com/reset-password.html"), {
-        method: "POST",
-        headers: { apikey: key, "Content-Type": "application/json" },
-        body: JSON.stringify({ email: recoveryEmail })
-      });
-      const raw = await response.text();
-      let data = {};
-      try { data = raw ? JSON.parse(raw) : {}; } catch (_) {}
-      if (!response.ok) throw new Error(data.msg || data.message || data.error_description || data.error || "تعذر إرسال رسالة الاستعادة.");
+      if (!auth?.resetPasswordForEmail) throw new Error("خدمة استعادة كلمة المرور غير جاهزة.");
+      await auth.resetPasswordForEmail(recoveryEmail);
       setStatus("لو البريد مسجل في المنصة، ستصلك رسالة استعادة. افتح أحدث رسالة من Supabase واضغط الرابط، ثم عيّن كلمة مرور جديدة. راجع الرسائل غير المرغوب فيها أيضًا.");
     } catch (error) {
       setStatus("تعذر إرسال رابط الاستعادة: " + error.message + " إذا ظهر خطأ في الرابط المسموح، يلزم إضافة https://layan-eg.com/reset-password.html إلى إعدادات Redirect URLs في Supabase.");
@@ -348,12 +324,10 @@ document.addEventListener("DOMContentLoaded", () => {
     button.disabled = true;
     setStatus("جارٍ تسجيل الدخول...");
     try {
-      const data = await request("/auth/v1/token?grant_type=password", {
-        method: "POST", headers: {}, body: JSON.stringify({email: email.value.trim(), password: password.value})
-      });
-      if (!data?.access_token || !data?.user?.id) throw new Error("لم يتم إنشاء جلسة دخول صالحة.");
-      session = {access_token:data.access_token,refresh_token:data.refresh_token || null,expires_at:data.expires_at || Math.floor(Date.now()/1000)+(data.expires_in || 3600),user:data.user};
-      sessionStorage.setItem(sessionKey, JSON.stringify(session));
+      if (!auth?.signIn) throw new Error("خدمة تسجيل الدخول غير جاهزة.");
+      await auth.signIn(email.value.trim(), password.value);
+      session = auth.getSession?.() || null;
+      if (!session?.access_token || !session?.user?.id) throw new Error("لم يتم إنشاء جلسة دخول صالحة.");
       showState(false);
       await loadPending();
     } catch (error) {
@@ -511,9 +485,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.getElementById("reloadPending").addEventListener("click", loadPending);
   document.getElementById("adminLogout").addEventListener("click", async () => {
-    try { if (session?.access_token) await fetch(base + "/auth/v1/logout", {method:"POST", headers:{apikey:key, Authorization:"Bearer "+session.access_token}}); } catch (_) {}
+    try { if (auth?.signOut) await auth.signOut(); } catch (error) { setStatus(error.message || "تعذر تسجيل الخروج."); return; }
     session = null;
-    sessionStorage.removeItem(sessionKey);
     showState(false);
     setStatus("تم تسجيل الخروج.");
   });
@@ -522,17 +495,15 @@ document.addEventListener("DOMContentLoaded", () => {
   async function verifyAndLoadAdmin() {
     if (!session?.access_token || !session?.user?.id) return;
     try {
-      const response = await fetch(base + "/auth/v1/user", {headers:{apikey:key, Authorization:"Bearer "+session.access_token}});
-      const user = response.ok ? await response.json() : null;
-      if (!user?.id || user.id !== session.user.id) throw new Error("جلسة الدخول غير صالحة.");
-      session.user = user;
-      sessionStorage.setItem(sessionKey, JSON.stringify(session));
+      if (!auth?.requireAuthenticated) throw new Error("خدمة التحقق من الحساب غير جاهزة.");
+      session = await auth.requireAuthenticated();
+      if (!session?.user?.id) throw new Error("جلسة الدخول غير صالحة.");
       const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", {method:"POST", body:"{}"});
       if (adminAllowed !== true) throw new Error("الحساب غير مصرح له بدخول لوحة الإدارة.");
       await loadPending();
     } catch (error) {
       session = null;
-      sessionStorage.removeItem(sessionKey);
+
       showState(false);
       setStatus("يلزم تسجيل الدخول والتحقق من صلاحية الإدارة مرة أخرى.");
     }
