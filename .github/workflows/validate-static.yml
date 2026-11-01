@@ -33,12 +33,12 @@ jobs:
           const path = require('node:path');
 
           const pages = [
-            'index.html', 'admin.html', 'companies.html', 'company.html',
+            'index.html', 'property.html', 'admin.html', 'companies.html', 'company.html',
             'marketplace.html', 'my-listings.html', 'payment.html',
             'reset-password.html'
           ];
           const cssFiles = [
-            'styles.css', 'buyer.css', 'sponsor.css', 'ai.css',
+            'styles.css', 'property.css', 'buyer.css', 'sponsor.css', 'ai.css',
             'companies.css', 'marketplace.css', 'marketplace-page.css',
             'my-listings.css'
           ];
