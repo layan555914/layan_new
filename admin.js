@@ -473,7 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await request("/rest/v1/partner_ad_slots?id=eq." + encodeURIComponent(card.dataset.adSlotId), {
         method: "PATCH", headers: { Prefer: "return=minimal" },
-        body: JSON.stringify({ status: action === "enable" ? "active" : "inactive" })
+        body: JSON.stringify({ status: action === "enable" ? "active" : "paused" })
       });
       setStatus(action === "enable" ? "تم تفعيل المساحة الإعلانية." : "تم إيقاف المساحة الإعلانية.");
       await loadPendingAdSlots();
