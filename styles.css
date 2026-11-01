@@ -2904,3 +2904,7 @@ a:focus-visible,button:focus-visible{
     font-size: 12px;
   }
 }
+
+
+/* Favorites and offer pagination */
+.offer-card-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}.offer-card-actions .details-button{flex:1}.favorite-button{min-height:42px;padding:8px 12px;border:1px solid #c9a65a;border-radius:10px;background:#fff;color:#102746;font:inherit;font-weight:700;cursor:pointer}.favorite-button.is-favorite{background:#fff5d9}.offers-pagination{display:flex;justify-content:center;align-items:center;gap:14px;margin:22px auto 0}.offers-pagination button{min-height:42px;padding:8px 18px;border:1px solid #102746;border-radius:9px;background:#fff;color:#102746;font:inherit;font-weight:700;cursor:pointer}.offers-pagination button:disabled{opacity:.45;cursor:not-allowed}.offers-pagination span{font-weight:700;color:#4b5865}
