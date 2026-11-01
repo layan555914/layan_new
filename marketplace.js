@@ -67,5 +67,14 @@ listingForm.elements.category.addEventListener("change",renderCategoryFields);
 document.querySelector(".category-grid")?.addEventListener("click",event=>{const button=event.target.closest("[data-market-category]");if(!button)return;categoryFilter.value=button.dataset.marketCategory;renderListings();document.querySelector(".marketplace-page")?.scrollIntoView({behavior:"smooth"})});
 categoryFilter.addEventListener("change",renderListings);listingForm.addEventListener("submit",submitListing);
 [authDialog,listingDialog].forEach(dialog=>dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close()}));
+window.addEventListener("layan-auth-callback",async event=>{
+ if(event.detail?.success){
+  currentSession=await getSession();
+  updateAuthButton();
+  authStatus.textContent=currentSession?.user?.id?"تم تأكيد البريد وتسجيل الدخول بنجاح.":"تم تأكيد البريد؛ سجّل الدخول للمتابعة.";
+ }else if(event.detail?.message){
+  authStatus.textContent="تعذر إكمال تأكيد البريد. افتح أحدث رابط وصل إلى بريدك أو سجّل الدخول بعد التأكيد.";
+ }
+});
 init();
 })();
