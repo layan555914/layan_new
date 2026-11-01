@@ -1,0 +1,224 @@
+document.addEventListener("DOMContentLoaded", async () => {
+  "use strict";
+
+  const root = document.getElementById("propertyDetailsRoot");
+  const config = window.LAYAN_CONFIG || {};
+  const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
+  const key = config.SUPABASE_PUBLISHABLE_KEY || "";
+  const params = new URLSearchParams(window.location.search);
+  const id = String(params.get("id") || "").trim();
+  const fields = [
+    "id","title","governorate","listing_purpose","land_ownership_authority",
+    "land_permit_details","land_utilities","land_zoning","city","area","area_m2",
+    "bedrooms","bathrooms","monthly_installment","property_type","description",
+    "total_price","down_payment","paid_amount","remaining_amount","assignment_fee",
+    "assignment_fee_percentage","discount_amount","discount_percent","developer_name",
+    "project_name","image_urls","is_featured","featured_until","contact_phone",
+    "latitude","longitude","created_at"
+  ].join(",");
+
+  const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[char]));
+  const safeURL = value => {
+    try {
+      const url = new URL(String(value || ""), window.location.href);
+      if (!["https:","http:"].includes(url.protocol)) return "";
+      if (url.origin === window.location.origin) return url.href;
+      return url.href;
+    } catch (_) { return ""; }
+  };
+  const money = value => {
+    const amount = Number(value);
+    if (!Number.isFinite(amount) || amount <= 0) return "غير محدد";
+    return new Intl.NumberFormat("ar-EG", {maximumFractionDigits:0}).format(amount) + " جنيه";
+  };
+  const valueOrUnknown = value => value === null || value === undefined || value === "" ? "غير محدد" : String(value);
+  const offerCode = offer => "ASY-" + String(offer.id || "").replace(/-/g,"").slice(0,8).toUpperCase();
+  const digits = value => String(value || "").replace(/\D/g,"");
+  const phoneForWhatsApp = value => {
+    let number = digits(value);
+    if (number.startsWith("00")) number = number.slice(2);
+    if (number.startsWith("0")) number = "20" + number.slice(1);
+    else if (number.length === 10 && number.startsWith("1")) number = "20" + number;
+    return number;
+  };
+  const makeFact = (label, value) => value === null || value === undefined || value === ""
+    ? "" : '<div class="property-fact"><span>' + escapeHTML(label) + '</span><strong>' + escapeHTML(value) + '</strong></div>';
+
+  function showState(title, message, retry = false) {
+    root.innerHTML = '<section class="property-state"><h1>' + escapeHTML(title) + '</h1><p>' + escapeHTML(message) + '</p>' +
+      (retry ? '<button class="property-action property-action-gold" id="retryPropertyLoad" type="button">إعادة المحاولة</button>' : '') +
+      '</section>';
+    root.querySelector("#retryPropertyLoad")?.addEventListener("click", loadProperty);
+  }
+
+  function renderProperty(row) {
+    const title = String(row.title || "إعلان عقاري على أسيوط عقار");
+    const purpose = String(row.listing_purpose || "بيع");
+    const imagesRaw = Array.isArray(row.image_urls) ? row.image_urls : [];
+    const images = imagesRaw.map(safeURL).filter(Boolean).slice(0, 20);
+    const phone = String(row.contact_phone || "");
+    const tel = phone.replace(/[^0-9+]/g, "");
+    const whatsapp = phoneForWhatsApp(phone);
+    const shareURL = new URL("./property.html", window.location.href);
+    shareURL.searchParams.set("id", row.id);
+    const shareText = "إعلان على أسيوط عقار: " + title + " — كود " + offerCode(row);
+    const isFeatured = row.is_featured === true && (!row.featured_until || new Date(row.featured_until) > new Date());
+    const locationText = [row.city, row.area].filter(Boolean).join(" · ") || "أسيوط";
+    const mapURL = row.latitude !== null && row.latitude !== undefined && row.longitude !== null && row.longitude !== undefined
+      ? "https://www.google.com/maps?q=" + encodeURIComponent(Number(row.latitude) + "," + Number(row.longitude)) : "";
+
+    document.title = title + " | أسيوط عقار";
+    const description = String(row.description || ("تفاصيل " + (row.property_type || "العقار") + " في " + locationText + " على منصة أسيوط عقار.")).slice(0, 155);
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title + " | أسيوط عقار");
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+    document.querySelector('meta[property="og:url"]')?.setAttribute("content", shareURL.href);
+    if (images[0]) document.querySelector('meta[property="og:image"]')?.setAttribute("content", images[0]);
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
+    canonical.href = shareURL.href;
+
+    const mainImage = images.length
+      ? '<img id="propertyMainImage" src="' + escapeHTML(images[0]) + '" alt="' + escapeHTML(title) + ' — الصورة الرئيسية" fetchpriority="high">'
+      : '<span class="property-gallery-empty">ASYUT AQAR</span>';
+    const thumbs = images.length > 1
+      ? '<div class="property-gallery-thumbs" aria-label="صور الإعلان">' + images.map((url,index) =>
+          '<button type="button" data-property-image="' + index + '" aria-label="عرض الصورة ' + (index + 1) + '" aria-pressed="' + (index === 0 ? "true" : "false") + '">' +
+          '<img src="' + escapeHTML(url) + '" alt="" loading="lazy"></button>'
+        ).join("") + '</div>' : "";
+    const contactActions = phone
+      ? '<div class="property-contact-actions"><a class="property-action property-action-gold" href="tel:' + escapeHTML(tel) + '">اتصال بصاحب الإعلان</a>' +
+        (whatsapp ? '<a class="property-action" href="https://wa.me/' + escapeHTML(whatsapp) + '?text=' + encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + title + " — كود " + offerCode(row) + " من منصة أسيوط عقار. " + shareURL.href) + '" target="_blank" rel="noopener noreferrer">واتساب صاحب الإعلان</a>' : '') +
+        '</div>' : '<p class="property-contact-note">لم يضف صاحب الإعلان رقم تواصل متاحًا حتى الآن.</p>';
+    const facts = [
+      makeFact("نوع العقار", row.property_type),
+      makeFact("نوع الإعلان", purpose),
+      makeFact("المدينة / المركز", row.city || "أسيوط"),
+      makeFact("المنطقة", row.area),
+      makeFact("المشروع / الكمبوند", row.project_name),
+      makeFact("المطور العقاري", row.developer_name),
+      makeFact("المساحة", row.area_m2 ? row.area_m2 + " م²" : ""),
+      makeFact("غرف النوم", row.bedrooms),
+      makeFact("الحمامات", row.bathrooms),
+      makeFact("إجمالي المدفوع", money(row.paid_amount)),
+      makeFact("القسط الشهري", row.monthly_installment ? money(row.monthly_installment) : ""),
+      makeFact("رسوم التنازل", purpose.includes("تنازل") ? (Number(row.assignment_fee) > 0 ? money(row.assignment_fee) : "تحدد من الجهة المختصة") : ""),
+      makeFact("الخصم المعلن", Number(row.discount_amount) > 0 ? money(row.discount_amount) : ""),
+      makeFact("جهة الولاية / التخصيص", row.land_ownership_authority),
+      makeFact("اشتراطات البناء", row.land_permit_details),
+      makeFact("المرافق", row.land_utilities),
+      makeFact("استخدام الأرض", row.land_zoning)
+    ].filter(Boolean).join("");
+
+    root.innerHTML = `
+      <div class="property-layout">
+        <div class="property-visual-column">
+          <section class="property-gallery-card" aria-label="صور العقار">
+            <div class="property-gallery-main">${mainImage}</div>
+            ${thumbs}
+          </section>
+          <section class="property-section-card">
+            <h2>تفاصيل ومواصفات العقار</h2>
+            <div class="property-facts-grid">${facts || '<p>لم يضف المعلن تفاصيل إضافية.</p>'}</div>
+          </section>
+          <section class="property-section-card">
+            <h2>وصف الإعلان</h2>
+            <p class="property-description">${escapeHTML(row.description || "لا يوجد وصف إضافي من صاحب الإعلان.")}</p>
+          </section>
+          <p class="property-disclaimer">تنبيه مهم: أسيوط عقار منصة إعلانات وربط بين المهتم وصاحب الإعلان، ولا تتدخل في التعاقد أو تحصيل ثمن العقار. راجع الملكية والعقد وجدول الأقساط ورسوم التنازل، وتحقق من موافقة الجهة أو المطوّر المختص قبل دفع أي مبالغ.</p>
+        </div>
+        <aside class="property-summary-card">
+          <div class="property-summary-top">
+            <span class="property-purpose-badge">${escapeHTML(row.property_type || "عقار")} · ${escapeHTML(purpose)}</span>
+            ${isFeatured ? '<span class="property-featured-badge">★ إعلان مميز</span>' : ""}
+          </div>
+          <p class="property-listing-code">كود الإعلان: <strong>${escapeHTML(offerCode(row))}</strong></p>
+          <h1>${escapeHTML(title)}</h1>
+          <p class="property-location">⌖ ${escapeHTML(locationText)} ${mapURL ? ' · <a href="' + escapeHTML(mapURL) + '" target="_blank" rel="noopener noreferrer">عرض الموقع</a>' : ""}</p>
+          <div class="property-price-highlight"><span>${purpose.includes("إيجار") ? "قيمة الإيجار المعلنة" : "السعر المعلن"}</span><strong>${money(row.total_price)}</strong></div>
+          <div class="property-key-figures">
+            <div class="property-key-figure"><span>المقدم عند التعاقد</span><strong>${money(row.down_payment)}</strong></div>
+            <div class="property-key-figure"><span>المبلغ المتبقي</span><strong>${money(row.remaining_amount)}</strong></div>
+          </div>
+          ${contactActions}
+          <p class="property-contact-note">التواصل والاتفاق يتمان مباشرة بين صاحب الإعلان والمهتم بالعقار. لا تفرض المنصة عمولة على إتمام الصفقة.</p>
+          <div class="property-footer-actions">
+            <button class="property-action property-action-outline" type="button" id="sharePropertyBtn">مشاركة الإعلان</button>
+            <a class="property-action property-action-outline" href="./#offers">العودة إلى العقارات</a>
+          </div>
+        </aside>
+      </div>
+      <div class="property-mobile-contact">
+        ${phone ? '<a class="property-action property-action-gold" href="tel:' + escapeHTML(tel) + '">اتصال</a>' : '<a class="property-action property-action-gold" href="./#offers">عقارات أخرى</a>'}
+        ${whatsapp ? '<a class="property-action" href="https://wa.me/' + escapeHTML(whatsapp) + '?text=' + encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + title + " — كود " + offerCode(row)) + '" target="_blank" rel="noopener noreferrer">واتساب</a>' : '<button class="property-action" id="mobileShareFallback" type="button">مشاركة الإعلان</button>'}
+      </div>
+    `;
+
+    root.querySelectorAll("[data-property-image]").forEach(button => {
+      button.addEventListener("click", () => {
+        const index = Number(button.dataset.propertyImage);
+        if (!Number.isInteger(index) || !images[index]) return;
+        const image = root.querySelector("#propertyMainImage");
+        if (image) { image.src = images[index]; image.alt = title + " — الصورة " + (index + 1); }
+        root.querySelectorAll("[data-property-image]").forEach(item => item.setAttribute("aria-pressed", item === button ? "true" : "false"));
+      });
+    });
+    root.querySelector("#sharePropertyBtn")?.addEventListener("click", share);
+    root.querySelector("#mobileShareFallback")?.addEventListener("click", share);
+
+    function share() {
+      const data = {title: title + " | أسيوط عقار", text: shareText, url: shareURL.href};
+      if (navigator.share) {
+        navigator.share(data).catch(error => { if (error?.name !== "AbortError") copyShare(); });
+      } else copyShare();
+    }
+    async function copyShare() {
+      try {
+        await navigator.clipboard.writeText(shareText + "\n" + shareURL.href);
+        showToast("تم نسخ رابط الإعلان للمشاركة.");
+      } catch (_) {
+        window.prompt("انسخ رابط الإعلان:", shareURL.href);
+      }
+    }
+    function showToast(message) {
+      const toast = document.getElementById("propertyToast");
+      if (!toast) return;
+      toast.textContent = message;
+      toast.hidden = false;
+      window.setTimeout(() => { toast.hidden = true; }, 2800);
+    }
+    document.getElementById("propertyToast")?.removeAttribute("hidden");
+    document.getElementById("propertyToast")?.setAttribute("hidden", "");
+  }
+
+  async function loadProperty() {
+    if (!root) return;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+      showState("رابط الإعلان غير مكتمل", "ارجع إلى قائمة العقارات واختر إعلانًا لعرض تفاصيله.");
+      return;
+    }
+    if (!base || !key) {
+      showState("الاتصال غير جاهز", "تعذر الاتصال بخدمة العقارات. حاول مرة أخرى لاحقًا.");
+      return;
+    }
+    showState("جارٍ تحميل الإعلان", "نحمّل بيانات العقار وصوره من قاعدة البيانات...");
+    try {
+      const endpoint = base + "/rest/v1/property_offers?select=" + fields + "&id=eq." + encodeURIComponent(id) + "&status=eq.available&limit=1";
+      const response = await fetch(endpoint, {headers:{apikey:key,Authorization:"Bearer " + key},cache:"no-store"});
+      if (!response.ok) throw new Error("تعذر تحميل الإعلان.");
+      const rows = await response.json();
+      if (!Array.isArray(rows) || !rows.length) {
+        showState("الإعلان غير متاح", "قد يكون صاحب الإعلان أوقفه أو لم يعد منشورًا. تصفح بقية عقارات أسيوط.");
+        return;
+      }
+      renderProperty(rows[0]);
+    } catch (error) {
+      console.warn("ASYUT AQAR property page:", error);
+      showState("تعذر تحميل الإعلان", "تحقق من اتصال الإنترنت ثم أعد المحاولة.", true);
+    }
+  }
+
+  loadProperty();
+});
