@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </label>
           <label>الحي / المنطقة المفضلة
             <input name="area" type="text" maxlength="100" list="buyerAreaHints" placeholder="اكتب اسم الحي أو المنطقة (اختياري)">
-            <datalist id="buyerAreaHints"></datalist>
+            <datalist id="buyerAreaHints"><option value="الهضبة"></datalist>
           </label>
           <label>أقصى سعر إجمالي تقدر عليه (جنيه)
             <input name="max_total_price" type="number" min="0" step="1000" inputmode="decimal" placeholder="اتركه 0 لو مش شرط">
