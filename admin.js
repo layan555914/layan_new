@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (marketplaceList) marketplaceList.innerHTML = "";
         if (marketplaceList) marketplaceList.innerHTML = "";
         if (propertyDocsList) propertyDocsList.innerHTML = "";
-        setStatus("هذا الحساب غير مخوّل بدخول لوحة إدارة LAYAN. يمكنك متابعة ملف شركتك من صفحة دليل الشركات.");
+        setStatus("هذا الحساب غير مخوّل بدخول لوحة إدارة أسيوط عقار. يمكنك متابعة ملف شركتك من صفحة دليل الشركات.");
         return false;
       }
 
@@ -383,7 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
       notes = window.prompt("اكتب البيانات أو التعديلات المطلوبة من الشركة:");
       if (notes === null) return;
       if (notes.trim().length < 3) { setStatus("اكتب تفاصيل واضحة لاستكمال البيانات."); return; }
-    } else if (!window.confirm(card.dataset.companyKind === "update" ? "اعتماد التعديلات وتحديث النسخة العامة لملف الشركة؟" : "اعتماد ملف الشركة ونشره في دليل ليان؟")) return;
+    } else if (!window.confirm(card.dataset.companyKind === "update" ? "اعتماد التعديلات وتحديث النسخة العامة لملف الشركة؟" : "اعتماد ملف الشركة ونشره في دليل أسيوط عقار؟")) return;
     button.disabled = true;
     try {
       if (card.dataset.companyKind === "update") {
