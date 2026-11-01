@@ -50,6 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="buyer-match-results">
           <div class="buyer-results-heading"><h3>العروض المناسبة لك</h3><span id="buyerMatchCount">0 عرض</span></div>
           <div id="buyerMatchCards"><div class="buyer-empty">املأ بياناتك وسنبحث في العروض المنشورة.</div></div>
+          <section class="buyer-alerts-panel" aria-labelledby="buyerAlertsTitle">
+            <div class="buyer-alerts-heading"><h3 id="buyerAlertsTitle">تنبيهات العروض الجديدة</h3><button id="markBuyerAlertsRead" class="link-btn" type="button" hidden>تحديد الكل كمقروء</button></div>
+            <p id="buyerAlertsCount" class="buyer-alerts-count">التنبيهات الجديدة ستظهر هنا بعد تسجيل الدخول وحفظ طلبك.</p>
+            <div id="buyerAlertList" aria-live="polite"></div>
+          </section>
         </div>
       </div>
       <p class="buyer-privacy-note">بيانات الميزانية والاحتياج خاصة بحسابك ولا تظهر لأصحاب الإعلانات. المطابقة استرشادية؛ راجع تفاصيل العرض وتحقق من الالتزامات قبل الاتفاق.</p>
@@ -107,7 +112,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   let saved = null;
   let knownMatches = new Set();
+  let baselineReady = false;
   let checkInProgress = false;
+  const alertList=$("buyerAlertList"),alertCount=$("buyerAlertsCount"),markAlertsReadButton=$("markBuyerAlertsRead");
+  function renderAlerts(rows) {
+    const alerts=Array.isArray(rows)?rows:[];
+    const unread=alerts.filter(row=>!row.read_at).length;
+    alertCount.textContent=unread?unread+" تنبيه غير مقروء":(alerts.length?"لا توجد تنبيهات جديدة غير مقروءة.":"لا توجد تنبيهات حتى الآن.");
+    markAlertsReadButton.hidden=unread===0;
+    alertList.innerHTML=alerts.length?alerts.map(row=>'<article class="buyer-alert-item '+(row.read_at?"is-read":"is-unread")+'"><a href="./?offer='+encodeURIComponent(row.offer_id)+'"><strong>'+esc(row.title_snapshot)+'</strong><span>'+esc([row.city_snapshot,row.area_snapshot].filter(Boolean).join(" · ")||"أسيوط")+'</span><small>'+new Date(row.created_at).toLocaleString("ar-EG")+'</small></a></article>').join(""):'<div class="buyer-empty">عند ظهور عقار جديد يناسب طلبك، سنضيف تنبيهًا هنا.</div>';
+  }
+  async function loadAlerts() {
+    const api=authService();
+    if(!api?.isAuthenticated?.()){renderAlerts([]);return;}
+    try{renderAlerts(await api.getBuyerAlerts(20));}
+    catch(error){alertCount.textContent="تعذر تحميل التنبيهات: "+(error.message||"");}
+  }
   async function loadOffers() {
     return await request("/rest/v1/property_offers?select=id,title,governorate,city,area,latitude,longitude,property_type,total_price,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc", {
       headers: { Authorization: "Bearer " + (config?.SUPABASE_PUBLISHABLE_KEY || "") }
@@ -147,6 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     if (!auth()) { status.textContent="سجّل الدخول أولًا لحفظ طلبك ومتابعة العروض المناسبة."; document.getElementById("loginBtn")?.click(); return; }
     saved=values();
+    baselineReady=false;
+    knownMatches=new Set();
     status.textContent="جارٍ حفظ طلبك والبحث عن العروض...";
     try {
       const s=await requireSession();
