@@ -636,7 +636,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
           </div>
         </article>`;
-    };
+    }).join("");
   }
 
   function updateAccountForm() {
