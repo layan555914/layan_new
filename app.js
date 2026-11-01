@@ -593,50 +593,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     grid.innerHTML = pageRows.map((o) => {
       const index = offers.indexOf(o);
       const image = o.image_urls[0];
-      const favorite=favorites.has(String(o.id));
+      const favorite = favorites.has(String(o.id));
+      const isAssignment = String(o.listing_purpose || "تنازل").includes("تنازل");
+      const isFeatured = o.is_featured && (!o.featured_until || new Date(o.featured_until) > new Date());
+      const photoCount = o.image_urls.length;
+      const priceLabel = String(o.listing_purpose || "").includes("إيجار") ? "قيمة الإيجار المعلنة" : "السعر المعلن";
 
       return `
         <article class="offer-card">
-          ${
-            image
-              ? `<img class="offer-image"
-                   src="${esc(image)}"
-                   alt="${esc(o.title)}"
-                   loading="lazy">`
-              : `<div class="offer-image offer-image-placeholder">
-                   ASYUT AQAR
-                 </div>`
-          }
+          <div class="offer-card-media">
+            ${
+              image
+                ? `<img class="offer-image" src="${esc(image)}" alt="${esc(o.title)}" loading="lazy" decoding="async">`
+                : `<div class="offer-image offer-image-placeholder"><span>ASYUT AQAR</span><small>أضف صورًا لهذا العقار</small></div>`
+            }
+            <div class="offer-card-badges">
+              <span class="offer-type">${esc(o.property_type)} · ${esc(o.listing_purpose || "تنازل")}</span>
+              ${isFeatured ? '<span class="featured-badge">★ عرض مميز</span>' : ""}
+            </div>
+            ${photoCount > 1 ? `<span class="offer-photo-count">▧ ${photoCount} صور</span>` : ""}
+          </div>
           <div class="offer-card-content">
-            ${o.is_featured && (!o.featured_until || new Date(o.featured_until) > new Date()) ? '<span class="featured-badge">★ عرض مميز</span>' : ''}
-            <span class="offer-type">${esc(o.property_type)} · ${esc(o.listing_purpose)}</span>
-            <p class="offer-code">كود الإعلان:
-              <strong>${esc(offerCode(o))}</strong>
-            </p>
+            <div class="offer-card-topline">
+              <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
+              <span class="offer-published-badge">إعلان منشور</span>
+            </div>
             <h3>${esc(o.title)}</h3>
-            <p class="offer-location">${esc([o.city, o.area].filter(Boolean).join(" · ") || "أسيوط")}</p>
+            <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join(" · ") || "أسيوط")}</p>
             ${o.latitude != null && o.longitude != null ? `<a class="offer-map-link" href="https://www.google.com/maps?q=${encodeURIComponent(Number(o.latitude)+","+Number(o.longitude))}" target="_blank" rel="noopener noreferrer">عرض موقع العقار على الخريطة</a>` : ""}
-            ${(o.area_m2 || o.bedrooms || o.bathrooms) ? `<p class="offer-specs">${o.area_m2 ? `المساحة ${esc(o.area_m2)} م²` : ""}${o.bedrooms ? ` · غرف ${esc(o.bedrooms)}` : ""}${o.bathrooms ? ` · حمامات ${esc(o.bathrooms)}` : ""}</p>` : ""}
+            ${(o.area_m2 || o.bedrooms || o.bathrooms) ? `<p class="offer-specs">${o.area_m2 ? `<span>المساحة <b>${esc(o.area_m2)} م²</b></span>` : ""}${o.bedrooms ? `<span>غرف النوم <b>${esc(o.bedrooms)}</b></span>` : ""}${o.bathrooms ? `<span>الحمامات <b>${esc(o.bathrooms)}</b></span>` : ""}</p>` : ""}
+            <div class="offer-price-main"><span>${priceLabel}</span><strong>${money(o.total_price)}</strong></div>
             <div class="offer-details">
-              <div><span>السعر الإجمالي</span>
-                <strong>${money(o.total_price)}</strong></div>
-              <div><span>المقدم عند التعاقد</span>
-                <strong>${money(o.down_payment)}</strong></div>
-              <div><span>إجمالي المدفوع حتى الآن (شامل المقدم)</span>
-                <strong>${money(o.paid_amount)}</strong></div>
-              <div><span>المبلغ المتبقي</span>
-                <strong>${money(o.remaining_amount)}</strong></div>
+              <div><span>المقدم عند التعاقد</span><strong>${money(o.down_payment)}</strong></div>
+              <div><span>إجمالي المدفوع</span><strong>${money(o.paid_amount)}</strong></div>
+              <div><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></div>
               ${o.monthly_installment ? `<div><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></div>` : ""}
-              <div><span>رسوم التنازل</span>
-                <strong>${money(o.assignment_fee)}</strong></div>
+              ${isAssignment ? `<div><span>رسوم التنازل</span><strong>${num(o.assignment_fee)>0 ? money(o.assignment_fee) : "تحدد من الجهة المختصة"}</strong></div>` : ""}
             </div>
             <div class="offer-card-actions">
-              <button type="button" class="favorite-button ${favorite ? "is-favorite" : ""}" data-favorite-id="${esc(o.id)}" aria-pressed="${favorite}">${favorite ? "★ محفوظ" : "☆ حفظ"}</button>
+              <button type="button" class="favorite-button ${favorite ? "is-favorite" : ""}" data-favorite-id="${esc(o.id)}" aria-pressed="${favorite}" aria-label="${favorite ? "إزالة من المفضلة" : "حفظ في المفضلة"}">${favorite ? "★ محفوظ" : "☆ حفظ"}</button>
               <button type="button" class="details-button" data-offer-index="${index}">عرض التفاصيل</button>
             </div>
           </div>
         </article>`;
-    }).join("");
+    };
   }
 
   function updateAccountForm() {
