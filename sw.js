@@ -1,9 +1,8 @@
-const CACHE_NAME = "asyut-aqar-shell-v87";
+const CACHE_NAME = "asyut-aqar-shell-v88-brand-cleanup";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./admin.html",
-  "./admin.css",
   "./admin.js",
   "./admin-entry.js",
   "./companies.html",
