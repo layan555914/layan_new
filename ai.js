@@ -17,11 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const message = input.value.trim();
     if (!message) { input.focus(); return; }
     const api = window.LAYAN_SUPABASE;
-    const session = api?.getSession?.();
-    if (!session?.access_token) {
+    if (!api?.isAuthenticated?.()) {
       answer.className = "layan-ai-answer layan-ai-error";
       answer.textContent = "سجّل الدخول أولًا لاستخدام مساعد أسيوط عقار.";
       document.getElementById("loginBtn")?.click();
+      return;
+    }
+    let session;
+    try {
+      session = await api.requireAuthenticated();
+      if (!session?.access_token) throw new Error("انتهت جلسة الدخول. سجّل الدخول مرة أخرى.");
+    } catch (error) {
+      answer.className = "layan-ai-answer layan-ai-error";
+      answer.textContent = error.message || "تعذر التحقق من جلسة الدخول. سجّل الدخول مرة أخرى.";
       return;
     }
     send.disabled = true;
