@@ -56,8 +56,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginNote = $("buyerLoginNote");
   const money = n => Number(n || 0).toLocaleString("ar-EG", {maximumFractionDigits:0}) + " ج.م";
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const getSession = () => { try { return JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null"); } catch { return null; } };
+  const authService = () => window.LAYAN_SUPABASE || null;
+  const getSession = () => authService()?.getSession?.() || null;
   const auth = () => { const s=getSession(); return s?.access_token && s?.user?.id ? s : null; };
+  async function requireSession() {
+    const service=authService();
+    if(!service?.requireAuthenticated) throw new Error("خدمة تسجيل الدخول غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
+    return await service.requireAuthenticated();
+  }
   const apiBase = () => String(config?.SUPABASE_URL || "").replace(/\/$/,"");
   const headers = () => { const s=auth(); return { apikey: config?.SUPABASE_PUBLISHABLE_KEY || "", Authorization: "Bearer " + (s?.access_token || config?.SUPABASE_PUBLISHABLE_KEY || ""), "Content-Type":"application/json" }; };
   async function request(path, options={}) {
@@ -91,7 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let knownMatches = new Set();
   let checkInProgress = false;
   async function loadOffers() {
-    return await request("/rest/v1/property_offers?select=id,title,governorate,area,property_type,total_price,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc");
+    return await request("/rest/v1/property_offers?select=id,title,governorate,area,property_type,total_price,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc", {
+      headers: { Authorization: "Bearer " + (config?.SUPABASE_PUBLISHABLE_KEY || "") }
+    });
   }
   async function refreshMatches(notify=false) {
     if (!saved || checkInProgress) return;
@@ -111,10 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
     finally { checkInProgress=false; }
   }
   async function loadSaved() {
-    const s=auth();
-    loginNote.hidden=Boolean(s);
-    if (!s) return;
+    const current=auth();
+    loginNote.hidden=Boolean(current);
+    if (!current) return;
     try {
+      const s=await requireSession();
       const rows=await request("/rest/v1/buyer_preferences?select=property_type,area,max_total_price,max_upfront,max_monthly_installment,min_bedrooms,notes,notifications_enabled&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=1");
       if (!Array.isArray(rows)||!rows.length) return;
       saved=rows[0];
@@ -124,11 +133,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   form.addEventListener("submit",async e=>{
     e.preventDefault();
-    const s=auth();
-    if (!s) { status.textContent="سجّل الدخول أولًا لحفظ طلبك ومتابعة العروض المناسبة."; document.getElementById("loginBtn")?.click(); return; }
+    if (!auth()) { status.textContent="سجّل الدخول أولًا لحفظ طلبك ومتابعة العروض المناسبة."; document.getElementById("loginBtn")?.click(); return; }
     saved=values();
     status.textContent="جارٍ حفظ طلبك والبحث عن العروض...";
     try {
+      const s=await requireSession();
       await request("/rest/v1/buyer_preferences?on_conflict=owner_id",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify({...saved,owner_id:s.user.id,updated_at:new Date().toISOString()})});
       await refreshMatches(false);
       status.textContent="تم حفظ طلبك والبحث في العروض المنشورة. سنعرض المطابقات الجديدة أثناء فتح المنصة.";
