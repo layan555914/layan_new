@@ -184,7 +184,7 @@
       "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price",
       "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
-      "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","created_at"
+      "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","latitude","longitude","created_at"
     ].join(",");
     const rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
     return Array.isArray(rows) ? rows : [];
@@ -331,6 +331,8 @@
       governorate: "أسيوط",
       city: offer.city || null,
       area: offer.area || null,
+      latitude: offer.latitude == null ? null : Number(offer.latitude),
+      longitude: offer.longitude == null ? null : Number(offer.longitude),
       area_m2: Number(offer.area_m2 || 0) || null,
       bedrooms: Number(offer.bedrooms || 0) || null,
       bathrooms: Number(offer.bathrooms || 0) || null,
@@ -390,7 +392,41 @@
     return getFavoriteOfferIds();
   }
 
+  async function getBuyerAlerts(limit = 20) {
+    if (!isAuthenticated()) return [];
+    const rows = await request("buyer_offer_alerts?select=id,offer_id,title_snapshot,city_snapshot,area_snapshot,price_snapshot,created_at,read_at&user_id=eq." +
+      encodeURIComponent(session.user.id) + "&order=created_at.desc&limit=" + Math.max(1, Math.min(50, Number(limit) || 20)));
+    return Array.isArray(rows) ? rows : [];
+  }
+  async function addBuyerAlerts(offers) {
+    if (!isAuthenticated() || !Array.isArray(offers) || !offers.length) return [];
+    const payload = offers.filter(o => Number.isFinite(Number(o.id))).map(o => ({
+      user_id: session.user.id,
+      offer_id: Number(o.id),
+      title_snapshot: String(o.title || "عرض عقاري").slice(0, 180),
+      city_snapshot: String(o.city || "أسيوط").slice(0, 120),
+      area_snapshot: o.area ? String(o.area).slice(0, 120) : null,
+      price_snapshot: Number(o.total_price || 0)
+    }));
+    if (!payload.length) return [];
+    await request("buyer_offer_alerts?on_conflict=user_id,offer_id", {
+      method: "POST",
+      headers: { Prefer: "resolution=ignore-duplicates,return=minimal" },
+      body: JSON.stringify(payload)
+    });
+    return getBuyerAlerts(20);
+  }
+  async function markBuyerAlertsRead() {
+    if (!isAuthenticated()) return false;
+    await request("buyer_offer_alerts?user_id=eq." + encodeURIComponent(session.user.id) + "&read_at=is.null", {
+      method: "PATCH",
+      headers: { Prefer: "return=minimal" },
+      body: JSON.stringify({ read_at: new Date().toISOString() })
+    });
+    return true;
+  }
+
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers };
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
