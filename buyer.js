@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label>تفاصيل إضافية عن احتياجك
             <textarea name="notes" rows="3" maxlength="500" placeholder="مثال: دور منخفض، قريب من المواصلات، مناسب للسكن..."></textarea>
           </label>
-          <div class="buyer-notify-choice"><label><input name="notifications_enabled" type="checkbox" checked> نبّهني لما يظهر عرض مناسب وأنا فاتح المنصة</label></div>
+          <div class="buyer-notify-choice"><label><input name="notifications_enabled" type="checkbox" checked> أرسل لي تنبيهًا عند ظهور عقار يطابق طلبي</label></div>
           <button class="btn btn-gold" type="submit">احفظ طلبي وابحث عن المناسب</button>
           <button class="btn btn-outline-dark" id="buyerPushSubscribe" type="button">تفعيل إشعارات الهاتف حتى عند إغلاق التطبيق</button><button class="btn btn-outline-dark" id="buyerPushUnsubscribe" type="button" hidden>إيقاف إشعارات هذا الجهاز</button><p class="buyer-push-help">يتطلب HTTPS وموافقة المتصفح. على بعض الهواتف يلزم تثبيت أسيوط عقار على الشاشة الرئيسية.</p>
           <p id="buyerMatchStatus" role="status" aria-live="polite"></p>
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </section>
         </div>
       </div>
-      <p class="buyer-privacy-note">بيانات الميزانية والاحتياج خاصة بحسابك ولا تظهر لأصحاب الإعلانات. نفحص العروض الجديدة أثناء فتح المنصة، ويمكن إظهار إشعار المتصفح بعد السماح به؛ التنبيه عند إغلاق التطبيق غير مفعّل بعد. المطابقة استرشادية؛ راجع تفاصيل العرض وتحقق من الالتزامات قبل الاتفاق.</p>
+      <p class="buyer-privacy-note">بيانات الميزانية والاحتياج خاصة بحسابك ولا تظهر لأصحاب الإعلانات. عند تفعيل إشعارات الهاتف، يمكن تنبيهك عند اعتماد عقار مطابق حتى إذا كانت المنصة مغلقة، بحسب دعم المتصفح ونظام الهاتف. وإن لم تفعّلها فستظل التنبيهات محفوظة داخل حسابك. المطابقة استرشادية؛ راجع تفاصيل العرض وتحقق من الالتزامات قبل الاتفاق.</p>
     </div>`;
   const offersSection = document.getElementById("offers");
   if (offersSection) offersSection.parentNode.insertBefore(root, document.getElementById("calculator") || offersSection.nextSibling);
