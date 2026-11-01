@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   root.className = "buyer-match-section";
   root.innerHTML = `
     <div class="buyer-match-wrap">
-      <div class="section-heading"><div><span class="eyebrow">بحث ذكي حسب احتياجك</span><h2>خلّي ليان تلاقي لك عقارك</h2>
+      <div class="section-heading"><div><span class="eyebrow">بحث ذكي حسب احتياجك</span><h2>خلّي أسيوط عقار تلاقي لك عقارك</h2>
       <p>حدد نوع الوحدة والمنطقة وميزانيتك، وسنطابق طلبك مع العروض المنشورة المتاحة.</p></div></div>
       <div class="buyer-match-layout">
         <form id="buyerPreferenceForm" class="buyer-preference-form">
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (notify && saved.notifications_enabled) {
         const fresh=matched.filter(o=>!knownMatches.has(String(o.id)));
         if (fresh.length && knownMatches.size && "Notification" in window && Notification.permission==="granted") {
-          new Notification("ليان عقار: ظهر عرض مناسب لك", {body:fresh.length===1?fresh[0].title:"ظهر "+fresh.length+" عروض تناسب طلبك", icon:"./assets/icon-192.png", tag:"layan-buyer-match"});
+          new Notification("أسيوط عقار: ظهر عرض مناسب لك", {body:fresh.length===1?fresh[0].title:"ظهر "+fresh.length+" عروض تناسب طلبك", icon:"./assets/icon-192.png", tag:"asyut-aqar-buyer-match"});
         }
       }
       knownMatches=new Set(matched.map(o=>String(o.id)));
