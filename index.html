@@ -17,6 +17,19 @@
   <meta property="og:title" content="ASYUT AQAR | أسيوط عقار">
   <meta property="og:description" content="اكتشف الفرص والتنازلات العقارية في أسيوط عبر منصة أسيوط عقار">
   <meta name="twitter:card" content="summary">
+  <meta property="og:locale" content="ar_EG">
+  <meta name="twitter:title" content="أسيوط عقار | عقارات وتنازلات وخدمات في أسيوط">
+  <meta name="twitter:description" content="ابحث عن عقارك في أسيوط وتصفح البيع والإيجار والتنازلات وسوق الخدمات العقارية.">
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"أسيوط عقار",
+    "alternateName":"ASYUT AQAR",
+    "url":"https://layan-eg.com/",
+    "inLanguage":"ar-EG"
+  }
+  </script>
   <title>ASYUT AQAR | أسيوط عقار</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -331,63 +344,81 @@
         </div>
       </div>
 
-      <div class="filters">
-        <input
-          id="searchInput"
-          type="search"
-          placeholder="ابحث عن وحدة أو منطقة أو شركة..."
-          aria-label="البحث عن العروض"
-        >
-
-        <select id="typeFilter" aria-label="تصفية حسب نوع العقار">
-          <option value="">كل أنواع العقارات</option>
-          <option value="شقة">شقة</option>
-          <option value="فيلا">فيلا</option>
-          <option value="محل">محل تجاري</option>
-          <option value="مكتب إداري">مكتب إداري</option>
-          <option value="عيادة طبية">عيادة طبية</option>
-          <option value="مخزن">مخزن</option>
-          <option value="معرض">معرض</option>
-          <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option><option value="أرض تنازل">أرض تنازل</option>
-        </select>
-
-        <select id="cityFilter" aria-label="تصفية حسب المدينة أو المركز">
-          <option value="">كل مدن ومراكز أسيوط</option>
-        </select>
-
-        <select id="areaFilter" aria-label="تصفية حسب الحي أو المنطقة">
-          <option value="">كل الأحياء والمناطق</option>
-          <option value="">كل مناطق محافظة أسيوط</option>
-          <option value="مدينة أسيوط">مدينة أسيوط</option>
-          <option value="أسيوط الجديدة">أسيوط الجديدة</option>
-          <option value="ديروط">ديروط</option>
-          <option value="القوصية">القوصية</option>
-          <option value="منفلوط">منفلوط</option>
-          <option value="أبنوب">أبنوب</option>
-          <option value="الفتح">الفتح</option>
-          <option value="ساحل سليم">ساحل سليم</option>
-          <option value="البداري">البداري</option>
-          <option value="أبو تيج">أبو تيج</option>
-          <option value="صدفا">صدفا</option>          <option value="الغنايم">الغنايم</option>
-        </select>
-        <label class="smart-filter-field">أقصى مقدم (جنيه)
-          <input id="downPaymentMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 300000" aria-label="أقصى مقدم بالجنيه">
-        </label>
-        <label class="smart-filter-field">أقصى قسط شهري (جنيه)
-          <input id="monthlyMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 10000" aria-label="أقصى قسط شهري بالجنيه">
-        </label>
-
-        <select id="sortFilter" aria-label="ترتيب العروض">
-          <option value="newest">الأحدث أولًا</option>
-          <option value="price-asc">السعر: من الأقل للأعلى</option>
-          <option value="price-desc">السعر: من الأعلى للأقل</option>
-          <option value="paid-asc">المبلغ المطلوب: من الأقل للأعلى</option>
-          <option value="monthly-asc">القسط الشهري: من الأقل للأعلى</option>
-        </select>
-
-        <button class="btn btn-gold" id="searchBtn" type="button">
-          بحث
-        </button>
+      <div class="filters" id="propertySearchFilters">
+        <div class="filters-primary">
+          <label class="filter-search-field">ابحث عن عقار أو منطقة أو مشروع
+            <input id="searchInput" type="search" placeholder="مثال: شقة في الهضبة أو محل تجاري" aria-label="ابحث عن عقار أو منطقة أو مشروع">
+          </label>
+          <label>نوع المعاملة
+            <select id="purposeFilter" aria-label="تصفية حسب نوع المعاملة">
+              <option value="">كل المعاملات</option>
+              <option value="بيع">بيع</option>
+              <option value="إيجار">إيجار</option>
+              <option value="تنازل">تنازل</option>
+            </select>
+          </label>
+          <label>نوع العقار
+            <select id="typeFilter" aria-label="تصفية حسب نوع العقار">
+              <option value="">كل أنواع العقارات</option>
+              <option value="شقة">شقة</option>
+              <option value="فيلا">فيلا</option>
+              <option value="محل">محل تجاري</option>
+              <option value="مكتب إداري">مكتب إداري</option>
+              <option value="عيادة طبية">عيادة طبية</option>
+              <option value="مخزن">مخزن</option>
+              <option value="معرض">معرض</option>
+              <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option>
+              <option value="أرض تنازل">أرض تنازل</option>
+            </select>
+          </label>
+          <label>المدينة / المركز
+            <select id="cityFilter" aria-label="تصفية حسب المدينة أو المركز">
+              <option value="">كل مدن ومراكز أسيوط</option>
+            </select>
+          </label>
+          <label>أقصى سعر معلن (جنيه)
+            <input id="totalPriceMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 1500000" aria-label="أقصى سعر معلن بالجنيه">
+          </label>
+        </div>
+        <div class="filters-actions">
+          <button class="filters-toggle" id="toggleAdvancedFilters" type="button" aria-expanded="false" aria-controls="advancedPropertyFilters">
+            <span aria-hidden="true">＋</span> فلاتر إضافية
+          </button>
+          <span class="filters-hint">حدّد المعاملة والمكان والميزانية للوصول إلى العروض المناسبة.</span>
+          <button class="btn btn-gold" id="searchBtn" type="button">عرض النتائج</button>
+        </div>
+        <div class="filters-advanced" id="advancedPropertyFilters" hidden>
+          <label>الحي أو المنطقة
+            <select id="areaFilter" aria-label="تصفية حسب الحي أو المنطقة">
+              <option value="">كل الأحياء والمناطق</option>
+              <option value="الهضبة">الهضبة</option>
+            </select>
+          </label>
+          <label>أقصى مقدم (جنيه)
+            <input id="downPaymentMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 300000" aria-label="أقصى مقدم بالجنيه">
+          </label>
+          <label>أقصى قسط شهري (جنيه)
+            <input id="monthlyMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 10000" aria-label="أقصى قسط شهري بالجنيه">
+          </label>
+          <label>أقل عدد غرف نوم
+            <select id="minBedroomsFilter" aria-label="أقل عدد غرف نوم">
+              <option value="">أي عدد غرف</option>
+              <option value="1">غرفة واحدة أو أكثر</option>
+              <option value="2">غرفتان أو أكثر</option>
+              <option value="3">3 غرف أو أكثر</option>
+              <option value="4">4 غرف أو أكثر</option>
+            </select>
+          </label>
+          <label>ترتيب النتائج
+            <select id="sortFilter" aria-label="ترتيب العروض">
+              <option value="newest">الأحدث أولًا</option>
+              <option value="price-asc">السعر: من الأقل للأعلى</option>
+              <option value="price-desc">السعر: من الأعلى للأقل</option>
+              <option value="paid-asc">المبلغ المدفوع: من الأقل للأعلى</option>
+              <option value="monthly-asc">القسط الشهري: من الأقل للأعلى</option>
+            </select>
+          </label>
+        </div>
       </div>
 
       <div class="results-toolbar">
