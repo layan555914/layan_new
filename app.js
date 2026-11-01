@@ -338,6 +338,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let offers = [];
   let activeKind = "";
+  const OFFERS_PER_PAGE = 12;
+  let offersPage = 1;
+  const FAVORITES_KEY = "asyutAqarFavoriteOffers";
   let activeDealKind = "";
   let selectedAccountType = "individual";
   let selectedPromotionDuration = 15;
@@ -388,6 +391,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       ? "ASY-" + id.replace(/-/g, "").slice(0, 8).toUpperCase()
       : "قيد المراجعة";
   };
+
+  function favoriteIds() { try { return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]").map(String)); } catch (_) { return new Set(); } }
+  function toggleFavorite(id) { const ids=favoriteIds(), key=String(id); ids.has(key)?ids.delete(key):ids.add(key); try{localStorage.setItem(FAVORITES_KEY,JSON.stringify([...ids]));}catch(_){} render(); }
+  function renderPagination(total) { const box=$("offersPagination"); if(!box)return; const pages=Math.max(1,Math.ceil(total/OFFERS_PER_PAGE)); offersPage=Math.min(Math.max(1,offersPage),pages); box.hidden=total<=OFFERS_PER_PAGE; if(box.hidden){box.replaceChildren();return;} box.innerHTML='<button type="button" data-page-nav="prev" '+(offersPage===1?'disabled':'')+'>السابق</button><span>صفحة '+offersPage+' من '+pages+'</span><button type="button" data-page-nav="next" '+(offersPage===pages?'disabled':'')+'>التالي</button>'; }
 
   function setStatus(message) {
     if (statusBox) statusBox.textContent = message;
@@ -545,9 +552,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    grid.innerHTML = filtered.map((o) => {
+    const pages=Math.max(1,Math.ceil(filtered.length/OFFERS_PER_PAGE));
+    offersPage=Math.min(Math.max(1,offersPage),pages);
+    const pageRows=filtered.slice((offersPage-1)*OFFERS_PER_PAGE,offersPage*OFFERS_PER_PAGE);
+    renderPagination(filtered.length);
+    const favorites=favoriteIds();
+    grid.innerHTML = pageRows.map((o) => {
       const index = offers.indexOf(o);
       const image = o.image_urls[0];
+      const favorite=favorites.has(String(o.id));
 
       return `
         <article class="offer-card">
@@ -583,11 +596,10 @@ document.addEventListener("DOMContentLoaded", async () => {
               <div><span>رسوم التنازل</span>
                 <strong>${money(o.assignment_fee)}</strong></div>
             </div>
-            <button type="button"
-              class="details-button"
-              data-offer-index="${index}">
-              عرض التفاصيل
-            </button>
+            <div class="offer-card-actions">
+              <button type="button" class="favorite-button ${favorite ? "is-favorite" : ""}" data-favorite-id="${esc(o.id)}" aria-pressed="${favorite}">${favorite ? "★ محفوظ" : "☆ حفظ"}</button>
+              <button type="button" class="details-button" data-offer-index="${index}">عرض التفاصيل</button>
+            </div>
           </div>
         </article>`;
     }).join("");
@@ -1281,6 +1293,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       setStatus("تعذر تحميل العروض. راجع إعدادات الاتصال والصلاحيات.");
     }
   }
+
+  $("offersPagination")?.addEventListener("click", event => { const button=event.target.closest("[data-page-nav]"); if(!button||button.disabled)return; offersPage+=button.dataset.pageNav==="next"?1:-1; render(); $("offers")?.scrollIntoView({behavior:"smooth",block:"start"}); });
+  $("offersGrid")?.addEventListener("click", event => { const button=event.target.closest("[data-favorite-id]"); if(button) toggleFavorite(button.dataset.favoriteId); });
 
   window.addEventListener("layan-auth-callback", event => {
     if (event.detail?.success) {
