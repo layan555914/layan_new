@@ -507,13 +507,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/\s+/g, " ");
     const search = normalizeSearch($("searchInput")?.value || "");
     const type = normalizeSearch($("typeFilter")?.value || "");
+    const purpose = normalizeSearch($("purposeFilter")?.value || "");
     const city = normalizeSearch(cityFilter?.value || "");
     const area = normalizeSearch(areaFilter?.value || "");
+    const totalPriceMaxRaw = $("totalPriceMaxFilter")?.value ?? "";
     const downPaymentMaxRaw = $("downPaymentMaxFilter")?.value ?? "";
     const monthlyMaxRaw = $("monthlyMaxFilter")?.value ?? "";
+    const minBedroomsRaw = $("minBedroomsFilter")?.value ?? "";
     const dealKind = activeDealKind;
+    const totalPriceMax = totalPriceMaxRaw.trim() === "" ? null : num(totalPriceMaxRaw);
     const downPaymentMax = downPaymentMaxRaw.trim() === "" ? null : num(downPaymentMaxRaw);
     const monthlyMax = monthlyMaxRaw.trim() === "" ? null : num(monthlyMaxRaw);
+    const minBedrooms = minBedroomsRaw.trim() === "" ? null : num(minBedroomsRaw);
     const sort = $("sortFilter")?.value || "newest";
     const companyQuery = normalizeSearch($("companySearchInput")?.value || "");
 
@@ -527,11 +532,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       return (!search || normalizedText.includes(search)) &&
         (!companyQuery || normalizeSearch(o.developer_name).includes(companyQuery)) &&
         (!type || normalizeSearch(o.property_type) === type) &&
+        (!purpose || normalizeSearch(o.listing_purpose || "تنازل") === purpose) &&
         (!city || normalizeSearch(o.city) === city) &&
         (!area || normalizeSearch(o.area) === area) &&
+        (totalPriceMax === null || num(o.total_price) <= totalPriceMax) &&
         (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
         (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
-        (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || String(o.listing_purpose || "تنازل") === dealKind);
+        (minBedrooms === null || num(o.bedrooms) >= minBedrooms) &&
+        (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || normalizeSearch(o.listing_purpose || "تنازل") === normalizeSearch(dealKind));
     });
 
     window.LAYAN_FILTERED_PROPERTY_OFFERS = filtered;
@@ -556,7 +564,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const resultsSummary = $("resultsSummary");
     if (resultsSummary) {
-      const activeFilters = Boolean(search || companyQuery || type || city || area || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || activeKind || activeDealKind);
+      const activeFilters = Boolean(search || companyQuery || type || purpose || city || area || totalPriceMaxRaw.trim() || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || minBedroomsRaw.trim() || activeKind || activeDealKind);
       resultsSummary.replaceChildren();
       const count = document.createElement("strong");
       count.textContent = String(filtered.length);
