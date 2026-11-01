@@ -213,6 +213,27 @@ document.addEventListener("DOMContentLoaded", () => {
     try { await authService()?.markBuyerAlertsRead?.(); await loadAlerts(); }
     catch(error) { status.textContent="تعذر تحديث حالة التنبيهات."; }
   });
+  async function reloadBuyerAccountState() {
+    baselineReady=false;
+    knownMatches=new Set();
+    saved=null;
+    if(auth()) {
+      await loadSaved();
+      if(saved) await refreshMatches(false);
+    } else {
+      loginNote.hidden=false;
+      renderAlerts([]);
+      cards.innerHTML='<div class="buyer-empty">سجّل الدخول واحفظ طلبك لعرض المطابقات والتنبيهات الخاصة بحسابك.</div>';
+      count.textContent="0 عرض";
+    }
+  }
+  window.addEventListener("layan-auth-state-changed",event=>{
+    if(event.detail?.authenticated) reloadBuyerAccountState();
+    else { saved=null; baselineReady=false; knownMatches=new Set(); loginNote.hidden=false; renderAlerts([]); }
+  });
+  window.addEventListener("layan-auth-callback",event=>{
+    if(event.detail?.success) reloadBuyerAccountState();
+  });
   loadSaved().then(()=>{ if(saved) refreshMatches(false); });
   window.addEventListener("focus",()=>{if(saved)refreshMatches(true);});
   document.addEventListener("visibilitychange",()=>{if(!document.hidden&&saved)refreshMatches(true);});
