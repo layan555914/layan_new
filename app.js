@@ -411,7 +411,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function compareIds() { try { const v=JSON.parse(localStorage.getItem(COMPARE_KEY)||"[]"); return Array.isArray(v)?[...new Set(v.map(String))].slice(0,3):[]; } catch (_) { return []; } }
   function updateCompareTray() {
     const tray=$("compareTray"), count=$("compareTrayCount"), open=$("openCompareBtn"); if(!tray||!count||!open)return;
-    const ids=compareIds(); tray.hidden=ids.length===0; count.textContent=ids.length+" من 3 عقارات محددة"; open.disabled=ids.length<2;
+    let ids=compareIds(); const availableIds=ids.filter(id=>offers.some(offer=>String(offer.id)===id)); if(availableIds.length!==ids.length){ids=availableIds;localStorage.setItem(COMPARE_KEY,JSON.stringify(ids));} tray.hidden=ids.length===0; count.textContent=ids.length+" من 3 عقارات محددة"; open.disabled=ids.length<2;
     document.querySelectorAll("[data-compare-id]").forEach(button=>{const yes=ids.includes(String(button.dataset.compareId));button.classList.toggle("is-compared",yes);button.setAttribute("aria-pressed",String(yes));button.textContent=yes?"✓ تمت الإضافة":"＋ قارن";});
   }
   function toggleCompare(id) {
