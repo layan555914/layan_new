@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (notify && saved.notifications_enabled && fresh.length) {
         const api=authService();
         let insertedAlerts=[];
-        try { insertedAlerts=await api?.addBuyerAlerts?.(fresh)||[]; await loadAlerts(); }
+        try { insertedAlerts=await api?.addBuyerAlerts?.(fresh)||[]; }
         catch(error) { status.textContent="تعذر حفظ التنبيه داخل حسابك: "+(error.message||""); }
         if (insertedAlerts.length) await loadAlerts();
       }
@@ -186,13 +186,6 @@ document.addEventListener("DOMContentLoaded", () => {
       await refreshMatches(false);
       status.textContent="تم حفظ طلبك والبحث في العروض المنشورة. سنعرض المطابقات الجديدة أثناء فتح المنصة.";
     } catch(e) { status.textContent="تعذر حفظ الطلب: "+e.message; }
-  });
-  $("buyerNotificationPermission").addEventListener("click",async()=>{
-    if (!("Notification" in window)) { status.textContent="المتصفح لا يدعم إشعارات النظام؛ ستظل التنبيهات محفوظة داخل حسابك."; return; }
-    try {
-      const permission=await Notification.requestPermission();
-      status.textContent=permission==="granted"?"تم السماح بإشعارات المتصفح. ستصل عند اكتشاف عرض مناسب أثناء فتح المنصة.":"لم يتم السماح بالإشعارات؛ ستظل التنبيهات محفوظة داخل حسابك.";
-    } catch(error) { status.textContent="تعذر طلب إذن الإشعارات من المتصفح."; }
   });
   const pushSubscribeButton=$("buyerPushSubscribe");
   const pushUnsubscribeButton=$("buyerPushUnsubscribe");
