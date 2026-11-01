@@ -264,6 +264,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function loadAdminStats() {
+    const panel=document.getElementById("adminStats");
+    const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value);};
+    const [properties,marketPending,companies,marketApproved]=await Promise.all([
+      request("/rest/v1/property_offers?select=id&status=eq.pending"),
+      request("/rest/v1/marketplace_listings?select=id&status=eq.pending"),
+      request("/rest/v1/company_profiles?select=id&status=eq.pending"),
+      request("/rest/v1/marketplace_listings?select=id&status=eq.approved")
+    ]);
+    set("statPendingProperties",Array.isArray(properties)?properties.length:0);
+    set("statPendingMarketplace",Array.isArray(marketPending)?marketPending.length:0);
+    set("statPendingCompanies",Array.isArray(companies)?companies.length:0);
+    set("statApprovedMarketplace",Array.isArray(marketApproved)?marketApproved.length:0);
+    if(panel)panel.hidden=false;
+  }
+
   async function loadPending() {
     setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
     try {
@@ -285,6 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       render(rows);
+      await loadAdminStats();
       await loadPendingCompanyProfiles();
       await loadPendingMarketplaceListings();
       await loadPendingPropertyOffers();
