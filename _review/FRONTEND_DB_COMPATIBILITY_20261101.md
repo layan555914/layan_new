@@ -70,3 +70,10 @@ The missing company-profile RPC also affects more than prefill: `companies.js` u
 
 ## Branding asset check
 Two candidate logo images were found in the Library. One is labeled `أسيوط عقار: أفق معماري أنيق` and contains “LAYAN AQAR” beneath the Arabic name; the other is labeled `شعار أسيوط العقاري الفاخر` and contains “ASYUT AQAR”. They are different images. Neither was copied into the repository or substituted for `icon.svg`, because the exact approved original logo has not been unambiguously confirmed.
+
+
+## Additional company submission hardening
+- The owner lookup now fetches up to two rows and blocks submission if multiple company profiles are found for one account, rather than arbitrarily editing the first row.
+- Paused company profiles are blocked from owner submission in the UI, consistent with the existing RLS update scope.
+- Company insert/update requests now ask PostgREST for the saved representation and require exactly one returned row before showing success. This prevents a zero-row PATCH from being reported as a successful update.
+- Multiline gallery/project fields retain real newline separators when loaded back into the form.
