@@ -1051,11 +1051,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   form?.querySelector('[name="property_type"]')?.addEventListener("change", updateLandFields);
   updateLandFields();
   $("resetFiltersBtn")?.addEventListener("click", () => {
-    ["searchInput", "typeFilter", "cityFilter", "areaFilter", "downPaymentMaxFilter", "monthlyMaxFilter"].forEach(id => {
+    ["searchInput", "purposeFilter", "typeFilter", "cityFilter", "areaFilter", "totalPriceMaxFilter", "downPaymentMaxFilter", "monthlyMaxFilter", "minBedroomsFilter"].forEach(id => {
       const field = $(id);
       if (field) field.value = "";
     });
     if ($("sortFilter")) $("sortFilter").value = "newest";
+    const advancedFilters = $("advancedPropertyFilters");
+    const advancedToggle = $("toggleAdvancedFilters");
+    if (advancedFilters) advancedFilters.hidden = true;
+    if (advancedToggle) advancedToggle.setAttribute("aria-expanded", "false");
     activeKind = "";
     activeDealKind = "";
     document.querySelectorAll("[data-category-kind]").forEach(tile => {
@@ -1066,6 +1070,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   $("searchInput")?.addEventListener("input", render);
   $("typeFilter")?.addEventListener("change", render);
+  $("purposeFilter")?.addEventListener("change", render);
+  $("totalPriceMaxFilter")?.addEventListener("input", render);
+  $("minBedroomsFilter")?.addEventListener("change", render);
+  $("toggleAdvancedFilters")?.addEventListener("click", () => {
+    const panel = $("advancedPropertyFilters");
+    const button = $("toggleAdvancedFilters");
+    if (!panel || !button) return;
+    panel.hidden = !panel.hidden;
+    button.setAttribute("aria-expanded", String(!panel.hidden));
+    button.textContent = panel.hidden ? "＋ فلاتر إضافية" : "− إخفاء الفلاتر";
+  });
   cityFilter?.addEventListener("change", render);
   areaFilter?.addEventListener("change", render);
   $("sortFilter")?.addEventListener("change", render);
