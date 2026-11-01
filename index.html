@@ -309,6 +309,13 @@
         <!-- يعرض app.js العروض هنا -->
       </div>
       <nav id="offersPagination" class="offers-pagination" aria-label="صفحات العروض" hidden></nav>
+      <div id="compareTray" class="compare-tray" hidden aria-live="polite">
+        <div><strong>مقارنة العقارات</strong><span id="compareTrayCount">0 من 3 عقارات محددة</span></div>
+        <div class="compare-tray-actions">
+          <button type="button" id="clearCompareBtn" class="compare-clear-btn">مسح الاختيارات</button>
+          <button type="button" id="openCompareBtn" class="btn btn-gold" disabled>قارن العقارات</button>
+        </div>
+      </div>
 
     </section>
 
@@ -536,6 +543,15 @@
     <p>للتواصل مع إدارة أسيوط عقار: <a href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" aria-label="تواصل مع إدارة أسيوط عقار عبر واتساب">💬 راسلنا على واتساب</a> · <a href="tel:+201007044265" aria-label="اتصل هاتفيًا بإدارة أسيوط عقار">للاتصال الهاتفي: 01007044265</a></p>
     <p>تحقق من بيانات الوحدة وشروط التنازل من الجهات المختصة قبل الاتفاق أو الدفع.</p>
   </footer>
+
+  <dialog id="compareDialog" class="compare-dialog" aria-labelledby="compareDialogTitle">
+    <div class="compare-dialog-head">
+      <div><span class="eyebrow">ASYUT AQAR · PROPERTY COMPARISON</span><h2 id="compareDialogTitle">قارن العقارات جنبًا إلى جنب</h2><p>قارن البيانات المتاحة في الإعلانات قبل التواصل مع المعلنين.</p></div>
+      <button type="button" id="closeCompareDialog" class="compare-close" aria-label="إغلاق المقارنة">×</button>
+    </div>
+    <div id="compareTableWrap" class="compare-table-wrap"></div>
+    <p class="compare-disclaimer">المقارنة مبنية على البيانات التي أدخلها أصحاب الإعلانات، وليست تحققًا من المستندات أو ضمانًا لصحة الأسعار والالتزامات. تواصل مع المعلن وتحقق من التفاصيل قبل الاتفاق.</p>
+  </dialog>
 
   <dialog id="offerDialog">
     <div class="dialog-header">
