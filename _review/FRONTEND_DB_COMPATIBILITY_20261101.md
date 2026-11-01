@@ -77,3 +77,13 @@ Two candidate logo images were found in the Library. One is labeled `أسيوط 
 - Paused company profiles are blocked from owner submission in the UI, consistent with the existing RLS update scope.
 - Company insert/update requests now ask PostgREST for the saved representation and require exactly one returned row before showing success. This prevents a zero-row PATCH from being reported as a successful update.
 - Multiline gallery/project fields retain real newline separators when loaded back into the form.
+
+
+## Superseding update — production repair applied
+The earlier trigger/policy findings above described the state before the production repair. Migration `20261101210205_asyut_aqar_company_profile_update_and_property_ad_limit` has since been applied and verified:
+- Owner updates to active company profiles are allowed only through the existing protected `pending_update` mechanism.
+- The promotion-state guard and per-company-ad three-property limit are now wired as BEFORE INSERT triggers on `property_offers`.
+- The company owner-update guard and updated-at helper are now wired as BEFORE UPDATE triggers on `company_profiles`.
+- The company ad limit function validates owner and active/pending ad state; it does not compare the company name with the distinct `developer_name` field.
+- Post-application tests passed under the authenticated non-admin role; all test rows were rolled back and verified absent.
+- The account-wide three-offer cap remains deliberately disabled pending confirmed trial/plan rules.
