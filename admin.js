@@ -65,6 +65,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return data;
   }
+  async function requestOneRow(path, options = {}) {
+    const rows = await request(path, {
+      ...options,
+      headers: { ...(options.headers || {}), Prefer: "return=representation" }
+    });
+    if (!Array.isArray(rows) || rows.length !== 1) {
+      throw new Error("لم يؤكد الخادم تحديث السجل المطلوب. ربما تغيّرت حالته أو لم يعد متاحًا للمراجعة؛ حدّث القائمة وحاول مرة أخرى.");
+    }
+    return rows[0];
+  }
   function showState(isLoggedIn) {
     authPanel.hidden = isLoggedIn;
     reviewPanel.hidden = !isLoggedIn;
@@ -364,9 +374,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Draft update on a published profile: server-side function (admin-only) merges or rejects it.
         await request("/rest/v1/rpc/layan_review_company_profile", { method: "POST", body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes }) });
       } else {
-        const done = await request("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
+        const done = await requestOneRow("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
           method: "PATCH",
-          headers: { Prefer: "return=minimal" },
           body: JSON.stringify({ status: action === "approve" ? "active" : action === "request_changes" ? "needs_changes" : "rejected", admin_notes: action === "approve" ? null : notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
         });
 
@@ -409,7 +418,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (!window.confirm("اعتماد هذا الإعلان ونشره للزوار؟")) return;
     button.disabled = true;
     try {
-      await request("/rest/v1/marketplace_listings?id=eq." + encodeURIComponent(card.dataset.marketplaceId) + "&status=eq.pending", {method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify({status:action==="approve"?"approved":"rejected",admin_notes:action==="approve"?null:notes,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id})});
+      await requestOneRow("/rest/v1/marketplace_listings?id=eq." + encodeURIComponent(card.dataset.marketplaceId) + "&status=eq.pending", {method:"PATCH",body:JSON.stringify({status:action==="approve"?"approved":"rejected",admin_notes:action==="approve"?null:notes,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id})});
       setStatus(action==="approve"?"تم اعتماد إعلان سوق الخدمات ونشره.":"تم رفض إعلان سوق الخدمات.");
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة الإعلان."); }
@@ -428,8 +437,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const patch = action === "activate"
         ? { status: "active", starts_at: now.toISOString(), ends_at: new Date(now.getTime() + 30 * 86400000).toISOString(), updated_at: now.toISOString() }
         : { status: "rejected", updated_at: now.toISOString() };
-      await request("/rest/v1/company_property_ads?id=eq." + encodeURIComponent(card.dataset.companyAdId) + "&status=eq.pending", {
-        method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify(patch)
+      await requestOneRow("/rest/v1/company_property_ads?id=eq." + encodeURIComponent(card.dataset.companyAdId) + "&status=eq.pending", {
+        method: "PATCH", body: JSON.stringify(patch)
       });
       setStatus(action === "activate" ? "تم تفعيل إعلان الشركة لمدة 30 يومًا." : "تم رفض طلب إعلان الشركة.");
       await loadPending();
@@ -445,8 +454,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!window.confirm(action === "enable" ? "تفعيل هذه المساحة الإعلانية؟" : "إيقاف هذه المساحة الإعلانية؟")) return;
     button.disabled = true;
     try {
-      await request("/rest/v1/partner_ad_slots?id=eq." + encodeURIComponent(card.dataset.adSlotId), {
-        method: "PATCH", headers: { Prefer: "return=minimal" },
+      await requestOneRow("/rest/v1/partner_ad_slots?id=eq." + encodeURIComponent(card.dataset.adSlotId), {
+        method: "PATCH",
         body: JSON.stringify({ status: action === "enable" ? "active" : "paused" })
       });
       setStatus(action === "enable" ? "تم تفعيل المساحة الإعلانية." : "تم إيقاف المساحة الإعلانية.");
