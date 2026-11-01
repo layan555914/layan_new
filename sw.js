@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v98-map-push-final-20261102";
+const CACHE_NAME = "asyut-aqar-shell-v99-leaflet-sri-background-push-20261102";
 const APP_SHELL = [
   "./",
   "./index.html",
