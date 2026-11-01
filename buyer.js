@@ -139,14 +139,25 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const offers=await loadOffers();
       const matched=offers.filter(o=>matches(o,saved));
-      if (notify && saved.notifications_enabled) {
-        const fresh=matched.filter(o=>!knownMatches.has(String(o.id)));
-        if (fresh.length && knownMatches.size && "Notification" in window && Notification.permission==="granted") {
-          new Notification("أسيوط عقار: ظهر عرض مناسب لك", {body:fresh.length===1?fresh[0].title:"ظهر "+fresh.length+" عروض تناسب طلبك", icon:"./icon.svg", tag:"asyut-aqar-buyer-match"});
+      const fresh=baselineReady ? matched.filter(o=>!knownMatches.has(String(o.id))) : [];
+      if (notify && saved.notifications_enabled && fresh.length) {
+        const api=authService();
+        try { await api?.addBuyerAlerts?.(fresh); await loadAlerts(); }
+        catch(error) { status.textContent="تعذر حفظ التنبيه داخل حسابك: "+(error.message||""); }
+        if ("Notification" in window && Notification.permission==="granted") {
+          try {
+            new Notification("أسيوط عقار: ظهر عرض مناسب لك", {
+              body:fresh.length===1?fresh[0].title:"ظهر "+fresh.length+" عروض تناسب طلبك",
+              icon:"./icon.svg",
+              tag:"asyut-aqar-buyer-match-"+String(fresh[0].id)
+            });
+          } catch(error) { console.warn("تعذر عرض إشعار المتصفح:",error); }
         }
       }
       knownMatches=new Set(matched.map(o=>String(o.id)));
+      baselineReady=true;
       render(matched,saved);
+      await loadAlerts();
     } catch(e) { status.textContent=e.message; }
     finally { checkInProgress=false; }
   }
@@ -178,9 +189,11 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch(e) { status.textContent="تعذر حفظ الطلب: "+e.message; }
   });
   $("buyerNotificationPermission").addEventListener("click",async()=>{
-    if (!("Notification" in window)) { status.textContent="المتصفح لا يدعم إشعارات النظام."; return; }
-    const permission=await Notification.requestPermission();
-    status.textContent=permission==="granted"?"تم تفعيل إشعارات المتصفح. ستظهر عند وجود عروض مطابقة أثناء فتح المنصة.":"لم يتم السماح بالإشعارات؛ ستظل العروض المطابقة ظاهرة داخل المنصة.";
+    if (!("Notification" in window)) { status.textContent="المتصفح لا يدعم إشعارات النظام؛ ستظل التنبيهات محفوظة داخل حسابك."; return; }
+    try {
+      const permission=await Notification.requestPermission();
+      status.textContent=permission==="granted"?"تم السماح بإشعارات المتصفح. ستصل عند اكتشاف عرض مناسب أثناء فتح المنصة.":"لم يتم السماح بالإشعارات؛ ستظل التنبيهات محفوظة داخل حسابك.";
+    } catch(error) { status.textContent="تعذر طلب إذن الإشعارات من المتصفح."; }
   });
   cards.addEventListener("click",e=>{
     const a=e.target.closest("[data-buyer-title]"); if(!a) return;
@@ -188,6 +201,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const search=document.getElementById("searchInput");
     if(search) { search.value=a.dataset.buyerTitle || ""; search.dispatchEvent(new Event("input",{bubbles:true})); }
     if(offersGrid) offersGrid.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+  markAlertsReadButton.addEventListener("click",async()=>{
+    try { await authService()?.markBuyerAlertsRead?.(); await loadAlerts(); }
+    catch(error) { status.textContent="تعذر تحديث حالة التنبيهات."; }
   });
   loadSaved().then(()=>{ if(saved) refreshMatches(false); });
   window.addEventListener("focus",()=>{if(saved)refreshMatches(true);});
