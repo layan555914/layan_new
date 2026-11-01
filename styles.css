@@ -2841,3 +2841,66 @@ a:focus-visible,button:focus-visible{
   background: #173d68 !important;
   border-color: #fff !important;
 }
+
+
+/* Mobile usability pass — apply to all platform forms and dialogs. */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .btn {
+    min-height: 46px;
+  }
+
+  .topbar {
+    gap: 10px 14px;
+    padding: 12px 14px;
+  }
+
+  .topbar nav {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 6px 12px;
+  }
+
+  .topbar nav a {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 4px;
+  }
+
+  .top-actions {
+    width: 100%;
+    gap: 8px;
+  }
+
+  dialog[open] {
+    max-width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .offer-card,
+  .company-directory-card,
+  .marketplace-card,
+  .my-listing-card {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand strong {
+    font-size: 18px;
+    letter-spacing: 1.5px;
+  }
+
+  .topbar nav {
+    gap: 4px 8px;
+    font-size: 12px;
+  }
+}
