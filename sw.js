@@ -1,7 +1,10 @@
-const CACHE_NAME = "asyut-aqar-shell-v102-ux-seo-refresh-20261102";
+const CACHE_NAME = "asyut-aqar-shell-v103-dedicated-property-pages-20261102";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./property.html",
+  "./property.css",
+  "./property.js",
   "./admin.html",
   "./admin.js",
   "./admin-entry.js",
