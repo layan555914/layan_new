@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v90-launch-browse-contrast";
+const CACHE_NAME = "asyut-aqar-shell-v91-shared-auth-20261101";
 const APP_SHELL = [
   "./",
   "./index.html",
