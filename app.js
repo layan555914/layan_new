@@ -621,7 +621,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const favorites=favoriteIds();
     updateCompareTray();
     grid.innerHTML = pageRows.map((o) => {
-      const index = offers.indexOf(o);
       const image = o.image_urls[0];
       const favorite = favorites.has(String(o.id));
       const isAssignment = String(o.listing_purpose || "تنازل").includes("تنازل");
@@ -663,7 +662,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="offer-card-actions">
               <button type="button" class="favorite-button ${favorite ? "is-favorite" : ""}" data-favorite-id="${esc(o.id)}" aria-pressed="${favorite}" aria-label="${favorite ? "إزالة من المفضلة" : "حفظ في المفضلة"}">${favorite ? "★ محفوظ" : "☆ حفظ"}</button>
               <button type="button" class="compare-card-button" data-compare-id="${esc(o.id)}" aria-pressed="false">＋ قارن</button>
-              <button type="button" class="details-button" data-offer-index="${index}">عرض التفاصيل</button>
+              <a class="details-button" href="./property.html?id=${encodeURIComponent(String(o.id))}">عرض التفاصيل</a>
             </div>
           </div>
         </article>`;
@@ -864,9 +863,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const shareButton = $("shareOfferBtn");
     shareButton?.addEventListener("click", async () => {
-      const shareUrl = new URL(window.location.href);
-      if (o.id != null) shareUrl.searchParams.set("offer", String(o.id));
-      else shareUrl.hash = "offers";
+      const shareUrl = new URL("./property.html", window.location.href);
+      if (o.id != null) shareUrl.searchParams.set("id", String(o.id));
+      else { shareUrl.pathname = "./"; shareUrl.hash = "offers"; }
       const shareData = {title: "ASYUT AQAR | " + o.title, text: "إعلان عقاري على أسيوط عقار: " + o.title + " — كود الإعلان " + offerCode(o), url: shareUrl.toString()};
       try {
         if (navigator.share) await navigator.share(shareData);
