@@ -728,14 +728,17 @@
   if (!form) return;
   form.addEventListener("submit", event => {
     event.preventDefault();
+    const purpose = document.getElementById("heroPurposeFilter")?.value || "";
     const type = document.getElementById("heroTypeFilter")?.value || "";
     const area = document.getElementById("heroAreaFilter")?.value || "";
     const budget = document.getElementById("heroBudgetFilter")?.value || "";
+    const purposeField = document.getElementById("purposeFilter");
     const typeField = document.getElementById("typeFilter");
     const cityField = document.getElementById("cityFilter");
     const areaField = document.getElementById("areaFilter");
     const searchField = document.getElementById("searchInput");
-    const budgetField = document.getElementById("downPaymentMaxFilter");
+    const budgetField = document.getElementById("totalPriceMaxFilter");
+    if (purposeField) purposeField.value = purpose;
     if (typeField) typeField.value = type;
     if (budgetField) budgetField.value = budget;
     const cityMatch = cityField && [...cityField.options].some(option => option.value === area);
@@ -743,7 +746,7 @@
     if (cityField) cityField.value = cityMatch ? area : "";
     if (areaField) areaField.value = !cityMatch && areaMatch ? area : "";
     if (searchField) searchField.value = area && !cityMatch && !areaMatch ? area : "";
-    [typeField, cityField, areaField, budgetField].forEach(field => field?.dispatchEvent(new Event("change", {bubbles:true})));
+    [purposeField, typeField, cityField, areaField, budgetField].forEach(field => field?.dispatchEvent(new Event("change", {bubbles:true})));
     budgetField?.dispatchEvent(new Event("input", {bubbles:true}));
     document.getElementById("searchBtn")?.click();
     document.getElementById("offers")?.scrollIntoView({behavior:"smooth",block:"start"});
