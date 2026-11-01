@@ -479,13 +479,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (areaFilter) {
       const previousArea = areaFilter.value;
-      const areas = [...new Set(offers.map(o => String(o.area || "").trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b,"ar"));
+      const areas = [...new Set(["الهضبة", ...offers.map(o => String(o.area || "").trim()).filter(Boolean)])].sort((a,b) => a.localeCompare(b,"ar"));
       areaFilter.innerHTML = '<option value="">كل الأحياء والمناطق</option>' + areas.map(area => '<option value="' + esc(area) + '">' + esc(area) + '</option>').join("");
       if (areas.includes(previousArea)) areaFilter.value = previousArea;
     }
     const areaHints = $("asyut-neighborhoods");
     if (areaHints) {
-      const areas = [...new Set(offers.map(o => String(o.area || "").trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b,"ar"));
+      const areas = [...new Set(["الهضبة", ...offers.map(o => String(o.area || "").trim()).filter(Boolean)])].sort((a,b) => a.localeCompare(b,"ar"));
       areaHints.innerHTML = areas.map(area => '<option value="' + esc(area) + '"></option>').join("");
     }
   }
@@ -501,6 +501,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/[أإآ]/g, "ا")
       .replace(/ى/g, "ي")
       .replace(/ة/g, "ه")
+      .replace(/^مدينه\s+/, "")
       .replace(/[\u064B-\u065F\u0670]/g, "")
       .replace(/[ـ]/g, "")
       .replace(/\s+/g, " ");
