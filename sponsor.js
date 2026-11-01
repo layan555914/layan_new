@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadAds() {
     if (!base || !key) return;
     try {
-      const rows = await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12");
+      const rows = await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12", { headers: { Authorization: "Bearer " + key } });
       const approvedAds = Array.isArray(rows) ? rows : [];
       // Only show real advertisements that have been approved by ASYUT AQAR administration.
       ads = approvedAds;
