@@ -2825,3 +2825,19 @@ a:focus-visible,button:focus-visible{
   border: 1px solid #ead9b2 !important;
   box-shadow: 0 5px 16px rgba(0,0,0,.18);
 }
+
+
+/* Make the launch-section "Browse offers" button visible beside account selection. */
+.launch-actions a.btn-outline {
+  color: #102746 !important;
+  background: linear-gradient(135deg,#fffdf8,#ead9b2) !important;
+  border: 2px solid #ead9b2 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+}
+.launch-actions a.btn-outline:hover,
+.launch-actions a.btn-outline:focus-visible {
+  color: #fff !important;
+  background: #173d68 !important;
+  border-color: #fff !important;
+}
