@@ -17,10 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (_) { return ""; }
   };
 
-  const getSession = () => {
-    try { return JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null"); }
-    catch (_) { return null; }
-  };
+  const authService = () => window.LAYAN_SUPABASE || null;
+  const getSession = () => authService()?.getSession?.() || null;
 
   async function api(path, options = {}) {
     if (!base || !key) throw new Error("إعدادات الاتصال غير مكتملة.");
@@ -87,9 +85,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   let dialog;
-  function openForm() {
-    const session = getSession();
-    if (!session?.access_token || !session?.user?.id) {
+  async function openForm() {
+    try {
+      const session = await authService()?.requireAuthenticated?.();
+      if (!session?.access_token || !session?.user?.id) throw new Error("جلسة الدخول غير متاحة.");
+    } catch (_) {
       window.alert("سجّل الدخول إلى حساب أسيوط عقار أولًا، ثم اطلب إعلانك الممول.");
       document.getElementById("loginBtn")?.click();
       return;
@@ -141,9 +141,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
     const status = form.querySelector(".sponsor-form-status");
-    const session = getSession();
-    if (!session?.access_token || !session?.user?.id) {
-      status.textContent = "انتهت جلسة الدخول. سجّل الدخول ثم أعد إرسال الطلب.";
+    let session;
+    try {
+      session = await authService()?.requireAuthenticated?.();
+      if (!session?.access_token || !session?.user?.id) throw new Error("انتهت جلسة الدخول. سجّل الدخول مرة أخرى.");
+    } catch (error) {
+      status.textContent = error.message || "انتهت جلسة الدخول. سجّل الدخول ثم أعد إرسال الطلب.";
       return;
     }
     const data = new FormData(form);
