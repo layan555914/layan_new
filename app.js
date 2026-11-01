@@ -668,6 +668,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         </article>`;
     }).join("");
+    updateCompareTray();
   }
 
   function updateAccountForm() {
