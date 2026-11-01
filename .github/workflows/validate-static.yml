@@ -1,0 +1,113 @@
+name: Validate static platform
+
+on:
+  push:
+    branches:
+      - restore/asyut-aqar-full-platform-20261101
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out restoration branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          set -e
+          for file in *.js; do
+            echo "Checking $file"
+            node --check "$file"
+          done
+      - name: Validate JSON and local page assets
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const pages = [
+            'index.html', 'admin.html', 'companies.html', 'company.html',
+            'marketplace.html', 'my-listings.html', 'payment.html',
+            'reset-password.html'
+          ];
+          const cssFiles = [
+            'styles.css', 'buyer.css', 'sponsor.css', 'ai.css',
+            'companies.css', 'marketplace.css', 'marketplace-page.css',
+            'my-listings.css'
+          ];
+          const errors = [];
+
+          function checkLocalRefs(file, source, pattern) {
+            for (const match of source.matchAll(pattern)) {
+              let ref = (match[1] || '').trim();
+              if (!ref || /^(?:[a-z]+:|\/\/|#)/i.test(ref)) continue;
+              ref = ref.split(/[?#]/, 1)[0];
+              if (!ref) continue;
+              let target;
+              if (ref.startsWith('/')) target = ref.slice(1);
+              else target = path.posix.normalize(path.posix.join(path.posix.dirname(file), ref));
+              if (target === '.' || target.endsWith('/')) target = path.posix.join(target, 'index.html');
+              if (!fs.existsSync(target)) errors.push(file + ' -> ' + match[1] + ' (missing ' + target + ')');
+            }
+          }
+
+          for (const file of pages) {
+            if (!fs.existsSync(file)) {
+              errors.push('Missing page: ' + file);
+              continue;
+            }
+            checkLocalRefs(file, fs.readFileSync(file, 'utf8'), /(?:src|href)=["']([^"']+)["']/g);
+          }
+          for (const file of cssFiles) {
+            if (!fs.existsSync(file)) {
+              errors.push('Missing stylesheet: ' + file);
+              continue;
+            }
+            checkLocalRefs(file, fs.readFileSync(file, 'utf8'), /url\(["']?([^"')]+)["']?\)/g);
+          }
+
+          try {
+            const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+            if (!manifest.name || !manifest.start_url || !Array.isArray(manifest.icons)) {
+              errors.push('manifest.json is missing required PWA fields');
+            }
+          } catch (error) {
+            errors.push('manifest.json: ' + error.message);
+          }
+
+          try {
+            const sw = fs.readFileSync('sw.js', 'utf8');
+            const match = sw.match(/const APP_SHELL = \[([\s\S]*?)\];/);
+            if (!match) errors.push('sw.js: APP_SHELL list not found');
+            else {
+              for (const item of match[1].matchAll(/["']([^"']+)["']/g)) {
+                let target = item[1].replace(/^\.\//, '');
+                if (!target || target.endsWith('/')) target = path.posix.join(target, 'index.html');
+                if (!fs.existsSync(target)) errors.push('sw.js APP_SHELL -> ' + item[1] + ' (missing ' + target + ')');
+              }
+            }
+          } catch (error) {
+            errors.push('sw.js: ' + error.message);
+          }
+
+          if (fs.existsSync('CNAME')) {
+            const cname = fs.readFileSync('CNAME', 'utf8').trim();
+            if (cname !== 'layan-eg.com') errors.push('Unexpected CNAME value: ' + cname);
+          } else {
+            errors.push('CNAME file is missing');
+          }
+
+          if (errors.length) {
+            console.error('Static validation failed:');
+            for (const error of errors) console.error(' - ' + error);
+            process.exit(1);
+          }
+          console.log('Static validation passed: JavaScript syntax, local references, PWA manifest, service-worker assets, and CNAME.');
+          NODE
