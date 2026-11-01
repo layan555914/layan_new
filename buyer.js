@@ -211,9 +211,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const registration=await navigator.serviceWorker.ready;
       const subscription=await registration.pushManager.getSubscription();
       if(!subscription)return;
-      const session=await requireSession();
-      const rows=await request("/rest/v1/buyer_push_subscriptions?select=id&user_id=eq."+encodeURIComponent(session.user.id)+"&endpoint=eq."+encodeURIComponent(subscription.endpoint)+"&limit=1");
-      if(Array.isArray(rows)&&rows.length){pushSubscribeButton.hidden=true;pushUnsubscribeButton.hidden=false;}
+      const state=await invokePush("subscription_status",{endpoint:subscription.endpoint});
+      if(state.subscribed){pushSubscribeButton.hidden=true;pushUnsubscribeButton.hidden=false;}
       else pushSubscribeButton.textContent="ربط إشعارات هذا الجهاز بحسابك";
     } catch(error){console.warn("تعذر فحص اشتراك الإشعارات:",error);}
   }
