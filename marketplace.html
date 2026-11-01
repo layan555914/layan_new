@@ -43,7 +43,7 @@
   .listing-body { padding: 12px; }
 }
 
- .marketplace-pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px auto 0}.marketplace-pagination button{min-height:42px;padding:8px 16px;border:1px solid var(--navy);border-radius:9px;background:#fff;color:var(--navy);font-weight:700;cursor:pointer}.marketplace-pagination button:disabled{opacity:.45;cursor:not-allowed}.marketplace-pagination span{font-weight:700;color:var(--muted)}</style>
+ .marketplace-pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px auto 0}.marketplace-pagination button{min-height:42px;padding:8px 16px;border:1px solid var(--navy);border-radius:9px;background:#fff;color:var(--navy);font-weight:700;cursor:pointer}.marketplace-pagination button:disabled{opacity:.45;cursor:not-allowed}.marketplace-pagination span{font-weight:700;color:var(--muted)}.marketplace-location-coordinates{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:10px}.marketplace-location-coordinates summary{cursor:pointer;color:var(--navy);font-weight:700}.marketplace-pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px auto 0}.marketplace-pagination button{min-height:42px;padding:8px 16px;border:1px solid var(--navy);border-radius:9px;background:#fff;color:var(--navy);font-weight:700;cursor:pointer}.marketplace-pagination button:disabled{opacity:.45;cursor:not-allowed}.marketplace-pagination span{font-weight:700;color:var(--muted)}</style>
 </head>
 <body>
 <header class="topbar">
@@ -75,15 +75,15 @@
 <label>القسم *<select name="category" required><option value="">اختر القسم</option><option>سوق العقارات</option><option>التنازلات العقارية</option><option>أراضي للبيع</option><option>أراضي التنازلات</option><option>إيجار يومي ومفروش</option><option>الشركات والمكاتب العقارية</option><option>مواد البناء والتشطيب</option><option>الأثاث والفرش وتجهيز الوحدات</option><option>المشروعات والمطورون العقاريون</option><option>الصيانة وإدارة العقارات</option><option>الاستشارات والخدمات العقارية</option></select></label>
 <label>نوع الإعلان<select name="listing_type"><option>خدمة</option><option>عقار للبيع</option><option>تنازل</option><option>إيجار يومي</option><option>إيجار أسبوعي</option><option>إيجار شهري</option><option>مشروع عقاري</option><option>منتج أو توريد</option></select></label>
 <label>عنوان الإعلان *<input name="title" required minlength="4" maxlength="180"></label><label>وصف الإعلان *<textarea name="description" required minlength="20" maxlength="3000" rows="4"></textarea></label>
-<div class="form-row"><label>المدينة / المركز *<input name="city" required value="أسيوط" maxlength="100"></label><label>المنطقة<input name="area" maxlength="120"></label></div>
+<div class="form-row"><label>المدينة / المركز *<input name="city" required value="مدينة أسيوط" list="marketplaceCities" maxlength="100"></label><label>الحي / المنطقة<input name="area" maxlength="120" list="marketplaceAreas"></label></div><datalist id="marketplaceCities"><option value="مدينة أسيوط"><option value="أسيوط الجديدة"><option value="ديروط"><option value="القوصية"><option value="منفلوط"><option value="أبنوب"><option value="الفتح"><option value="ساحل سليم"><option value="البداري"><option value="أبو تيج"><option value="صدفا"><option value="الغنايم"></datalist><datalist id="marketplaceAreas"></datalist>
 <div class="form-row"><label>نوع العقار (إن وجد)<input name="property_type" maxlength="100"></label><label>السعر بالجنيه (اختياري)<input name="price" type="number" min="0" step="0.01"></label></div>
 <div id="marketplaceCategoryFields" class="category-fields"><p class="muted">اختر القسم لإظهار التفاصيل المناسبة.</p></div>
 <label>مدة السعر<select name="price_period"><option value="">غير محدد</option><option>لليوم</option><option>للأسبوع</option><option>للشهر</option><option>للوحدة</option><option>للمتر</option><option>للاتفاق</option></select></label>
 <div class="form-row"><label>رقم التواصل *<input name="contact_phone" required type="tel" minlength="7" maxlength="30"></label><label>واتساب (اختياري)<input name="whatsapp" type="tel" maxlength="30"></label></div>
-<label>صور الإعلان (اختياري – JPG أو PNG، حتى 2 ميجابايت للصورة)<input name="images" type="file" accept="image/jpeg,image/png" multiple></label>
+<details class="marketplace-location-coordinates"><summary>إضافة موقع الإعلان للخريطة (اختياري)</summary><p class="muted">أدخل إحداثيات العقار أو موقع النشاط فقط إذا كنت متأكدًا منها. لا تدخل موقعك الشخصي.</p><div class="form-row"><label>خط العرض (Latitude)<input name="latitude" type="number" min="-90" max="90" step="0.0000001" inputmode="decimal"></label><label>خط الطول (Longitude)<input name="longitude" type="number" min="-180" max="180" step="0.0000001" inputmode="decimal"></label></div></details><label>صور الإعلان (اختياري – JPG أو PNG، حتى 2 ميجابايت للصورة)<input name="images" type="file" accept="image/jpeg,image/png" multiple></label>
 <p class="muted">يتم تصغير الصور داخل جهازك قبل إرسالها، ولا ترفع مستندات أو بيانات شخصية.</p><p id="marketplaceFormStatus" class="status" role="status" aria-live="polite"></p><button class="btn btn-gold full" type="submit">إرسال للمراجعة مجانًا</button>
 </form></div></dialog>
 <script src="./config.js"></script>
 <script src="./gubabase.js"></script>
-<script src="./marketplace.js"></script>
+<script src="./marketplace.js?v=location-data-20261102-1"></script>
 </body></html>
