@@ -16,7 +16,8 @@ async function loadMyProfile(){
  let s;try{s=await verifiedSession()}catch(_){return false}
  try{
   // Read only this signed-in owner's row; RLS scopes the query to auth.uid().
-  const rows=await api("company_profiles?select=id,owner_id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,status,admin_notes,reviewed_at,reviewed_by,pending_update,update_status,update_notes&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=1");
+  const rows=await api("company_profiles?select=id,owner_id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,status,admin_notes,reviewed_at,reviewed_by,pending_update,update_status,update_notes&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=2");
+  if((rows||[]).length>1){status.textContent="وجدنا أكثر من ملف شركة مرتبطًا بحسابك. أوقفنا التعديل مؤقتًا لتجنب تعديل ملف غير مقصود؛ يلزم مراجعة الإدارة.";return false}
   const c=rows?.[0]||null;profileLookupComplete=true;if(!c)return true;
   existingProfileId=c.id;existingStatus=c.status;supportsDraft=Object.prototype.hasOwnProperty.call(c,"pending_update");
   const draft=(supportsDraft&&c.pending_update&&typeof c.pending_update==="object")?c.pending_update:null;const src=draft?{...c,...draft}:c;
