@@ -47,3 +47,15 @@ Read-only inspection of the restoration branch and production database. No SQL, 
 - No changes to Auth users, passwords, permissions, RLS policies, or storage.
 - No DNS or domain changes.
 - No deployment and no PR merge.
+
+
+## Additional function-level verification
+The definitions of the four guard/limit functions were read:
+- `enforce_layan_offer_limit()` is a trigger function that requires the authenticated owner, forces new offers to pending, and caps the owner at three offers.
+- `enforce_company_property_ad_limit()` is a trigger function that validates the company ad owner/name and caps a company ad at three linked property offers.
+- `guard_company_owner_update()` is a trigger function that protects approved company profiles and routes changes through `pending_update`.
+- `guard_property_offer_promotion()` is a trigger function that prevents client-supplied featured state on insert.
+
+Because the public trigger inventory is empty, none of these trigger functions is currently wired to a table event in `public`. The frontend directly inserts into the relevant tables, so the intended server-side protections cannot be assumed to execute. This is a confirmed release blocker requiring reviewed trigger definitions and tests, not a change to apply blindly.
+
+The missing company-profile RPC also affects more than prefill: `companies.js` uses its result to retain the existing profile ID/status and determine whether to submit a safe `pending_update` draft. If lookup fails, an existing company owner may be treated like a first-time submitter. Verify duplicate prevention and the owner-scoped lookup design before restoring this workflow.
