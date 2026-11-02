@@ -25,3 +25,5 @@
 #directoryMapStatus{margin:0 0 9px;color:#697688;font-size:12px;line-height:1.8}
 .directory-map-shell>section>p:last-child{margin:7px 0 0;color:#778294;font-size:10px}
 .directory-map-link{display:inline-flex;margin-top:6px;padding:6px 9px;border:1px solid #e8dfcd;border-radius:8px;background:#fffaf0;color:#795a22!important;text-decoration:none!important;font-size:11px!important;font-weight:800}
+@media(max-width:760px){.directory-map-panel{grid-template-columns:1fr}#directoryMap{height:340px}}
+@media(max-width:620px){.directory-map-shell{padding:15px}#directoryMap{height:310px}}
