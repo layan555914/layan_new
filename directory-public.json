@@ -90,84 +90,6 @@
       "name_ar": "ناصر الجديدة / غرب أسيوط",
       "name_en": "Nasser New City / West Assiut",
       "area_type": "new_city"
-    },
-    {
-      "id": "AREA-014",
-      "name_ar": "حي شرق أسيوط",
-      "name_en": "East District",
-      "area_type": "district"
-    },
-    {
-      "id": "AREA-015",
-      "name_ar": "حي غرب أسيوط",
-      "name_en": "West District",
-      "area_type": "district"
-    },
-    {
-      "id": "AREA-016",
-      "name_ar": "الوليدية",
-      "name_en": "Al-Walideya",
-      "area_type": "neighborhood"
-    },
-    {
-      "id": "AREA-017",
-      "name_ar": "شارع الجمهورية / وسط المدينة",
-      "name_en": "El-Gomhoreya / Downtown",
-      "area_type": "zone"
-    },
-    {
-      "id": "AREA-018",
-      "name_ar": "الهضبة",
-      "name_en": "El-Hadaba",
-      "area_type": "zone"
-    },
-    {
-      "id": "AREA-019",
-      "name_ar": "المنطقة الإقليمية",
-      "name_en": "Regional Services Area",
-      "area_type": "zone"
-    },
-    {
-      "id": "AREA-020",
-      "name_ar": "حي رجال الأعمال",
-      "name_en": "Business District",
-      "area_type": "zone"
-    },
-    {
-      "id": "AREA-021",
-      "name_ar": "مركز خدمات الحي الثاني",
-      "name_en": "Second District Services Center",
-      "area_type": "zone"
-    },
-    {
-      "id": "AREA-022",
-      "name_ar": "مركز المدينة الرئيسي",
-      "name_en": "Main City Center",
-      "area_type": "zone"
-    },
-    {
-      "id": "AREA-023",
-      "name_ar": "مركز الخدمات الرئيسي",
-      "name_en": "Main Services Center",
-      "area_type": "zone"
-    },
-    {
-      "id": "AREA-024",
-      "name_ar": "المنطقة الصناعية الثانية",
-      "name_en": "Second Industrial Zone",
-      "area_type": "industrial_zone"
-    },
-    {
-      "id": "AREA-025",
-      "name_ar": "التوسعات الشمالية الغربية",
-      "name_en": "North-Western Extensions",
-      "area_type": "zone"
-    },
-    {
-      "id": "AREA-026",
-      "name_ar": "التوسعات الجنوبية الشرقية",
-      "name_en": "South-Eastern Extensions",
-      "area_type": "zone"
     }
   ],
   "sources": [
@@ -397,5 +319,85 @@
     }
   ],
   "entities": [],
-  "projects": []
+  "projects": [],
+  "draftAreas": [
+    {
+      "id": "AREA-014",
+      "name_ar": "حي شرق أسيوط",
+      "name_en": "East District",
+      "area_type": "district"
+    },
+    {
+      "id": "AREA-015",
+      "name_ar": "حي غرب أسيوط",
+      "name_en": "West District",
+      "area_type": "district"
+    },
+    {
+      "id": "AREA-016",
+      "name_ar": "الوليدية",
+      "name_en": "Al-Walideya",
+      "area_type": "neighborhood"
+    },
+    {
+      "id": "AREA-017",
+      "name_ar": "شارع الجمهورية / وسط المدينة",
+      "name_en": "El-Gomhoreya / Downtown",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-018",
+      "name_ar": "الهضبة",
+      "name_en": "El-Hadaba",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-019",
+      "name_ar": "المنطقة الإقليمية",
+      "name_en": "Regional Services Area",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-020",
+      "name_ar": "حي رجال الأعمال",
+      "name_en": "Business District",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-021",
+      "name_ar": "مركز خدمات الحي الثاني",
+      "name_en": "Second District Services Center",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-022",
+      "name_ar": "مركز المدينة الرئيسي",
+      "name_en": "Main City Center",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-023",
+      "name_ar": "مركز الخدمات الرئيسي",
+      "name_en": "Main Services Center",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-024",
+      "name_ar": "المنطقة الصناعية الثانية",
+      "name_en": "Second Industrial Zone",
+      "area_type": "industrial_zone"
+    },
+    {
+      "id": "AREA-025",
+      "name_ar": "التوسعات الشمالية الغربية",
+      "name_en": "North-Western Extensions",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-026",
+      "name_ar": "التوسعات الجنوبية الشرقية",
+      "name_en": "South-Eastern Extensions",
+      "area_type": "zone"
+    }
+  ]
 }
