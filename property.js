@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadProperty() {
     if (!root) return;
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    if (!/^[1-9][0-9]{0,18}$/.test(id) || (id.length === 19 && id > "9223372036854775807")) {
       showState("رابط الإعلان غير مكتمل", "ارجع إلى قائمة العقارات واختر إعلانًا لعرض تفاصيله.");
       return;
     }
