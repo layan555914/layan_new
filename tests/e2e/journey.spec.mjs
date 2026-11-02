@@ -224,7 +224,7 @@ test("customer can search, open, save, submit, track and admin-review a property
   await expect(pendingCard).toContainText("إعلان اختبار رحلة المستخدم");
   page.once("dialog", dialog => dialog.accept());
   await pendingCard.locator("[data-property-action='approve']").click();
-  await expect(page.locator("#adminStatus")).toContainText("تم اعتماد الإعلان ونشره");
+  await expect(page.locator("[data-property-offer-id='202']")).toHaveCount(0);
   expect(state.adminReviews).toHaveLength(1);
   expect(state.adminReviews[0].p_id).toBe(202);
   expect(offers.find(item => String(item.id) === CREATED_ID).status).toBe("available");
