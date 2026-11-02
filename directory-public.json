@@ -1,16 +1,16 @@
 {
   "meta": {
     "title": "دليل أسيوط العقاري",
-    "version": 3,
+    "version": 4,
     "lastUpdated": "2026-11-02",
     "disclaimer": "دليل معلوماتي مستقل. إدراج جهة أو مصدر لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا. لا تُعرض الجهات أو المشروعات قبل مراجعة الإدارة واعتمادها."
   },
   "researchCounts": {
-    "entities": 57,
+    "entities": 58,
     "projects": 25,
     "areas": 26,
     "governmentOpportunities": 8,
-    "sources": 35
+    "sources": 36
   },
   "areas": [
     {
@@ -337,6 +337,13 @@
       "publisher": "عقارات مصر",
       "source_type": "دليل أعمال عقاري – للاكتشاف فقط",
       "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut/category/marketing"
+    },
+    {
+      "id": "SRC-037",
+      "title": "دليل شركات العقارات في أسيوط – القائمة العامة",
+      "publisher": "عقارات مصر",
+      "source_type": "دليل أعمال عقاري – لاكتشاف الأسماء فقط",
+      "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut"
     }
   ],
   "entities": [],
