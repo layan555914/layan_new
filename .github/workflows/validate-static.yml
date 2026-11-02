@@ -162,12 +162,12 @@ jobs:
           const readOptionValues = selector => {
             const select = companiesPage.match(new RegExp('<select[^>]*' + selector + '[^>]*>([\\s\\S]*?)<\\/select>', 'i'));
             if (!select) return null;
-            return [...select[1].matchAll(/<option(?:\\s+value=["']([^"']*)["'])?[^>]*>([\\s\\S]*?)<\\/option>/gi)]
-              .map(option => (option[1] ?? option[2].replace(/<[^>]+>/g, '')).trim())
+            return [...select[1].matchAll(/<option[^>]*>([^<]+)<\/option>/gi)]
+              .map(option => option[1].trim())
               .filter(Boolean);
           };
-          const filterCategories = readOptionValues('id=["']companyCategoryFilter["']');
-          const signupCategories = readOptionValues('name=["']category["']');
+          const filterCategories = readOptionValues('id="companyCategoryFilter"').filter(value => value !== "كل المجالات");
+          const signupCategories = readOptionValues('name="category"').filter(value => value !== "اختر المجال");
           if (!filterCategories || !signupCategories ||
               new Set(filterCategories).size !== filterCategories.length ||
               new Set(signupCategories).size !== signupCategories.length ||
