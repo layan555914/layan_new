@@ -1,0 +1,33 @@
+name: Export ASYUT AQAR source for external review
+
+on:
+  push:
+    branches:
+      - claude-handoff/export-20261102
+
+permissions:
+  contents: read
+
+jobs:
+  export-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact branch snapshot
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build source archive (exclude Git internals and historical review notes)
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip -rq /tmp/asyut-aqar-source.zip . \
+            -x './.git/*' './_review/*'
+          mkdir -p handoff
+          cp /tmp/asyut-aqar-source.zip handoff/asyut-aqar-source.zip
+      - name: Upload source archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: asyut-aqar-source-main
+          path: handoff/asyut-aqar-source.zip
+          if-no-files-found: error
+          retention-days: 7
