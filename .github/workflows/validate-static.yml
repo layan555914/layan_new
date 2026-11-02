@@ -3,6 +3,8 @@ name: Validate ASYUT AQAR platform
 on:
   push:
     branches:
+      - main
+      - feature/directory-browser-improvements-20261102
       - restore/asyut-aqar-full-platform-20261101
       - feature/asyut-real-estate-directory
       - fix/directory-cache-bust-v107
