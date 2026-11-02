@@ -145,3 +145,14 @@ jobs:
           }
           console.log('Validation passed: JavaScript, Edge Function types, RTL pages, local assets, PWA shell, auth mode UI, sponsor imagery and CNAME.');
           NODE
+
+      - name: Install Playwright test runner
+        run: npm install --no-save --no-package-lock @playwright/test@1.64.1
+
+      - name: Install Chromium for browser journey tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Run customer and admin browser journey against mocked Supabase
+        env:
+          CI: "true"
+        run: npx playwright test
