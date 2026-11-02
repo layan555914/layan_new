@@ -1123,6 +1123,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("monthlyMaxFilter")?.addEventListener("input", render);
   $("searchBtn")?.addEventListener("click", render);
 
+  // Wire the hero's quick-search controls to the same canonical filters as the main results.
+  $("heroQuickSearch")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const purpose = $("heroPurposeFilter")?.value || "";
+    const type = $("heroTypeFilter")?.value || "";
+    const place = $("heroAreaFilter")?.value || "";
+    const budget = $("heroBudgetFilter")?.value || "";
+
+    if ($("purposeFilter")) $("purposeFilter").value = purpose;
+    if ($("typeFilter")) $("typeFilter").value = type;
+    if (cityFilter) cityFilter.value = place && place !== "الهضبة" ? place : "";
+    if (areaFilter) areaFilter.value = place === "الهضبة" ? place : "";
+    if ($("totalPriceMaxFilter")) $("totalPriceMaxFilter").value = budget;
+
+    // Clear hidden advanced filters so the quick search does not inherit old criteria.
+    ["downPaymentMaxFilter", "monthlyMaxFilter", "minBedroomsFilter"].forEach(id => {
+      const field = $(id);
+      if (field) field.value = "";
+    });
+    if ($("sortFilter")) $("sortFilter").value = "newest";
+    activeKind = "";
+    activeDealKind = "";
+    document.querySelectorAll("[data-category-kind]").forEach(tile => {
+      tile.classList.remove("active");
+      tile.setAttribute("aria-pressed", "false");
+    });
+    render();
+    $("offers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
   const calcContract = $("calcContract");
   const calcPaid = $("calcPaid");
   const calcFees = $("calcFees");
