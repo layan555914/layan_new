@@ -3408,3 +3408,7 @@ a:focus-visible,button:focus-visible{
   outline:3px solid var(--gold);
   outline-offset:3px;
 }
+
+/* Keep the password-recovery action unmistakably visible in the sign-in dialog. */
+.auth-form .auth-forgot-password{display:block!important;visibility:visible!important;opacity:1!important;min-height:46px;padding:10px 14px;border:1px solid var(--gold);border-radius:10px;background:#fffaf0;color:var(--navy);font-weight:800;text-align:center}
+.auth-form .auth-forgot-password[hidden]{display:none!important}
