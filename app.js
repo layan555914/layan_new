@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       activeDealKind = "";
       const typeFilter = $("typeFilter");
       const areaFilter = $("areaFilter");
-  const cityFilter = $("cityFilter");
       if (typeFilter) typeFilter.value = "";
       if (areaFilter) areaFilter.value = "";
       $("searchInput") && ($("searchInput").value = "");
