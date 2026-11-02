@@ -3,22 +3,113 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#102746">
-<title>إدارة دليل أسيوط العقاري | أسيوط عقار</title>
+<title>إدارة قاعدة بيانات السوق العقاري | أسيوط عقار</title>
 <link rel="stylesheet" href="./styles.css">
 <style>
-body{background:#f4f6f9;color:#182b42}.dir-admin-wrap{width:min(1180px,calc(100% - 24px));margin:22px auto 60px}.dir-admin-head{background:#102746;color:#fff;border-radius:18px;padding:22px;margin-bottom:18px}.dir-admin-head h1{margin:0 0 6px;font-size:25px}.dir-admin-head p{margin:0;color:#e5ebf3;line-height:1.8;font-size:13px}.dir-admin-top{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:14px}.dir-admin-panel{background:#fff;border:1px solid #e4e9f0;border-radius:16px;padding:18px;margin:14px 0}.dir-admin-login{max-width:480px;display:grid;gap:12px}.dir-admin-login label,.dir-admin-card label{display:grid;gap:5px;font-size:12px;font-weight:700;color:#526176}.dir-admin-login input,.dir-admin-card input,.dir-admin-card textarea{border:1px solid #d7dee8;border-radius:9px;padding:10px;font:inherit;color:#182b42;background:#fff;width:100%;min-width:0}.dir-admin-card textarea{min-height:78px;resize:vertical}.dir-admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.dir-admin-tabs button{border:1px solid #dbe2ea;background:#fff;border-radius:30px;padding:8px 14px;font:inherit;font-size:12px;cursor:pointer}.dir-admin-tabs button.active{background:#17395f;color:#fff;border-color:#17395f}.dir-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.dir-admin-card{border:1px solid #e1e7ef;border-radius:13px;padding:15px;min-width:0;display:grid;gap:10px}.dir-admin-card h3{margin:0;color:#102746;font-size:16px}.dir-admin-card p{margin:0;color:#687589;line-height:1.8;font-size:12px;overflow-wrap:anywhere}.dir-admin-meta{display:flex;gap:6px;flex-wrap:wrap}.dir-admin-chip{display:inline-flex;padding:4px 9px;border-radius:20px;background:#f0f3f7;color:#495a70;font-size:10px;font-weight:700}.dir-admin-chip.warn{background:#fff5dc;color:#795b20}.dir-admin-sources{display:grid;gap:5px;padding:10px;border-radius:9px;background:#f7f9fc}.dir-admin-sources a{font-size:11px;color:#8b6728;overflow-wrap:anywhere}.dir-admin-check{display:flex!important;align-items:center;gap:8px!important;padding:8px;background:#fffaf0;border:1px solid #ecd9ad;border-radius:8px}.dir-admin-check input{width:auto}.dir-admin-actions{display:flex;gap:8px;flex-wrap:wrap}.dir-admin-actions button{flex:1;min-width:130px}.dir-admin-empty{padding:22px;text-align:center;color:#6c7888;background:#f8fafc;border:1px dashed #d8e0e9;border-radius:10px}.dir-admin-warning{padding:12px;border-radius:9px;background:#fff8e9;color:#705721;font-size:12px;line-height:1.8}.dir-admin-status{padding:12px;border-radius:9px;background:#edf1f6;color:#526176;min-height:42px;font-size:12px}.dir-admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.dir-admin-stats div{border:1px solid #e1e7ef;border-radius:10px;padding:12px;background:#fafbfd}.dir-admin-stats strong{display:block;font-size:24px;color:#102746}.dir-admin-stats span{font-size:11px;color:#697688}
-@media(max-width:720px){.dir-admin-grid{grid-template-columns:1fr}.dir-admin-stats{grid-template-columns:repeat(2,1fr)}.dir-admin-wrap{width:calc(100% - 16px)}.dir-admin-panel{padding:13px}.dir-admin-head{padding:17px}}
+body{background:#f4f6f9;color:#182b42}
+.dir-admin-wrap{width:min(1240px,calc(100% - 24px));margin:22px auto 60px}
+.dir-admin-head{background:#102746;color:#fff;border-radius:18px;padding:22px;margin-bottom:18px}
+.dir-admin-head h1{margin:0 0 7px;font-size:25px}.dir-admin-head p{margin:0;color:#e5ebf3;line-height:1.8;font-size:13px}
+.dir-admin-top{display:flex;gap:9px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-top:14px}
+.dir-admin-panel{background:#fff;border:1px solid #e4e9f0;border-radius:16px;padding:18px;margin:14px 0}
+.dir-admin-login{max-width:480px;display:grid;gap:12px}.dir-admin-login label,.dir-admin-card label,.dir-admin-source-form label{display:grid;gap:5px;font-size:12px;font-weight:700;color:#526176}
+.dir-admin-login input,.dir-admin-card input,.dir-admin-card textarea,.dir-admin-card select,.dir-admin-source-form input,.dir-admin-source-form select,.dir-admin-source-form textarea{border:1px solid #d7dee8;border-radius:9px;padding:10px;font:inherit;color:#182b42;background:#fff;width:100%;min-width:0}
+.dir-admin-card textarea,.dir-admin-source-form textarea{min-height:76px;resize:vertical}
+.dir-admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.dir-admin-tabs button{border:1px solid #dbe2ea;background:#fff;border-radius:30px;padding:9px 14px;font:inherit;font-size:12px;cursor:pointer;min-height:40px}
+.dir-admin-tabs button.active{background:#17395f;color:#fff;border-color:#17395f}
+.dir-admin-toolbar{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(2,minmax(150px,1fr));gap:9px;margin:12px 0}
+.dir-admin-toolbar label{display:grid;gap:5px;font-size:12px;font-weight:700;color:#526176}
+.dir-admin-toolbar input,.dir-admin-toolbar select{border:1px solid #d7dee8;border-radius:9px;padding:10px;font:inherit;background:#fff;min-width:0}
+.dir-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dir-admin-card{border:1px solid #e1e7ef;border-radius:13px;padding:15px;min-width:0;display:grid;gap:10px;background:#fff}
+.dir-admin-card h3{margin:0;color:#102746;font-size:16px}.dir-admin-card p{margin:0;color:#687589;line-height:1.8;font-size:12px;overflow-wrap:anywhere}
+.dir-admin-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.dir-admin-fields .wide{grid-column:1/-1}
+.dir-admin-meta{display:flex;gap:6px;flex-wrap:wrap}.dir-admin-chip{display:inline-flex;padding:4px 9px;border-radius:20px;background:#f0f3f7;color:#495a70;font-size:10px;font-weight:700}.dir-admin-chip.warn{background:#fff5dc;color:#795b20}.dir-admin-chip.good{background:#e8f5ed;color:#28613f}
+.dir-admin-sources{display:grid;gap:7px;padding:10px;border-radius:9px;background:#f7f9fc}.dir-admin-sources a{font-size:11px;color:#8b6728;overflow-wrap:anywhere}
+.dir-admin-source-row{display:flex;gap:8px;align-items:flex-start;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e6ebf1;font-size:11px}.dir-admin-source-row:last-child{border:0}
+.dir-admin-check{display:flex!important;align-items:center;gap:8px!important;padding:9px;background:#fffaf0;border:1px solid #ecd9ad;border-radius:8px;line-height:1.7}
+.dir-admin-check input{width:auto!important;min-width:auto!important}
+.dir-admin-actions{display:flex;gap:8px;flex-wrap:wrap}.dir-admin-actions button{flex:1;min-width:120px}
+.dir-admin-empty{padding:22px;text-align:center;color:#6c7888;background:#f8fafc;border:1px dashed #d8e0e9;border-radius:10px;grid-column:1/-1}
+.dir-admin-warning{padding:12px;border-radius:9px;background:#fff8e9;color:#705721;font-size:12px;line-height:1.8}
+.dir-admin-status{padding:12px;border-radius:9px;background:#edf1f6;color:#526176;min-height:42px;font-size:12px;line-height:1.8}
+.dir-admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.dir-admin-stats div{border:1px solid #e1e7ef;border-radius:10px;padding:12px;background:#fafbfd}
+.dir-admin-stats strong{display:block;font-size:24px;color:#102746}.dir-admin-stats span{font-size:11px;color:#697688}
+.dir-admin-source-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:14px;border:1px solid #e4e9f0;border-radius:12px;background:#fafbfd;margin:12px 0 18px}
+.dir-admin-source-form .wide{grid-column:1/-1}.dir-admin-source-form .check{display:flex;align-items:center;gap:8px}
+.dir-admin-source-form .check input{width:auto}.dir-admin-log{border:1px solid #e1e7ef;border-radius:10px;padding:12px;margin-bottom:9px}
+.dir-admin-log summary{cursor:pointer;font-weight:700;color:#17395f}.dir-admin-log pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f9fc;padding:10px;border-radius:8px;font-size:11px;direction:ltr;text-align:left}
+@media(max-width:760px){.dir-admin-grid{grid-template-columns:1fr}.dir-admin-stats{grid-template-columns:repeat(2,1fr)}.dir-admin-toolbar{grid-template-columns:1fr 1fr}.dir-admin-toolbar label:first-child{grid-column:1/-1}.dir-admin-source-form{grid-template-columns:1fr 1fr}.dir-admin-wrap{width:calc(100% - 16px)}.dir-admin-panel{padding:13px}.dir-admin-head{padding:17px}}
+@media(max-width:420px){.dir-admin-fields,.dir-admin-source-form{grid-template-columns:1fr}.dir-admin-fields .wide,.dir-admin-source-form .wide{grid-column:auto}.dir-admin-tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px}.dir-admin-tabs button{white-space:nowrap;flex:0 0 auto}}
 </style>
 </head>
 <body>
 <main class="dir-admin-wrap">
-<header class="dir-admin-head"><h1>إدارة دليل أسيوط العقاري</h1><p>مراجعة الجهات والمشروعات والطروحات الحكومية. لا يتم النشر إلا بعد مراجعة مصدر مستقل ومحتوى السجل والموقع.</p><div class="dir-admin-top"><a class="btn btn-outline" href="./admin.html">لوحة الإدارة الرئيسية</a><a class="btn btn-outline" href="./directory.html">معاينة الدليل العام</a><button class="btn btn-outline" id="dirAdminLogout" type="button" hidden>تسجيل الخروج</button></div></header>
-<section class="dir-admin-panel" id="dirAdminLoginPanel"><h2>دخول مسؤول الدليل</h2><p>يُسمح فقط للحسابات التي تعتمدها قاعدة بيانات أسيوط عقار.</p><form id="dirAdminLogin" class="dir-admin-login"><label>البريد الإلكتروني<input id="dirAdminEmail" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="dirAdminPassword" type="password" autocomplete="current-password" required></label><button class="btn btn-gold" type="submit">تسجيل الدخول والتحقق</button></form></section>
+<header class="dir-admin-head">
+<h1>مركز إدارة قاعدة بيانات السوق العقاري</h1>
+<p>إدارة الجهات والشركات والمشروعات والمناطق والطروحات والمصادر في محافظة أسيوط. البيانات الداخلية لا تظهر للزوار إلا بعد اعتماد مسؤول ومصدر عام مرتبط.</p>
+<div class="dir-admin-top">
+<div><a class="btn btn-outline" href="./admin.html">لوحة الإدارة الرئيسية</a> <a class="btn btn-outline" href="./directory.html">معاينة الدليل العام</a></div>
+<button class="btn btn-outline" id="dirAdminLogout" type="button" hidden>تسجيل الخروج</button>
+</div>
+</header>
+<section class="dir-admin-panel" id="dirAdminLoginPanel">
+<h2>دخول مسؤول قاعدة البيانات</h2>
+<p>يُسمح فقط بالحسابات التي تعتمدها قاعدة بيانات أسيوط عقار. تسجيل الدخول وحده لا يمنح صلاحية الإدارة.</p>
+<form id="dirAdminLogin" class="dir-admin-login">
+<label>البريد الإلكتروني<input id="dirAdminEmail" type="email" autocomplete="username" required></label>
+<label>كلمة المرور<input id="dirAdminPassword" type="password" autocomplete="current-password" required></label>
+<button class="btn btn-gold" type="submit">تسجيل الدخول والتحقق من الصلاحية</button>
+</form>
+</section>
 <section id="dirAdminPanel" hidden>
-<div class="dir-admin-panel"><div class="dir-admin-stats"><div><strong id="dirStatEntities">—</strong><span>جهات</span></div><div><strong id="dirStatProjects">—</strong><span>مشروعات</span></div><div><strong id="dirStatOpps">—</strong><span>طروحات مؤرشفة</span></div><div><strong id="dirStatPublished">—</strong><span>سجلات منشورة</span></div></div></div>
-<div class="dir-admin-panel"><div class="dir-admin-tabs" role="tablist"><button class="active" data-view="entities" type="button">الشركات والمطورون</button><button data-view="projects" type="button">المشروعات</button><button data-view="opportunities" type="button">الطروحات الحكومية</button><button data-view="sources" type="button">المصادر</button></div><div class="dir-admin-warning">تذكير: دليل معلوماتي مستقل، وليس دليل شركاء. لا تعتمد سجلًا لمجرد ظهوره في دليل تجاري. لا تنشر بيانات الهاتف أو العنوان إلا بعد التحقق من كونها وسيلة اتصال عامة منشورة. سجلات الطروحات القديمة لا تُعرض كفرص متاحة دون تحديث.</div><p id="dirAdminListStatus">جارٍ تحميل بيانات الدليل...</p><div id="dirAdminRecords" class="dir-admin-grid"></div></div>
+<div class="dir-admin-panel">
+<div class="dir-admin-stats">
+<div><strong id="dirStatEntities">—</strong><span>جهات وشركات</span></div>
+<div><strong id="dirStatProjects">—</strong><span>مشروعات</span></div>
+<div><strong id="dirStatAreas">—</strong><span>مناطق</span></div>
+<div><strong id="dirStatPublished">—</strong><span>سجلات منشورة</span></div>
+</div>
+</div>
+<div class="dir-admin-panel">
+<div class="dir-admin-tabs" role="tablist" aria-label="أقسام قاعدة البيانات">
+<button class="active" data-view="entities" type="button" role="tab" aria-selected="true">الجهات والشركات</button>
+<button data-view="projects" type="button" role="tab" aria-selected="false">المشروعات</button>
+<button data-view="areas" type="button" role="tab" aria-selected="false">المناطق</button>
+<button data-view="opportunities" type="button" role="tab" aria-selected="false">الطروحات الحكومية</button>
+<button data-view="sources" type="button" role="tab" aria-selected="false">المصادر</button>
+<button data-view="history" type="button" role="tab" aria-selected="false">سجل التعديلات</button>
+</div>
+<div class="dir-admin-warning">قبل النشر: راجع الرابط ومحتوى المصدر والصفة والموقع. يجب ربط مصدر عام واحد على الأقل بالجهة أو المشروع أو الطرح. الطروحات القديمة لا تُعرض كفرص متاحة إلا بعد التحقق من سريانها؛ ويمكن إبقاؤها أرشيفية.</div>
+<div class="dir-admin-toolbar" id="dirAdminToolbar">
+<label>بحث في السجلات<input id="dirAdminSearch" type="search" placeholder="اسم الشركة أو المشروع أو المنطقة..." autocomplete="off"></label>
+<label>حالة المراجعة<select id="dirAdminStatusFilter"><option value="">كل الحالات</option><option value="draft">مسودة</option><option value="needs_review">قيد المراجعة</option><option value="verified">تم التحقق</option><option value="published">منشور</option><option value="archived">مؤرشف</option><option value="public">مصدر عام</option><option value="internal">مصدر داخلي</option></select></label>
+<label>المنطقة<select id="dirAdminAreaFilter"><option value="">كل مناطق أسيوط</option></select></label>
+</div>
+<section id="dirAdminSourcesPanel" hidden>
+<h3>إضافة مصدر جديد إلى قاعدة المراجع</h3>
+<p>أضف رابطًا رسميًا أو مرجعًا موثوقًا، واحتفظ به داخليًا حتى يتم التحقق منه. لا تفعّل خيار المصدر العام إلا إذا كان الرابط منشورًا ويمكن للزوار الاطلاع عليه.</p>
+<form id="dirAdminSourceForm" class="dir-admin-source-form">
+<label>عنوان المصدر<input name="title" required maxlength="220" placeholder="مثال: الموقع الرسمي للجهة"></label>
+<label>الناشر<input name="publisher" maxlength="180" placeholder="اسم الجهة أو الناشر"></label>
+<label>نوع المصدر<input name="source_type" required maxlength="80" placeholder="موقع رسمي / بيان / خبر"></label>
+<label class="wide">رابط المصدر<input name="source_url" type="url" required placeholder="https://..."></label>
+<label>تاريخ النشر<input name="publication_date" type="date"></label>
+<label>مستوى الثقة<select name="confidence_level"><option value="unverified">غير متحقق</option><option value="low">منخفض</option><option value="medium">متوسط</option><option value="high">مرتفع</option><option value="official">رسمي</option></select></label>
+<label class="wide">ملاحظات داخلية<textarea name="notes" placeholder="ما الذي يثبته المصدر؟ وما الذي لا يثبته؟"></textarea></label>
+<label class="check"><input type="checkbox" name="is_public"> مصدر عام صالح للإظهار مع السجلات المنشورة</label>
+<button class="btn btn-gold" type="submit">حفظ المصدر</button>
+</form>
+</section>
+<p id="dirAdminListStatus" aria-live="polite">جارٍ تحميل قاعدة البيانات...</p>
+<div id="dirAdminRecords" class="dir-admin-grid"></div>
+</div>
 </section>
 <p id="dirAdminStatus" class="dir-admin-status" role="status" aria-live="polite"></p>
 </main>
-<script src="./config.js"></script><script src="./gubabase.js?v=admin-shared-auth-1"></script><script src="./directory-admin.js?v=directory-admin-2-20261102"></script>
-</body></html>
+<script src="./config.js"></script>
+<script src="./gubabase.js?v=admin-shared-auth-1"></script>
+<script src="./directory-admin.js?v=directory-admin-v3-20261103" defer></script>
+</body>
+</html>
