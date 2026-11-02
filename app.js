@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <label>كلمة المرور<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل"></label>
         <p id="authStatus" role="status" aria-live="polite"></p>
         <button class="btn btn-outline-dark" id="resendConfirmationBtn" type="button" hidden>إعادة إرسال رسالة التأكيد</button>
-        <button class="btn btn-outline-dark" id="forgotPasswordBtn" type="button">نسيت كلمة المرور؟</button>
+        <button class="btn btn-outline-dark auth-forgot-password" id="forgotPasswordBtn" type="button" aria-label="استعادة كلمة المرور عبر البريد الإلكتروني">نسيت كلمة المرور؟</button>
         <button class="btn btn-gold" id="authSubmit" type="submit">تسجيل الدخول</button>
         <button class="btn btn-outline-dark" id="authToggle" type="button">إنشاء حساب جديد</button>
       </form>`;
@@ -316,11 +316,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   function updateAuthButton() {
     const button = $("loginBtn");
+    const listingsLink = $("myListingsLink");
     const api = window.LAYAN_SUPABASE;
     if (!button || !api) return;
     const user = api.getUser();
     button.textContent = user ? "خروج (" + (user.email || "حسابي") + ")" : "تسجيل الدخول";
     button.title = user ? "اضغط لتسجيل الخروج" : "تسجيل الدخول أو إنشاء حساب";
+    if (listingsLink) listingsLink.hidden = !user;
   }
   window.addEventListener("layan:auth-ready", () => {
     updateAuthButton();
