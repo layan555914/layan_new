@@ -119,6 +119,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     photosPreview.appendChild(grid);
   });
   const areaFilter = $("areaFilter");
+  const cityFilter = $("cityFilter");
   // Instagram does not accept a website URL as a direct feed-post share.
   // Open Instagram directly and copy the official ASYUT AQAR URL for pasting into a bio, story, or DM.
   // Prefer the Android/iOS native share sheet so Facebook can open in its installed app.
