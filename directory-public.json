@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "دليل أسيوط العقاري",
-    "version": 10,
+    "version": 11,
     "lastUpdated": "2026-11-02",
     "disclaimer": "دليل معلوماتي مستقل. إدراج جهة أو مصدر لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا. لا تُعرض الجهات أو المشروعات قبل مراجعة الإدارة واعتمادها."
   },
@@ -9,8 +9,8 @@
     "entities": 70,
     "projects": 37,
     "areas": 26,
-    "governmentOpportunities": 29,
-    "sources": 79
+    "governmentOpportunities": 31,
+    "sources": 81
   },
   "areas": [
     {
