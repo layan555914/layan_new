@@ -292,7 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
         showState(false);
         list.innerHTML = "";
         if (companyProfilesList) companyProfilesList.innerHTML = "";
-      if (marketplaceList) marketplaceList.innerHTML = "";
         if (marketplaceList) marketplaceList.innerHTML = "";
         if (propertyDocsList) propertyDocsList.innerHTML = "";
         setStatus("هذا الحساب غير مخوّل بدخول لوحة إدارة أسيوط عقار. يمكنك متابعة ملف شركتك من صفحة دليل الشركات.");
