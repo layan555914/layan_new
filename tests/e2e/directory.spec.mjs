@@ -170,7 +170,7 @@ async function mockDirectoryAdmin(page, { isAdmin = true } = {}) {
       return;
     }
     if (method === "PATCH") {
-      const id = url.searchParams.get("id")?.replace(/^eq\\./, "");
+      const id = url.searchParams.get("id")?.replace(/^eq\./, "");
       const row = (db[table] || []).find(item => item.id === id);
       if (!row) {
         await route.fulfill({status:200,contentType:"application/json",body:"[]"});
