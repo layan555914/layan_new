@@ -77,6 +77,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
     document.querySelector('meta[property="og:url"]')?.setAttribute("content", shareURL.href);
     if (images[0]) document.querySelector('meta[property="og:image"]')?.setAttribute("content", images[0]);
+    let schema = document.getElementById("propertyStructuredData");
+    if (!schema) {
+      schema = document.createElement("script");
+      schema.id = "propertyStructuredData";
+      schema.type = "application/ld+json";
+      document.head.appendChild(schema);
+    }
+    schema.textContent = JSON.stringify({
+      "@context":"https://schema.org",
+      "@type":"RealEstateListing",
+      "name":title,
+      "description":description,
+      "url":shareURL.href,
+      "datePosted":row.created_at || undefined,
+      "image":images.length ? images : undefined,
+      "address":{"@type":"PostalAddress","addressLocality":row.city || "أسيوط","addressRegion":row.governorate || "أسيوط","addressCountry":"EG"},
+      "offers":Number.isFinite(Number(row.total_price)) ? {"@type":"Offer","price":Number(row.total_price),"priceCurrency":"EGP","availability":"https://schema.org/InStock"} : undefined
+    });
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
     canonical.href = shareURL.href;
