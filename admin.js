@@ -1,0 +1,558 @@
+document.addEventListener("DOMContentLoaded", () => {
+  "use strict";
+  const config = window.LAYAN_CONFIG || {};
+  const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
+  const key = config.SUPABASE_PUBLISHABLE_KEY || "";
+  const list = document.getElementById("pendingAds");
+  const propertyDocsList = document.getElementById("pendingPropertyDocuments");
+  const companyProfilesList = document.getElementById("pendingCompanyProfiles");
+  const marketplaceList = document.getElementById("pendingMarketplaceListings");
+  const companyAdsList = document.getElementById("pendingCompanyAds");
+  const adSlotsList = document.getElementById("pendingAdSlots");
+  const usersList = document.getElementById("adminUsers");
+  const status = document.getElementById("adminStatus");
+  const login = document.getElementById("adminLogin");
+  const email = document.getElementById("adminEmail");
+  const password = document.getElementById("adminPassword");
+  const authPanel = document.getElementById("authPanel");
+  const reviewPanel = document.getElementById("reviewPanel");
+  // The admin page uses the same verified Supabase session as every other platform page.
+  const auth = window.LAYAN_SUPABASE;
+  let session = auth?.getSession?.() || null;
+  const setStatus = message => { status.textContent = message || ""; };
+  async function ensureFreshSession() {
+    if (!session?.access_token) session = auth?.getSession?.() || null;
+    if (!session?.access_token) throw new Error("سجّل الدخول إلى حساب الإدارة أولًا.");
+    const expiresAt = Number(session.expires_at || 0);
+    if (expiresAt > Math.floor(Date.now() / 1000) + 60) return;
+    try {
+      if (!auth?.requireAuthenticated) throw new Error("خدمة التحقق من الجلسة غير جاهزة.");
+      session = await auth.requireAuthenticated();
+    } catch (_) {
+      session = null;
+      showState(false);
+      throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
+    }
+  }
+  async function request(path, options = {}) {
+    if (!base || !key) throw new Error("إعدادات قاعدة البيانات غير مكتملة.");
+    const isAuthEndpoint = path.startsWith("/auth/v1/");
+    if (!isAuthEndpoint) await ensureFreshSession();
+    let response;
+    try {
+      const isAuthEndpoint = path.startsWith("/auth/v1/");
+      response = await fetch(base + path, {
+        ...options,
+        headers: {
+          apikey: key,
+          Authorization: "Bearer " + (isAuthEndpoint ? key : (session?.access_token || key)),
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        }
+      });
+    } catch (networkError) {
+      throw new Error("تعذر الاتصال بخدمة Supabase. تحقق من الإنترنت وإعدادات عنوان المشروع والمفتاح العام ثم أعد المحاولة.");
+    }
+    const raw = await response.text();
+    let data = null;
+    try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
+    if (!response.ok) {
+      const detail = data?.message || data?.error_description || data?.msg || data?.error || data?.details || data?.hint;
+      if (response.status === 400 && path.startsWith("/auth/v1/token")) {
+        throw new Error(detail || "بيانات الدخول غير صحيحة أو لم يتم تفعيل تأكيد البريد في حساب Supabase.");
+      }
+      throw new Error(detail || ("تعذر تنفيذ الطلب (HTTP " + response.status + ")."));
+    }
+    return data;
+  }
+  async function requestOneRow(path, options = {}) {
+    const rows = await request(path, {
+      ...options,
+      headers: { ...(options.headers || {}), Prefer: "return=representation" }
+    });
+    if (!Array.isArray(rows) || rows.length !== 1) {
+      throw new Error("لم يؤكد الخادم تحديث السجل المطلوب. ربما تغيّرت حالته أو لم يعد متاحًا للمراجعة؛ حدّث القائمة وحاول مرة أخرى.");
+    }
+    return rows[0];
+  }
+  function showState(isLoggedIn) {
+    authPanel.hidden = isLoggedIn;
+    reviewPanel.hidden = !isLoggedIn;
+  }
+  function esc(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch]);
+  }
+  // Only http/https links are ever rendered as clickable; anything else (javascript:, data:, ...) is disabled.
+  const safeUrl = value => { try { const u = new URL(String(value || "")); return ["https:", "http:"].includes(u.protocol) ? u.href : ""; } catch (_) { return ""; } };
+  const linkHtml = (url, label) => {
+    if (!url) return "";
+    const s = safeUrl(url);
+    return s ? '<a href="' + esc(s) + '" target="_blank" rel="noopener noreferrer">' + label + '</a>'
+             : '<span class="admin-chip">رابط غير آمن تم تعطيله (' + label + ')</span>';
+  };
+  function render(rows) {
+    if (!Array.isArray(rows) || !rows.length) {
+      list.innerHTML = '<p class="admin-empty">لا توجد إعلانات قيد المراجعة حاليًا.</p>';
+      return;
+    }
+    list.innerHTML = rows.map(ad => '<article class="admin-ad" data-ad-id="' + esc(ad.id) + '">' +
+      '<div><span class="admin-chip">' + esc(ad.category) + '</span><h2>' + esc(ad.title) + '</h2>' +
+      '<p><strong>النشاط:</strong> ' + esc(ad.business_name) + '</p><p>' + esc(ad.description) + '</p>' +
+      '<p><strong>الهاتف:</strong> ' + esc(ad.contact_phone) + '</p><p><strong>نوع الطلب:</strong> ' + 'طلب إعلان مخصص' + '</p>' +
+      '<p><strong>المدة:</strong> ' + (Number(ad.requested_days) > 0 ? esc(ad.requested_days) + ' يومًا (مبدئية)' : 'تُحدد بعد الاتفاق') + '</p>' +
+      (ad.image_url ? '<p>' + linkHtml(ad.image_url, 'عرض صورة الإعلان') + '</p>' : '') +
+      (ad.target_url ? '<p>' + linkHtml(ad.target_url, 'رابط النشاط') + '</p>' : '') +
+      '</div><div class="admin-actions">' +
+      '<div class="admin-activation-fields"><label>المدة المتفق عليها (يومًا)<input type="number" min="1" max="365" step="1" value="' + esc(ad.requested_days > 0 ? ad.requested_days : "") + '" data-agreed-days></label>' +
+      '<label>السعر المتفق عليه (جنيه)<input type="number" min="0" step="1" placeholder="اكتب السعر بعد الاتفاق" data-agreed-price></label></div>' +
+      '<button type="button" class="btn btn-gold" data-action="activate">تفعيل بعد تأكيد الاتفاق</button>' +
+      '<button type="button" class="btn btn-outline-dark" data-action="reject">رفض الطلب</button></div></article>').join("");
+  }
+  async function loadPendingPropertyOffers() {
+    const target = document.getElementById("pendingPropertyOffers");
+    if (!target) return;
+    target.innerHTML = '<p class="admin-empty">جارٍ تحميل تفاصيل التنازلات والعقارات...</p>';
+    try {
+      const rows = await request("/rest/v1/property_offers?select=id,title,property_type,listing_purpose,city,area,area_m2,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,assignment_fee,discount_amount,developer_name,project_name,contact_name,contact_phone,description,verification_status,developer_approval_status,verification_notes,created_at&status=eq.pending&or=(verification_status.eq.pending,verification_status.eq.under_review)&order=created_at.asc");
+      if (!Array.isArray(rows) || !rows.length) { target.innerHTML = '<p class="admin-empty">لا توجد إعلانات عقارية معلقة.</p>'; return; }
+      target.innerHTML = rows.map(x => '<article class="admin-ad" data-property-offer-id="' + esc(x.id) + '"><div><span class="admin-chip">' + esc(x.property_type || "عقار") + ' · ' + esc(x.listing_purpose || "بيع") + '</span><h2>' + esc(x.title) + '</h2><p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + '</p><p><strong>المساحة:</strong> ' + (x.area_m2 == null ? "غير محددة" : esc(x.area_m2) + " م²") + '</p><p><strong>السعر:</strong> ' + Number(x.total_price || 0).toLocaleString("ar-EG") + ' جنيه · <strong>المقدم:</strong> ' + Number(x.down_payment || 0).toLocaleString("ar-EG") + ' جنيه · <strong>المدفوع:</strong> ' + Number(x.paid_amount || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>المتبقي:</strong> ' + Number(x.remaining_amount || 0).toLocaleString("ar-EG") + ' جنيه · <strong>القسط:</strong> ' + Number(x.monthly_installment || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>رسوم التنازل:</strong> ' + Number(x.assignment_fee || 0).toLocaleString("ar-EG") + ' جنيه · <strong>الخصم:</strong> ' + Number(x.discount_amount || 0).toLocaleString("ar-EG") + ' جنيه</p><p><strong>المطور/المشروع:</strong> ' + esc(x.developer_name || "غير مسجل") + ' / ' + esc(x.project_name || "غير مسجل") + '</p><p><strong>صاحب الإعلان:</strong> ' + esc(x.contact_name || "غير مسجل") + ' · ' + esc(x.contact_phone || "لا يوجد هاتف") + '</p><p>' + esc(x.description || "") + '</p><p><strong>حالة التحقق:</strong> ' + esc(x.verification_status || "غير محددة") + ' · <strong>موافقة المطور:</strong> ' + esc(x.developer_approval_status || "غير محددة") + '</p>' + (x.verification_notes ? '<p class="admin-chip">' + esc(x.verification_notes) + '</p>' : '') + '<div class="admin-actions"><button type="button" class="btn btn-gold" data-property-action="approve">اعتماد ونشر</button><button type="button" class="btn btn-outline-dark" data-property-action="reject">رفض مع السبب</button></div></div></article>').join("");
+    } catch (error) { target.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل الإعلانات العقارية.") + '</p>'; }
+  }
+  async function loadPendingPropertyDocuments() {
+    if (!propertyDocsList) return;
+    propertyDocsList.innerHTML = '<p class="admin-empty">جارٍ تحميل مستندات العقارات...</p>';
+    try {
+      const rows = await request("/rest/v1/property_offers?select=id,title,developer_name,project_name,document_urls,created_at&status=eq.pending&order=created_at.asc");
+      if (!Array.isArray(rows) || !rows.length) {
+        propertyDocsList.innerHTML = '<p class="admin-empty">لا توجد مستندات عقارات معلقة للمراجعة حاليًا.</p>';
+        return;
+      }
+      const cards = [];
+      for (const offer of rows) {
+        const docs = Array.isArray(offer.document_urls) ? offer.document_urls.filter(path => typeof path === "string" && path.startsWith("documents/")) : [];
+        // Do not show an empty document card for an offer that has no attached files.
+        if (!docs.length) continue;
+        const links = [];
+        for (const path of docs) {
+          if (typeof path !== "string" || !path.startsWith("documents/")) continue;
+          const response = await fetch(base + "/storage/v1/object/sign/layan-property-documents/" + path.split("/").map(encodeURIComponent).join("/"), {
+            method:"POST",headers:{apikey:key,Authorization:"Bearer "+session.access_token,"Content-Type":"application/json"},body:JSON.stringify({expiresIn:600})
+          });
+          const result = await response.json().catch(()=>({}));
+          if (!response.ok || !result.signedURL) continue;
+          const href = safeUrl(result.signedURL.startsWith("http") ? result.signedURL : base + "/storage/v1" + result.signedURL);
+          if (!href) continue;
+          links.push('<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">فتح مستند خاص</a>');
+        }
+        cards.push('<article class="admin-ad"><div><h3>'+esc(offer.title)+'</h3><p><strong>المطور:</strong> '+esc(offer.developer_name || "غير مسجل")+'</p><p><strong>المشروع:</strong> '+esc(offer.project_name || "غير مسجل")+'</p><p><strong>المستندات:</strong> '+links.length+' من '+docs.length+'</p>'+ (links.length ? links.join(" · ") : '<span>تعذر إنشاء روابط العرض المؤقتة.</span>') +'</div></article>');
+      }
+      propertyDocsList.innerHTML = cards.length ? cards.join("") : '<p class="admin-empty">لا توجد مستندات مرفقة بعقارات قيد المراجعة حاليًا.</p>';
+    } catch (error) {
+      propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
+    }
+  }
+  const COMPANY_COLS = "id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,created_at";
+  let companyDraftSupported = false;
+  async function loadPendingCompanyProfiles() {
+    if (!companyProfilesList) return;
+    companyProfilesList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات ملفات الشركات...</p>';
+    let rows;
+    try {
+      // Scoped SECURITY DEFINER RPC returns the review queue only after checking layan_is_admin().
+      rows = await request("/rest/v1/rpc/layan_admin_list_company_profiles", { method: "POST", body: "{}" });
+      companyDraftSupported = true;
+    } catch (error) {
+      companyDraftSupported = false;
+      throw new Error("تعذر تحميل طلبات الشركات عبر قناة الإدارة الآمنة: " + (error.message || "تحقق من تطبيق تحديث قاعدة البيانات."));
+    }
+    if (!Array.isArray(rows) || !rows.length) {
+      companyProfilesList.innerHTML = '<p class="admin-empty">لا توجد طلبات ملفات شركات معلقة.</p>';
+      return;
+    }
+    companyProfilesList.innerHTML = rows.map(row => {
+      const isUpdate = companyDraftSupported && row.status === "active" && row.update_status === "pending" && row.pending_update && typeof row.pending_update === "object";
+      const c = isUpdate ? Object.assign({}, row, row.pending_update) : row;
+      const services = Array.isArray(c.services) ? c.services : [];
+      const projects = Array.isArray(c.projects) ? c.projects : [];
+      const gallery = Array.isArray(c.gallery_urls) ? c.gallery_urls : [];
+      return '<article class="admin-ad" data-company-profile-id="' + esc(row.id) + '" data-company-kind="' + (isUpdate ? "update" : "new") + '">' +
+        '<div class="company-review-details" data-company-details hidden>' +
+        '<span class="admin-chip">' + esc(c.category) + '</span> <span class="admin-chip">' + (isUpdate ? "طلب تعديل على ملف منشور — النسخة المنشورة ما زالت ظاهرة" : "طلب جديد أو إعادة إرسال") + '</span>' +
+        '<h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p>' +
+        '<p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + (c.address ? ' — <strong>العنوان:</strong> ' + esc(c.address) : '') + '</p>' +
+        '<p><strong>الهاتف:</strong> ' + esc(c.phone) + (c.whatsapp ? ' — <strong>واتساب:</strong> ' + esc(c.whatsapp) : '') + '</p>' +
+        '<p><strong>الخدمات:</strong> ' + esc(services.join("، ")) + '</p>' +
+        '<p><strong>المشروعات:</strong> ' + esc(projects.map(p => (p && p.title) || "").filter(Boolean).join("، ") || "لم تُضف") + '</p>' +
+        (c.website ? '<p>' + linkHtml(c.website, 'الموقع الإلكتروني') + '</p>' : '') +
+        (c.logo_url ? '<p>' + linkHtml(c.logo_url, 'شعار الشركة') + '</p>' : '') +
+        '<p><strong>صور الأعمال:</strong> ' + gallery.length + '</p>' + gallery.map((u, i) => linkHtml(u, 'صورة ' + (i + 1))).join(' · ') +
+        '</div><div class="admin-actions"><button type="button" class="btn btn-outline-dark" data-company-action="review" aria-expanded="false">مراجعة البيانات</button>' +
+        '<button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button>' +
+        '<button type="button" class="btn btn-outline-dark" data-company-action="request_changes">طلب استكمال البيانات</button>' +
+        '<button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>';
+    }).join("");
+  }
+
+  async function loadPendingMarketplaceListings() {
+    if (!marketplaceList) return;
+    marketplaceList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات سوق الخدمات...</p>';
+    const rows = await request("/rest/v1/marketplace_listings?select=id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,image_urls,details,created_at&status=eq.pending&order=created_at.asc");
+    if (!Array.isArray(rows) || !rows.length) {
+      marketplaceList.innerHTML = '<p class="admin-empty">لا توجد طلبات جديدة في سوق الخدمات.</p>';
+      return;
+    }
+    marketplaceList.innerHTML = rows.map(row => '<article class="admin-ad" data-marketplace-id="' + esc(row.id) + '"><div><span class="admin-chip">' + esc(row.category) + ' · ' + esc(row.listing_type) + '</span><h2>' + esc(row.title) + '</h2><p>' + esc(row.description) + '</p><p><strong>الموقع:</strong> ' + esc(row.city) + (row.area ? ' — ' + esc(row.area) : '') + '</p><p><strong>السعر:</strong> ' + (row.price === null ? 'عند التواصل' : esc(row.price) + ' جنيه ' + esc(row.price_period || '')) + '</p><p><strong>الهاتف:</strong> ' + esc(row.contact_phone) + (row.whatsapp ? ' · واتساب: ' + esc(row.whatsapp) : '') + '</p>' + (row.details && typeof row.details === 'object' ? '<p><strong>تفاصيل القسم:</strong> ' + Object.entries(row.details).filter(([,v])=>String(v||'').trim()).map(([k,v])=>esc(k.replace(/_/g,' '))+': '+esc(v)).join(' · ') + '</p>' : '') + (Array.isArray(row.image_urls) ? row.image_urls.map((u,i)=>linkHtml(u,'صورة '+(i+1))).join(' · ') : '') + '</div><div class="admin-actions"><button type="button" class="btn btn-gold" data-marketplace-action="approve">اعتماد ونشر</button><button type="button" class="btn btn-outline-dark" data-marketplace-action="reject">رفض الطلب</button></div></article>').join("");
+  }
+
+
+  async function loadPendingCompanyAds() {
+    if (!companyAdsList) return;
+    companyAdsList.innerHTML = '<p class="admin-empty">جارٍ تحميل إعلانات الشركات...</p>';
+    try {
+      const rows = await request("/rest/v1/company_property_ads?select=id,business_name,plan_code,status,starts_at,ends_at,created_at&status=eq.pending&order=created_at.asc");
+      if (!Array.isArray(rows) || !rows.length) {
+        companyAdsList.innerHTML = '<p class="admin-empty">لا توجد طلبات إعلانات شركات معلّقة.</p>';
+        return;
+      }
+      companyAdsList.innerHTML = rows.map(row =>
+        '<article class="admin-ad" data-company-ad-id="' + esc(row.id) + '"><div><span class="admin-chip">' + esc(row.plan_code) + '</span><h2>' + esc(row.business_name) + '</h2><p>تاريخ الطلب: ' + esc(new Date(row.created_at).toLocaleString("ar-EG")) + '</p></div><div class="admin-actions"><button type="button" class="btn btn-gold" data-company-ad-action="activate">تفعيل 30 يومًا</button><button type="button" class="btn btn-outline-dark" data-company-ad-action="reject">رفض الطلب</button></div></article>'
+      ).join("");
+    } catch (error) {
+      companyAdsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل إعلانات الشركات.") + '</p>';
+    }
+  }
+
+  async function loadPendingAdSlots() {
+    if (!adSlotsList) return;
+    adSlotsList.innerHTML = '<p class="admin-empty">جارٍ تحميل المساحات الإعلانية...</p>';
+    try {
+      const rows = await request("/rest/v1/partner_ad_slots?select=id,slot_key,category,title,description,is_free_trial,status,display_order&order=display_order.asc");
+      if (!Array.isArray(rows) || !rows.length) {
+        adSlotsList.innerHTML = '<p class="admin-empty">لا توجد مساحات إعلانية مسجلة.</p>';
+        return;
+      }
+      adSlotsList.innerHTML = rows.map(row =>
+        '<article class="admin-ad" data-ad-slot-id="' + esc(row.id) + '"><div><span class="admin-chip">' + esc(row.category) + '</span><h2>' + esc(row.title) + '</h2><p>' + esc(row.description || "") + '</p><p>المعرّف: ' + esc(row.slot_key) + ' · الحالة: ' + (row.status === "active" ? "مفعّلة" : "متوقفة") + (row.is_free_trial ? " · تجربة مجانية" : "") + '</p></div><div class="admin-actions"><button type="button" class="btn btn-outline-dark" data-slot-action="' + (row.status === "active" ? "disable" : "enable") + '">' + (row.status === "active" ? "إيقاف المساحة" : "تفعيل المساحة") + '</button></div></article>'
+      ).join("");
+    } catch (error) {
+      adSlotsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل المساحات الإعلانية.") + '</p>';
+    }
+  }
+
+  async function loadAdminUsers() {
+    if (!usersList) return;
+    usersList.innerHTML = '<p class="admin-empty">جارٍ تحميل حسابات المستخدمين...</p>';
+    try {
+      await ensureFreshSession();
+      const response = await fetch(base + "/functions/v1/asyut-admin", {
+        method: "POST",
+        headers: { apikey: key, Authorization: "Bearer " + session.access_token, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "list_users", page: 1, perPage: 100 })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "تعذر تحميل حسابات المستخدمين.");
+      const rows = Array.isArray(data.users) ? data.users : [];
+      if (!rows.length) {
+        usersList.innerHTML = '<p class="admin-empty">لا توجد حسابات مسجلة في قاعدة البيانات.</p>';
+        return;
+      }
+      usersList.innerHTML = '<div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="text-align:right;padding:10px">البريد الإلكتروني</th><th style="text-align:right;padding:10px">تاريخ التسجيل</th><th style="text-align:right;padding:10px">آخر دخول</th><th style="text-align:right;padding:10px">تأكيد البريد</th><th style="text-align:right;padding:10px">الحالة</th></tr></thead><tbody>' +
+        rows.map(user => '<tr><td style="padding:10px;border-top:1px solid #e5e8ee">' + esc(user.email || "—") + '</td><td style="padding:10px;border-top:1px solid #e5e8ee">' + esc(user.created_at ? new Date(user.created_at).toLocaleString("ar-EG") : "—") + '</td><td style="padding:10px;border-top:1px solid #e5e8ee">' + esc(user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString("ar-EG") : "لم يسجل دخولًا") + '</td><td style="padding:10px;border-top:1px solid #e5e8ee">' + (user.email_confirmed_at ? "مؤكد" : "غير مؤكد") + '</td><td style="padding:10px;border-top:1px solid #e5e8ee">' + (user.banned_until ? "موقوف مؤقتًا" : "نشط") + '</td></tr>').join("") +
+        '</tbody></table></div><p class="admin-empty">يتم عرض أول 100 حساب. لا تتوفر من هذه الشاشة إجراءات حذف أو تغيير كلمات المرور.</p>';
+    } catch (error) {
+      usersList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل حسابات المستخدمين.") + '</p>';
+    }
+  }
+
+  async function loadAdminStats() {
+    const panel=document.getElementById("adminStats");
+    const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value);};
+    const [properties,marketPending,companies,marketApproved]=await Promise.all([
+      request("/rest/v1/property_offers?select=id&status=eq.pending"),
+      request("/rest/v1/marketplace_listings?select=id&status=eq.pending"),
+      request("/rest/v1/company_profiles?select=id&status=eq.pending"),
+      request("/rest/v1/marketplace_listings?select=id&status=eq.approved")
+    ]);
+    set("statPendingProperties",Array.isArray(properties)?properties.length:0);
+    set("statPendingMarketplace",Array.isArray(marketPending)?marketPending.length:0);
+    set("statPendingCompanies",Array.isArray(companies)?companies.length:0);
+    set("statApprovedMarketplace",Array.isArray(marketApproved)?marketApproved.length:0);
+    if(panel)panel.hidden=false;
+  }
+
+  async function loadPending() {
+    setStatus("جارٍ التحقق من صلاحية الإدارة وتحميل الطلبات...");
+    try {
+      // Fail closed: password authentication is not proof of administrator authorization.
+      // Check the protected server-side allowlist before requesting any review data or signing documents.
+      const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", { method: "POST", body: "{}" });
+      if (adminAllowed !== true) {
+        session = null;
+
+        showState(false);
+        list.innerHTML = "";
+        if (companyProfilesList) companyProfilesList.innerHTML = "";
+        if (marketplaceList) marketplaceList.innerHTML = "";
+        if (propertyDocsList) propertyDocsList.innerHTML = "";
+        setStatus("هذا الحساب غير مخوّل بدخول لوحة إدارة أسيوط عقار. يمكنك متابعة ملف شركتك من صفحة دليل الشركات.");
+        return false;
+      }
+
+      const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
+      render(rows);
+      await loadAdminStats();
+      await loadPendingCompanyProfiles();
+      await loadPendingMarketplaceListings();
+      await loadPendingPropertyOffers();
+      await loadPendingPropertyDocuments();
+      await loadPendingCompanyAds();
+      await loadPendingAdSlots();
+      await loadAdminUsers();
+      showState(true);
+      setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
+      return true;
+    } catch (error) {
+      showState(false);
+      list.innerHTML = "";
+      if (companyProfilesList) companyProfilesList.innerHTML = "";
+      if (propertyDocsList) propertyDocsList.innerHTML = "";
+      setStatus(/غير مصرح|permission|row-level|policy|401|403|غير مخوّل/i.test(error.message)
+        ? "هذا الحساب غير مخوّل للإدارة. يمكنك متابعة ملف شركتك من صفحة دليل الشركات."
+        : error.message);
+      return false;
+    }
+  }
+  const forgotPassword = document.getElementById("adminForgotPassword");
+  forgotPassword?.addEventListener("click", async event => {
+    event.preventDefault();
+    const recoveryEmail = email.value.trim();
+    if (!recoveryEmail) {
+      setStatus("اكتب بريدك الإلكتروني أولًا، ثم اضغط «نسيت كلمة المرور؟».");
+      email.focus();
+      return;
+    }
+    const link = forgotPassword;
+    link.style.pointerEvents = "none";
+    setStatus("جارٍ إرسال رابط استعادة كلمة المرور إلى بريدك...");
+    try {
+      if (!auth?.resetPasswordForEmail) throw new Error("خدمة استعادة كلمة المرور غير جاهزة.");
+      await auth.resetPasswordForEmail(recoveryEmail);
+      setStatus("لو البريد مسجل في المنصة، ستصلك رسالة استعادة. افتح أحدث رسالة من Supabase واضغط الرابط، ثم عيّن كلمة مرور جديدة. راجع الرسائل غير المرغوب فيها أيضًا.");
+    } catch (error) {
+      setStatus("تعذر إرسال رابط الاستعادة: " + error.message + " إذا ظهر خطأ في الرابط المسموح، يلزم إضافة https://layan-eg.com/reset-password.html إلى قائمة Redirect URLs في Supabase Auth. أضف رابط الإنتاج ورابط المعاينة الذي تستخدمه.");
+    } finally {
+      link.style.pointerEvents = "";
+    }
+  });
+  login.addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = login.querySelector('button[type="submit"]');
+    button.disabled = true;
+    setStatus("جارٍ تسجيل الدخول...");
+    try {
+      if (!auth?.signIn) throw new Error("خدمة تسجيل الدخول غير جاهزة.");
+      await auth.signIn(email.value.trim(), password.value);
+      session = auth.getSession?.() || null;
+      if (!session?.access_token || !session?.user?.id) throw new Error("لم يتم إنشاء جلسة دخول صالحة.");
+      showState(false);
+      await loadPending();
+    } catch (error) {
+      setStatus("تعذر تسجيل الدخول: " + error.message);
+    } finally { button.disabled = false; }
+  });
+  companyProfilesList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-company-action]");
+    const card = event.target.closest("[data-company-profile-id]");
+    if (!button || !card) return;
+    const action = button.dataset.companyAction;
+    const id = card.dataset.companyProfileId;
+    if (action === "review") {
+      const details = card.querySelector("[data-company-details]");
+      const expanded = button.getAttribute("aria-expanded") === "true";
+      details.hidden = expanded;
+      button.setAttribute("aria-expanded", String(!expanded));
+      button.textContent = expanded ? "مراجعة البيانات" : "إخفاء البيانات";
+      return;
+    }
+    let notes = null;
+    if (action === "reject") {
+      notes = window.prompt("اكتب سبب رفض ملف الشركة:");
+      if (notes === null) return;
+      if (notes.trim().length < 3) { setStatus("اكتب سببًا واضحًا للرفض."); return; }
+    } else if (action === "request_changes") {
+      notes = window.prompt("اكتب البيانات أو التعديلات المطلوبة من الشركة:");
+      if (notes === null) return;
+      if (notes.trim().length < 3) { setStatus("اكتب تفاصيل واضحة لاستكمال البيانات."); return; }
+    } else if (!window.confirm(card.dataset.companyKind === "update" ? "اعتماد التعديلات وتحديث النسخة العامة لملف الشركة؟" : "اعتماد ملف الشركة ونشره في دليل أسيوط عقار؟")) return;
+    button.disabled = true;
+    try {
+      if (card.dataset.companyKind === "update") {
+        // Draft update on a published profile: server-side function (admin-only) merges or rejects it.
+        await request("/rest/v1/rpc/layan_review_company_profile", { method: "POST", body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes }) });
+      } else {
+        const done = await requestOneRow("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
+          method: "PATCH",
+          body: JSON.stringify({ status: action === "approve" ? "active" : action === "request_changes" ? "needs_changes" : "rejected", admin_notes: action === "approve" ? null : notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
+        });
+
+      }
+      setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
+      await loadPending();
+    } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
+    finally { button.disabled = false; }
+  });
+  document.getElementById("pendingPropertyOffers")?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-property-action]");
+    const card = event.target.closest("[data-property-offer-id]");
+    if (!button || !card) return;
+    const action = button.dataset.propertyAction;
+    let notes = null;
+    if (action === "reject") {
+      notes = window.prompt("اكتب سبب رفض الإعلان (3 أحرف على الأقل):");
+      if (notes === null) return;
+      if (notes.trim().length < 3) { setStatus("اكتب سببًا واضحًا للرفض."); return; }
+    } else if (!window.confirm("اعتماد الإعلان ونشره للزوار؟")) return;
+    button.disabled = true;
+    try {
+      await request("/rest/v1/rpc/layan_admin_review_property_offer", {
+        method: "POST",
+        body: JSON.stringify({ p_id: Number(card.dataset.propertyOfferId), p_action: action, p_notes: notes })
+      });
+      let pushStatus = "";
+      if (action === "approve") {
+        try {
+          session = await auth.requireAuthenticated();
+          const pushResponse = await fetch(base + "/functions/v1/asyut-push", {
+            method: "POST",
+            headers: { apikey: key, Authorization: "Bearer " + session.access_token, "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "send_offer_push", offer_id: Number(card.dataset.propertyOfferId) })
+          });
+          const pushData = await pushResponse.json().catch(() => ({}));
+          if (pushResponse.ok) {
+            pushStatus = pushData.sent > 0 ? " تم إرسال تنبيه إلى " + pushData.sent + " جهاز." : " تم حفظ التنبيه للمشترين المطابقين؛ لا توجد أجهزة مفعّلة حاليًا.";
+          } else {
+            console.warn("Push notification dispatch failed:", pushData.error || pushResponse.status);
+            pushStatus = " تعذر إرسال إشعارات الهاتف، لكن تم نشر الإعلان بنجاح.";
+          }
+        } catch (pushError) {
+          console.warn("Push notification dispatch error:", pushError);
+          pushStatus = " تعذر إرسال إشعارات الهاتف، لكن تم نشر الإعلان بنجاح.";
+        }
+      }
+      setStatus(action === "approve" ? "تم اعتماد الإعلان ونشره." + pushStatus : "تم رفض الإعلان وتسجيل السبب.");
+      await loadPending();
+    } catch (error) {
+      setStatus(error.message || "تعذر تنفيذ مراجعة الإعلان.");
+    } finally { button.disabled = false; }
+  });
+  marketplaceList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-marketplace-action]");
+    const card = event.target.closest("[data-marketplace-id]");
+    if (!button || !card) return;
+    const action = button.dataset.marketplaceAction;
+    let notes = null;
+    if (action === "reject") { notes = window.prompt("اكتب سبب رفض الإعلان:"); if (notes === null) return; if (notes.trim().length < 3) { setStatus("اكتب سببًا واضحًا للرفض."); return; } }
+    else if (!window.confirm("اعتماد هذا الإعلان ونشره للزوار؟")) return;
+    button.disabled = true;
+    try {
+      await requestOneRow("/rest/v1/marketplace_listings?id=eq." + encodeURIComponent(card.dataset.marketplaceId) + "&status=eq.pending", {method:"PATCH",body:JSON.stringify({status:action==="approve"?"approved":"rejected",admin_notes:action==="approve"?null:notes,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id})});
+      setStatus(action==="approve"?"تم اعتماد إعلان سوق الخدمات ونشره.":"تم رفض إعلان سوق الخدمات.");
+      await loadPending();
+    } catch (error) { setStatus(error.message || "تعذر تحديث حالة الإعلان."); }
+    finally { button.disabled = false; }
+  });
+
+  companyAdsList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-company-ad-action]");
+    const card = event.target.closest("[data-company-ad-id]");
+    if (!button || !card) return;
+    const action = button.dataset.companyAdAction;
+    if (!window.confirm(action === "activate" ? "تفعيل إعلان هذه الشركة لمدة 30 يومًا؟" : "تأكيد رفض طلب إعلان الشركة؟")) return;
+    button.disabled = true;
+    try {
+      const now = new Date();
+      const patch = action === "activate"
+        ? { status: "active", starts_at: now.toISOString(), ends_at: new Date(now.getTime() + 30 * 86400000).toISOString(), updated_at: now.toISOString() }
+        : { status: "rejected", updated_at: now.toISOString() };
+      await requestOneRow("/rest/v1/company_property_ads?id=eq." + encodeURIComponent(card.dataset.companyAdId) + "&status=eq.pending", {
+        method: "PATCH", body: JSON.stringify(patch)
+      });
+      setStatus(action === "activate" ? "تم تفعيل إعلان الشركة لمدة 30 يومًا." : "تم رفض طلب إعلان الشركة.");
+      await loadPending();
+    } catch (error) { setStatus(error.message || "تعذر تحديث إعلان الشركة."); }
+    finally { button.disabled = false; }
+  });
+
+  adSlotsList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-slot-action]");
+    const card = event.target.closest("[data-ad-slot-id]");
+    if (!button || !card) return;
+    const action = button.dataset.slotAction;
+    if (!window.confirm(action === "enable" ? "تفعيل هذه المساحة الإعلانية؟" : "إيقاف هذه المساحة الإعلانية؟")) return;
+    button.disabled = true;
+    try {
+      await requestOneRow("/rest/v1/partner_ad_slots?id=eq." + encodeURIComponent(card.dataset.adSlotId), {
+        method: "PATCH",
+        body: JSON.stringify({ status: action === "enable" ? "active" : "paused" })
+      });
+      setStatus(action === "enable" ? "تم تفعيل المساحة الإعلانية." : "تم إيقاف المساحة الإعلانية.");
+      await loadPendingAdSlots();
+    } catch (error) { setStatus(error.message || "تعذر تحديث المساحة الإعلانية."); }
+    finally { button.disabled = false; }
+  });
+
+  list.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-action]");
+    const card = event.target.closest("[data-ad-id]");
+    if (!button || !card) return;
+    const id = card.dataset.adId;
+    button.disabled = true;
+    try {
+      if (button.dataset.action === "activate") {
+        const days = Number(card.querySelector("[data-agreed-days]")?.value);
+        const priceInput = card.querySelector("[data-agreed-price]");
+        const price = Number(priceInput?.value);
+        if (!Number.isInteger(days) || days < 1 || days > 365 || !Number.isFinite(price) || price < 0 || priceInput?.value === "") {
+          throw new Error("اكتب المدة المتفق عليها من 1 إلى 365 يومًا والسعر النهائي بعد التواصل مع الشركة عبر واتساب.");
+        }
+        if (!window.confirm("تأكيد تفعيل الإعلان لمدة " + days + " يومًا بالسعر المتفق عليه " + price + " جنيه؟")) return;
+        await request("/rest/v1/rpc/layan_activate_supplier_ad", {method:"POST",body:JSON.stringify({p_ad_id:id,p_days:days,p_price:price})});
+        setStatus("تم تفعيل الإعلان بعد تسجيل السعر والمدة المتفق عليهما.");
+      } else {
+        const reason = window.prompt("اكتب سبب رفض الطلب (3 أحرف على الأقل):");
+        if (reason === null) return;
+        await request("/rest/v1/rpc/layan_reject_supplier_ad", {method:"POST",body:JSON.stringify({p_ad_id:id,p_reason:reason})});
+        setStatus("تم رفض الطلب.");
+      }
+      await loadPending();
+    } catch (error) {
+      setStatus(error.message || "تعذر تنفيذ الإجراء.");
+    } finally { button.disabled = false; }
+  });
+  document.getElementById("reloadPending").addEventListener("click", loadPending);
+  document.getElementById("adminLogout").addEventListener("click", async () => {
+    try { if (auth?.signOut) await auth.signOut(); } catch (error) { setStatus(error.message || "تعذر تسجيل الخروج."); return; }
+    session = null;
+    showState(false);
+    setStatus("تم تسجيل الخروج.");
+  });
+  // Never reveal the administration panel from a locally cached token alone.
+  showState(false);
+  async function verifyAndLoadAdmin() {
+    if (!session?.access_token || !session?.user?.id) return;
+    try {
+      if (!auth?.requireAuthenticated) throw new Error("خدمة التحقق من الحساب غير جاهزة.");
+      session = await auth.requireAuthenticated();
+      if (!session?.user?.id) throw new Error("جلسة الدخول غير صالحة.");
+      const adminAllowed = await request("/rest/v1/rpc/layan_is_admin", {method:"POST", body:"{}"});
+      if (adminAllowed !== true) throw new Error("الحساب غير مصرح له بدخول لوحة الإدارة.");
+      await loadPending();
+    } catch (error) {
+      session = null;
+
+      showState(false);
+      setStatus("يلزم تسجيل الدخول والتحقق من صلاحية الإدارة مرة أخرى.");
+    }
+  }
+  if (session?.access_token) verifyAndLoadAdmin();
+});

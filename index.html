@@ -1,0 +1,752 @@
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102746">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <meta name="description" content="أسيوط عقار - سوق العقارات والتنازلات والبيع والإيجار والخدمات العقارية في محافظة أسيوط">
+  <link rel="canonical" href="https://layan-eg.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://layan-eg.com/">
+  <meta property="og:title" content="ASYUT AQAR | أسيوط عقار">
+  <meta property="og:description" content="اكتشف الفرص والتنازلات العقارية في أسيوط عبر منصة أسيوط عقار">
+  <meta name="twitter:card" content="summary">
+  <meta property="og:locale" content="ar_EG">
+  <meta name="twitter:title" content="أسيوط عقار | عقارات وتنازلات وخدمات في أسيوط">
+  <meta name="twitter:description" content="اكتشف عقارات للبيع والإيجار والتنازل في أسيوط، وقارن العروض وتواصل مباشرة مع المعلنين.">
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"أسيوط عقار",
+    "alternateName":"ASYUT AQAR",
+    "url":"https://layan-eg.com/",
+    "inLanguage":"ar-EG"
+  }
+  </script>
+  <title>ASYUT AQAR | أسيوط عقار</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=professional-search-compare-20261102-1">
+  <link rel="stylesheet" href="buyer.css?v=background-push-20261102-1">
+  <link rel="stylesheet" href="sponsor.css?v=auth-signup-fix-1">
+  <link rel="stylesheet" href="ai.css?v=unified-brand-20261101-1">
+  <link rel="stylesheet" href="companies.css?v=company-directory-1">
+  <link rel="stylesheet" href="marketplace.css?v=marketplace-hub-1">
+</head>
+<body>
+  <div class="install-app-banner" id="installAppBanner" hidden>
+    <span><strong>ثبّت أسيوط عقار على موبايلك</strong><small>افتح المنصة بسهولة من شاشة التطبيقات</small></span>
+    <button class="btn btn-gold" id="installAppBtn" type="button">تثبيت</button>
+    <button class="install-dismiss" id="dismissInstallBtn" type="button" aria-label="إخفاء">×</button>
+  </div>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="ASYUT AQAR الصفحة الرئيسية">
+      <img src="icon.svg"
+           alt="شعار أسيوط عقار" class="brand-logo">
+      <span>
+        <strong>ASYUT AQAR</strong>
+        <small>أسيوط عقار</small>
+      </span>
+    </a>
+
+    <nav aria-label="القائمة الرئيسية">
+      <a class="active" href="./" aria-current="page">الرئيسية</a>
+      <a href="#offers">العقارات</a>
+      <a href="./marketplace.html">سوق الخدمات</a>
+      <a href="./companies.html">الشركات</a>
+      <a href="./favorites.html">المفضلة</a>
+    </nav>
+
+    <div class="top-actions">
+      <a class="btn btn-outline" id="adminDashboardLink" href="./admin.html" hidden>دخول الإدارة</a>
+      <a class="btn btn-outline" id="myListingsLink" href="./my-listings.html" hidden>إعلاناتي</a>
+      <button class="btn btn-outline" id="loginBtn" type="button">
+        تسجيل الدخول
+      </button>
+      <button class="btn btn-gold" id="addOfferTop" type="button">
+        أضف عرضك
+      </button>
+    </div>
+  </header>
+
+  <main>
+<section class="hero design-hero" aria-labelledby="heroTitle">
+      <div class="hero-content design-hero-content">
+        <span class="eyebrow">ASYUT AQAR · أسيوط</span>
+        <h1 id="heroTitle">فرصتك العقارية <span>تبدأ من هنا</span></h1>
+        <p class="design-hero-lead">كل فرص أسيوط العقارية في مكان واحد</p>
+        <p class="design-hero-sub">ابحث عن شقة أو محل أو أرض للبيع والإيجار والتنازل. قارن المقدم والمدفوع والمتبقي والأقساط، ثم تواصل مباشرة مع صاحب الإعلان. لا عمولة على إتمام البيع أو التنازل.</p>
+        <div class="hero-actions">
+          <a class="btn btn-gold" href="#offers">تصفح العروض</a>
+          <button class="btn btn-outline" id="addOfferBtn" type="button">اعرض وحدتك</button>
+        </div>
+      </div>
+      <form class="design-hero-search" id="heroQuickSearch" role="search" aria-label="بحث سريع عن العقارات">
+        <label>نوع المعاملة
+          <select id="heroPurposeFilter">
+            <option value="">بيع أو إيجار أو تنازل</option>
+            <option value="بيع">بيع</option><option value="إيجار">إيجار</option><option value="تنازل">تنازل</option>
+          </select>
+        </label>
+        <label>نوع العقار
+          <select id="heroTypeFilter">
+            <option value="">كل الوحدات</option>
+            <option value="شقة">شقة</option><option value="فيلا">فيلا</option>
+            <option value="محل">محل تجاري</option><option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option><option value="أرض تنازل">أرض تنازل</option>
+            <option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option>
+          </select>
+        </label>
+        <label>المنطقة
+          <select id="heroAreaFilter">
+            <option value="">كل مناطق أسيوط ومراكزها</option>
+            <option value="مدينة أسيوط">مدينة أسيوط</option>
+            <option value="أسيوط الجديدة">أسيوط الجديدة</option>
+            <option value="الهضبة">الهضبة</option>
+            <option value="ديروط">ديروط</option>
+            <option value="القوصية">القوصية</option>
+            <option value="منفلوط">منفلوط</option>
+            <option value="أبنوب">أبنوب</option>
+            <option value="الفتح">الفتح</option>
+            <option value="ساحل سليم">ساحل سليم</option>
+            <option value="البداري">البداري</option>
+            <option value="أبو تيج">أبو تيج</option>
+            <option value="صدفا">صدفا</option>
+            <option value="الغنايم">الغنايم</option>
+          </select>
+        </label>
+        <label>أقصى سعر معلن (جنيه)
+          <input id="heroBudgetFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 1500000">
+        </label>
+        <button class="btn btn-red design-search-button" type="submit">ابحث الآن <span aria-hidden="true">⌕</span></button>
+      </form>
+    </section>
+
+<section class="design-benefits" aria-label="مزايا منصة أسيوط عقار">
+      <div><span aria-hidden="true">✓</span><strong>تواصل مباشر</strong><small>مع صاحب الإعلان</small></div>
+      <div><span aria-hidden="true">⌂</span><strong>عروض عقارية</strong><small>في محافظة أسيوط</small></div>
+      <div><span aria-hidden="true">◇</span><strong>بدون عمولة لأسيوط عقار</strong><small>لا رسوم على إتمام التنازل</small></div>
+      <div><span aria-hidden="true">▣</span><strong>تفاصيل واضحة</strong><small>المقدم والمتبقي والأقساط</small></div>
+    </section>
+
+<section class="launch-campaign" id="free-launch" aria-labelledby="launchCampaignTitle">
+      <div class="launch-campaign-copy">
+        <span class="launch-pill">ابدأ مجانًا مع أسيوط عقار</span>
+        <h2 id="launchCampaignTitle">اعرض عقارك مجانًا وابحث عن فرصتك</h2>
+        <p>تصفّح العقارات والعروض مجانًا، وأنشئ حسابك لإضافة إعلانك العادي ومتابعته. أسيوط عقار لا تحصل على عمولة عند إتمام البيع أو التنازل.</p>
+        <small>الإعلان العادي مجاني. التمييز والإعلانات التجارية خدمات اختيارية، وتُرسل تفاصيلها وأسعارها عبر واتساب بعد التواصل مع الإدارة.</small>
+        <div class="launch-actions">
+          <a class="btn btn-gold" href="#accounts">اختَر نوع حسابك</a>
+          <a class="btn btn-outline" href="#offers">تصفّح العروض</a>
+        </div>
+      </div>
+      <div class="launch-benefits" aria-label="مزايا منصة أسيوط عقار">
+        <div><strong>مجانًا</strong><span>تصفح وإعلان عادي</span></div>
+        <div><strong>بدون عمولة</strong><span>على البيع أو التنازل</span></div>
+        <div><strong>واتساب</strong><span>تفاصيل الإعلانات التجارية</span></div>
+      </div>
+    </section>
+
+<section class="category-explorer" id="property-types" aria-labelledby="propertyTypesTitle">
+      <div class="category-explorer-intro">
+        <span class="eyebrow">اكتشف عقارك</span>
+        <h2 id="propertyTypesTitle">بتدور على عقار من أي نوع؟</h2>
+        <p>اختار القسم المناسب، وشوف العروض المنشورة فيه مباشرة.</p>
+      </div>
+      <div class="deal-purpose-grid" aria-label="نوع المعاملة العقارية">
+        <button class="deal-purpose-card" type="button" data-deal-kind="بيع"><strong>عقارات للبيع</strong><span>وحدات سكنية وتجارية وإدارية وطبية للبيع</span></button>
+        <button class="deal-purpose-card" type="button" data-deal-kind="إيجار"><strong>عقارات للإيجار</strong><span>ابحث عن وحدة مناسبة للسكن أو النشاط</span></button>
+        <button class="deal-purpose-card" type="button" data-deal-kind="تنازل"><strong>قسم التنازلات</strong><span>وحدات ومحلات وأراضٍ للتنازل واستكمال الأقساط</span></button>
+      </div>
+      <div class="category-tiles">
+        <button class="category-tile" type="button" data-category-kind="سكني" aria-label="عرض العقارات السكنية">
+          <span class="category-tile-icon" aria-hidden="true">⌂</span>
+          <strong>سكني</strong>
+          <span>شقق وفلل ووحدات سكنية</span>
+          <b>شوف العقارات السكنية ←</b>
+        </button>
+        <button class="category-tile" type="button" data-category-kind="تجاري" aria-label="عرض العقارات التجارية">
+          <span class="category-tile-icon" aria-hidden="true">▤</span>
+          <strong>تجاري</strong>
+          <span>محلات ومعارض ومخازن</span>
+          <b>شوف العقارات التجارية ←</b>
+        </button>
+        <button class="category-tile" type="button" data-category-kind="إداري" aria-label="عرض العقارات الإدارية">
+          <span class="category-tile-icon" aria-hidden="true">▥</span>
+          <strong>إداري</strong>
+          <span>مكاتب ومقرات للشركات</span>
+          <b>شوف العقارات الإدارية ←</b>
+        </button>
+        <button class="category-tile" type="button" data-category-kind="طبي" aria-label="عرض العقارات الطبية">
+          <span class="category-tile-icon" aria-hidden="true">✚</span>
+          <strong>طبي</strong>
+          <span>عيادات ومراكز طبية</span>
+          <b>شوف العقارات الطبية ←</b>
+        </button>
+      </div>
+
+      <div class="land-market-grid" aria-label="أقسام الأراضي">
+        <article class="land-market-card">
+          <span class="land-market-icon" aria-hidden="true">▱</span>
+          <div><span class="eyebrow">سوق الأراضي</span><h3>أراضٍ مطروحة للبناء</h3>
+          <p>أراضٍ للبيع المباشر في أسيوط ومراكزها، مع توضيح المساحة والسعر والموقع وجهة الولاية واشتراطات البناء المتاحة.</p></div>
+          <button class="btn btn-outline" type="button" data-category-kind="أراضي مطروحة للبناء">تصفح أراضي البناء</button>
+        </article>
+        <article class="land-market-card">
+          <span class="land-market-icon" aria-hidden="true">⇄</span>
+          <div><span class="eyebrow">سوق التنازلات</span><h3>أراضي للتنازل</h3>
+          <p>أراضٍ مخصصة أو محجوزة يرغب أصحابها في التنازل عنها، مع بيانات المدفوع والمتبقي والأقساط ورسوم التنازل وشروط الجهة المختصة.</p></div>
+          <button class="btn btn-outline" type="button" data-category-kind="أراضي التنازلات">تصفح أراضي التنازلات</button>
+        </article>
+      </div>
+      <div class="category-trust-strip">
+        <span class="trust-mark" aria-hidden="true">✓</span>
+        <div><strong>تنازل بدون عمولة لأسيوط عقار</strong><p>أسيوط عقار لا تحصل على عمولة عند إتمام التنازل. راجع المقدم والمبلغ المتبقي والأقساط ورسوم التنازل التي يحددها المطوّر قبل الاتفاق.</p></div>
+        <a class="btn btn-gold" href="#offers">تصفح كل العروض</a>
+      </div>
+    </section>
+
+<section class="offers-section" id="offers">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">فرص عقارية</span>
+          <h2>قائمة العروض</h2>
+          <p>تصفح عقارات أسيوط للبيع والإيجار والتنازل، واختر نوع الفرصة المناسبة لك.</p>
+        </div>
+      </div>
+
+      <div class="filters" id="propertySearchFilters">
+        <div class="filters-primary">
+          <label class="filter-search-field">ابحث عن عقار أو منطقة أو مشروع
+            <input id="searchInput" type="search" placeholder="مثال: شقة في الهضبة أو محل تجاري" aria-label="ابحث عن عقار أو منطقة أو مشروع">
+          </label>
+          <label>نوع المعاملة
+            <select id="purposeFilter" aria-label="تصفية حسب نوع المعاملة">
+              <option value="">كل المعاملات</option>
+              <option value="بيع">بيع</option>
+              <option value="إيجار">إيجار</option>
+              <option value="تنازل">تنازل</option>
+            </select>
+          </label>
+          <label>نوع العقار
+            <select id="typeFilter" aria-label="تصفية حسب نوع العقار">
+              <option value="">كل أنواع العقارات</option>
+              <option value="شقة">شقة</option>
+              <option value="فيلا">فيلا</option>
+              <option value="محل">محل تجاري</option>
+              <option value="مكتب إداري">مكتب إداري</option>
+              <option value="عيادة طبية">عيادة طبية</option>
+              <option value="مخزن">مخزن</option>
+              <option value="معرض">معرض</option>
+              <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option>
+              <option value="أرض تنازل">أرض تنازل</option>
+            </select>
+          </label>
+          <label>المدينة / المركز
+            <select id="cityFilter" aria-label="تصفية حسب المدينة أو المركز">
+              <option value="">كل مدن ومراكز أسيوط</option>
+            </select>
+          </label>
+          <label>أقصى سعر معلن (جنيه)
+            <input id="totalPriceMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 1500000" aria-label="أقصى سعر معلن بالجنيه">
+          </label>
+        </div>
+        <div class="filters-actions">
+          <button class="filters-toggle" id="toggleAdvancedFilters" type="button" aria-expanded="false" aria-controls="advancedPropertyFilters">
+            <span aria-hidden="true">＋</span> فلاتر إضافية
+          </button>
+          <span class="filters-hint">حدّد المعاملة والمكان والميزانية للوصول إلى العروض المناسبة.</span>
+          <button class="btn btn-gold" id="searchBtn" type="button">عرض النتائج</button>
+        </div>
+        <div class="filters-advanced" id="advancedPropertyFilters" hidden>
+          <label>الحي أو المنطقة
+            <select id="areaFilter" aria-label="تصفية حسب الحي أو المنطقة">
+              <option value="">كل الأحياء والمناطق</option>
+              <option value="الهضبة">الهضبة</option>
+            </select>
+          </label>
+          <label>أقصى مقدم (جنيه)
+            <input id="downPaymentMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 300000" aria-label="أقصى مقدم بالجنيه">
+          </label>
+          <label>أقصى قسط شهري (جنيه)
+            <input id="monthlyMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 10000" aria-label="أقصى قسط شهري بالجنيه">
+          </label>
+          <label>أقل عدد غرف نوم
+            <select id="minBedroomsFilter" aria-label="أقل عدد غرف نوم">
+              <option value="">أي عدد غرف</option>
+              <option value="1">غرفة واحدة أو أكثر</option>
+              <option value="2">غرفتان أو أكثر</option>
+              <option value="3">3 غرف أو أكثر</option>
+              <option value="4">4 غرف أو أكثر</option>
+            </select>
+          </label>
+          <label>ترتيب النتائج
+            <select id="sortFilter" aria-label="ترتيب العروض">
+              <option value="newest">الأحدث أولًا</option>
+              <option value="price-asc">السعر: من الأقل للأعلى</option>
+              <option value="price-desc">السعر: من الأعلى للأقل</option>
+              <option value="paid-asc">المبلغ المدفوع: من الأقل للأعلى</option>
+              <option value="monthly-asc">القسط الشهري: من الأقل للأعلى</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="results-toolbar">
+        <p id="resultsSummary" class="results-summary" role="status" aria-live="polite"></p>
+        <button id="resetFiltersBtn" class="reset-filters-btn" type="button" hidden>مسح الفلاتر</button>
+      </div>      <div id="statusMessage" role="status" aria-live="polite"></div>
+
+      <div class="property-map-toolbar"><div><strong>العقارات على الخريطة</strong><span id="propertyMapCount" role="status" aria-live="polite">المواقع المسجلة فقط</span></div><button id="togglePropertyMap" class="btn btn-outline-dark" type="button" aria-expanded="false" aria-controls="propertyMapPanel">عرض الخريطة</button></div><section id="propertyMapPanel" class="property-map-panel" hidden aria-label="خريطة العقارات المنشورة"><p id="propertyMapStatus" class="property-map-status" role="status" aria-live="polite">افتح الخريطة لعرض العقارات التي أضيفت لها إحداثيات صحيحة.</p><div id="propertyMap" role="application" aria-label="خريطة تفاعلية لعقارات أسيوط"></div><p class="property-map-attribution">الخريطة © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>. <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener noreferrer">الإبلاغ عن مشكلة بالخريطة</a></p></section>
+
+      <div class="offers-grid" id="offersGrid">
+        <!-- يعرض app.js العروض هنا -->
+      </div>
+      <nav id="offersPagination" class="offers-pagination" aria-label="صفحات العروض" hidden></nav>
+      <div id="compareTray" class="compare-tray" hidden aria-live="polite">
+        <div><strong>مقارنة العقارات</strong><span id="compareTrayCount">0 من 3 عقارات محددة</span></div>
+        <div class="compare-tray-actions">
+          <button type="button" id="clearCompareBtn" class="compare-clear-btn">مسح الاختيارات</button>
+          <button type="button" id="openCompareBtn" class="btn btn-gold" disabled>قارن العقارات</button>
+        </div>
+      </div>
+
+    </section>
+
+<section class="marketplace-hub" id="services" aria-labelledby="marketplaceTitle">
+      <div class="marketplace-heading">
+        <span class="eyebrow">سوق أسيوط للخدمات العقارية</span>
+        <h2 id="marketplaceTitle">كل ما تحتاجه لعقارك في مكان واحد</h2>
+        <p>من البحث عن العقار إلى التجهيز والصيانة والاستشارات، اكتشف الأقسام ومقدمي الخدمات في محافظة أسيوط.</p>
+      </div>
+      <div class="marketplace-grid">
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%B3%D9%88%D9%82%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA"><span>⌂</span><strong>سوق العقارات</strong><small>شقق، فلل، محلات، مكاتب، عيادات، مخازن ومبانٍ</small><b>تصفح العقارات ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%A7%D9%84%D8%AA%D9%86%D8%A7%D8%B2%D9%84%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9"><span>⇄</span><strong>التنازلات العقارية</strong><small>المقدم والمدفوع والمتبقي والأقساط ورسوم التنازل</small><b>تصفح التنازلات ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%A3%D8%B1%D8%A7%D8%B6%D9%8A%20%D9%84%D9%84%D8%A8%D9%8A%D8%B9"><span>▱</span><strong>أراضي للبيع</strong><small>أراضٍ سكنية وتجارية وزراعية حسب الاستخدام</small><b>تصفح الأراضي ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%A3%D8%B1%D8%A7%D8%B6%D9%8A%20%D8%A7%D9%84%D8%AA%D9%86%D8%A7%D8%B2%D9%84%D8%A7%D8%AA"><span>⇆</span><strong>أراضي التنازلات</strong><small>تخصيصات وتعاقدات مع توضيح المستحقات والشروط</small><b>تصفح أراضي التنازلات ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1%20%D9%8A%D9%88%D9%85%D9%8A%20%D9%88%D9%85%D9%81%D8%B1%D9%88%D8%B4"><span>▣</span><strong>إيجار يومي ومفروش</strong><small>يومي وأسبوعي وشهري مع السعر والتوافر والتجهيزات</small><b>استكشف الإيجارات ←</b></a>
+        <a class="marketplace-card" href="./companies.html"><span>▦</span><strong>الشركات والمكاتب العقارية</strong><small>شركات التسويق والتطوير والمكاتب والوسطاء والمسوقون</small><b>دليل الشركات ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D9%85%D9%88%D8%A7%D8%AF%20%D8%A7%D9%84%D8%A8%D9%86%D8%A7%D8%A1%20%D9%88%D8%A7%D9%84%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8"><span>▧</span><strong>مواد البناء والتشطيب</strong><small>سيراميك وبورسلين ودهانات وأدوات صحية ومطابخ وألوميتال</small><b>مقدمو خدمات التشطيب ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%A7%D9%84%D8%A3%D8%AB%D8%A7%D8%AB%20%D9%88%D8%A7%D9%84%D9%81%D8%B1%D8%B4%20%D9%88%D8%AA%D8%AC%D9%87%D9%8A%D8%B2%20%D8%A7%D9%84%D9%88%D8%AD%D8%AF%D8%A7%D8%AA"><span>▤</span><strong>الأثاث والفرش والتجهيز</strong><small>أثاث ومفروشات وأجهزة وتجهيز الوحدات</small><b>دليل الموردين ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%A7%D9%84%D9%85%D8%B4%D8%B1%D9%88%D8%B9%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D9%85%D8%B7%D9%88%D8%B1%D9%88%D9%86%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D9%88%D9%86"><span>⌂</span><strong>المشروعات والمطورون</strong><small>صفحات المشروعات والمطورين والمواقع والوحدات وأنظمة السداد</small><b>اكتشف الشركات والمشروعات ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%A7%D9%84%D8%B5%D9%8A%D8%A7%D9%86%D8%A9%20%D9%88%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA"><span>⚒</span><strong>الصيانة وإدارة العقارات</strong><small>كهرباء وسباكة وتكييف ونظافة وصيانة وإدارة وحدات</small><b>ابحث عن مقدم خدمة ←</b></a>
+        <a class="marketplace-card" href="./marketplace.html?category=%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9"><span>⚖</span><strong>الاستشارات والخدمات العقارية</strong><small>استشارات هندسية وقانونية وعقود ومعاينات وخدمات الشراء والبيع</small><b>دليل الخدمات ←</b></a>
+      </div>
+      <div class="marketplace-join">
+        <div><strong>هل تقدم خدمة أو تدير شركة في أسيوط؟</strong><p>أنشئ ملفًا تعريفيًا مجانيًا وأرسل بيانات نشاطك للمراجعة. لا يظهر الملف للزوار قبل اعتماد الإدارة.</p></div>
+        <a class="btn btn-gold" href="./marketplace.html">أضف إعلانك أو خدمتك</a>
+      </div>
+      <p class="marketplace-note">الأقسام العقارية مرتبطة بالعروض المنشورة. دليل مقدمي الخدمات والمشروعات يخضع لمراجعة الإدارة، وتُضاف الإعلانات التجارية الممولة بشكل واضح بعد الموافقة.</p>
+    </section>
+
+<section class="calculator-section" id="calculator">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">حاسبة استرشادية</span>
+          <h2>احسب المبلغ المطلوب للتنازل</h2>
+          <p>تقدير مبدئي بناءً على البيانات التي تدخلها، وليس اعتمادًا للمستندات أو عرض سعر نهائي.</p>
+        </div>
+      </div>
+      <div class="calculator-card">
+        <label>إجمالي سعر الوحدة في العقد (ج.م)
+          <input id="calcContract" type="number" min="0" step="0.01" inputmode="decimal" placeholder="مثال: 1200000">
+        </label>
+        <label>إجمالي المبلغ المدفوع (ج.م)
+          <input id="calcPaid" type="number" min="0" step="0.01" inputmode="decimal" placeholder="مثال: 400000">
+        </label>
+        <label>رسوم التنازل التي يحددها المطوّر (ج.م)
+          <input id="calcFees" type="number" min="0" step="0.01" inputmode="decimal" placeholder="أدخل الرسوم إن وُجدت">
+        </label>
+        <div class="calculator-results" aria-live="polite">
+          <div><span>المتبقي من سعر العقد</span><strong id="calcRemaining">—</strong></div>
+          <div><span>المدفوع مضافًا إليه الرسوم المدخلة</span><strong id="calcTotal">—</strong></div>
+        </div>
+        <p class="calculator-note">الحاسبة لا تضيف أي عمولة لأسيوط عقار. رسوم التنازل — إن وُجدت — يحددها المطوّر أو الجهة المالكة. الحساب لا يشمل أقساطًا متأخرة أو صيانة أو فوائد أو التزامات غير مدخلة؛ راجع العقد والمطوّر قبل اتخاذ أي قرار.</p>
+      </div>
+    </section>
+
+<section class="how-section" id="how">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">دليل أسيوط عقار</span>
+          <h2>كيف تعمل المنصة؟</h2>
+          <p>كل ما تحتاج معرفته عن استخدام أسيوط عقار، من البحث وحتى التواصل.</p>
+        </div>
+      </div>
+
+      <div class="how-grid">
+        <article class="how-card">
+          <h3>١. ابحث عن فرصتك</h3>
+          <p>تصفح عروض التنازل العقاري، واستخدم البحث والفلاتر للوصول إلى المنطقة ونوع العقار المناسبين لك.</p>
+        </article>
+        <article class="how-card">
+          <h3>٢. راجع تفاصيل العرض</h3>
+          <p>افتح «عرض التفاصيل» لمراجعة السعر الإجمالي والمقدم والمبلغ المدفوع والمتبقي ورسوم التنازل والوصف والصور المتاحة.</p>
+        </article>
+        <article class="how-card">
+          <h3>٣. تواصل مباشرة مع المعلن</h3>
+          <p>من تفاصيل الإعلان، اتصل بصاحب العرض أو راسله عبر واتساب باستخدام بيانات التواصل التي أضافها بنفسه. أسيوط عقار لا تتوسط في التفاوض أو الاتفاق.</p>
+        </article>
+        <article class="how-card">
+          <h3>٤. أضف عرضك العقاري</h3>
+          <p>اضغط «أضف عرضك»، واملأ بيانات الوحدة والسعر والمبالغ والصور وبيانات التواصل، ثم أرسل العرض للمراجعة.</p>
+        </article>
+        <article class="how-card">
+          <h3>٥. راجع بيانات الوحدة قبل الاتفاق</h3>
+          <p>تحقق بنفسك من العقد والأقساط والالتزامات وموافقة المطوّر أو الجهة المالكة على التنازل قبل دفع أي مبلغ أو توقيع اتفاق.</p>
+        </article>
+        <article class="how-card">
+          <h3>٦. الإعلانات المميزة</h3>
+          <p>يمكن طلب الخدمات التجارية وتمييز الإعلان عبر واتساب إدارة أسيوط عقار لمعرفة التفاصيل. لا تُعرض أسعار أو باقات أو وسائل دفع على هذه الصفحة.</p>
+        </article>
+      </div>
+
+      <div class="how-card" style="margin-top:20px">
+        <h3>ملاحظات مهمة</h3>
+        <p>أسيوط عقار منصة إعلانات وليست وسيطًا عقاريًا، ولا تحصل على عمولة عند إتمام التنازل. التواصل والتفاوض والاتفاق يتم مباشرة بين المعلن والمهتم. يجب التحقق من العقد والمستندات ورسوم المطوّر وموافقة الجهة المالكة قبل دفع أي مبلغ. الحاسبة استرشادية فقط.</p>
+      </div>
+    </section>
+
+<section class="company-section" id="companies">
+      <div class="section-heading"><div><span class="eyebrow">دليل الشركات</span><h2>ابحث عن شركة عقارية</h2>
+      <p>اكتشف ملفات الشركات المعتمدة ومشروعاتها وخدماتها وأعمالها السابقة.</p></div></div>      <p><a class="btn btn-gold" href="./companies.html">افتح دليل الشركات والملفات التعريفية</a></p>
+      <div class="company-search">        <input id="companySearchInput" type="search" placeholder="ابحث باسم الشركة..." aria-label="البحث باسم الشركة">
+        <button class="btn btn-gold" id="companySearchBtn" type="button">بحث عن شركة</button>
+      </div>
+      <div class="company-grid" id="companyGrid" aria-live="polite">
+        <p class="company-empty">ستظهر هنا الشركات وعقاراتها المنشورة مجتمعة في بطاقة واحدة.</p>
+      </div>
+    </section>
+
+<section class="audience-section" id="accounts">
+      <div class="section-heading">
+        <div><span class="eyebrow">ابدأ مع أسيوط عقار</span><h2>اختَر نوع حسابك في أسيوط عقار</h2>
+        <p>اختَر المسار المناسب لك للوصول إلى الخدمات الملائمة.</p></div>
+      </div>
+      <div class="audience-grid">
+        <button class="audience-card" type="button" data-account-type="individual">
+          <span class="audience-icon" aria-hidden="true">♙</span><strong>عميل / مالك عقار</strong>
+          <span>تصفح العروض أو أرسل عقارك للتنازل.</span><b>متابعة كعميل</b>
+        </button>
+        <button class="audience-card" type="button" data-account-type="company">
+          <span class="audience-icon" aria-hidden="true">▦</span><strong>شركة عقارية</strong>
+          <span>اعرض عقارات الشركة واستكشف باقات التمييز.</span><b>متابعة كشركة</b>
+        </button>
+        <button class="audience-card" type="button" data-open-sponsor-form>
+          <span class="audience-icon" aria-hidden="true">✦</span><strong>شركة تشطيب أو ديكور</strong>
+          <span>اعرض خدماتك ومنتجاتك أمام المهتمين بتجهيز وحداتهم.</span><b>اطلب إعلانًا تجاريًا</b>
+        </button>
+      </div>
+    </section>
+
+<section class="my-offers-section" id="my-offers" aria-labelledby="myOffersTitle">
+      <div class="section-heading">
+        <div><span class="eyebrow">حسابك في أسيوط عقار</span><h2 id="myOffersTitle">تابع عروضك العقارية</h2>
+        <p>راجع حالة كل عرض أرسلته، وتابع ما إذا كان قيد المراجعة أو متاحًا أو تم حجزه أو بيعه.</p></div>
+        <button class="btn btn-gold" type="button" id="loadMyOffersBtn">عرض عروضي</button>
+      </div>
+      <p id="myOffersStatus" class="my-offers-status" role="status" aria-live="polite">سجّل الدخول ثم اضغط «عرض عروضي» لمتابعة إعلاناتك.</p>
+      <div class="my-offers-list" id="myOffersList" aria-live="polite"></div>
+    </section>
+
+<section class="partner-ads-section" id="partner-ads" aria-labelledby="partnerAdsTitle">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">فرص إعلانية للشركات</span>
+          <h2 id="partnerAdsTitle">مساحات إعلانية للشركات والخدمات العقارية</h2>
+          <p>فرص لعرض خدمات الشركات العقارية والتشطيب والديكور والأثاث والسيراميك والدهانات والموردين أمام الباحثين عن عقار وتجهيز منزل.</p>
+        </div>
+        <span class="partner-free-note">مساحات إعلانية متاحة</span>
+      </div>
+      <div class="partner-ads-grid">
+        <article class="partner-ad partner-ad-ceramic" data-partner-slot="ceramics">
+          <img class="partner-ad-art" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85" alt="سيراميك وأرضيات داخل منزل" loading="lazy">
+          <div class="partner-ad-content"><span class="partner-ad-category">سيراميك وبورسلين</span><h3>مساحة إعلانية لمعارض السيراميك</h3><p>اعرض تشكيلات السيراميك والبورسلين ومستلزمات تجهيز الوحدات.</p><small>مساحة إعلانية متاحة — لا تمثل شركة بعينها.</small><a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D9%85%D8%B3%D8%A7%D8%AD%D8%A9%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%D9%8A%D8%A9%20%D9%84%D9%85%D8%B9%D8%B1%D8%B6%20%D8%B3%D9%8A%D8%B1%D8%A7%D9%85%D9%8A%D9%83" target="_blank" rel="noopener noreferrer">اطلب تفاصيل المساحة</a></div>
+        </article>
+        <article class="partner-ad partner-ad-furniture" data-partner-slot="furniture">
+          <img class="partner-ad-art" src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85" alt="أثاث غرفة معيشة" loading="lazy">
+          <div class="partner-ad-content"><span class="partner-ad-category">أثاث ومفروشات</span><h3>مساحة إعلانية للأثاث والمفروشات</h3><p>عرّف العملاء بمنتجات الأثاث والتجهيز والتفصيل وخيارات التوصيل.</p><small>مساحة إعلانية متاحة — لا تمثل شركة بعينها.</small><a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B3%D8%A7%D8%AD%D8%A9%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%D9%8A%D8%A9%20%D9%84%D9%84%D8%A3%D8%AB%D8%A7%D8%AB%20%D9%88%D8%A7%D9%84%D9%85%D9%81%D8%B1%D9%88%D8%B4%D8%A7%D8%AA" target="_blank" rel="noopener noreferrer">اطلب تفاصيل المساحة</a></div>
+        </article>
+        <article class="partner-ad partner-ad-curtains" data-partner-slot="curtains">
+          <img class="partner-ad-art" src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85" alt="ستائر وديكور داخلي" loading="lazy">
+          <div class="partner-ad-content"><span class="partner-ad-category">تشطيب وديكور</span><h3>مساحة لشركات التشطيب والديكور</h3><p>اعرض أعمالك وخدمات التصميم والتشطيب وتجهيز الوحدات.</p><small>مساحة إعلانية متاحة — لا تمثل شركة بعينها.</small><a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B3%D8%A7%D8%AD%D8%A9%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%D9%8A%D8%A9%20%D9%84%D8%B4%D8%B1%D9%83%D8%A9%20%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8%20%D9%88%D8%AF%D9%8A%D9%83%D9%88%D8%B1" target="_blank" rel="noopener noreferrer">اطلب تفاصيل المساحة</a></div>
+        </article>
+        <article class="partner-ad partner-ad-paint" data-partner-slot="paint">
+          <img class="partner-ad-art" src="https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1200&q=85" alt="دهانات وألوان حوائط" loading="lazy">
+          <div class="partner-ad-content"><span class="partner-ad-category">بويات ودهانات</span><h3>مساحة إعلانية لمحلات الدهانات</h3><p>اعرض منتجات الدهانات والألوان وخدمات التوريد والتطبيق.</p><small>مساحة إعلانية متاحة — لا تمثل شركة بعينها.</small><a class="btn btn-dark" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D9%85%D8%B3%D8%A7%D8%AD%D8%A9%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%D9%8A%D8%A9%20%D9%84%D9%85%D8%AD%D9%84%20%D8%A8%D9%88%D9%8A%D8%A7%D8%AA%20%D9%88%D8%AF%D9%87%D8%A7%D9%86%D8%A7%D8%AA" target="_blank" rel="noopener noreferrer">اطلب تفاصيل المساحة</a></div>
+        </article>
+      </div>
+      <div id="supplierAdsGrid" class="sponsor-live-grid" aria-live="polite"></div>
+      <p class="partner-ads-disclaimer">هذه مساحات وفئات إعلانية وليست إعلانات لشركات بعينها. لا يُنشر اسم شركة أو عرض تجاري إلا بعد تقديمه ومراجعته واعتماده من إدارة أسيوط عقار. تفاصيل الأسعار والتعاقد عبر واتساب.</p>
+    </section>
+
+<section class="pricing-section" id="pricing">
+      <div class="section-heading"><div><span class="eyebrow">مميزات أسيوط عقار للشركاء</span><h2>سوّق نشاطك العقاري مع أسيوط عقار</h2>
+      <p>تواصل معنا للتعرف على فرص التعاون والوصول إلى العملاء المهتمين بالعقارات في أسيوط. تُحدد تفاصيل التعاون مع الإدارة حسب نشاطك واحتياجك.</p></div></div>
+      <div class="pricing-grid">
+        <article class="pricing-card pricing-card-featured"><span class="pricing-label">للأفراد وملاك العقارات</span><h3>اعرض عقارك بسهولة</h3><p>أرسل بيانات العقار للتنازل، واستقبل استفسارات المهتمين مباشرة. لا توجد عمولة على إتمام التنازل.</p><button class="btn btn-gold" type="button" data-account-type="individual">اعرض عقارك مجانًا</button></article>
+        <article class="pricing-card"><span class="pricing-label">للشركات العقارية</span><h3>وسّع قاعدة عملائك</h3><p>عرّف العملاء بمشروعاتك وعروضك، واطلب خطة مناسبة لحجم نشاطك وطريقة عرض عقاراتك.</p><a class="btn btn-gold" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AE%D8%AF%D9%85%D8%A7%D8%AA%20%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82%20%D9%84%D8%B4%D8%B1%D9%83%D8%A9%20%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9%20%D9%84%D8%AF%D9%89%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20%D8%B9%D9%82%D8%A7%D8%B1" target="_blank" rel="noopener noreferrer">اطلب عرضًا للشركات</a></article>
+        <article class="pricing-card"><span class="pricing-label">لشركات التشطيب والديكور</span><h3>كن شريكًا في تجهيز البيت</h3><p>عرّف أصحاب الوحدات بخدمات التشطيب والأثاث والسيراميك وغيرها، واستفسر عن المساحات المتاحة للشركاء.</p><a class="btn btn-gold" href="https://wa.me/201007044265?text=%D8%A3%D8%B1%D8%BA%D8%A8%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D9%86%D8%B6%D9%85%D8%A7%D9%85%20%D9%84%D8%B4%D8%B1%D9%83%D8%A7%D8%A1%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20%D8%B9%D9%82%D8%A7%D8%B1%20%D9%84%D9%84%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8%20%D9%88%D8%A7%D9%84%D8%AF%D9%8A%D9%83%D9%88%D8%B1" target="_blank" rel="noopener noreferrer">انضم لشركاء أسيوط عقار</a></article>
+      </div>
+      <p class="pricing-note">إضافة الإعلان العقاري العادي مجانية. الإعلانات المميزة وإعلانات الشركات خدمات اختيارية، وتُحدد تفاصيلها وأسعارها بالتواصل مع إدارة أسيوط عقار عبر واتساب.</p>
+    </section>
+
+<section class="layan-ai-section" id="layan-ai" aria-labelledby="layanAiTitle">
+      <div class="layan-ai-head"><div><h2 id="layanAiTitle">مساعد أسيوط عقار الذكي</h2><p>ابحث عن الفرصة المناسبة، أو افتح أدوات الإرشاد الإداري للحسابات المخوّلة.</p></div><span aria-hidden="true">✦ ASYUT AQAR AI</span></div>
+      <div class="layan-ai-tabs" role="group" aria-label="نوع المساعد">
+        <button type="button" data-ai-mode="search" aria-pressed="true">مساعد البحث العقاري</button>
+        <button type="button" data-ai-mode="admin" aria-pressed="false">مساعد الإدارة</button>
+      </div>
+      <form id="layanAiForm" class="layan-ai-form">
+        <textarea id="layanAiPrompt" maxlength="1200" required placeholder="مثال: عايز شقة في أسيوط بمقدم أقل من 300 ألف..." aria-label="اكتب سؤالك لمساعد أسيوط عقار"></textarea>
+        <button class="btn btn-gold" id="layanAiSend" type="submit">اسأل أسيوط عقار</button>
+      </form>
+      <div id="layanAiAnswer" class="layan-ai-answer" role="status" aria-live="polite"></div>
+      <small class="layan-ai-note">الإجابات مساعدة وليست ضمانًا لصحة الإعلان. تحقق من التفاصيل مباشرة مع صاحب العرض. مساعد الإدارة محمي بصلاحية إدارية على الخادم.</small>
+    </section>
+  </main>
+
+  <nav class="mobile-nav" aria-label="التنقل السريع">
+    <a href="./" aria-label="الرئيسية"><span>⌂</span><small>الرئيسية</small></a>
+    <a href="#offers" aria-label="العقارات"><span>▦</span><small>العقارات</small></a>
+    <a href="./marketplace.html" aria-label="سوق الخدمات"><span>◇</span><small>الخدمات</small></a>
+    <a href="./favorites.html" aria-label="المفضلة"><span>☆</span><small>المفضلة</small></a>
+    <button type="button" id="mobileAddOfferBtn" aria-label="إضافة عرض"><span>＋</span><small>أضف عرضك</small></button>
+  </nav>
+
+  <footer class="footer">
+    <div class="social-links" aria-label="حسابات أسيوط عقار على مواقع التواصل">
+      <span class="social-links-title">تابع ASYUT AQAR على مواقع التواصل</span>
+      <a class="social-link social-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Flayan-eg.com%2F" target="_blank" rel="noopener noreferrer" aria-label="مشاركة رابط أسيوط عقار على فيسبوك">
+        <svg style="width:24px;height:24px;min-width:24px;min-height:24px;flex:0 0 24px" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.3V13h2.8v8h3.4z"/></svg>
+        <span>Facebook</span>
+      </a>
+      <a class="social-link social-instagram" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="مشاركة رابط أسيوط عقار على إنستجرام" id="instagramShareLink">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.8" r="1.2"/></svg>
+        <span>Instagram</span>
+      </a>
+    </div>
+
+    <a class="brand footer-brand" href="#" aria-label="ASYUT AQAR">
+      <span>
+        <strong>ASYUT AQAR</strong>
+        <small>أسيوط عقار</small>
+      </span>
+    </a>
+    <p>منصة إعلانات عقارية تربط أصحاب العروض بالمهتمين مباشرة دون وساطة.</p>
+    <p>للتواصل مع إدارة أسيوط عقار: <a href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" aria-label="تواصل مع إدارة أسيوط عقار عبر واتساب">💬 راسلنا على واتساب</a> · <a href="tel:+201007044265" aria-label="اتصل هاتفيًا بإدارة أسيوط عقار">للاتصال الهاتفي: 01007044265</a></p>
+    <p>تحقق من بيانات الوحدة وشروط التنازل من الجهات المختصة قبل الاتفاق أو الدفع.</p>
+  </footer>
+
+  <dialog id="compareDialog" class="compare-dialog" aria-labelledby="compareDialogTitle">
+    <div class="compare-dialog-head">
+      <div><span class="eyebrow">ASYUT AQAR · PROPERTY COMPARISON</span><h2 id="compareDialogTitle">قارن العقارات جنبًا إلى جنب</h2><p>قارن البيانات المتاحة في الإعلانات قبل التواصل مع المعلنين.</p></div>
+      <button type="button" id="closeCompareDialog" class="compare-close" aria-label="إغلاق المقارنة">×</button>
+    </div>
+    <div id="compareTableWrap" class="compare-table-wrap"></div>
+    <p class="compare-disclaimer">المقارنة مبنية على البيانات التي أدخلها أصحاب الإعلانات، وليست تحققًا من المستندات أو ضمانًا لصحة الأسعار والالتزامات. تواصل مع المعلن وتحقق من التفاصيل قبل الاتفاق.</p>
+  </dialog>
+
+  <dialog id="offerDialog">
+    <div class="dialog-header">
+      <h2>إضافة عرض عقاري</h2>
+      <button id="closeDialog" type="button" aria-label="إغلاق">×</button>
+    </div>
+
+    <form id="offerForm">
+      <div id="formStatusMessage" role="status" aria-live="polite"></div>
+      <label>
+        نوع الحساب
+        <select name="account_type" id="accountTypeSelect" required>
+          <option value="individual">عميل / مالك عقار</option>
+          <option value="company">شركة عقارية</option>
+        </select>
+      </label>
+      <label id="companyNameField" hidden>
+        اسم الشركة صاحبة الإعلان
+        <input name="company_business_name" id="companyNameInput" type="text" placeholder="اكتب اسم الشركة العقارية">
+        <small>يمكن ربط حتى 3 عقارات بإعلان الشركة الواحد.</small>
+      </label>
+      <label>اسم الشركة المطورة / المطور العقاري<input name="developer_name" type="text" maxlength="160" placeholder="اسم المطور أو الشركة المطورة"></label>
+      <label>اسم المشروع أو الكمبوند<input name="project_name" type="text" maxlength="160" placeholder="اسم المشروع أو الكمبوند"></label>
+      <label>
+        عنوان العرض
+        <input name="title" type="text" required>
+      </label>
+
+      <label>نوع الإعلان<select name="listing_purpose" id="listingPurpose" required><option value="تنازل">تنازل عقاري</option><option value="بيع">بيع مباشر</option><option value="إيجار">إيجار</option></select></label>
+      <label>
+        نوع العقار
+        <select name="property_type" required>
+          <option value="">اختر النوع</option>
+          <option value="شقة">شقة</option>
+          <option value="فيلا">فيلا</option>
+          <option value="محل">محل تجاري</option>
+          <option value="مكتب إداري">مكتب إداري</option>
+          <option value="عيادة طبية">عيادة طبية</option>
+          <option value="مخزن">مخزن</option>
+          <option value="معرض">معرض</option>
+          <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option>
+          <option value="أرض تنازل">أرض تنازل</option>
+        </select>
+      </label>
+
+      <label>
+        المدينة / المركز
+        <input name="city" type="text" list="asyut-centers" placeholder="اختر أو اكتب المدينة / المركز" autocomplete="address-level2">        <datalist id="asyut-centers"><option value="مدينة أسيوط"><option value="أسيوط الجديدة"><option value="ديروط"><option value="القوصية"><option value="منفلوط"><option value="أبنوب"><option value="الفتح"><option value="ساحل سليم"><option value="البداري"><option value="أبو تيج"><option value="صدفا"><option value="الغنايم"></datalist>      </label>
+
+      <label>
+        المنطقة
+        <input name="area" type="text" list="asyut-neighborhoods" placeholder="اسم الحي أو المنطقة">
+        <datalist id="asyut-neighborhoods"></datalist>
+      </label>
+
+      <details class="location-coordinates">
+        <summary>إضافة موقع العقار للخريطة (اختياري)</summary>
+        <p class="form-help">أدخل إحداثيات العقار من خرائط Google إن كانت متاحة. لا تدخل موقعك الشخصي؛ المطلوب موقع الوحدة نفسها.</p>
+        <div class="form-row">
+          <label>خط العرض (Latitude)
+            <input name="latitude" type="number" min="-90" max="90" step="0.0000001" inputmode="decimal" placeholder="مثال: 27.18">
+          </label>
+          <label>خط الطول (Longitude)
+            <input name="longitude" type="number" min="-180" max="180" step="0.0000001" inputmode="decimal" placeholder="مثال: 31.18">
+          </label>
+        </div>
+        <p class="form-help">اترك الحقلين فارغين لو مش متأكد من الإحداثيات.</p>
+      </details>
+
+      <label>
+        مساحة الوحدة (م²)
+        <input name="area_m2" type="number" min="0" step="0.1" inputmode="decimal">
+      </label>
+
+      <fieldset class="land-details-fields" id="landDetailsFields" hidden><legend>بيانات الأرض (إن كان الإعلان عن أرض)</legend>
+        <label>جهة الولاية / التخصيص<input name="land_ownership_authority" maxlength="180" placeholder="مثال: جهاز مدينة / جمعية / هيئة"></label>
+        <label>اشتراطات وتراخيص البناء<textarea name="land_permit_details" rows="2" maxlength="800"></textarea></label>
+        <label>المرافق المتاحة<input name="land_utilities" maxlength="180" placeholder="مياه، كهرباء، صرف، غاز..."></label>
+        <label>تصنيف / استخدام الأرض<input name="land_zoning" maxlength="180" placeholder="سكني، تجاري، إداري..."></label>
+      </fieldset>
+      <label>
+        عدد غرف النوم
+        <input name="bedrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
+      </label>
+
+      <label>        عدد الحمامات
+        <input name="bathrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
+      </label>
+
+      <label>
+        إجمالي السعر
+        <input name="total_price" type="number" min="0" required>
+      </label>
+
+      <label>المقدم المدفوع عند التعاقد<input name="down_payment" type="number" min="0"><small>قيمة الدفعة الأولى التي دفعها المالك عند الحجز أو التعاقد.</small></label>
+
+      <label>إجمالي المدفوع حتى الآن (شامل المقدم)<input name="paid_amount" type="number" min="0"><small>إجمالي ما سدده المالك للمطور حتى اليوم، ويشمل المقدم أعلاه.</small></label>
+
+      <label>
+        المبلغ المتبقي
+        <input name="remaining_installments" type="number" min="0" step="0.01" inputmode="decimal">
+        <small>راجع أن مجموع المبلغ المدفوع والمتبقي لا يتجاوز إجمالي السعر.</small>
+      </label>
+
+      <label>
+        القسط الشهري (إن وجد)
+        <input name="monthly_installment" type="number" min="0" step="0.01" inputmode="decimal">
+      </label>
+
+      <label>
+        رسوم التنازل
+        <input name="transfer_fee" type="number" min="0">
+      </label>
+
+      <label>
+        قيمة الخصم بالجنيه (إن وجدت)
+        <input name="discount_amount" type="number" min="0" step="0.01" inputmode="decimal">
+      </label>
+
+      <label>
+        نسبة الخصم إن وجدت (%)
+        <input name="discount_percent" type="number" min="0" max="100">
+      </label>
+
+      <label>
+        اسم صاحب العرض
+        <input
+          name="contact_name"
+          type="text"
+          autocomplete="name"
+          placeholder="اكتب اسم صاحب العرض"
+        >
+      </label>
+
+      <label>
+        رقم الموبايل للتواصل
+        <input
+          name="contact_phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="مثال: 01012345678"
+          pattern="[0-9+\s()-]{7,20}"
+          title="اكتب رقم هاتف صحيحًا"
+        >
+      </label>
+
+      <label class="consent-line">
+        <input name="contact_consent" type="checkbox">
+        أوافق صراحةً على نشر رقم الموبايل أعلاه للزوار داخل إعلاني للتواصل فقط. وإن تركته فارغًا فلن يُنشر أي رقم.
+      </label>
+
+      <label>
+        وصف الوحدة
+        <textarea name="description" rows="4"></textarea>
+      </label>
+
+      <label>
+        نوع الإعلان
+        <select name="promotion_plan" id="promotionPlanSelect">
+          <option value="standard">إعلان عادي — مجاني</option>
+          <option value="featured_15">طلب تمييز الإعلان — 15 يومًا (التفاصيل عبر الإدارة)</option>
+          <option value="featured_30">طلب تمييز الإعلان — 30 يومًا (التفاصيل عبر الإدارة)</option>
+        </select>
+        <small id="promotionPlanNote">الإعلان العادي مجاني. لطلب تمييز الإعلان لمدة 15 أو 30 يومًا، اضغط على الرابط لمعرفة المميزات والسعر قبل التأكيد: <a href="https://wa.me/201007044265?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AE%D8%AF%D9%85%D8%A9%20%D8%AA%D9%85%D9%8A%D9%8A%D8%B2%20%D8%A5%D8%B9%D9%84%D8%A7%D9%86%20%D9%84%D8%AF%D9%89%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20%D8%B9%D9%82%D8%A7%D8%B1.%20%D9%85%D9%86%20%D9%81%D8%B6%D9%84%D9%83%D9%85%20%D8%A3%D8%B1%D8%B3%D9%84%D9%88%D8%A7%20%D8%AA%D9%81%D8%A7%D8%B5%D9%8A%D9%84%20%D8%A7%D9%84%D8%AE%D8%AF%D9%85%D8%A9." target="_blank" rel="noopener noreferrer">استفسر عن تمييز الإعلان عبر واتساب</a>. لا تدفع قبل استلام السعر وتأكيده من الإدارة.</small>
+      </label>
+
+      <label>مستندات العقار (اختياري)
+        <input id="documentsInput" name="documents" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" multiple>
+        <small>عقد التخصيص أو البيع، إيصالات السداد، وموافقة المطور إن وجدت. PDF أو JPG أو PNG، بحد أقصى 10 ميجابايت للملف. المستندات خاصة ولا تظهر للزوار.</small>
+      </label>
+      <label>
+        صور الوحدة
+        <input id="photosInput"
+          name="photos"
+          type="file"
+          accept=".jpg,.jpeg,image/jpeg"
+          multiple
+        >
+        <small>لأمان المنصة، الصور بصيغة JPG أو JPEG فقط، بحد أقصى 5 ميجابايت للصورة.</small>
+      </label>
+
+      <button class="btn btn-gold" type="submit">إرسال العرض</button>
+    </form>
+  </dialog>
+
+  <script src="config.js?v=location-data-20261102-1"></script>
+  <script src="gubabase.js?v=location-alerts-20261102-1"></script>
+  <script src="app.js?v=journey-search-fix-20261102-1"></script>
+  <script src="map.js?v=interactive-map-20261102-3"></script>
+  <script src="buyer.js?v=land-match-20261102-1"></script>
+  <script src="sponsor.js?v=sponsor-auth-session-20261101-1"></script>
+  <script src="ai.js?v=asyut-aqar-20261031-2"></script>
+<script src="admin-entry.js?v=admin-auth-refresh-20261101-1"></script>
+  <script src="pwa.js" defer></script>
+</body>
+</html>

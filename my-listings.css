@@ -1,0 +1,110 @@
+.my-listings-wrap{width:min(1050px,calc(100% - 28px));margin:28px auto 60px}.my-listings-hero{background:#102746;color:#fff;padding:25px;border-radius:18px}.my-listings-hero h1{margin:4px 0}.my-listings-hero p{color:#e5eaf1}.my-listings-grid{display:grid;gap:16px;margin-top:18px}.my-listing-card{background:#fff;border:1px solid #e2e7ef;border-radius:15px;padding:18px}.my-listing-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.my-listing-status{border-radius:30px;padding:4px 12px;font-size:13px;background:#eef1f5}.status-approved{background:#e7f5ed;color:#17633a}.status-rejected{background:#fff0ed;color:#9a3527}.my-listing-note{background:#fff7e6;padding:10px;border-right:3px solid #d5ad55}.my-listing-edit{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid #e5e8ee}.my-listing-edit label{display:grid;gap:5px}.my-listing-edit input,.my-listing-edit textarea{width:100%;padding:10px;border:1px solid #cbd3df;border-radius:8px;font:inherit}.my-listing-edit textarea,.my-listing-edit button{grid-column:1/-1}.my-listings-empty{padding:25px;background:#fff;border-radius:14px;text-align:center}
+.my-listings-section-title{color:#102746;margin:30px 0 14px;font-size:1.25rem}
+
+.my-listings-section-title{color:#102746;margin:30px 0 14px;font-size:1.25rem}
+
+.my-listing-detail-chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.my-listing-detail-chips span{display:inline-flex;padding:6px 9px;border-radius:999px;background:#f3f1eb;border:1px solid #e5dfd1;font-size:.85rem;color:#26364b}
+
+
+/* Mobile-first finishing rules: readable cards and comfortable tap targets. */
+.my-listing-card,
+.my-listing-top,
+.my-listing-edit,
+.my-listings-wrap {
+  min-width: 0;
+}
+.my-listing-card p,
+.my-listing-card h2,
+.my-listing-card h3,
+.my-listing-status,
+.my-listing-detail-chips span {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .my-listings-wrap {
+    width: calc(100% - 24px);
+    margin: 16px auto 36px;
+  }
+  .my-listings-hero {
+    padding: 18px 16px;
+    border-radius: 14px;
+  }
+  .my-listings-hero h1 {
+    font-size: clamp(22px, 6vw, 28px);
+  }
+  .my-listings-hero p {
+    font-size: 14px;
+    line-height: 1.85;
+  }
+  .my-listings-hero .btn {
+    width: 100%;
+    min-height: 46px;
+  }
+  #myListingsStatus {
+    overflow-wrap: anywhere;
+    padding: 12px;
+    font-size: 13px;
+  }
+  .my-listings-section-title {
+    margin: 22px 0 10px;
+    font-size: 1.1rem;
+  }
+  .my-listings-grid {
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .my-listing-card {
+    padding: 14px;
+    border-radius: 12px;
+  }
+  .my-listing-top {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .my-listing-status {
+    max-width: 100%;
+    white-space: normal;
+  }
+  .my-listing-edit {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .my-listing-edit label,
+  .my-listing-edit input,
+  .my-listing-edit textarea,
+  .my-listing-edit button {
+    min-width: 0;
+    width: 100%;
+  }
+  .my-listing-edit input,
+  .my-listing-edit textarea {
+    min-height: 46px;
+    font-size: 16px;
+  }
+  .my-listing-edit button {
+    min-height: 46px;
+    white-space: normal;
+  }
+  .my-listing-detail-chips {
+    gap: 6px;
+  }
+  .my-listing-detail-chips span {
+    max-width: 100%;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .my-listings-wrap {
+    width: calc(100% - 18px);
+  }
+  .my-listing-card {
+    padding: 12px;
+  }
+  .my-listing-edit button {
+    padding-inline: 10px;
+    font-size: 12px;
+  }
+}
