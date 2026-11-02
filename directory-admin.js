@@ -109,7 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function rows(table, select, order) {
     const suffix = order ? "&order=" + encodeURIComponent(order) : "";
-    const data = await api("/rest/v1/" + table + "?select=" + encodeURIComponent(select) + suffix);
+    const limit = table === "directory_change_log" ? "&limit=100" : "";
+    const data = await api("/rest/v1/" + table + "?select=" + encodeURIComponent(select) + suffix + limit);
     return Array.isArray(data) ? data : [];
   }
 
@@ -360,6 +361,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const isHistory = view === "history";
     toolbar.hidden = isHistory;
     sourcesPanel.hidden = view !== "sources";
+    const previousStatus = statusFilter.value;
+    const statusOptions = view === "sources" ? [
+      ["", "كل المصادر"], ["public", "مصادر عامة"], ["internal", "مصادر داخلية"]
+    ] : [
+      ["", "كل الحالات"], ["draft", "مسودة"], ["needs_review", "قيد المراجعة"],
+      ["verified", "تم التحقق"], ["published", "منشور"], ["archived", "مؤرشف"]
+    ];
+    statusFilter.innerHTML = statusOptions.map(option =>
+      '<option value="' + option[0] + '">' + option[1] + '</option>'
+    ).join("");
+    if (statusOptions.some(option => option[0] === previousStatus)) statusFilter.value = previousStatus;
     const result = filteredRows();
     records.className = view === "history" ? "" : "dir-admin-grid";
     if (view === "sources") records.innerHTML = result.map(sourceCard).join("") ||
@@ -461,6 +473,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const patch = patchFromCard(card);
         const url = safeUrl(patch.source_url);
         if (!url) throw new Error("اكتب رابط مصدر صحيحًا يبدأ بـ https:// أو http://.");
+        if (patch.is_public === false) {
+          const linkedLiveEntity = cache.entityLinks.some(link => link.source_id === recordId &&
+            cache.entities.some(item => item.id === link.entity_id && item.public_visible && item.verification_status === "published"));
+          const linkedLiveProject = cache.projectLinks.some(link => link.source_id === recordId &&
+            cache.projects.some(item => item.id === link.project_id && item.public_visible && item.verification_status === "published"));
+          const linkedLiveOpportunity = cache.opportunityLinks.some(link => link.source_id === recordId &&
+            cache.opportunities.some(item => item.id === link.opportunity_id && item.public_visible && item.verification_status === "published"));
+          if (linkedLiveEntity || linkedLiveProject || linkedLiveOpportunity) {
+            throw new Error("هذا المصدر مرتبط بسجل منشور. أخفِ السجل العام أو اربطه بمصدر عام بديل قبل إخفاء هذا المصدر.");
+          }
+        }
         const beforeAfter = changedValues(cache.sources.find(item => item.id === recordId), patch);
         const result = await api("/rest/v1/directory_sources?id=eq." + encodeURIComponent(recordId), {
           method: "PATCH", headers: { Prefer: "return=representation" }, body: JSON.stringify(patch)
