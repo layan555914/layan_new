@@ -739,42 +739,11 @@
     </form>
   </dialog>
 
-<script>
-(() => {
-  const form = document.getElementById("heroQuickSearch");
-  if (!form) return;
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    const purpose = document.getElementById("heroPurposeFilter")?.value || "";
-    const type = document.getElementById("heroTypeFilter")?.value || "";
-    const area = document.getElementById("heroAreaFilter")?.value || "";
-    const budget = document.getElementById("heroBudgetFilter")?.value || "";
-    const purposeField = document.getElementById("purposeFilter");
-    const typeField = document.getElementById("typeFilter");
-    const cityField = document.getElementById("cityFilter");
-    const areaField = document.getElementById("areaFilter");
-    const searchField = document.getElementById("searchInput");
-    const budgetField = document.getElementById("totalPriceMaxFilter");
-    if (purposeField) purposeField.value = purpose;
-    if (typeField) typeField.value = type;
-    if (budgetField) budgetField.value = budget;
-    const cityMatch = cityField && [...cityField.options].some(option => option.value === area);
-    const areaMatch = areaField && [...areaField.options].some(option => option.value === area);
-    if (cityField) cityField.value = cityMatch ? area : "";
-    if (areaField) areaField.value = !cityMatch && areaMatch ? area : "";
-    if (searchField) searchField.value = area && !cityMatch && !areaMatch ? area : "";
-    [purposeField, typeField, cityField, areaField, budgetField].forEach(field => field?.dispatchEvent(new Event("change", {bubbles:true})));
-    budgetField?.dispatchEvent(new Event("input", {bubbles:true}));
-    document.getElementById("searchBtn")?.click();
-    document.getElementById("offers")?.scrollIntoView({behavior:"smooth",block:"start"});
-  });
-})();
-</script>
   <script src="config.js?v=location-data-20261102-1"></script>
   <script src="gubabase.js?v=location-alerts-20261102-1"></script>
-  <script src="app.js?v=professional-search-compare-20261102-1"></script>
+  <script src="app.js?v=journey-search-fix-20261102-1"></script>
   <script src="map.js?v=interactive-map-20261102-3"></script>
-  <script src="buyer.js?v=background-push-20261102-2"></script>
+  <script src="buyer.js?v=land-match-20261102-1"></script>
   <script src="sponsor.js?v=sponsor-auth-session-20261101-1"></script>
   <script src="ai.js?v=asyut-aqar-20261031-2"></script>
 <script src="admin-entry.js?v=admin-auth-refresh-20261101-1"></script>
