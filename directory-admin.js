@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         rows("directory_entity_sources", "entity_id,source_id,claim_key"),
         rows("directory_project_sources", "project_id,source_id,claim_key"),
         rows("directory_opportunity_sources", "opportunity_id,source_id,claim_key"),
-        rows("directory_change_log", "id,table_name,record_id,changed_by,old_values,new_values,reason,created_at", "created_at.desc&limit=100")
+        rows("directory_change_log", "id,table_name,record_id,changed_by,old_values,new_values,reason,created_at", "created_at.desc")
       ]);
       cache = {
         entities: result[0], projects: result[1], areas: result[2], opportunities: result[3],
