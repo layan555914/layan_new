@@ -498,10 +498,9 @@ document.addEventListener("DOMContentLoaded", () => {
         say("تم ربط المصدر بالسجل وتسجيل العملية.");
       } else {
         const patch = patchFromCard(card);
-        const reason = card.querySelector("[data-reason]")?.value.trim() ||
-          "تعديل من لوحة إدارة قاعدة بيانات السوق العقاري";
+        const auditReason = card.querySelector("[data-reason]")?.value.trim() || "";
         if (button.hasAttribute("data-save")) {
-          await updateRecord(type, recordId, patch, reason);
+          await updateRecord(type, recordId, patch, auditReason || "حفظ تعديلات السجل");
           say("تم حفظ التعديلات دون تغيير حالة النشر، وتسجيلها في سجل المراجعة.");
         } else if (button.hasAttribute("data-publish")) {
           if (!card.querySelector("[data-confirm]")?.checked) throw new Error("يجب تأكيد مراجعة المعلومات والمصدر قبل النشر.");
@@ -518,19 +517,19 @@ document.addEventListener("DOMContentLoaded", () => {
             next.setDate(next.getDate() + (type === "entities" ? 90 : 60));
             patch.next_review_at = next.toISOString().slice(0, 10);
           }
-          await updateRecord(type, recordId, patch, reason || "اعتماد ونشر سجل بعد المراجعة");
+          await updateRecord(type, recordId, patch, auditReason || "اعتماد ونشر سجل بعد المراجعة");
           say("تم اعتماد السجل ونشره وتسجيل قرار الاعتماد.");
         } else if (button.hasAttribute("data-unpublish")) {
           if (!window.confirm("إخفاء السجل وإعادته إلى حالة قيد المراجعة؟")) return;
           patch.verification_status = "needs_review";
           patch.public_visible = false;
-          await updateRecord(type, recordId, patch, reason || "إخفاء السجل وإعادته للمراجعة");
+          await updateRecord(type, recordId, patch, auditReason || "إخفاء السجل وإعادته للمراجعة");
           say("تم إخفاء السجل وإعادته للمراجعة.");
         } else if (button.hasAttribute("data-archive")) {
           if (!window.confirm("أرشفة السجل وإخفاؤه من الدليل العام؟")) return;
           patch.verification_status = "archived";
           patch.public_visible = false;
-          await updateRecord(type, recordId, patch, reason || "أرشفة السجل");
+          await updateRecord(type, recordId, patch, auditReason || "أرشفة السجل");
           say("تمت أرشفة السجل وإخفاؤه عن الزوار.");
         } else return;
       }
