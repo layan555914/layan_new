@@ -1,16 +1,16 @@
 {
   "meta": {
     "title": "دليل أسيوط العقاري",
-    "version": 4,
+    "version": 5,
     "lastUpdated": "2026-11-02",
     "disclaimer": "دليل معلوماتي مستقل. إدراج جهة أو مصدر لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا. لا تُعرض الجهات أو المشروعات قبل مراجعة الإدارة واعتمادها."
   },
   "researchCounts": {
-    "entities": 58,
-    "projects": 25,
+    "entities": 61,
+    "projects": 26,
     "areas": 26,
     "governmentOpportunities": 8,
-    "sources": 36
+    "sources": 40
   },
   "areas": [
     {
@@ -344,6 +344,34 @@
       "publisher": "عقارات مصر",
       "source_type": "دليل أعمال عقاري – لاكتشاف الأسماء فقط",
       "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut"
+    },
+    {
+      "id": "SRC-038",
+      "title": "الوقائع المصرية – قرار وزارة الإسكان رقم 1005 لسنة 2025 بشأن قطعة 15–17 بأسيوط الجديدة",
+      "publisher": "الوقائع المصرية – سجل تشريعي/قانوني",
+      "source_type": "مرجع قانوني للوقائع المصرية",
+      "source_url": "https://www.mksegypt.org/public/index.php/ar/nashras/42"
+    },
+    {
+      "id": "SRC-039",
+      "title": "اعتماد تخطيط وتقسيم أرض مشروع البارون للاستثمار العقاري بمدينة أسيوط الجديدة – 15 أبريل 2026",
+      "publisher": "المصدر – تغطية قرار وزارة الإسكان والوقائع المصرية",
+      "source_type": "صحافة اقتصادية",
+      "source_url": "https://www.almasdar.com/169169"
+    },
+    {
+      "id": "SRC-040",
+      "title": "صفحة شركة كيان المستقبل – أسيوط الجديدة والرحاب",
+      "publisher": "شركة كيان المستقبل – صفحة تعريفية ذاتية",
+      "source_type": "صفحة تعريفية ذاتية غير مستقلة",
+      "source_url": "https://sites.google.com/view/kayanthefuture/"
+    },
+    {
+      "id": "SRC-041",
+      "title": "عن كيان للتطوير العقاري – Kayan Developments",
+      "publisher": "Kayan Developments",
+      "source_type": "الموقع الرسمي للشركة",
+      "source_url": "https://kayandev.com/ar/about-us"
     }
   ],
   "entities": [],
