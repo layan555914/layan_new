@@ -27,3 +27,12 @@
 .directory-map-link{display:inline-flex;margin-top:6px;padding:6px 9px;border:1px solid #e8dfcd;border-radius:8px;background:#fffaf0;color:#795a22!important;text-decoration:none!important;font-size:11px!important;font-weight:800}
 @media(max-width:760px){.directory-map-panel{grid-template-columns:1fr}#directoryMap{height:340px}}
 @media(max-width:620px){.directory-map-shell{padding:15px}#directoryMap{height:310px}}
+
+.directory-map-frame{display:block;width:100%;height:390px;border:1px solid #dfe5ed;border-radius:12px;background:#edf1f5}
+.directory-map-attribution{margin:7px 0;color:#778294;font-size:10px}
+.directory-map-attribution a{color:#8b6728}
+.directory-map-areas{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.directory-map-areas a{display:inline-flex;padding:8px 12px;border:1px solid #dce3ec;border-radius:30px;background:#fff;color:#42546b;font-size:11px;font-weight:700;text-decoration:none}
+.directory-map-areas a:hover,.directory-map-areas a:focus-visible{border-color:#b48b45;color:#78591f;outline:2px solid #c8963e;outline-offset:2px}
+.directory-map-shell>small{display:block;color:#778294;font-size:10px;line-height:1.8}
+@media(max-width:620px){.directory-map-frame{height:320px}}
