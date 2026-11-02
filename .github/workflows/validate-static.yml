@@ -156,3 +156,6 @@ jobs:
         env:
           CI: "true"
         run: npx playwright test
+
+      - name: Verify live Supabase reads and anonymous permission boundaries
+        run: node tests/e2e/live-supabase-readonly.mjs
