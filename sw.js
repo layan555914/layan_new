@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v117-directory-20261102";
+const CACHE_NAME = "asyut-aqar-shell-v118-directory-admin-20261103";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -10,6 +10,8 @@ const APP_SHELL = [
   "./admin-entry.js",
   "./companies.html",
   "./directory.html",
+  "./directory-admin.html",
+  "./directory-admin.js?v=directory-admin-v3-20261103",
   "./directory.css",
   "./directory.js",
   "./directory-public.json",
