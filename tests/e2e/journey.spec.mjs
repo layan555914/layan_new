@@ -166,7 +166,7 @@ test("customer can search, open, save, submit, track and admin-review a property
   await page.locator("#offersGrid .details-button").click();
   await expect(page).toHaveURL(/property\.html\?id=101/);
   await expect(page.locator("#propertyDetailsRoot")).toContainText("شقة اختبار أسيوط الجديدة");
-  await expect(page.locator("#propertyDetailsRoot a[href^='tel:']")).toHaveCount(1);
+  await expect(page.locator("#propertyDetailsRoot a[href^='tel:']").first()).toBeVisible();
 
   // 3. Saving an offer is reflected on the dedicated favorites page.
   await page.goto("/");
