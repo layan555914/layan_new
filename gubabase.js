@@ -10,6 +10,8 @@
   const key = config.SUPABASE_PUBLISHABLE_KEY;
   const bucket = "layan_real_estat";
   const SESSION_KEY = "layanSupabaseSession";
+  // Use the canonical production domain for all email-auth callbacks.
+  const AUTH_REDIRECT_URL = "https://layan-eg.com/";
   let session = null;
   try { session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch (_) {}
   if (session?.expires_at && session.expires_at * 1000 < Date.now()) session = null;
@@ -62,13 +64,13 @@
     const cleanEmail = normalizeEmail(email);
     if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
     if (String(password || "").length < 6) throw new Error("Password should be at least 6 characters.");
-    const redirectTo = window.location.origin + window.location.pathname;
+    const redirectTo = AUTH_REDIRECT_URL;
     const data = await authRequest("signup?redirect_to=" + encodeURIComponent(redirectTo), { email: cleanEmail, password });
     normalizeSession(data);
     return { user: data?.user || null, session: session, needsEmailConfirmation: !data?.access_token };
   }
   async function resendConfirmation(email) {
-    const redirectTo = window.location.origin + window.location.pathname;
+    const redirectTo = AUTH_REDIRECT_URL;
     return authRequest("resend", {
       type: "signup",
       email: normalizeEmail(email),
@@ -76,7 +78,7 @@
     });
   }
   async function resetPasswordForEmail(email) {
-    const redirectTo = window.location.origin + window.location.pathname.replace(/[^/]*$/, "reset-password.html");
+    const redirectTo = AUTH_REDIRECT_URL + "reset-password.html";
     return authRequest("recover?redirect_to=" + encodeURIComponent(redirectTo), { email: normalizeEmail(email) });
   }
   async function signIn(email, password) {
