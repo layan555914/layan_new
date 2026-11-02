@@ -21,3 +21,7 @@
 .directory-map-toggle{border:1px solid #b48b45;border-radius:10px;padding:10px 16px;background:#fffaf0;color:#6b4c17;font:inherit;font-size:12px;font-weight:800;cursor:pointer;min-height:44px;margin-bottom:12px}
 .directory-map-panel[hidden]{display:none}
 .directory-map-panel{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(220px,.7fr);gap:16px}
+#directoryMap{height:390px;min-height:300px;border:1px solid #dfe5ed;border-radius:12px;overflow:hidden;background:#edf1f5;z-index:0}
+#directoryMapStatus{margin:0 0 9px;color:#697688;font-size:12px;line-height:1.8}
+.directory-map-shell>section>p:last-child{margin:7px 0 0;color:#778294;font-size:10px}
+.directory-map-link{display:inline-flex;margin-top:6px;padding:6px 9px;border:1px solid #e8dfcd;border-radius:8px;background:#fffaf0;color:#795a22!important;text-decoration:none!important;font-size:11px!important;font-weight:800}
