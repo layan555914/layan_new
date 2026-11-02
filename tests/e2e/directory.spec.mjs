@@ -262,7 +262,7 @@ test("public directory shows an attributed interactive Assiut area map without c
   await expect(map).toBeVisible();
   await expect(map).toHaveAttribute("src", /openstreetmap\.org\/export\/embed\.html/);
   await expect(page.locator(".directory-map-shell")).toContainText("ليست موقع مطور أو مشروع أو شركة");
-  await expect(page.locator(".directory-map-attribution a")).toHaveAttribute("href", /openstreetmap\.org\/copyright/);
+  await expect(page.locator(".directory-map-attribution a").first()).toHaveAttribute("href", /openstreetmap\.org\/copyright/);
   await expect(page.locator(".directory-map-areas a")).toHaveCount(6);
   await expect(page.locator(".directory-map-areas a").first()).toHaveAttribute("href", /google\.com\/maps\/search\/\?api=1/);
 });
