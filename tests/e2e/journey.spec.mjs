@@ -152,6 +152,13 @@ test("customer can search, open, save, submit, track and admin-review a property
 
   // 1. Public discovery and filtering.
   await page.goto("/");
+  if ((page.viewportSize()?.width || 1365) <= 500) {
+    const dimensions = await page.evaluate(() => ({
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth
+    }));
+    expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+  }
   await expect(page.locator("#offersGrid .offer-card").first()).toContainText("شقة اختبار أسيوط الجديدة");
 
   await page.locator("#heroPurposeFilter").selectOption("تنازل");
