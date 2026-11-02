@@ -218,6 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const forgotButton = authDialog.querySelector("#forgotPasswordBtn");
     const paintMode = () => {
       resendButton.hidden = true;
+      forgotButton.hidden = mode !== "login";
       title.textContent = mode === "login" ? "تسجيل الدخول إلى أسيوط عقار" : "إنشاء حساب مجاني";
       submit.textContent = mode === "login" ? "تسجيل الدخول" : "إنشاء الحساب";
       toggle.textContent = mode === "login" ? "ليس لديك حساب؟ أنشئ حسابًا" : "لديك حساب بالفعل؟ سجّل الدخول";
