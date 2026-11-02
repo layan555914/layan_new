@@ -5,6 +5,7 @@ on:
     branches:
       - restore/asyut-aqar-full-platform-20261101
       - feature/asyut-real-estate-directory
+      - fix/directory-opportunity-source-links
   workflow_dispatch:
 
 permissions:

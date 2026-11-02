@@ -1,16 +1,16 @@
 {
   "meta": {
     "title": "دليل أسيوط العقاري",
-    "version": 2,
+    "version": 3,
     "lastUpdated": "2026-11-02",
     "disclaimer": "دليل معلوماتي مستقل. إدراج جهة أو مصدر لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا. لا تُعرض الجهات أو المشروعات قبل مراجعة الإدارة واعتمادها."
   },
   "researchCounts": {
-    "entities": 47,
-    "projects": 23,
+    "entities": 57,
+    "projects": 25,
     "areas": 26,
     "governmentOpportunities": 8,
-    "sources": 32
+    "sources": 35
   },
   "areas": [
     {
@@ -316,6 +316,27 @@
       "publisher": "مصراوي",
       "source_type": "صحافة اقتصادية",
       "source_url": "https://www.masrawy.com/news/news_egypt/details/2026/7/25/3022854/الإسكان-تعلن-نتائج-قرعة-أراضي-شراكة-المطورين-ضمن-سكن-لكل-المصريين"
+    },
+    {
+      "id": "SRC-034",
+      "title": "دليل شركات العقارات والاستثمار والتسويق العقاري في أسيوط",
+      "publisher": "دليل 140",
+      "source_type": "دليل أعمال تجاري – للاكتشاف فقط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout"
+    },
+    {
+      "id": "SRC-035",
+      "title": "متابعة تنفيذ مشروع ديارنا في أسيوط الجديدة وناصر الجديدة – 10 سبتمبر 2026",
+      "publisher": "الهيئة العامة للاستعلامات / وزارة الإسكان",
+      "source_type": "مصدر حكومي رسمي",
+      "source_url": "https://sis.gov.eg/ar/المركز-الإعلامي/الأخبار/وزيرة-الإسكان-تتابع-موقف-تنفيذ-عدد-من-المشروعات-السكنية-والخدمية-بمدن-الصعيد-الجديدة/"
+    },
+    {
+      "id": "SRC-036",
+      "title": "شركات التسويق العقاري في أسيوط – دليل عقارات مصر",
+      "publisher": "عقارات مصر",
+      "source_type": "دليل أعمال عقاري – للاكتشاف فقط",
+      "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut/category/marketing"
     }
   ],
   "entities": [],
