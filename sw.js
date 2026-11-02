@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v103-dedicated-property-pages-20261102";
+const CACHE_NAME = "asyut-aqar-shell-v104-full-platform-review-20261102";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -18,6 +18,8 @@ const APP_SHELL = [
   "./my-listings.html",
   "./my-listings.css",
   "./my-listings.js",
+  "./reset-password.html",
+  "./payment.html",
   "./company.html",
   "./companies.css",
   "./companies.js",
