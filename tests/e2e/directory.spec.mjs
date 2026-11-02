@@ -228,6 +228,7 @@ test("directory admin reviews, sources, publication and audit history", async ({
   const entity = page.locator("#dirAdminRecords [data-kind=entities]");
   await entity.locator("[data-link-source]").selectOption("source-admin-1");
   await entity.locator("[data-link-record]").click();
+  await expect(page.locator("#dirAdminStatus")).toContainText("تم ربط المصدر بالسجل وتسجيل العملية.");
   await expect(entity.locator(".dir-admin-sources")).toContainText("الموقع الرسمي التجريبي");
   expect(db.directory_entity_sources).toHaveLength(1);
 
