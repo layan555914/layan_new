@@ -9,9 +9,24 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:4173",
     headless: true,
-    viewport: { width: 1365, height: 900 },
     trace: "retain-on-failure"
   },
+  projects: [
+    {
+      name: "desktop-chromium",
+      use: { browserName: "chromium", viewport: { width: 1365, height: 900 } }
+    },
+    {
+      name: "mobile-chromium",
+      use: {
+        browserName: "chromium",
+        viewport: { width: 390, height: 844 },
+        deviceScaleFactor: 1,
+        isMobile: true,
+        hasTouch: true
+      }
+    }
+  ],
   webServer: {
     command: "node tests/e2e/server.mjs",
     url: "http://127.0.0.1:4173",
