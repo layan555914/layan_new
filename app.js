@@ -1131,6 +1131,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const place = $("heroAreaFilter")?.value || "";
     const budget = $("heroBudgetFilter")?.value || "";
 
+    // Reset any previous free-text query so the quick-search choices work independently.
+    if ($("searchInput")) $("searchInput").value = "";
     if ($("purposeFilter")) $("purposeFilter").value = purpose;
     if ($("typeFilter")) $("typeFilter").value = type;
     if (cityFilter) cityFilter.value = place && place !== "الهضبة" ? place : "";
