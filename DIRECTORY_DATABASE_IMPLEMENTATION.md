@@ -75,18 +75,18 @@
 ## سجل تغييرات Supabase
 
 المعرفات التي تم تطبيقها في المشروع:
-- `20261102175232_create_asyut_real_estate_directory_v1`
+- `20261102175232_create_asyut_real_estate_directory_v1` (إنشاء الجداول والصلاحيات الأساسية)
 - `20261102175438_allow_contextual_duplicate_directory_source_urls`
 - `20261102175617_seed_asyut_directory_areas_and_sources_v1`
 - `20261102175735_seed_asyut_directory_entities_v1`
 - `20261102180129_seed_asyut_directory_projects_v1`
 - `20261102180205_link_asyut_directory_entities_projects_and_opportunities_v1`
 - `20261102180326_refine_asyut_directory_policies_and_indexes`
-- `2026110218xxxx_require_public_source_before_directory_publication` (معرف النسخة النهائية محفوظ في سجل migrations الحي).
+- `20261102180739_require_public_source_before_directory_publication` (حارس نشر مصدر).
 
 ملحوظة: ملفات seed التي تتضمن أرقام اتصال وعناوين مرشحة لم تُحفظ في هذا المستودع العام؛ لأنها معلومات مراجعة داخلية. قاعدة البيانات الحية وملف Excel الداخلي هما مرجع الاستيراد، ولا يجوز رفع حقول الاتصال الخاصة إلى ملفات عامة.
 
-## آلية التحديث
+## واجهة الإدارة\n\n- `directory-admin.html` شاشة إدارة مستقلة مرتبطة بجلسة Supabase نفسها وتتحقق من `layan_is_admin()` على الخادم قبل تحميل أي بيانات.\n- تعرض مصادر الجهات والمشروعات والطروحات، وملاحظات الاتصال الداخلية للمسؤول فقط.\n- تسمح بتعديل الوصف والموقع ومحتوى الطرح، ثم اعتماد ونشر سجل واحد بعد التحقق.\n- يتطلب النشر تأكيد المراجعة ووجود مصدر عام مرتبط؛ ويمنع trigger في قاعدة البيانات النشر من دون مصدر.\n\n## آلية التحديث
 
 - الشركات/المطورون: مراجعة كل 90 يومًا.
 - المشروعات: مراجعة كل 60 يومًا أو عند ظهور قرار/خبر جديد.
