@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <form id="buyerPreferenceForm" class="buyer-preference-form">
           <p class="buyer-login-note" id="buyerLoginNote">سجّل الدخول لحفظ طلبك ومتابعة العروض المناسبة لك.</p>
           <label>إيه نوع العقار اللي بتدور عليه؟
-            <select name="property_type" required><option value="أي نوع">أي نوع</option><option value="شقة">شقة</option><option value="فيلا">فيلا</option><option value="محل">محل تجاري</option><option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option><option value="مخزن">مخزن</option><option value="معرض">معرض</option><option value="أرض">أرض</option></select>
+            <select name="property_type" required><option value="أي نوع">أي نوع</option><option value="شقة">شقة</option><option value="فيلا">فيلا</option><option value="محل">محل تجاري</option><option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option><option value="مخزن">مخزن</option><option value="معرض">معرض</option><option value="أرض">أي أرض</option><option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option><option value="أرض تنازل">أرض تنازل</option></select>
           </label>
           <label>المدينة / المركز
             <select name="city">
@@ -94,7 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const normalizeLocation = value => String(value||"").trim().toLocaleLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/^مدينه\s+/,"").replace(/[\u064B-\u065F\u0670]/g,"").replace(/[ـ]/g,"").replace(/\s+/g," ");
   function matches(o,p) {
-    if (p.property_type!=="أي نوع" && o.property_type!==p.property_type) return false;
+    const offerType = String(o.property_type || "").trim();
+    const requestedType = String(p.property_type || "أي نوع").trim();
+    const typeMatches = requestedType === "أي نوع" ||
+      (requestedType === "أرض" ? offerType.includes("أرض") : offerType === requestedType);
+    if (!typeMatches) return false;
     if (p.city && normalizeLocation(o.city)!==normalizeLocation(p.city)) return false;
     if (p.area && !normalizeLocation(o.area).includes(normalizeLocation(p.area))) return false;
     if (p.max_total_price>0 && Number(o.total_price||0)>p.max_total_price) return false;
