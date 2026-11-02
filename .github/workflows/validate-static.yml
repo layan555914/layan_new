@@ -1,4 +1,4 @@
-name: Validate static platform
+name: Validate ASYUT AQAR platform
 
 on:
   push:
@@ -10,74 +10,97 @@ permissions:
   contents: read
 
 jobs:
-  static-validation:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - name: Check out restoration branch
         uses: actions/checkout@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+
+      - name: Set up Deno for Supabase Edge Function type checks
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
       - name: Check JavaScript syntax
+        shell: bash
         run: |
-          set -e
-          for file in *.js; do
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
             echo "Checking $file"
             node --check "$file"
-          done
-      - name: Validate JSON and local page assets
+          done < <(find . -type f -name '*.js' -not -path './.git/*' -not -path './node_modules/*' -print0)
+
+      - name: Type-check Supabase Edge Functions
+        run: |
+          deno check --no-lock             supabase/functions/asyut-admin/index.ts             supabase/functions/asyut-push/index.ts
+
+      - name: Validate pages, local assets, PWA shell and auth UI contracts
         run: |
           node --input-type=commonjs <<'NODE'
           const fs = require('node:fs');
           const path = require('node:path');
 
-          const pages = [
-            'index.html', 'property.html', 'admin.html', 'companies.html', 'company.html',
-            'marketplace.html', 'my-listings.html', 'payment.html',
-            'reset-password.html'
-          ];
-          const cssFiles = [
-            'styles.css', 'property.css', 'buyer.css', 'sponsor.css', 'ai.css',
-            'companies.css', 'marketplace.css', 'marketplace-page.css',
-            'my-listings.css'
-          ];
           const errors = [];
+          const ignored = new Set(['.git', 'node_modules', '.vercel']);
 
-          function checkLocalRefs(file, source, pattern) {
-            for (const match of source.matchAll(pattern)) {
-              let ref = (match[1] || '').trim();
-              if (!ref || /^(?:[a-z]+:|\/\/|#)/i.test(ref)) continue;
-              ref = ref.split(/[?#]/, 1)[0];
-              if (!ref) continue;
-              let target;
-              if (ref.startsWith('/')) target = ref.slice(1);
-              else target = path.posix.normalize(path.posix.join(path.posix.dirname(file), ref));
-              if (target === '.' || target.endsWith('/')) target = path.posix.join(target, 'index.html');
-              if (!fs.existsSync(target)) errors.push(file + ' -> ' + match[1] + ' (missing ' + target + ')');
+          function walk(directory) {
+            const files = [];
+            for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+              if (entry.isDirectory()) {
+                if (!ignored.has(entry.name)) files.push(...walk(path.join(directory, entry.name)));
+              } else if (entry.isFile()) {
+                files.push(path.join(directory, entry.name).replaceAll(path.sep, '/'));
+              }
+            }
+            return files;
+          }
+
+          const allFiles = walk('.');
+          const htmlFiles = allFiles.filter(file => file.endsWith('.html'));
+          const cssFiles = allFiles.filter(file => file.endsWith('.css'));
+          if (!htmlFiles.includes('index.html')) errors.push('index.html is missing');
+          if (!htmlFiles.includes('admin.html')) errors.push('admin.html is missing');
+          if (!htmlFiles.includes('property.html')) errors.push('property.html is missing');
+
+          function checkLocalReference(file, rawReference) {
+            let ref = String(rawReference || '').trim();
+            if (!ref || /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(ref)) return;
+            ref = ref.split(/[?#]/, 1)[0];
+            if (!ref) return;
+            let target = ref.startsWith('/')
+              ? ref.slice(1)
+              : path.posix.normalize(path.posix.join(path.posix.dirname(file), ref));
+            if (target === '.' || target.endsWith('/')) target = path.posix.join(target, 'index.html');
+            if (!fs.existsSync(target)) errors.push(file + ' -> ' + rawReference + ' (missing ' + target + ')');
+          }
+
+          for (const file of htmlFiles) {
+            const source = fs.readFileSync(file, 'utf8');
+            if (!/\blang=["']ar["']/i.test(source)) errors.push(file + ' is missing lang="ar"');
+            if (!/\bdir=["']rtl["']/i.test(source)) errors.push(file + ' is missing dir="rtl"');
+            for (const match of source.matchAll(/\b(?:src|href|poster)=["']([^"']+)["']/gi)) {
+              checkLocalReference(file, match[1]);
             }
           }
 
-          for (const file of pages) {
-            if (!fs.existsSync(file)) {
-              errors.push('Missing page: ' + file);
-              continue;
-            }
-            checkLocalRefs(file, fs.readFileSync(file, 'utf8'), /(?:src|href)=["']([^"']+)["']/g);
-          }
           for (const file of cssFiles) {
-            if (!fs.existsSync(file)) {
-              errors.push('Missing stylesheet: ' + file);
-              continue;
+            const source = fs.readFileSync(file, 'utf8');
+            for (const match of source.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/gi)) {
+              checkLocalReference(file, match[1]);
             }
-            checkLocalRefs(file, fs.readFileSync(file, 'utf8'), /url\(["']?([^"')]+)["']?\)/g);
           }
 
           try {
             const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
-            if (!manifest.name || !manifest.start_url || !Array.isArray(manifest.icons)) {
+            if (!manifest.name || !manifest.start_url || !manifest.scope || !Array.isArray(manifest.icons) || !manifest.icons.length) {
               errors.push('manifest.json is missing required PWA fields');
             }
+            for (const icon of manifest.icons || []) checkLocalReference('manifest.json', icon.src);
           } catch (error) {
             errors.push('manifest.json: ' + error.message);
           }
@@ -88,13 +111,24 @@ jobs:
             if (!match) errors.push('sw.js: APP_SHELL list not found');
             else {
               for (const item of match[1].matchAll(/["']([^"']+)["']/g)) {
-                let target = item[1].replace(/^\.\//, '');
-                if (!target || target.endsWith('/')) target = path.posix.join(target, 'index.html');
-                if (!fs.existsSync(target)) errors.push('sw.js APP_SHELL -> ' + item[1] + ' (missing ' + target + ')');
+                checkLocalReference('sw.js', item[1]);
               }
             }
           } catch (error) {
             errors.push('sw.js: ' + error.message);
+          }
+
+          const app = fs.readFileSync('app.js', 'utf8');
+          const marketplace = fs.readFileSync('marketplace.js', 'utf8');
+          const sponsor = fs.readFileSync('sponsor.js', 'utf8');
+          if (!/forgotButton\.hidden\s*=\s*mode\s*!==\s*["']login["']/.test(app)) {
+            errors.push('Main auth dialog must hide password recovery outside login mode');
+          }
+          if (!/\$\(["']forgotPassword["']\)\.hidden\s*=\s*signup/.test(marketplace)) {
+            errors.push('Marketplace auth dialog must hide password recovery during signup');
+          }
+          if (/images\.pexels\.com/.test(sponsor)) {
+            errors.push('Sponsor cards must not use unrelated generic stock photos as advertiser images');
           }
 
           if (fs.existsSync('CNAME')) {
@@ -105,9 +139,9 @@ jobs:
           }
 
           if (errors.length) {
-            console.error('Static validation failed:');
+            console.error('Validation failed:');
             for (const error of errors) console.error(' - ' + error);
             process.exit(1);
           }
-          console.log('Static validation passed: JavaScript syntax, local references, PWA manifest, service-worker assets, and CNAME.');
+          console.log('Validation passed: JavaScript, Edge Function types, RTL pages, local assets, PWA shell, auth mode UI, sponsor imagery and CNAME.');
           NODE
