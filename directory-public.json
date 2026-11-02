@@ -1,16 +1,18 @@
 {
   "meta": {
     "title": "دليل أسيوط العقاري",
-    "version": 4,
+    "version": 12,
     "lastUpdated": "2026-11-02",
     "disclaimer": "دليل معلوماتي مستقل. إدراج جهة أو مصدر لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا. لا تُعرض الجهات أو المشروعات قبل مراجعة الإدارة واعتمادها."
   },
   "researchCounts": {
-    "entities": 58,
-    "projects": 25,
+    "entities": 70,
+    "projects": 37,
     "areas": 26,
-    "governmentOpportunities": 8,
-    "sources": 36
+    "governmentOpportunities": 29,
+    "sources": 81,
+    "investmentPartnerships": 2,
+    "opportunities": 31
   },
   "areas": [
     {
@@ -344,6 +346,48 @@
       "publisher": "عقارات مصر",
       "source_type": "دليل أعمال عقاري – لاكتشاف الأسماء فقط",
       "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut"
+    },
+    {
+      "id": "SRC-038",
+      "title": "الوقائع المصرية – قرار وزارة الإسكان رقم 1005 لسنة 2025 بشأن قطعة 15–17 بأسيوط الجديدة",
+      "publisher": "الوقائع المصرية – سجل تشريعي/قانوني",
+      "source_type": "مرجع قانوني للوقائع المصرية",
+      "source_url": "https://www.mksegypt.org/public/index.php/ar/nashras/42"
+    },
+    {
+      "id": "SRC-039",
+      "title": "اعتماد تخطيط وتقسيم أرض مشروع البارون للاستثمار العقاري بمدينة أسيوط الجديدة – 15 أبريل 2026",
+      "publisher": "المصدر – تغطية قرار وزارة الإسكان والوقائع المصرية",
+      "source_type": "صحافة اقتصادية",
+      "source_url": "https://www.almasdar.com/169169"
+    },
+    {
+      "id": "SRC-042",
+      "title": "مشروع West Gardens في الهضبة بأسيوط – إعلان Home Town Group",
+      "publisher": "Home Town Group",
+      "source_type": "الموقع الرسمي للشركة",
+      "source_url": "https://htg-eg.com/ar/latest-residential-project-in-el-hadaba-assiut-west-gardens-2/"
+    },
+    {
+      "id": "SRC-043",
+      "title": "قرار 1070 لسنة 2025 – تخطيط قطعة هوم تاون بالحي الأول في ناصر الجديدة",
+      "publisher": "المصدر",
+      "source_type": "صحافة اقتصادية تنقل الوقائع المصرية",
+      "source_url": "https://www.almasdar.com/167326"
+    },
+    {
+      "id": "SRC-044",
+      "title": "الأسئلة الرسمية لمشروع ديارنا – مدن أسيوط الجديدة وناصر الجديدة",
+      "publisher": "بنك التعمير والإسكان",
+      "source_type": "صفحة أسئلة وأجوبة رسمية",
+      "source_url": "https://www.hdb-egy.com/HousingProjectsFAQs/"
+    },
+    {
+      "id": "SRC-045",
+      "title": "تنفيذ خمس عمارات و130 وحدة ضمن ديارنا بأسيوط الجديدة",
+      "publisher": "المصري اليوم",
+      "source_type": "صحافة محلية تنقل تصريح رئيس جهاز المدينة",
+      "source_url": "https://www.almasryalyoum.com/news/details/4210166"
     }
   ],
   "entities": [],
