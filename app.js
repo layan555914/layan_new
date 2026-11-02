@@ -328,6 +328,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateAuthButton();
     setStatus("تم تأكيد بريدك الإلكتروني وتسجيل دخولك بنجاح. أهلًا بك في أسيوط عقار.");
   });
+  window.addEventListener("layan-auth-state-changed", updateAuthButton);
   function openAuth(mode = "login") {
     const d = ensureAuthDialog();
     d._setMode(mode);
