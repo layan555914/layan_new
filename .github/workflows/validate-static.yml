@@ -8,6 +8,7 @@ on:
       - fix/directory-cache-bust-v107
       - fix/directory-data-cache-v108
       - fix/directory-opportunity-source-links
+      - research/directory-assiut-batch-20261102
   workflow_dispatch:
 
 permissions:
