@@ -1,0 +1,8 @@
+-- SUPERSEDED — DO NOT EXECUTE THIS OLD DRAFT.
+-- The production directory schema has already been applied to Supabase project ebyhwqkmhxbgocngpqfe.
+-- Source-of-truth migration identifiers are documented in DIRECTORY_DATABASE_IMPLEMENTATION.md.
+-- This placeholder intentionally prevents re-applying the earlier incomplete draft.
+-- The applied schema includes private internal contact review fields, opportunity archive tables,
+-- source relations, administrator-only RLS policies, explicit grants, indexes, and publication guards.
+-- Seed data contains candidate business contact information in an admin-only table and must not be copied
+-- into this public repository or a public SQL export.

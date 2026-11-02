@@ -1,0 +1,403 @@
+{
+  "meta": {
+    "title": "دليل أسيوط العقاري",
+    "version": 2,
+    "lastUpdated": "2026-11-02",
+    "disclaimer": "دليل معلوماتي مستقل. إدراج جهة أو مصدر لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا. لا تُعرض الجهات أو المشروعات قبل مراجعة الإدارة واعتمادها."
+  },
+  "researchCounts": {
+    "entities": 47,
+    "projects": 23,
+    "areas": 26,
+    "governmentOpportunities": 8,
+    "sources": 32
+  },
+  "areas": [
+    {
+      "id": "AREA-001",
+      "name_ar": "مدينة/مركز أسيوط",
+      "name_en": "Asyut City / Markaz",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-002",
+      "name_ar": "أبو تيج",
+      "name_en": "Abu Tig",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-003",
+      "name_ar": "الغنايم",
+      "name_en": "Al-Ghanayem",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-004",
+      "name_ar": "صدفا",
+      "name_en": "Sidfa",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-005",
+      "name_ar": "منفلوط",
+      "name_en": "Manfalut",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-006",
+      "name_ar": "القوصية",
+      "name_en": "Al-Qusiya",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-007",
+      "name_ar": "ديروط",
+      "name_en": "Dayrout",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-008",
+      "name_ar": "أبنوب",
+      "name_en": "Abnub",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-009",
+      "name_ar": "الفتح",
+      "name_en": "Al-Fath",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-010",
+      "name_ar": "ساحل سليم",
+      "name_en": "Sahel Selim",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-011",
+      "name_ar": "البداري",
+      "name_en": "Al-Badari",
+      "area_type": "center"
+    },
+    {
+      "id": "AREA-012",
+      "name_ar": "أسيوط الجديدة",
+      "name_en": "New Assiut",
+      "area_type": "new_city"
+    },
+    {
+      "id": "AREA-013",
+      "name_ar": "ناصر الجديدة / غرب أسيوط",
+      "name_en": "Nasser New City / West Assiut",
+      "area_type": "new_city"
+    }
+  ],
+  "sources": [
+    {
+      "id": "SRC-001",
+      "title": "أسيوط الجديدة – هيئة المجتمعات العمرانية الجديدة",
+      "publisher": "هيئة المجتمعات العمرانية الجديدة",
+      "source_type": "جهة حكومية رسمية",
+      "source_url": "https://lands.nuca.gov.eg/ar/ViewCity.aspx?ID=11"
+    },
+    {
+      "id": "SRC-002",
+      "title": "طرح فرص استثمارية بمدينة أسيوط الجديدة",
+      "publisher": "الهيئة العامة للاستعلامات / وزارة الإسكان",
+      "source_type": "جهة حكومية رسمية",
+      "source_url": "https://sis.gov.eg/ar/المركز-الإعلامي/الأخبار/طرح-أراض-استثمارية-جديدة-بمواقع-متميزة-بمدينة-أسيوط-الجديدة/"
+    },
+    {
+      "id": "SRC-003",
+      "title": "طرح محال وصيدليات ووحدات إدارية وورش",
+      "publisher": "وزارة الإسكان",
+      "source_type": "جهة حكومية رسمية",
+      "source_url": "https://mhuc.gov.eg/طرح_محال_وصيدليات_ووحدات_إدارية_ومهنية_وقطع_أراضٍ_بنشاط_ورش_للبيع_بمدينتي_أسيوط_الجديدة_والعبور_الجديدة/بيانات_صحفية"
+    },
+    {
+      "id": "SRC-004",
+      "title": "لؤلؤة أسيوط الجديدة",
+      "publisher": "الهيئة العامة لتعاونيات البناء والإسكان",
+      "source_type": "جهة حكومية رسمية",
+      "source_url": "https://chc-egypt.com/أسيوط-الجديدة/"
+    },
+    {
+      "id": "SRC-005",
+      "title": "سابقة أعمال فينيسيا للتنمية العمرانية",
+      "publisher": "فينيسيا للتنمية والتخطيط العمراني",
+      "source_type": "الموقع الرسمي للشركة",
+      "source_url": "https://venecia-dev.com/portfolio"
+    },
+    {
+      "id": "SRC-006",
+      "title": "فينيسيا للتنمية والتخطيط العمراني",
+      "publisher": "Venecia Developments",
+      "source_type": "الموقع الرسمي للشركة",
+      "source_url": "https://venecia-dev.com/"
+    },
+    {
+      "id": "SRC-007",
+      "title": "هوم تاون جروب",
+      "publisher": "Home Town Group",
+      "source_type": "الموقع الرسمي للشركة",
+      "source_url": "https://htg-eg.com/ar/"
+    },
+    {
+      "id": "SRC-008",
+      "title": "خبر مشروع West Gardens بغرب أسيوط",
+      "publisher": "جريدة البورصة",
+      "source_type": "صحافة اقتصادية",
+      "source_url": "https://www.alborsaanews.com/2026/02/17/1950271"
+    },
+    {
+      "id": "SRC-009",
+      "title": "خبر القرار الوزاري لمشروع West Gardens",
+      "publisher": "بوابة الأهرام بيزنس",
+      "source_type": "صحافة اقتصادية",
+      "source_url": "https://business.ahram.org.eg/News/67501.aspx"
+    },
+    {
+      "id": "SRC-010",
+      "title": "مشروعات Arab Developers Holding",
+      "publisher": "Arab Developers Holding",
+      "source_type": "الموقع الرسمي للشركة",
+      "source_url": "https://ad-holding.com/project/"
+    },
+    {
+      "id": "SRC-011",
+      "title": "عن طايل جروب – Hayah City",
+      "publisher": "Tayel Group / Hayah City",
+      "source_type": "الموقع الرسمي للشركة",
+      "source_url": "https://www.hayahcity.com/ar/about-us.php"
+    },
+    {
+      "id": "SRC-012",
+      "title": "Global House Developments – صفحة الشركة",
+      "publisher": "Global House Developments",
+      "source_type": "LinkedIn للشركة",
+      "source_url": "https://eg.linkedin.com/company/global-house-developments"
+    },
+    {
+      "id": "SRC-013",
+      "title": "معلومات صحفية عن مشروع Asayla",
+      "publisher": "الجريدة العقارية",
+      "source_type": "صحافة عقارية متخصصة",
+      "source_url": "https://www.aleqaria.com.eg/post/details/285509/133-فيلا-بين-الـ-تاون-هاوس-وتوين-هاوس-وفيلات-مستقلة-بمشروع-asayla--بأسيوط"
+    },
+    {
+      "id": "SRC-014",
+      "title": "مباني إدريس واستعداد تسليم وحدات من أصايله",
+      "publisher": "الجريدة العقارية",
+      "source_type": "صحافة عقارية متخصصة",
+      "source_url": "https://www.aleqaria.com.eg/post/details/273060/شركة-مباني-إدريس-77753"
+    },
+    {
+      "id": "SRC-015",
+      "title": "Asayla Compound – Key Point",
+      "publisher": "Key Point Real Estate",
+      "source_type": "منصة تسويق/وساطة عقارية",
+      "source_url": "https://keypoint-realestate.com/project/asayla-compound/"
+    },
+    {
+      "id": "SRC-016",
+      "title": "تغطية عن المطورين في الصعيد",
+      "publisher": "جريدة البورصة",
+      "source_type": "صحافة اقتصادية",
+      "source_url": "https://www.alborsaanews.com/2026/09/15/1992465"
+    },
+    {
+      "id": "SRC-017",
+      "title": "شركات عقارية في أسيوط – دليل D&B",
+      "publisher": "Dun & Bradstreet",
+      "source_type": "دليل أعمال لاكتشاف الأسماء",
+      "source_url": "https://www.dnb.com/business-directory/company-information.real_estate.eg.asyut.html"
+    },
+    {
+      "id": "SRC-018",
+      "title": "مكاتب وساطة عقارية في أسيوط – D&B",
+      "publisher": "Dun & Bradstreet",
+      "source_type": "دليل أعمال لاكتشاف الأسماء",
+      "source_url": "https://www.dnb.com/business-directory/company-information.offices_of_real_estate_agents_and_brokers.eg.asyut.html"
+    },
+    {
+      "id": "SRC-019",
+      "title": "دليل الأنشطة العقارية في أسيوط – Buy.com.eg",
+      "publisher": "Buy.com.eg",
+      "source_type": "دليل أعمال لاكتشاف الأسماء",
+      "source_url": "https://buy.com.eg/ar/directory?category=real-estate&city=asyut-city&governorate=asyut"
+    },
+    {
+      "id": "SRC-020",
+      "title": "تقسيم محافظة أسيوط ومراكزها ومدنها",
+      "publisher": "الهيئة العامة للاستعلامات",
+      "source_type": "مرجع حكومي",
+      "source_url": "https://mediadr.sis.gov.eg/bitstream/handle/123456789/3433/AFED_ASSIUT18052022.pdf?sequence=1&isAllowed=y"
+    },
+    {
+      "id": "SRC-021",
+      "title": "الوقائع المصرية – قرار وزاري رقم 823 لسنة 2025",
+      "publisher": "الوقائع المصرية / وزارة الإسكان",
+      "source_type": "جريدة رسمية حكومية",
+      "source_url": "https://mediadr.sis.gov.eg/bitstream/handle/123456789/118601/WQ11_20260114_8880.pdf?isAllowed=y&sequence=2"
+    },
+    {
+      "id": "SRC-022",
+      "title": "دليل المطورين – عقارات مصر",
+      "publisher": "عقارات مصر",
+      "source_type": "منصة عقارية مرجعية",
+      "source_url": "https://realestate.eg/ar/developers"
+    },
+    {
+      "id": "SRC-023",
+      "title": "دليل المطورين – URE",
+      "publisher": "URE",
+      "source_type": "منصة عقارية مرجعية",
+      "source_url": "https://ureeg.com/en/developers/"
+    },
+    {
+      "id": "SRC-024",
+      "title": "دليل المطورين – Ahlan Homes",
+      "publisher": "Ahlan Homes",
+      "source_type": "منصة عقارية مرجعية",
+      "source_url": "https://www.ahlanhomes.com/developers"
+    },
+    {
+      "id": "SRC-025",
+      "title": "تقرير قطاع العقارات – AmCham Egypt",
+      "publisher": "AmCham Egypt",
+      "source_type": "مرجع قطاعي",
+      "source_url": "https://www.amcham.org.eg/bsac/RealEstate_IndustryInsight_Dec2025.pdf"
+    },
+    {
+      "id": "SRC-026",
+      "title": "دليل خرائط – بحث شركات عقارية في أسيوط",
+      "publisher": "Google Maps",
+      "source_type": "بحث خرائط لاكتشاف الأسماء والمواقع",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=real+estate+companies+Assiut+Egypt"
+    },
+    {
+      "id": "SRC-028",
+      "title": "أسيوط الجديدة – بوابة الأراضي الرسمية",
+      "publisher": "هيئة المجتمعات العمرانية الجديدة",
+      "source_type": "مصدر حكومي رسمي",
+      "source_url": "https://lands.nuca.gov.eg/ar/ViewCity.aspx?ID=11"
+    },
+    {
+      "id": "SRC-029",
+      "title": "حياه إيليت – صفحة تسويق عقاري",
+      "publisher": "فانسيا للتسويق العقاري",
+      "source_type": "منصة تسويق عقاري",
+      "source_url": "https://venecia.estate/hayah-elite/"
+    },
+    {
+      "id": "SRC-030",
+      "title": "الموقع الرسمي – RDF Developments",
+      "publisher": "RDF Developments",
+      "source_type": "الموقع الرسمي للشركة",
+      "source_url": "https://rdfdevelopments.com/"
+    },
+    {
+      "id": "SRC-031",
+      "title": "تغطية إطلاق مشروع Paradise Compound",
+      "publisher": "موقع اليوم",
+      "source_type": "صحافة عقارية",
+      "source_url": "https://el-yomnews.com/لأول-مرة-في-أسيوط-الجديدة-rdf-development-تطلق-مشروعها-الأول-تحت-اسم-para/"
+    },
+    {
+      "id": "SRC-032",
+      "title": "تغطية التقدم لقطعة أرض 20 فدانًا في أسيوط الجديدة",
+      "publisher": "جريدة المال",
+      "source_type": "صحافة اقتصادية",
+      "source_url": "https://almalnews.com/2119694/شركتان-تتقدمان-لحجز-قطعة-أرض-بمساحة-20/"
+    },
+    {
+      "id": "SRC-033",
+      "title": "نتائج قرعة أراضي شراكة المطورين – شركة البدري للاستثمار",
+      "publisher": "مصراوي",
+      "source_type": "صحافة اقتصادية",
+      "source_url": "https://www.masrawy.com/news/news_egypt/details/2026/7/25/3022854/الإسكان-تعلن-نتائج-قرعة-أراضي-شراكة-المطورين-ضمن-سكن-لكل-المصريين"
+    }
+  ],
+  "entities": [],
+  "projects": [],
+  "draftAreas": [
+    {
+      "id": "AREA-014",
+      "name_ar": "حي شرق أسيوط",
+      "name_en": "East District",
+      "area_type": "district"
+    },
+    {
+      "id": "AREA-015",
+      "name_ar": "حي غرب أسيوط",
+      "name_en": "West District",
+      "area_type": "district"
+    },
+    {
+      "id": "AREA-016",
+      "name_ar": "الوليدية",
+      "name_en": "Al-Walideya",
+      "area_type": "neighborhood"
+    },
+    {
+      "id": "AREA-017",
+      "name_ar": "شارع الجمهورية / وسط المدينة",
+      "name_en": "El-Gomhoreya / Downtown",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-018",
+      "name_ar": "الهضبة",
+      "name_en": "El-Hadaba",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-019",
+      "name_ar": "المنطقة الإقليمية",
+      "name_en": "Regional Services Area",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-020",
+      "name_ar": "حي رجال الأعمال",
+      "name_en": "Business District",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-021",
+      "name_ar": "مركز خدمات الحي الثاني",
+      "name_en": "Second District Services Center",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-022",
+      "name_ar": "مركز المدينة الرئيسي",
+      "name_en": "Main City Center",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-023",
+      "name_ar": "مركز الخدمات الرئيسي",
+      "name_en": "Main Services Center",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-024",
+      "name_ar": "المنطقة الصناعية الثانية",
+      "name_en": "Second Industrial Zone",
+      "area_type": "industrial_zone"
+    },
+    {
+      "id": "AREA-025",
+      "name_ar": "التوسعات الشمالية الغربية",
+      "name_en": "North-Western Extensions",
+      "area_type": "zone"
+    },
+    {
+      "id": "AREA-026",
+      "name_ar": "التوسعات الجنوبية الشرقية",
+      "name_en": "South-Eastern Extensions",
+      "area_type": "zone"
+    }
+  ]
+}

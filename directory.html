@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102746"><meta name="description" content="دليل أسيوط العقاري: مرجع مستقل للمطورين وشركات التسويق والمشروعات والمناطق العقارية في محافظة أسيوط.">
+<meta name="robots" content="index,follow"><title>دليل أسيوط العقاري | ASYUT AQAR</title>
+<link rel="icon" href="./icon.svg" type="image/svg+xml"><link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./directory.css?v=directory-v2-20261102">
+</head>
+<body class="directory-page">
+<header class="topbar">
+<a class="brand" href="./" aria-label="ASYUT AQAR الصفحة الرئيسية"><img src="./icon.svg" alt="شعار أسيوط عقار" class="brand-logo"><span><strong>ASYUT AQAR</strong><small>أسيوط عقار</small></span></a>
+<nav aria-label="القائمة الرئيسية"><a href="./">الرئيسية</a><a href="./#offers">العقارات</a><a href="./marketplace.html">سوق الخدمات</a><a href="./companies.html">الشركات</a><a class="active" href="./directory.html" aria-current="page">الدليل العقاري</a><a href="./favorites.html">المفضلة</a></nav>
+<div class="top-actions"><a class="btn btn-gold" href="./">تصفح المنصة</a></div>
+</header>
+<main class="directory-main">
+<section class="directory-hero"><div class="directory-hero-copy"><span class="directory-eyebrow">مرجع محلي مستقل · محافظة أسيوط</span><h1>دليل أسيوط العقاري</h1><p>دليلك للمطورين وشركات التسويق والمشروعات والمناطق العقارية في أسيوط — بمعلومات مرتبطة بمصادرها وقابلة للمراجعة والتحديث.</p><div class="directory-hero-actions"><a class="btn btn-gold" href="#directory-browser">ابدأ البحث</a><a class="btn btn-outline" href="#directory-method">كيف نتحقق من المعلومات؟</a></div></div><div class="directory-hero-mark" aria-hidden="true"><span>ASYUT</span><strong>REAL ESTATE</strong><small>DIRECTORY</small></div></section>
+<section class="directory-notice"><strong>دليل معلوماتي وليس دليل شركاء أو إعلانات</strong><p>إدراج شركة أو مشروع هنا لا يعني وجود شراكة مع أسيوط عقار أو تزكية أو اعتماد قانوني. تُنشر السجلات بعد مراجعة مصادرها فقط، ولا تُعرض بيانات الاتصال إلا إذا كانت منشورة رسميًا وتم التحقق منها.</p></section>
+<section class="directory-stats" aria-label="حجم قاعدة البحث الأولية"><div class="directory-stat"><strong id="statEntities">—</strong><span>سجلات جهات أولية</span><small>قيد المراجعة</small></div><div class="directory-stat"><strong id="statProjects">—</strong><span>سجلات مشروعات أولية</span><small>قيد المراجعة</small></div><div class="directory-stat"><strong id="statAreas">—</strong><span>مناطق ونطاقات</span><small>قاعدة جغرافية أولية</small></div><div class="directory-stat"><strong id="statSources">—</strong><span>مراجع ومصادر</span><small>تُراجع دوريًا</small></div></section>
+<p class="directory-stats-caption">الأرقام تصف قاعدة البحث الداخلية ولا تعني أن جميع السجلات منشورة أو مؤكدة.</p>
+<section class="directory-browser" id="directory-browser" aria-labelledby="directoryBrowserTitle">
+<div class="directory-section-heading"><div><span class="directory-eyebrow">اكتشف السوق المحلي</span><h2 id="directoryBrowserTitle">ابحث في الدليل</h2><p>اختر نوع البيانات أو ابحث باسم الشركة أو المشروع أو المنطقة.</p></div><button class="directory-refresh" id="directoryRefresh" type="button">تحديث البيانات ↻</button></div>
+<div class="directory-filters"><label>كلمة البحث<input id="directorySearch" type="search" placeholder="اسم شركة، مشروع، منطقة..." autocomplete="off"></label><label>المنطقة<select id="directoryAreaFilter"><option value="">كل مناطق أسيوط</option></select></label><label>نوع الجهة<select id="directoryTypeFilter"><option value="">كل الأنواع</option><option value="developer">مطور عقاري</option><option value="marketing">تسويق عقاري</option><option value="brokerage">وساطة ومكتب عقاري</option><option value="other">جهات أخرى</option></select></label></div>
+<div class="directory-tabs" role="tablist" aria-label="تصنيف الدليل"><button class="is-active" type="button" data-view="entities" role="tab" aria-selected="true">الشركات والمطورون</button><button type="button" data-view="projects" role="tab" aria-selected="false">المشروعات</button><button type="button" data-view="areas" role="tab" aria-selected="false">المناطق</button><button type="button" data-view="opportunities" role="tab" aria-selected="false">الطروحات الحكومية</button><button type="button" data-view="sources" role="tab" aria-selected="false">المصادر</button></div>
+<div id="directoryStatus" class="directory-status" role="status" aria-live="polite">جارٍ تحميل الدليل...</div><div id="directoryResults" class="directory-results"></div>
+<div id="directoryEmpty" class="directory-empty" hidden><span aria-hidden="true">⌕</span><h3>لا توجد سجلات منشورة في هذا التصنيف حاليًا</h3><p>السجلات الأولية ما زالت قيد التحقق. سنعرض البيانات العامة بعد مراجعة المصدر واعتمادها، ولن نعرض أسماء أو أرقامًا غير مؤكدة.</p></div>
+</section>
+<section class="directory-method" id="directory-method"><div class="directory-section-heading"><div><span class="directory-eyebrow">منهجية التحقق</span><h2>المعلومة بمصدرها وتاريخها</h2><p>نستخدم مصادر متعددة ولا نعتمد على دليل تجاري بمفرده لإثبات نشاط شركة أو حالة مشروع.</p></div></div>
+<div class="directory-method-grid"><article><span>01</span><h3>مصادر رسمية</h3><p>الجهات الحكومية والهيئات والقرارات المنشورة والمواقع الرسمية للشركات.</p></article><article><span>02</span><h3>مقارنة مستقلة</h3><p>الصحافة الاقتصادية والعقارية للمقارنة، مع توضيح ما إذا كانت المعلومة إفصاحًا ذاتيًا.</p></article><article><span>03</span><h3>مراجعة وتحديث</h3><p>كل سجل يحتفظ بمصدره وتاريخ آخر تحقق وحالة المراجعة قبل إتاحته للزوار.</p></article></div>
+<div class="directory-status-key"><span><i class="status-dot status-verified"></i> موثق / منشور</span><span><i class="status-dot status-review"></i> قيد المراجعة</span><span><i class="status-dot status-draft"></i> بيانات أولية</span></div></section>
+<section class="directory-sources-note"><strong>تنبيه بخصوص المراجع</strong><p>تُستخدم المواقع الرسمية للشركات لإثبات ما تعلنه الشركة عن نفسها، بينما تُستخدم أدلة الأعمال والمنصات العقارية لاكتشاف الأسماء ومقارنة طريقة تنظيم المعلومات. لا يُعتبر أي منهما وحده شهادة ترخيص أو ضمانًا لحالة المشروع.</p></section>
+</main>
+<footer class="directory-footer"><a href="./">ASYUT AQAR · أسيوط عقار</a><span>دليل معلوماتي مستقل لمحافظة أسيوط</span><a href="./companies.html">دليل الشركات المعلنة</a></footer>
+<script src="./config.js"></script><script src="./directory.js?v=directory-v2-20261102" defer></script>
+</body></html>

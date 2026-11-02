@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - restore/asyut-aqar-full-platform-20261101
+      - feature/asyut-real-estate-directory
   workflow_dispatch:
 
 permissions:
