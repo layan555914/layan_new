@@ -6,6 +6,7 @@ on:
       - main
       - feature/directory-browser-improvements-20261102
       - feature/directory-admin-console-20261103
+      - fix/directory-admin-mobile-test-race-20261103
       - restore/asyut-aqar-full-platform-20261101
       - feature/asyut-real-estate-directory
       - fix/directory-cache-bust-v107
