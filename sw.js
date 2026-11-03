@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v119-preview-auth-redirect-20261103";
+const CACHE_NAME = "asyut-aqar-shell-v120-stable-auth-alias-20261103";
 const APP_SHELL = [
   "./",
   "./index.html",
