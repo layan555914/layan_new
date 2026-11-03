@@ -2,7 +2,8 @@
 
 **Date:** 2026-11-03  
 **User decision:** Approved temporary use of `layan-claude-test` as a candidate test environment, with explicit preservation of its existing user, migrations, Edge Function, and all existing data.  
-**Audit mode:** Read-only. No schema, data, Auth, Storage, RLS, function, secret, or project-setting changes were made.
+**Execution status:** Two reviewed, staging-only migrations applied. Production was not changed.
+**Audit mode:** Initial review was read-only; subsequent schema changes were limited to the approved test project. No data, Auth identities, admin memberships, Edge Function code, secrets or Storage objects were copied or changed.
 
 ## Executive result
 
@@ -77,11 +78,80 @@ Only source logic was inspected. Runtime invocation was not attempted because it
 
 - Temporary candidate staging environment: approved by user.
 - Compatibility audit: completed read-only.
-- Hosted test-project migrations: **not applied**.
-- Auth user or admin membership: unchanged.
-- Edge Function: unchanged.
-- Storage buckets and objects: unchanged.
-- Production database and Storage: untouched.
-- PR #42: remains Draft and unmerged; no deployment performed.
+## Applied staging-only schema work
 
-**Decision:** Keep `layan-claude-test`, but do not load the production baseline into it as-is. First complete the disposable local rehearsal and produce an additive compatibility migration that preserves its existing objects and account.
+The original baseline SQL was not run directly. A separate additive migration was prepared, rehearsed inside a transaction with rollback, and then applied to this project only:
+
+- `20261103093854 staging_additive_compatibility_20261103`
+- `20261103094114 staging_cleanup_duplicate_marketplace_checks_20261103`
+
+Tracked SQL files:
+- `_review/STAGING_ADDITIVE_COMPATIBILITY_20261103.sql`
+- `_review/STAGING_COMPATIBILITY_CLEANUP_20261103.sql`
+
+The migration created the 27 missing application tables and preserved the existing `public.marketplace_listings` table. It added three missing columns to that existing table and aligned its effective validation with production while keeping its pre-existing checks and policies. The cleanup removed only six redundant check constraints created by the first compatibility draft.
+
+### Verified post-application inventory
+
+| Object | Staging after migration | Production snapshot |
+|---|---:|---:|
+| Public application tables | 26 | 26 |
+| Private application tables | 2 | 2 |
+| Application constraints | 137 | 135 |
+| Secondary indexes | 33 | 32 |
+| Functions/procedures | 21 | 20 |
+| Public views | 2 | 2 |
+| Application triggers | 7 | 7 |
+| Application RLS policies | 81 | 80 |
+| App tables missing RLS | 0 | 0 |
+
+The small count differences are deliberately retained test-project objects:
+- Two additional constraints on `marketplace_listings`: the pre-existing details-object check and a stricter compatibility check retained under a separate name. The original weaker description check was not dropped.
+- One pre-existing test-only `marketplace_listings_public_idx` index.
+- One test-only `private.asyut_aqar_is_admin()` routine.
+- One extra pre-existing marketplace RLS policy. No existing policy was removed or rewritten.
+
+The three production marketplace columns `featured_until`, `latitude`, and `longitude` now exist in staging. Its column-name list matches the production snapshot.
+
+### Preserved data and service boundaries
+
+- Auth users: 1 before and after.
+- Auth identities: 1 before and after.
+- `private.layan_admins`: 0 rows; no account was granted administrator status.
+- `public.marketplace_listings`: 0 rows.
+- Directory entities and sources: 0 rows.
+- Storage objects: 0; no file bytes or object records were transferred.
+- Storage object policies: 6 before and after.
+- Edge Function `asyut-admin`: still ACTIVE, version 1, JWT verification enabled. Its source and settings were not changed.
+- The read-only admin check returns `false` for an identity not present in the admin allowlist.
+
+### Remaining compatibility gaps
+
+1. The photo bucket `layan_real_estat` still accepts JPEG only in staging. Production accepts JPEG, PNG and WebP. The Storage bucket was intentionally not changed because no supported Storage management action is available in this connected toolset; do not change bucket metadata by direct SQL.
+2. Two existing staging public functions were preserved rather than replaced:
+   - `public.layan_activate_supplier_ad(uuid, integer, numeric)` returns `void` in staging versus `jsonb` in production, and the definitions differ.
+   - `public.layan_reject_supplier_ad(uuid, text)` returns `void` in staging versus `jsonb` in production, and the definitions differ.
+   The current admin UI calls both RPCs but does not consume their return bodies. Their actual admin action behavior remains untested because no administrator identity was assigned.
+3. Supabase security advisors still report four RLS-enabled/no-policy tables (`private.layan_admins`, `private.project_decisions`, `public.buyer_push_subscriptions`, and `public.buyer_push_vapid_config`). These are preserved deny-all boundaries; no public policies were added.
+4. Leaked-password protection remains disabled. It was not changed.
+5. Performance advisors report 31 unused indexes and four multiple-permissive-policy findings. The index notices are expected on empty/new tables; policies were not weakened or removed.
+
+### Test coverage and limitations
+
+- The full additive DDL was executed once inside a transaction with assertions for table counts, RLS coverage, policies, routines, views, triggers, marketplace compatibility columns, unchanged Auth row counts and absence of admin assignments. The transaction was rolled back, and a subsequent read-only check confirmed the test project returned to its original one-table state before the permanent migration.
+- The actual staging migrations then applied successfully and their versions appeared in Supabase migration history.
+- Post-application read-only checks confirmed all 28 application tables, 0 missing-RLS tables, 2 views, 7 triggers, 81 policies, 21 routines, preserved Auth counts, zero data import, and the six original Storage policies.
+- A later attempt to run synthetic directory insert/update trigger tests was blocked by the tool's safety checks before execution. No such test data was inserted.
+- No browser E2E, Storage HTTP upload, administrator action, or load test has been run against this hosted test project.
+- GitHub Actions results for the current PR head are not visible through the connected status lookup; CI is **not claimed as passed**.
+
+## Current status and decision
+
+- Temporary test environment: retained and now schema-expanded.
+- Additive compatibility migrations: applied to `layan-claude-test` only.
+- Existing Auth account, identity, Edge Function, existing marketplace rows/policies/indexes/functions, and Storage bucket settings: preserved.
+- Production database and Storage: untouched.
+- No production rows or files copied.
+- PR #42 remains Draft and unmerged; no deployment performed.
+
+**Decision:** The test project is now a useful schema-level staging environment, but not yet a complete behavioral clone of production. Resolve the two function-definition differences and photo-bucket MIME configuration before claiming full feature parity.
