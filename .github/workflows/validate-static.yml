@@ -14,6 +14,7 @@ on:
       - fix/directory-data-cache-v108
       - fix/directory-opportunity-source-links
       - research/directory-assiut-batch-20261102
+      - feature/assyut-directory-maps-taxonomy-refresh-20261104
   workflow_dispatch:
 
 permissions:
