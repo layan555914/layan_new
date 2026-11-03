@@ -9,6 +9,7 @@ on:
       - fix/directory-admin-mobile-test-race-20261103
       - fix/directory-admin-visible-nav-buttons-20261103
       - restore/asyut-aqar-full-platform-20261101
+      - review/directory-atomic-audit-20261103
       - feature/asyut-real-estate-directory
       - fix/directory-cache-bust-v107
       - fix/directory-data-cache-v108
