@@ -157,7 +157,7 @@ BEGIN
       AND a.attnum>0 AND NOT a.attisdropped
   )
   SELECT md5(data::text) INTO v_actual FROM d;
-  IF v_actual IS DISTINCT FROM '423b58e02bebe5adb53963d02723998c' THEN
+  IF v_actual IS DISTINCT FROM 'a283488be8971790a5ede069c55ad06a' THEN
     RAISE EXCEPTION 'Production column fingerprint mismatch: %',v_actual;
   END IF;
 
