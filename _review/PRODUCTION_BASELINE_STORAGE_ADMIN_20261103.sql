@@ -15,6 +15,11 @@
 GRANT USAGE ON SCHEMA storage TO anon, authenticated, service_role;
 ALTER TABLE storage.buckets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- The disposable local Supabase stack may ship broader default ACLs than production.
+-- Clear API-role and PUBLIC grants first, then reproduce the captured production ACLs.
+REVOKE ALL PRIVILEGES ON TABLE storage.buckets FROM PUBLIC, anon, authenticated, service_role;
+REVOKE ALL PRIVILEGES ON TABLE storage.objects FROM PUBLIC, anon, authenticated, service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE storage.buckets TO anon, authenticated;
 GRANT ALL PRIVILEGES ON TABLE storage.buckets TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE storage.objects TO anon, authenticated;
