@@ -54,17 +54,29 @@ A new empty local Supabase stack replayed all 62 successfully. Assertions verifi
 
 The production catalog was rechecked immediately before the metadata-only ledger repair at 2026-11-03 15:35 UTC: all 15 fingerprints matched. The production ledger now contains 61 records after adding only the baseline and category-seed metadata; no migration SQL was run.
 
-## Final readiness check — directory administration RPC (2026-11-03)
+## Production directory-admin RPC — applied (2026-11-03)
 
-The latest full CI run after the ledger alignment and documentation update passed:
-[CI #41666562897 — full success](https://github.com/layan555914/layan_new/actions/runs/41666562897)
+The user separately approved applying only `20261103141537_directory_admin_mutate_with_audit.sql` to production.
 
-The staging RPC received an additional transactional smoke test using its existing synthetic directory entity and the existing staging Auth identity:
-- The authenticated admin-only update returned the changed synthetic record and an audit ID.
-- The entire transaction was rolled back.
-- Follow-up verification showed zero audit rows, zero temporary admin memberships, the original synthetic description, and the same single pre-existing staging Auth user.
-- Staging RPC remains SECURITY INVOKER with empty search_path; anon EXECUTE=false, authenticated/service_role EXECUTE=true.
+The reviewed migration source was fetched from branch `review/directory-atomic-audit-20261103` at blob SHA `09b5f17009d1dfd8aefbd52f473dfcb6c2f93b39`. A transactional production change was executed with preconditions for the 61-row ledger, absence of the RPC, existence of all dependency tables and the admin helper, required authenticated table grants, and RLS enabled on every affected table. The migration SQL and its ledger record were applied in one transaction with postconditions for the 62-row ledger and RPC security properties.
 
-A production read-only preflight confirms every RPC dependency exists: directory entity/project/area/opportunity/source tables, source-link tables, audit table, `layan_is_admin()`, required authenticated table grants, audit INSERT grant, and RLS enabled on all eight affected tables. The RPC itself is still absent.
+Post-application checks:
+- Production migration ledger lists all 62 expected versions, including `20261103141537_directory_admin_mutate_with_audit`.
+- The RPC exists in production.
+- The migration ledger row stores four parsed SQL statements.
+- All 11 marketplace categories remain present.
+- The production directory audit log remains empty (zero test records).
+- The existing two production admin memberships were not changed.
+- No user account, password, Auth identity, property, listing, source record, Storage object, frontend deployment, or GitHub merge was modified.
 
-**Ready for one separately approved production DDL step:** apply only `20261103141537_directory_admin_mutate_with_audit.sql`. This changes the production schema and migration ledger. It has not been applied. Do not merge PR #42, deploy the frontend, or run any other migration as part of this step without separate approval.
+The staging-only transactional smoke test had already verified that an authenticated staging admin update creates an audit row and that rollback removes the audit and restores the synthetic record. No live production admin mutation was performed, so the production RPC's end-to-end authenticated invocation remains untested against a real production admin session.
+
+Supabase advisors after the migration still report:
+- Four INFO findings for RLS-enabled tables with no policies (private/admin or server-only tables; remain deny-by-default).
+- One WARN for disabled leaked-password protection.
+- Fourteen unused-index INFO findings.
+- One multiple-permissive-policy WARN on `public.company_profiles`.
+No advisor finding was automatically changed or "fixed" as part of this migration.
+
+**PR #42 remains Draft and unmerged. No frontend deployment occurred.** The remaining release step is a separate review of the PR diff and explicit approval to merge/deploy. Do not infer approval for that step from approval of this database migration.
+
