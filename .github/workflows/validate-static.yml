@@ -186,6 +186,13 @@ jobs:
       - name: Verify live Supabase reads and anonymous permission boundaries
         run: node tests/e2e/live-supabase-readonly.mjs
 
+      - name: Verify hosted staging HTTP reads and anonymous security boundaries
+        env:
+          STAGING_SUPABASE_URL: https://wisnmlbefdrkcbbqvdlg.supabase.co
+          # Public publishable key only; no service-role key or user credential.
+          STAGING_SUPABASE_PUBLISHABLE_KEY: sb_publishable_Witds4WbdcsSIgfCx1NcOA__lasXKhk
+        run: node tests/e2e/staging-readonly.mjs
+
   rehearse-full-supabase-baseline:
     runs-on: ubuntu-latest
     timeout-minutes: 35
