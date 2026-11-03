@@ -346,7 +346,7 @@ test("directory admin creates a draft project, links a source and records both a
 
   await page.locator("[data-view=history]").click();
   await expect(page.locator(".dir-admin-log")).toHaveCount(3);
-  await expect(page.locator("#dirAdminRecords")).toContainText("إضافة مشروع للاختبار");
+  await expect(page.locator("#dirAdminRecords")).toContainText("اختبار إدخال مسودة");
   await expect(page.locator("#dirAdminRecords")).toContainText("ربط مصدر بالسجل");
 });
 
