@@ -75,6 +75,13 @@ for history_file in "$ROOT_DIR"/supabase/migrations/*.sql; do
      || "$history_file" == "$PROJECT_CREATE_MIGRATION_FILE" ]]; then
     continue
   fi
+  # The catalog-derived current-state baseline below replaces historical
+  # executable DDL. Replay only comment-only version markers before it; older
+  # executable migrations may depend on tables that the baseline will create.
+  if grep -Eq '^[[:space:]]*[^-[:space:]]' "$history_file"; then
+    echo "Skipping executable historical migration (covered by schema snapshot): $(basename "$history_file")"
+    continue
+  fi
   cp "$history_file" "$TEST_DIR/supabase/migrations/"
 done
 
