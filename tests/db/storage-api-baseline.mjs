@@ -338,6 +338,118 @@ async function testMarketplaceSecurity() {
   console.log('PASS: marketplace owner isolation, anonymous pending-read denial, admin-field escalation denial, self-approval denial, and non-admin/anonymous supplier RPC denial.');
 }
 
+
+async function testPropertyOfferLifecycle(photoUrl) {
+  const basePayload = {
+    owner_id: userA.id, title: 'شقة اختبار دورة العقار — اصطناعي فقط',
+    governorate: 'أسيوط', city: 'أسيوط (اختبار محلي)', area: 'منطقة اختبار محلية',
+    property_type: 'شقة', listing_purpose: 'تنازل', bedrooms: 3, bathrooms: 1, area_m2: 115,
+    total_price: 600000, down_payment: 100000, paid_amount: 100000,
+    remaining_amount: 500000, remaining_installments: 500000, monthly_installment: 5000,
+    assignment_fee: 0, assignment_fee_percentage: 0, transfer_fee: 0,
+    discount_amount: 0, discount_percent: 0,
+    description: 'بيانات اصطناعية لا تمثل عقاراً حقيقياً؛ لا تتصل بصاحب الإعلان.',
+    image_urls: photoUrl ? [photoUrl] : [], photos: [], document_urls: [],
+    developer_name: 'مطور افتراضي للاختبار', project_name: 'مشروع افتراضي للاختبار',
+    contact_name: 'مالك اختبار', contact_phone: '0000000000',
+    status: 'pending', verification_status: 'pending', developer_approval_status: 'unknown',
+    featured_requested: false, is_featured: false, promotion_status: 'none',
+  };
+
+  async function submit(title) {
+    const result = await restRequest('/rest/v1/property_offers', {
+      method: 'POST', token: tokenA,
+      payload: { ...basePayload, title }, prefer: 'return=representation',
+    });
+    assert(result.response.ok && Array.isArray(result.body) && result.body.length === 1 && result.body[0]?.id,
+      `Owner could not submit a pending property offer (HTTP ${result.response.status}): ${JSON.stringify(result.body)}`);
+    const row = result.body[0];
+    createdPropertyOfferIds.push(row.id);
+    assert(row.status === 'pending' && row.verification_status === 'pending' && row.is_featured === false,
+      'A newly submitted property offer did not start in the safe pending state.');
+    return row;
+  }
+
+  const approveOffer = await submit('شقة اختبار — سيتم اعتمادها');
+  const rejectOffer = await submit('شقة اختبار — سيتم رفضها');
+
+  const ownerRead = await restRequest(
+    `/rest/v1/property_offers?select=id,status,verification_status,image_urls&id=eq.${approveOffer.id}`, { token: tokenA });
+  assert(ownerRead.response.ok && ownerRead.body?.length === 1
+    && ownerRead.body[0].status === 'pending' && ownerRead.body[0].image_urls?.[0] === photoUrl,
+    'Owner could not read their pending offer and stored image URL.');
+
+  const otherUserRead = await restRequest(
+    `/rest/v1/property_offers?select=id&id=eq.${approveOffer.id}`, { token: tokenB });
+  assert(otherUserRead.response.ok && Array.isArray(otherUserRead.body) && otherUserRead.body.length === 0,
+    'A different account read a pending property offer.');
+
+  const anonymousReadBefore = await restRequest(
+    `/rest/v1/property_offers?select=id&id=eq.${approveOffer.id}`, { token: anonKey });
+  assert(anonymousReadBefore.response.ok && Array.isArray(anonymousReadBefore.body) && anonymousReadBefore.body.length === 0,
+    'Anonymous visitor read a pending property offer.');
+
+  const selfApprovalAttempt = await restRequest(
+    `/rest/v1/property_offers?id=eq.${approveOffer.id}&status=eq.pending`,
+    { method: 'PATCH', token: tokenA, payload: { status: 'available', verification_status: 'verified' }, prefer: 'return=representation' });
+  const stillPending = await restRequest(
+    `/rest/v1/property_offers?select=id,status,verification_status,is_featured&id=eq.${approveOffer.id}`,
+    { serviceRole: true });
+  assert(stillPending.response.ok && stillPending.body?.length === 1
+    && stillPending.body[0].status === 'pending'
+    && stillPending.body[0].verification_status === 'pending'
+    && stillPending.body[0].is_featured === false,
+    `Owner self-approval changed the offer (PATCH HTTP ${selfApprovalAttempt.response.status}).`);
+
+  const adminCheck = await restRequest('/rest/v1/rpc/layan_is_admin', { method: 'POST', token: tokenAdmin, payload: {} });
+  assert(adminCheck.response.ok && adminCheck.body === true, 'Disposable local admin account was not recognized.');
+  const ownerAdminCheck = await restRequest('/rest/v1/rpc/layan_is_admin', { method: 'POST', token: tokenA, payload: {} });
+  assert(ownerAdminCheck.response.ok && ownerAdminCheck.body === false, 'An ordinary owner incorrectly gained admin privileges.');
+
+  const adminPendingRead = await restRequest(
+    `/rest/v1/property_offers?select=id,status&id=eq.${approveOffer.id}&status=eq.pending`, { token: tokenAdmin });
+  assert(adminPendingRead.response.ok && adminPendingRead.body?.length === 1,
+    'Admin could not see the pending property offer.');
+
+  const approve = await restRequest('/rest/v1/rpc/layan_admin_review_property_offer', {
+    method: 'POST', token: tokenAdmin,
+    payload: { p_id: Number(approveOffer.id), p_action: 'approve', p_notes: null },
+  });
+  assert(approve.response.ok, `Admin could not approve property offer (HTTP ${approve.response.status}): ${JSON.stringify(approve.body)}`);
+
+  const publicApprovedRead = await restRequest(
+    `/rest/v1/property_offers?select=id,title,status,verification_status,image_urls&id=eq.${approveOffer.id}&status=eq.available`,
+    { token: anonKey });
+  assert(publicApprovedRead.response.ok && publicApprovedRead.body?.length === 1
+    && publicApprovedRead.body[0].verification_status === 'verified'
+    && publicApprovedRead.body[0].image_urls?.[0] === photoUrl,
+    'Approved property offer was not publicly visible with its image URL.');
+
+  const publicImage = await fetch(photoUrl, { signal: AbortSignal.timeout(10000) });
+  assert(publicImage.ok, `Approved offer image was not publicly readable (HTTP ${publicImage.status}).`);
+
+  const reject = await restRequest('/rest/v1/rpc/layan_admin_review_property_offer', {
+    method: 'POST', token: tokenAdmin,
+    payload: { p_id: Number(rejectOffer.id), p_action: 'reject', p_notes: 'سجل اصطناعي للاختبار فقط' },
+  });
+  assert(reject.response.ok, `Admin could not reject property offer (HTTP ${reject.response.status}): ${JSON.stringify(reject.body)}`);
+
+  const rejectedOwnerRead = await restRequest(
+    `/rest/v1/property_offers?select=id,status,verification_status,verification_notes&id=eq.${rejectOffer.id}`, { token: tokenA });
+  assert(rejectedOwnerRead.response.ok && rejectedOwnerRead.body?.length === 1
+    && rejectedOwnerRead.body[0].status === 'pending'
+    && rejectedOwnerRead.body[0].verification_status === 'rejected'
+    && rejectedOwnerRead.body[0].verification_notes === 'سجل اصطناعي للاختبار فقط',
+    'Rejected offer must retain its allowed pending status and store the rejected verification state and reason.');
+
+  const anonymousRejectedRead = await restRequest(
+    `/rest/v1/property_offers?select=id&id=eq.${rejectOffer.id}`, { token: anonKey });
+  assert(anonymousRejectedRead.response.ok && Array.isArray(anonymousRejectedRead.body) && anonymousRejectedRead.body.length === 0,
+    'Anonymous visitor read a rejected property offer.');
+
+  console.log('PASS: property lifecycle — local Auth owner submission, pending-state protection, owner isolation, admin approval/rejection, public visibility, and image access.');
+}
+
 async function main() {
   const ownerSignup = await signUp(emailA);
   userA = ownerSignup.user;
