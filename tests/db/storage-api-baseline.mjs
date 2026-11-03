@@ -578,6 +578,6 @@ try {
       (SELECT count(*) FROM public.marketplace_listings WHERE id IN (${listingIdList})) +
       (SELECT count(*) FROM storage.objects WHERE ${storagePredicate});
   `));
-  assert.equal(remaining, 0, 'Temporary Auth users, admin rows, test listings or Storage objects remained after cleanup.');
+  assert(remaining === 0, `Temporary Auth users, identities, admin rows, property offers, marketplace listings or Storage objects remained after cleanup (count=${remaining}).`);
   console.log('PASS: local test cleanup verified zero remaining Auth users/identities, admin rows, property offers, marketplace listings and Storage objects.');
 }
