@@ -98,6 +98,12 @@ The inspected staging activation function references `supplier_ads.agreed_price`
 
 Production's versions return structured JSON and update the columns that exist in the current schema. Replacing a PostgreSQL function with a different return type requires dropping/recreating that function or another reviewed migration approach; it must not be attempted casually.
 
+### Production admin-check defect also found
+
+A deeper permission check found that production `authenticated` has **no SELECT privilege** on `private.layan_admins`; RLS is enabled on that table and there are no policies. However, the production SECURITY INVOKER functions `public.layan_reject_supplier_ad` and `public.layan_approve_free_trial_ad` directly SELECT from this table for their admin check. Those direct reads can fail before the intended business logic runs.
+
+The safer pattern already available is `public.layan_is_admin()`, which calls the private SECURITY DEFINER allowlist helper. The staging-only reconciliation proposal was revised to use this predicate for both functions, rather than reproducing the production defect. **Production was not changed.**
+
 ### 3. Function execution grants are broader in staging
 
 The aggregate table grants match production, but function ACLs do not. Staging has additional `PUBLIC` and `anon` EXECUTE privileges on the two stale supplier-ad RPCs and several admin RPC wrappers. Production's corresponding public supplier-ad functions are restricted to `authenticated`, `service_role`, and `postgres`.
@@ -134,7 +140,7 @@ Performance:
 ## Required next work — approval boundary
 
 1. Prepare a reviewed staging-only migration to replace the marketplace owner INSERT/UPDATE/read policies with the production-equivalent conditions.
-2. Prepare a reviewed migration to reconcile the public supplier-ad RPC return types, update logic and EXECUTE grants. Review dependent UI/function callers before dropping or recreating anything.
+2. Prepare a reviewed migration to reconcile the public supplier-ad RPC return types, update logic and EXECUTE grants. The proposal uses `public.layan_is_admin()` for admin checks instead of direct reads from the RLS-locked private allowlist. Review dependent UI/function callers before dropping or recreating anything.
 3. Align the public admin wrapper with the production helper while preserving the empty admin allowlist. Do not add the user's account to `private.layan_admins` without separate explicit approval.
 4. Align the photo bucket MIME allowlist using the supported Storage API/configuration route.
 5. After those changes are separately approved and tested, run authenticated/browser/Storage tests with disposable test accounts only.
