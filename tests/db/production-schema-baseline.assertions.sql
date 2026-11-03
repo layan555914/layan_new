@@ -9,8 +9,8 @@ DECLARE
   v_count integer;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 62 THEN
-    RAISE EXCEPTION 'Expected 62 local migration ledger rows (59 historical markers + baseline + seed + RPC); found %', v_count;
+  IF v_count <> 64 THEN
+    RAISE EXCEPTION 'Expected 64 local migration ledger rows (59 historical markers + baseline + seed + admin RPC + audit-log hardening + project creation); found %', v_count;
   END IF;
 
   SELECT count(*) INTO v_count
