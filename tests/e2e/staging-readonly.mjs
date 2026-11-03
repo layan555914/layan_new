@@ -109,9 +109,13 @@ async function main() {
     },
     body: Buffer.from([0xff, 0xd8, 0xff, 0xd9])
   });
-  assert.ok([401, 403].includes(anonymousUpload.response.status),
-    "Anonymous upload to the public LAYAN image bucket must be denied; got HTTP " + anonymousUpload.response.status);
-  console.log("PASS: anonymous upload to public image bucket is denied (HTTP " + anonymousUpload.response.status + ").");
+  const uploadErrorText = JSON.stringify(anonymousUpload.body || {});
+  assert.ok([400, 401, 403].includes(anonymousUpload.response.status)
+      && /unauthorized|row-level security|accessdenied/i.test(uploadErrorText),
+    "Anonymous image upload must be rejected by Storage RLS; got HTTP " + anonymousUpload.response.status +
+      " with body " + uploadErrorText);
+  console.log("PASS: anonymous upload to public image bucket is rejected by Storage RLS (HTTP " +
+    anonymousUpload.response.status + "; " + uploadErrorText.slice(0, 240) + ").");
 
   const edge = await request("/functions/v1/asyut-admin", {
     method: "POST",
