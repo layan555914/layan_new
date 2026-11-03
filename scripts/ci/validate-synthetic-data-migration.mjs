@@ -265,7 +265,7 @@ function validateTarget(options) {
 function runSelfTests() {
   const fixture = syntheticFixture();
   const plan = validateFixture(fixture);
-  assert.equal(plan.total_rows,21);
+  assert.equal(plan.total_rows,22);
   assert.equal(plan.storage.objects,2);
   assert.equal(plan.storage.bytes,12);
   assert.equal(plan.writes_performed,0);
