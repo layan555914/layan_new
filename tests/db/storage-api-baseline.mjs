@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Exercise LAYAN Storage RLS through the actual local Storage HTTP API.
+ * Exercise local Auth, directory admin RPC atomicity, and Storage RLS through the APIs.
  * Requires only environment variables returned by `supabase status -o env`.
  * Refuses to run against any non-loopback host.
  */
@@ -743,6 +743,16 @@ try {
     } catch {
       // The local Supabase stack is disposable and is stopped by the caller's EXIT trap.
     }
+  }
+
+  // Remove the injected failure trigger even if the RPC test aborted before its inner cleanup.
+  try {
+    runLocalSql(`
+      DROP TRIGGER IF EXISTS ci_force_directory_audit_failure ON public.directory_change_log;
+      DROP FUNCTION IF EXISTS public.ci_force_directory_audit_failure();
+    `);
+  } catch {
+    // The trigger may not have been installed; the temporary local stack is disposable.
   }
 
   // Remove local directory RPC fixtures and audit rows using the disposable local database only.
