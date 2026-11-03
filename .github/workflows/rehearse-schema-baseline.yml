@@ -1,0 +1,44 @@
+name: Rehearse ASYUT AQAR production schema baseline
+
+on:
+  push:
+    branches:
+      - review/directory-atomic-audit-20261103
+    paths:
+      - "_review/PRODUCTION_BASELINE_COMPLETE_20261103.sql"
+      - "tests/db/production-schema-baseline.assertions.sql"
+      - "scripts/ci/rehearse-production-schema-baseline.sh"
+      - ".github/workflows/rehearse-production-schema-baseline.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: asyut-aqar-schema-baseline-rehearsal
+  cancel-in-progress: true
+
+jobs:
+  full-supabase-rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out review branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js for Supabase CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pinned Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 2.84.2
+
+      - name: Confirm local Docker runtime
+        run: docker version
+
+      - name: Rebuild the full local Supabase stack and run assertions
+        shell: bash
+        run: bash scripts/ci/rehearse-production-schema-baseline.sh
