@@ -152,28 +152,63 @@ async function mockDirectoryAdmin(page, { isAdmin = true } = {}) {
       return;
     }
     const body = request.postDataJSON() || {};
-    if (method === "POST" && table === "directory_sources") {
-      const row = {id:"source-admin-1",accessed_at:"2026-11-03T08:00:00Z",...body};
-      db.directory_sources.push(row);
-      await route.fulfill({status:201,contentType:"application/json",body:JSON.stringify([row])});
+    if (method === "POST" && table === "directory_admin_mutate_with_audit") {
+      const { p_table_name, p_operation, p_record_id, p_data, p_reason } = body;
+      if (p_reason === "force audit failure") {
+        await route.fulfill({
+          status:500,
+          contentType:"application/json",
+          body:JSON.stringify({message:"forced audit insert failure"})
+        });
+        return;
+      }
+
+      let record;
+      let recordId = p_record_id || null;
+      let oldValues = {};
+      if (p_operation === "insert" && p_table_name === "directory_sources") {
+        record = {
+          id:"source-admin-1",
+          accessed_at:"2026-11-03T08:00:00Z",
+          ...p_data
+        };
+        db.directory_sources.push(record);
+        recordId = record.id;
+      } else if (p_operation === "insert" && p_table_name === "directory_entity_sources") {
+        record = { ...p_data };
+        db.directory_entity_sources.push(record);
+      } else if (p_operation === "update") {
+        record = (db[p_table_name] || []).find(item => item.id === p_record_id);
+        if (!record) {
+          await route.fulfill({status:404,contentType:"application/json",body:JSON.stringify({message:"record not found"})});
+          return;
+        }
+        oldValues = Object.fromEntries(Object.keys(p_data).map(key => [key, record[key] ?? null]));
+        Object.assign(record, p_data);
+      } else {
+        await route.fulfill({status:400,contentType:"application/json",body:JSON.stringify({message:"unsupported test mutation"})});
+        return;
+      }
+
+      const audit = {
+        id:"change-" + (db.directory_change_log.length + 1),
+        created_at:new Date().toISOString(),
+        table_name:p_table_name,
+        record_id:recordId,
+        changed_by:"admin-user-1",
+        old_values:oldValues,
+        new_values:p_operation === "insert" ? record : { ...p_data },
+        reason:p_reason
+      };
+      db.directory_change_log.unshift(audit);
+      await route.fulfill({
+        status:200,
+        contentType:"application/json",
+        body:JSON.stringify({record,audit_id:audit.id})
+      });
       return;
     }
-    if (method === "POST" && table === "directory_entity_sources") {
-      db.directory_entity_sources.push(body);
-      await route.fulfill({status:201,contentType:"application/json",body:JSON.stringify([body])});
-      return;
-    }
-    if (method === "POST" && table === "directory_change_log") {
-      const row = {id:"change-" + (db.directory_change_log.length + 1),created_at:new Date().toISOString(),...body};
-      db.directory_change_log.unshift(row);
-      await route.fulfill({status:201,contentType:"application/json",body:JSON.stringify([row])});
-      return;
-    }
-    if (method === "PATCH") {
-      const id = url.searchParams.get("id")?.replace(/^eq\./, "");
-      const row = (db[table] || []).find(item => item.id === id);
-      if (!row) {
-        await route.fulfill({status:200,contentType:"application/json",body:"[]"});
+    await route.fulfill({status:200,contentType:"application/json",body:"[]"});
         return;
       }
       Object.assign(row, body);
