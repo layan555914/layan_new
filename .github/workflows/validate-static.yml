@@ -178,9 +178,12 @@ jobs:
       - name: Install Chromium for browser journey tests
         run: npx playwright install --with-deps chromium
 
-      - name: Run customer and admin browser journey against mocked Supabase
+      - name: Run customer and admin browser journey against mocked Supabase and hosted staging
         env:
           CI: "true"
+          STAGING_SUPABASE_URL: https://wisnmlbefdrkcbbqvdlg.supabase.co
+          # Public publishable key only; no service-role key or user credential.
+          STAGING_SUPABASE_PUBLISHABLE_KEY: sb_publishable_Witds4WbdcsSIgfCx1NcOA__lasXKhk
         run: npx playwright test
 
       - name: Verify live Supabase reads and anonymous permission boundaries
