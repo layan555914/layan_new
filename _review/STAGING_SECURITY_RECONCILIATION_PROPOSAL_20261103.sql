@@ -124,9 +124,7 @@ LANGUAGE plpgsql
 SET search_path TO ''
 AS $function$
 BEGIN
-  IF auth.uid() IS NULL OR NOT EXISTS (
-    SELECT 1 FROM private.layan_admins a WHERE a.user_id = auth.uid()
-  ) THEN
+  IF auth.uid() IS NULL OR NOT public.layan_is_admin() THEN
     RAISE EXCEPTION 'غير مصرح: يلزم حساب إدارة معتمد';
   END IF;
 
@@ -148,6 +146,62 @@ BEGIN
     'success', true,
     'ad_id', p_ad_id,
     'status', 'rejected'
+  );
+END;
+$function$;
+
+
+-- Also repair the existing free-trial admin RPC's direct read from the private
+-- allowlist. This is a discovered production defect: the current SECURITY INVOKER
+-- implementation directly SELECTs private.layan_admins, while authenticated has
+-- no SELECT grant and the table has RLS enabled with no policies. Use the verified
+-- admin predicate instead; this does not grant anyone admin membership.
+CREATE OR REPLACE FUNCTION public.layan_approve_free_trial_ad(p_ad_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SET search_path TO ''
+AS $function$
+DECLARE
+  v_ad public.supplier_ads%rowtype;
+BEGIN
+  IF auth.uid() IS NULL OR NOT public.layan_is_admin() THEN
+    RAISE EXCEPTION 'غير مصرح: يلزم حساب إدارة معتمد';
+  END IF;
+
+  SELECT * INTO v_ad
+  FROM public.supplier_ads
+  WHERE id = p_ad_id
+  FOR UPDATE;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'الإعلان غير موجود';
+  END IF;
+
+  IF v_ad.status <> 'pending' THEN
+    RAISE EXCEPTION 'لا يمكن اعتماد إعلان حالته ليست قيد المراجعة';
+  END IF;
+
+  IF v_ad.plan_code <> 'trial_30'
+     OR v_ad.requested_days <> 30
+     OR v_ad.requested_price <> 0 THEN
+    RAISE EXCEPTION 'هذه العملية مخصصة للتجربة المجانية فقط';
+  END IF;
+
+  UPDATE public.supplier_ads
+  SET status = 'active',
+      price = 0,
+      starts_at = now(),
+      ends_at = now() + interval '30 days',
+      free_trial_started_at = now(),
+      free_trial_ends_at = now() + interval '30 days',
+      updated_at = now()
+  WHERE id = p_ad_id;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'ad_id', p_ad_id,
+    'status', 'active',
+    'trial_days', 30
   );
 END;
 $function$;
