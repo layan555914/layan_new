@@ -98,7 +98,9 @@ cp "$MIGRATION_FILE" "$GENERATED_MIGRATION"
 sleep 1
 
 supabase migration new seed_asyut_aqar_marketplace_categories >/dev/null
-GENERATED_MARKETPLACE_SEED_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_seed_asyut_aqar_marketplace_categories.sql' -print -quit)"
+# Several historical migrations share this suffix; choose the newest CLI-created
+# path so the new seed never overwrites an older ledger marker.
+GENERATED_MARKETPLACE_SEED_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_seed_asyut_aqar_marketplace_categories.sql' -print | sort | tail -n 1)"
 if [[ -z "$GENERATED_MARKETPLACE_SEED_MIGRATION" ]]; then
   echo "Supabase CLI did not create the expected marketplace seed migration." >&2
   exit 1
