@@ -47,3 +47,11 @@ This snapshot reflects current production state, not the missing original 59 mig
 ## Safety boundary
 
 The baseline files remain on `review/directory-atomic-audit-20261103` under `_review/`. They are not active production migrations. No production DDL, role grants, policies, data, migration ledger, merge to `main`, or deployment was changed as part of this rehearsal. PR #42 remains a draft for review.
+
+
+## Secure data restore inventory
+
+Metadata-only inventory, with exact row counts and no row values or secrets exported:
+`_review/PRODUCTION_DATA_RESTORE_INVENTORY_20261103.md`.
+
+It records 3 Auth users, 2 admin allowlist entries, 12 Storage objects (11 photos + 1 private document), and zero rows in the current company/property/promotion/notification/VAPID-config datasets. It also lists the exact directory relationship counts and the safe ordering for a future migration. No data migration has been performed.
