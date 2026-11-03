@@ -54,6 +54,9 @@ jobs:
         run: |
           deno check --no-lock             supabase/functions/asyut-admin/index.ts             supabase/functions/asyut-push/index.ts
 
+      - name: Test synthetic-only data migration planner
+        run: node scripts/ci/validate-synthetic-data-migration.mjs --self-test
+
       - name: Validate pages, local assets, PWA shell and auth UI contracts
         run: |
           node --input-type=commonjs <<'NODE'
