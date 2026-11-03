@@ -15,20 +15,34 @@ A clean database is rebuilt by applying, in timestamp order:
 
 The Storage bootstrap remains separate at `../bootstrap/storage-baseline.sql` because Supabase manages Storage table ownership separately from application migrations.
 
-## Existing production adoption — proposal only
+## Existing production adoption — completed
 
-Production already has the first 59 versions applied and already contains the current schema and all 11 marketplace categories. After a fresh catalog fingerprint check and separate explicit approval, the intended ledger-only alignment is:
+**Completed 2026-11-03 17:35 Egypt time (UTC+02).**
 
-```bash
-supabase migration repair --status applied 20261103140155
-supabase migration repair --status applied 20261103140655
-supabase migration list
-supabase db push --dry-run
-```
+A fresh production preflight passed immediately before the metadata update:
+- All 15 application, privilege and Storage catalog fingerprints matched the reviewed production snapshot.
+- All 11 marketplace categories matched the category seed exactly (name, description, order and active flag).
+- Both target migration versions were absent from the ledger.
+- `directory_admin_mutate_with_audit(text,text,uuid,jsonb,text)` was still absent from production.
 
-The two `migration repair` commands only add migration-history records; they do not execute either SQL file. They must only be used after verifying the live production schema still matches the baseline and the 11 category values still match the seed. The dry run should then show only the directory-admin RPC migration as pending.
+The two missing history records were then inserted into `supabase_migrations.schema_migrations` only:
+- `20261103140155_asyut_aqar_production_schema_baseline`
+- `20261103140655_seed_asyut_aqar_marketplace_categories`
 
-**Do not run these commands against production without a separate user approval.** Do not run the baseline SQL against the populated production database. The original 59 SQL bodies remain unrecovered and are not represented by these placeholders.
+The write reproduced the Supabase CLI v2.84.2 `migration repair --status applied` metadata upsert semantics (version, name and parsed statement array). The CLI executable itself was not run because no linked CLI/database-password session was available; the database-side metadata-only operation was performed through the authorized Supabase SQL connection.
+
+**Neither migration's SQL was executed against production.** No table, policy, function, category row, user, file or application record was changed.
+
+Post-write verification:
+- Production migration ledger: 61 rows (59 historical + 2 metadata records).
+- Both new version/name pairs appear in `list_migrations`.
+- The directory-admin RPC migration `20261103141537` remains absent from the ledger.
+- The directory-admin RPC remains absent from production.
+- All 11 category rows remain present and unchanged.
+
+The repository contains 62 migration files; comparing those timestamps with the verified 61 production ledger entries leaves exactly one pending file: `20261103141537_directory_admin_mutate_with_audit.sql`. This is the expected pending migration. A literal `supabase db push --dry-run` was not run because this session has no linked Supabase CLI/password session; no push was attempted.
+
+**Do not apply the pending directory-admin RPC migration or deploy it without separate explicit approval.** The original 59 SQL bodies remain unrecovered and are not represented by the historical markers.
 
 ## Latest verification
 
@@ -38,4 +52,4 @@ A new empty local Supabase stack replayed all 62 successfully. Assertions verifi
 
 [CI #41660618571 — full success, 2026-11-03 15:09 UTC](https://github.com/layan555914/layan_new/actions/runs/41660618571)
 
-The production catalog was rechecked at 2026-11-03 15:05:44 UTC: all 15 fingerprints remained identical to the captured reference. The production ledger remains at 59 applied versions; no ledger repair or SQL write was made.
+The production catalog was rechecked immediately before the metadata-only ledger repair at 2026-11-03 15:35 UTC: all 15 fingerprints matched. The production ledger now contains 61 records after adding only the baseline and category-seed metadata; no migration SQL was run.
