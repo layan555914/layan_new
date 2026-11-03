@@ -169,8 +169,27 @@ BEGIN
   IF NOT has_schema_privilege('authenticated','private','USAGE') THEN
     RAISE EXCEPTION 'authenticated is missing private schema usage';
   END IF;
-  IF NOT has_table_privilege('authenticated','public.directory_change_log','INSERT') THEN
-    RAISE EXCEPTION 'authenticated is missing the directory audit insert grant';
+  IF NOT has_table_privilege('authenticated','public.directory_change_log','SELECT')
+     OR NOT has_table_privilege('authenticated','public.directory_change_log','INSERT') THEN
+    RAISE EXCEPTION 'authenticated must retain SELECT and INSERT on the directory audit log';
+  END IF;
+  IF has_table_privilege('authenticated','public.directory_change_log','UPDATE')
+     OR has_table_privilege('authenticated','public.directory_change_log','DELETE')
+     OR has_table_privilege('authenticated','public.directory_change_log','TRUNCATE')
+     OR has_table_privilege('authenticated','public.directory_change_log','REFERENCES')
+     OR has_table_privilege('authenticated','public.directory_change_log','TRIGGER') THEN
+    RAISE EXCEPTION 'authenticated must not mutate or truncate the directory audit log';
+  END IF;
+  IF has_table_privilege('anon','public.directory_change_log','SELECT')
+     OR has_table_privilege('anon','public.directory_change_log','INSERT') THEN
+    RAISE EXCEPTION 'anon must not access the directory audit log';
+  END IF;
+  IF NOT has_table_privilege('service_role','public.directory_change_log','SELECT')
+     OR NOT has_table_privilege('service_role','public.directory_change_log','INSERT')
+     OR NOT has_table_privilege('service_role','public.directory_change_log','UPDATE')
+     OR NOT has_table_privilege('service_role','public.directory_change_log','DELETE')
+     OR NOT has_table_privilege('service_role','public.directory_change_log','TRUNCATE') THEN
+    RAISE EXCEPTION 'service_role audit-log privileges changed unexpectedly';
   END IF;
   IF has_function_privilege('anon','public.layan_is_admin()','EXECUTE') THEN
     RAISE EXCEPTION 'anon must not execute public.layan_is_admin()';
@@ -337,7 +356,10 @@ BEGIN
     CROSS JOIN (VALUES ('anon'),('authenticated'),('service_role')) rn(name)
     JOIN pg_roles r ON r.rolname=rn.name
     CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(privilege)
+    -- The audit-log relation is excluded here because this change intentionally
+    -- tightens its authenticated grants; exact expected grants are asserted above.
     WHERE n.nspname IN ('public','private') AND c.relkind IN ('r','p','v','m')
+      AND c.relname <> 'directory_change_log'
   )
   SELECT md5(data::text) INTO v_actual FROM d;
   IF v_actual IS DISTINCT FROM '7bd719f0dccb0c722b466213ed8f18dd' THEN
