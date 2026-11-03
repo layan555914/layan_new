@@ -87,6 +87,41 @@ body{background:#f4f6f9;color:#182b42}
 <label>حالة المراجعة<select id="dirAdminStatusFilter"><option value="">كل الحالات</option><option value="draft">مسودة</option><option value="needs_review">قيد المراجعة</option><option value="verified">تم التحقق</option><option value="published">منشور</option><option value="archived">مؤرشف</option><option value="public">مصدر عام</option><option value="internal">مصدر داخلي</option></select></label>
 <label>المنطقة<select id="dirAdminAreaFilter"><option value="">كل مناطق أسيوط</option></select></label>
 </div>
+
+<section id="dirAdminProjectsPanel" hidden>
+<h3>إضافة مشروع جديد إلى الدليل</h3>
+<p>يُحفظ المشروع أولًا كمسودة مخفية عن الزوار. بعد الحفظ، اربط مصدرًا من بطاقة المشروع. النشر يحتاج مراجعة مسؤول ومصدرًا عامًا موثوقًا.</p>
+<form id="dirAdminProjectForm" class="dir-admin-source-form">
+<label>اسم المشروع بالعربية<input name="name_ar" required maxlength="220" placeholder="مثال: مشروع سكني في أسيوط الجديدة"></label>
+<label>اسم المشروع بالإنجليزية<input name="name_en" maxlength="220" placeholder="Project name"></label>
+<label>معرّف مختصر (اختياري)<input name="slug" maxlength="160" pattern="[A-Za-z0-9-]*" placeholder="new-assiut-project"></label>
+<label>نوع المشروع
+<select name="project_type" required>
+<option value="residential">سكني</option><option value="commercial">تجاري</option>
+<option value="administrative">إداري</option><option value="medical">طبي</option>
+<option value="educational">تعليمي</option><option value="mixed_use">متعدد الاستخدامات</option>
+<option value="land">أراضٍ</option><option value="service">خدمي</option><option value="other">أخرى</option>
+</select></label>
+<label>حالة المشروع
+<select name="project_status">
+<option value="unknown">غير معلومة</option><option value="announced">معلن</option>
+<option value="planned">مخطط</option><option value="under_construction">تحت الإنشاء</option>
+<option value="partially_delivered">تم تسليم جزء</option><option value="completed">مكتمل</option>
+<option value="operating">يعمل</option><option value="stalled">متوقف</option>
+</select></label>
+<label>منطقة المشروع
+<select id="dirProjectArea" name="area_id"><option value="">غير محدد</option></select>
+</label>
+<label class="wide">وصف الموقع<input name="location_text" maxlength="500" placeholder="الحي أو الشارع أو أقرب معلم"></label>
+<label>المساحة<input name="size_value" type="number" min="0" step="any" inputmode="decimal"></label>
+<label>وحدة المساحة<input name="size_unit" maxlength="40" placeholder="متر مربع / فدان"></label>
+<label>عدد الوحدات<input name="unit_count" type="number" min="0" step="1" inputmode="numeric"></label>
+<label class="wide">وصف المشروع<textarea name="description" maxlength="5000" placeholder="الوصف كما ورد في المصدر دون إضافة معلومات غير مؤكدة"></textarea></label>
+<label class="wide">سبب الإضافة / ملاحظة المراجعة<input name="reason" maxlength="240" placeholder="مثال: إدخال أولي من مصدر رسمي"></label>
+<button class="btn btn-gold" type="submit">حفظ المشروع كمسودة</button>
+</form>
+</section>
+
 <section id="dirAdminSourcesPanel" hidden>
 <h3>إضافة مصدر جديد إلى قاعدة المراجع</h3>
 <p>أضف رابطًا رسميًا أو مرجعًا موثوقًا، واحتفظ به داخليًا حتى يتم التحقق منه. لا تفعّل خيار المصدر العام إلا إذا كان الرابط منشورًا ويمكن للزوار الاطلاع عليه.</p>
