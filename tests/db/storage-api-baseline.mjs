@@ -31,6 +31,7 @@ let userB;
 let tokenA;
 let tokenB;
 const createdObjects = [];
+const createdMarketplaceListingIds = [];
 
 function headers(apiKey, accessToken, extra = {}) {
   return {
@@ -116,11 +117,136 @@ async function deleteUser(id) {
   });
 }
 
+
+async function restRequest(path, options = {}) {
+  const useServiceRole = options.serviceRole === true;
+  const apiKey = useServiceRole ? serviceRoleKey : anonKey;
+  const accessToken = useServiceRole ? serviceRoleKey : (options.token || anonKey);
+  const extraHeaders = {};
+  if (options.payload !== undefined) extraHeaders['content-type'] = 'application/json';
+  if (options.prefer) extraHeaders.Prefer = options.prefer;
+  const requestOptions = {
+    method: options.method || 'GET',
+    headers: headers(apiKey, accessToken, extraHeaders),
+  };
+  if (options.payload !== undefined) requestOptions.body = JSON.stringify(options.payload);
+  return request(path, requestOptions);
+}
+
+async function testMarketplaceSecurity() {
+  const listingPayload = {
+    owner_id: userA.id,
+    category: 'التنازلات العقارية',
+    title: 'إعلان اختبار أمني',
+    description: 'سجل اصطناعي لاختبار صلاحيات قاعدة البيانات المحلية فقط.',
+    contact_phone: '01000000000',
+  };
+
+  const created = await restRequest('/rest/v1/marketplace_listings', {
+    method: 'POST',
+    token: tokenA,
+    payload: listingPayload,
+    prefer: 'return=representation',
+  });
+  assert(
+    created.response.ok && Array.isArray(created.body) && created.body.length === 1 && created.body[0]?.id,
+    `Owner could not submit a valid pending marketplace listing (HTTP ${created.response.status}).`,
+  );
+
+  const listingId = created.body[0].id;
+  createdMarketplaceListingIds.push(listingId);
+
+  const ownerRead = await restRequest(
+    `/rest/v1/marketplace_listings?select=id,status,is_featured,admin_notes,reviewed_at,reviewed_by&id=eq.${encodeURIComponent(listingId)}`,
+    { token: tokenA },
+  );
+  assert(ownerRead.response.ok && ownerRead.body?.length === 1, 'Owner could not read their own pending marketplace listing.');
+  assert(
+    ownerRead.body[0].status === 'pending' && ownerRead.body[0].is_featured === false,
+    'A normal owner listing must remain pending and not featured.',
+  );
+
+  const otherOwnerRead = await restRequest(
+    `/rest/v1/marketplace_listings?select=id&id=eq.${encodeURIComponent(listingId)}`,
+    { token: tokenB },
+  );
+  assert(otherOwnerRead.response.ok && Array.isArray(otherOwnerRead.body) && otherOwnerRead.body.length === 0,
+    'A different authenticated user read a pending marketplace listing.');
+
+  const anonymousRead = await restRequest(
+    `/rest/v1/marketplace_listings?select=id&id=eq.${encodeURIComponent(listingId)}`,
+    { token: anonKey },
+  );
+  assert(anonymousRead.response.ok && Array.isArray(anonymousRead.body) && anonymousRead.body.length === 0,
+    'An anonymous visitor read a pending marketplace listing.');
+
+  const forgedFeaturedInsert = await restRequest('/rest/v1/marketplace_listings', {
+    method: 'POST',
+    token: tokenA,
+    payload: { ...listingPayload, title: 'إعلان مميز مزور', is_featured: true },
+    prefer: 'return=representation',
+  });
+  assert(!forgedFeaturedInsert.response.ok,
+    'Owner inserted a marketplace listing with the admin-controlled is_featured flag.');
+
+  const forgedApproval = await restRequest(
+    `/rest/v1/marketplace_listings?id=eq.${encodeURIComponent(listingId)}`,
+    { method: 'PATCH', token: tokenA, payload: { status: 'approved' }, prefer: 'return=representation' },
+  );
+  assert(!forgedApproval.response.ok, 'Owner approved their own pending marketplace listing.');
+
+  const forgedPromotion = await restRequest(
+    `/rest/v1/marketplace_listings?id=eq.${encodeURIComponent(listingId)}`,
+    { method: 'PATCH', token: tokenA, payload: { is_featured: true }, prefer: 'return=representation' },
+  );
+  assert(!forgedPromotion.response.ok, 'Owner marked their own marketplace listing as featured.');
+
+  const finalOwnerRead = await restRequest(
+    `/rest/v1/marketplace_listings?select=id,status,is_featured&id=eq.${encodeURIComponent(listingId)}`,
+    { token: tokenA },
+  );
+  assert(
+    finalOwnerRead.response.ok && finalOwnerRead.body?.length === 1
+      && finalOwnerRead.body[0].status === 'pending'
+      && finalOwnerRead.body[0].is_featured === false,
+    'A denied owner privilege escalation changed the marketplace listing.',
+  );
+
+  // These calls must fail for the non-admin test users; the test never creates an admin.
+  const rpcCases = [
+    ['layan_activate_supplier_ad', { p_ad_id: randomUUID(), p_days: 30, p_price: 0 }],
+    ['layan_reject_supplier_ad', { p_ad_id: randomUUID(), p_reason: 'سبب اختبار غير إداري' }],
+    ['layan_approve_free_trial_ad', { p_ad_id: randomUUID() }],
+  ];
+  for (const [rpcName, payload] of rpcCases) {
+    const result = await restRequest(`/rest/v1/rpc/${rpcName}`, {
+      method: 'POST',
+      token: tokenA,
+      payload,
+    });
+    assert(!result.response.ok, `Non-admin user successfully invoked ${rpcName}.`);
+  }
+
+  // Anonymous callers must not have EXECUTE on admin RPC endpoints.
+  for (const [rpcName, payload] of rpcCases) {
+    const result = await restRequest(`/rest/v1/rpc/${rpcName}`, {
+      method: 'POST',
+      token: anonKey,
+      payload,
+    });
+    assert(!result.response.ok, `Anonymous caller successfully invoked ${rpcName}.`);
+  }
+
+  console.log('PASS: marketplace owner isolation, anonymous pending-read denial, admin-field escalation denial, self-approval denial, and non-admin/anonymous supplier RPC denial.');
+}
+
 async function main() {
   userA = await createUser(emailA);
   userB = await createUser(emailB);
   tokenA = await signIn(emailA);
   tokenB = await signIn(emailB);
+
+  await testMarketplaceSecurity();
 
   const photoA = `offers/${userA.id}/offer.jpg`;
   const docA = `documents/${userA.id}/contract.pdf`;
@@ -170,6 +296,19 @@ async function main() {
 try {
   await main();
 } finally {
+  // Best-effort cleanup inside the disposable local project; service_role is local-only.
+  for (const id of createdMarketplaceListingIds.reverse()) {
+    try {
+      await restRequest(`/rest/v1/marketplace_listings?id=eq.${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        serviceRole: true,
+        prefer: 'return=minimal',
+      });
+    } catch {
+      // The local Supabase stack is disposable and is stopped by the caller's EXIT trap.
+    }
+  }
+
   // Best-effort cleanup through the Storage API before deleting temporary Auth users.
   for (const object of createdObjects.reverse()) {
     try {
