@@ -117,7 +117,7 @@ BEGIN
           USING ERRCODE = '22023';
     END CASE;
 
-    IF p_table_name <> 'directory_sources'
+    IF p_table_name IN ('directory_entity_sources', 'directory_project_sources', 'directory_opportunity_sources')
        AND (p_record_id IS NULL OR v_expected_owner_id IS DISTINCT FROM p_record_id) THEN
       RAISE EXCEPTION 'معرّف السجل المرتبط بالمصدر غير مطابق.'
         USING ERRCODE = '22023';
