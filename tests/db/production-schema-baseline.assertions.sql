@@ -221,7 +221,6 @@ DO $storage_owner_test$
 DECLARE
   v_count integer;
   v_blocked boolean := false;
-  v_deleted integer;
 BEGIN
   SELECT count(*) INTO v_count
   FROM storage.objects
@@ -246,26 +245,35 @@ BEGIN
     RAISE EXCEPTION 'Owner uploaded into another user folder';
   END IF;
 
-  DELETE FROM storage.objects
-  WHERE bucket_id='layan-property-documents'
-    AND name='documents/00000000-0000-0000-0000-000000000499/other.pdf';
-  GET DIAGNOSTICS v_deleted = ROW_COUNT;
-
-  IF v_deleted <> 0 THEN
-    RAISE EXCEPTION 'Owner deleted another user document';
-  END IF;
-
-  DELETE FROM storage.objects
-  WHERE bucket_id='layan-property-documents'
-    AND name='documents/00000000-0000-0000-0000-000000000401/own.pdf';
-  GET DIAGNOSTICS v_deleted = ROW_COUNT;
-
-  IF v_deleted <> 1 THEN
-    RAISE EXCEPTION 'Owner could not delete their own document';
-  END IF;
 END;
 $storage_owner_test$;
 RESET ROLE;
+
+-- The Storage protect_delete() trigger intentionally rejects direct SQL DELETE.
+-- Verify the owner-only DELETE policy is installed; real deletion must go through the Storage API.
+DO $storage_delete_policy_test$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname='storage' AND tablename='objects'
+      AND policyname='Owners delete own LAYAN offer photos'
+      AND cmd='DELETE' AND 'authenticated'=ANY(roles)
+      AND qual LIKE '%auth.uid%' AND qual LIKE '%offers%'
+  ) THEN
+    RAISE EXCEPTION 'Owner-only offer-photo DELETE policy is missing or not owner-scoped';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname='storage' AND tablename='objects'
+      AND policyname='Owners delete own LAYAN property documents'
+      AND cmd='DELETE' AND 'authenticated'=ANY(roles)
+      AND qual LIKE '%auth.uid%' AND qual LIKE '%documents%'
+  ) THEN
+    RAISE EXCEPTION 'Owner-only property-document DELETE policy is missing or not owner-scoped';
+  END IF;
+END;
+$storage_delete_policy_test$;
 
 -- Public access is limited to matching JPEG paths; private documents stay hidden.
 SET LOCAL ROLE anon;
