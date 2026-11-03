@@ -153,3 +153,14 @@ Post-change checks:
 - No SQL from the two repaired migration files was executed; no application data, users, files, schema objects or policies were changed.
 
 The repository has 62 migration files, so the only file not yet represented in the production ledger is `20261103141537_directory_admin_mutate_with_audit.sql`. A literal `supabase db push --dry-run` was not available in this session; the pending state was derived from the verified repository file list and the production migration ledger. No push, merge or deployment was performed.
+
+
+## Final readiness check — directory admin RPC (2026-11-03)
+
+CI run [#41666562897](https://github.com/layan555914/layan_new/actions/runs/41666562897) completed successfully for both the full disposable Supabase baseline rehearsal and platform validation.
+
+A new staging transaction test invoked the already-installed RPC as an authenticated staging admin, updated only the synthetic directory entity, and returned a valid audit ID. The transaction was rolled back. Post-rollback checks showed: zero audit rows, zero temporary admin memberships, original synthetic entity description restored, and the same single pre-existing staging Auth user.
+
+Staging catalog still reports SECURITY INVOKER, empty search_path, no anon EXECUTE, and authenticated/service_role EXECUTE. The production read-only preflight confirmed all RPC dependency tables and `layan_is_admin()` exist, authenticated table grants and audit INSERT are in place, and RLS is enabled on all affected tables. The RPC itself remains absent in production.
+
+**Status: ready for a separately approved production DDL migration only.** No production RPC SQL has been executed; no merge, frontend deployment, or additional production migration was performed.
