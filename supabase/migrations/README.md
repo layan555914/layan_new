@@ -53,3 +53,18 @@ A new empty local Supabase stack replayed all 62 successfully. Assertions verifi
 [CI #41660618571 — full success, 2026-11-03 15:09 UTC](https://github.com/layan555914/layan_new/actions/runs/41660618571)
 
 The production catalog was rechecked immediately before the metadata-only ledger repair at 2026-11-03 15:35 UTC: all 15 fingerprints matched. The production ledger now contains 61 records after adding only the baseline and category-seed metadata; no migration SQL was run.
+
+## Final readiness check — directory administration RPC (2026-11-03)
+
+The latest full CI run after the ledger alignment and documentation update passed:
+[CI #41666562897 — full success](https://github.com/layan555914/layan_new/actions/runs/41666562897)
+
+The staging RPC received an additional transactional smoke test using its existing synthetic directory entity and the existing staging Auth identity:
+- The authenticated admin-only update returned the changed synthetic record and an audit ID.
+- The entire transaction was rolled back.
+- Follow-up verification showed zero audit rows, zero temporary admin memberships, the original synthetic description, and the same single pre-existing staging Auth user.
+- Staging RPC remains SECURITY INVOKER with empty search_path; anon EXECUTE=false, authenticated/service_role EXECUTE=true.
+
+A production read-only preflight confirms every RPC dependency exists: directory entity/project/area/opportunity/source tables, source-link tables, audit table, `layan_is_admin()`, required authenticated table grants, audit INSERT grant, and RLS enabled on all eight affected tables. The RPC itself is still absent.
+
+**Ready for one separately approved production DDL step:** apply only `20261103141537_directory_admin_mutate_with_audit.sql`. This changes the production schema and migration ledger. It has not been applied. Do not merge PR #42, deploy the frontend, or run any other migration as part of this step without separate approval.
