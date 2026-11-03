@@ -164,3 +164,21 @@ A new staging transaction test invoked the already-installed RPC as an authentic
 Staging catalog still reports SECURITY INVOKER, empty search_path, no anon EXECUTE, and authenticated/service_role EXECUTE. The production read-only preflight confirmed all RPC dependency tables and `layan_is_admin()` exist, authenticated table grants and audit INSERT are in place, and RLS is enabled on all affected tables. The RPC itself remains absent in production.
 
 **Status: ready for a separately approved production DDL migration only.** No production RPC SQL has been executed; no merge, frontend deployment, or additional production migration was performed.
+
+
+## Production RPC application — verified (2026-11-03)
+
+The user explicitly approved applying only `20261103141537_directory_admin_mutate_with_audit.sql`. The exact reviewed migration blob SHA was `09b5f17009d1dfd8aefbd52f473dfcb6c2f93b39`. It was applied transactionally with production preconditions and postconditions.
+
+Production verification now confirms:
+- The production migration ledger contains 62 entries and the exact RPC migration name/version.
+- The RPC exists and is SECURITY INVOKER (`prosecdef=false`).
+- Function `search_path` is explicitly empty.
+- EXECUTE: anon=false, PUBLIC=false, authenticated=true, service_role=true.
+- The 11 marketplace category rows remain present.
+- The directory audit log contains zero test rows; the two pre-existing production admin memberships were not changed.
+- The RPC was not invoked as a live production administrator. The staging admin transaction test was successful and fully rolled back.
+
+Supabase advisor results after the change: four INFO RLS-enabled/no-policy findings (deny-by-default server/private tables), one WARN for disabled leaked-password protection, 14 unused-index INFO findings, and one multiple-permissive-policy WARN for company_profiles SELECT. None were altered during this migration.
+
+The CI run triggered by the documentation update is still running at the time of this addendum. PR #42 remains Draft/open/unmerged; no frontend deploy or merge was performed.
