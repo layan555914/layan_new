@@ -5,6 +5,7 @@
 This repository now carries a **squashed current-state schema baseline** captured from the ASYUT AQAR production catalog on 2026-11-03:
 
 - `migrations/20261103140155_asyut_aqar_production_schema_baseline.sql` — application-owned tables, constraints, indexes, functions, views, triggers, RLS and grants.
+- `migrations/20261103140655_seed_asyut_aqar_marketplace_categories.sql` — 11 stable, public marketplace reference categories.
 - `migrations/20261103141537_directory_admin_mutate_with_audit.sql` — incremental directory administration RPC. It uses `SECURITY INVOKER`, a strict table/column allowlist, checks `auth.uid()` and `public.layan_is_admin()`, and writes the change log in the same transaction.
 - `bootstrap/storage-baseline.sql` — separate local-only bootstrap for Supabase-managed Storage grants, the two application buckets and six application Storage object policies. It is not an application migration because the managed Storage objects have a separate owner and must be applied with the Storage-owner/superuser context in the isolated CI rehearsal.
 - `../tests/db/production-schema-baseline.assertions.sql` — catalog, grant, RLS, directory-publication, and Storage policy assertions.
@@ -14,9 +15,9 @@ The application baseline contains schema only. It does **not** contain productio
 
 ## Important history limitation
 
-The original 59 production migration SQL files were not recovered from Git. Supabase's production migration ledger provided version/name metadata, but that is not the original SQL source. The baseline above is a catalog-derived snapshot of the current schema, not a reconstruction of the exact historical 59-step sequence.
+The original SQL bodies for the 59 production migrations were not recovered from Git. Their exact version/name metadata was recovered from Supabase. The 59 corresponding files in this directory are explicitly labelled **comment-only ledger markers**; they contain no historical SQL and must not be mistaken for reconstructed migrations.
 
-Do not invent old migration files, rewrite `supabase_migrations.schema_migrations`, or run `supabase migration repair` as a shortcut. A fresh local database can be rebuilt from the canonical baseline, but that does not reconcile the already-populated production database's historical ledger.
+A clean local database replays those 59 no-op markers, then the current-state baseline, the 11-row public marketplace reference seed, and the directory RPC. This preserves CLI version matching without inventing historical SQL.
 
 ## Local setup and verification
 
@@ -57,6 +58,13 @@ Do not place Storage-managed owner operations in an ordinary application migrati
 
 ## Production safety
 
-**Do not run `supabase link`, `supabase db push --linked`, `supabase db reset --linked`, or `supabase migration repair` against the existing production project as part of this baseline work.** The current-state baseline would collide with already-existing objects if pushed to the populated project, and its timestamp does not stand in for the original 59 historical migration entries.
+**No production command has been run.** The proposed adoption, after a fresh fingerprint check and separate approval, is to mark the current-state baseline and the already-existing 11-category seed as applied in the production migration ledger (without executing either SQL file), then preview the remaining directory RPC migration:
 
-Any production ledger reconciliation, baseline adoption, or deployment requires a separate change plan, an independently verified backup/restore path, a reviewed dry run, and a new explicit user approval. The review PR stays Draft until that work is completed and reviewed.
+```bash
+supabase migration repair --status applied 20261103140155
+supabase migration repair --status applied 20261103140655
+supabase migration list
+supabase db push --dry-run
+```
+
+The repair commands modify only `supabase_migrations.schema_migrations`; they do not execute SQL. The exact 59 old version markers remain matched to their existing remote entries. The dry run should show only `directory_admin_mutate_with_audit` as pending. Actual repair or push requires a separate explicit user approval, fresh backup/restore validation, and confirmation that the production catalog and category values still match this captured baseline. Never run the baseline SQL against the populated production database. The review PR stays Draft.

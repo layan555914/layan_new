@@ -8,6 +8,78 @@ DO $catalog_assertions$
 DECLARE
   v_count integer;
 BEGIN
+  SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
+  IF v_count <> 62 THEN
+    RAISE EXCEPTION 'Expected 62 local migration ledger rows (59 historical markers + baseline + seed + RPC); found %', v_count;
+  END IF;
+
+  SELECT count(*) INTO v_count
+  FROM supabase_migrations.schema_migrations
+  WHERE version IN (
+    '20261025191213',
+    '20261025193501',
+    '20261025193613',
+    '20261025202223',
+    '20261025205042',
+    '20261025210106',
+    '20261025210305',
+    '20261026065223',
+    '20261026191159',
+    '20261027093734',
+    '20261027131047',
+    '20261027142311',
+    '20261027142412',
+    '20261027142717',
+    '20261027142729',
+    '20261027143024',
+    '20261027144249',
+    '20261028174607',
+    '20261029123626',
+    '20261029124034',
+    '20261029182442',
+    '20261030192609',
+    '20261030192718',
+    '20261030193054',
+    '20261030193123',
+    '20261030193157',
+    '20261030194725',
+    '20261030210935',
+    '20261030211003',
+    '20261030220045',
+    '20261031081655',
+    '20261031081658',
+    '20261031081701',
+    '20261031081754',
+    '20261031104640',
+    '20261031132027',
+    '20261031132151',
+    '20261031183034',
+    '20261101170447',
+    '20261101172141',
+    '20261101210205',
+    '20261101220335',
+    '20261101220830',
+    '20261101221638',
+    '20261101222604',
+    '20261101222624',
+    '20261101223114',
+    '20261101223300',
+    '20261102040339',
+    '20261102040527',
+    '20261102040606',
+    '20261102175232',
+    '20261102175438',
+    '20261102175617',
+    '20261102175735',
+    '20261102180129',
+    '20261102180205',
+    '20261102180326',
+    '20261102180739'
+  );
+  IF v_count <> 59 THEN
+    RAISE EXCEPTION 'Expected all 59 production migration version markers in the local replay; found %', v_count;
+  END IF;
+
   SELECT count(*) INTO v_count
   FROM pg_class c
   JOIN pg_namespace n ON n.oid=c.relnamespace
@@ -363,6 +435,43 @@ BEGIN
   END IF;
 END;
 $production_fingerprint_assertions$;
+
+-- The stable marketplace category reference rows are part of the reproducible baseline.
+DO $marketplace_seed_assertions$
+DECLARE
+  v_count integer;
+BEGIN
+  SELECT count(*) INTO v_count FROM public.marketplace_categories;
+  IF v_count <> 11 THEN
+    RAISE EXCEPTION 'Expected 11 stable marketplace categories; found %',v_count;
+  END IF;
+
+  SELECT count(*) INTO v_count
+  FROM (VALUES
+    ('سوق العقارات','بيع وشراء الشقق والفلل والمحلات والمكاتب والعيادات والمخازن',1),
+    ('التنازلات العقارية','المقدم والمدفوع والمتبقي والأقساط ورسوم التنازل',2),
+    ('أراضي للبيع','أراضٍ سكنية وتجارية وزراعية',3),
+    ('أراضي التنازلات','تخصيصات وعقود أراضٍ وشروطها',4),
+    ('إيجار يومي ومفروش','إقامة يومية وأسبوعية وشهرية ووحدات مفروشة',5),
+    ('الشركات والمكاتب العقارية','دليل المكاتب والوسطاء والمسوقين',6),
+    ('مواد البناء والتشطيب','مواد البناء والسيراميك والدهانات والتشطيب',7),
+    ('الأثاث والفرش وتجهيز الوحدات','أثاث ومفروشات وتجهيزات المنازل',8),
+    ('المشروعات والمطورون العقاريون','المشروعات السكنية والتجارية والمطورون',9),
+    ('الصيانة وإدارة العقارات','الصيانة والتشغيل وإدارة الوحدات',10),
+    ('الاستشارات والخدمات العقارية','استشارات ومعاينات وتصوير وخدمات قانونية عقارية',11)
+  ) AS expected(name,description,display_order)
+  LEFT JOIN public.marketplace_categories actual
+    ON actual.name=expected.name
+   AND actual.description=expected.description
+   AND actual.display_order=expected.display_order
+   AND actual.is_active=true
+  WHERE actual.name IS NULL;
+
+  IF v_count <> 0 THEN
+    RAISE EXCEPTION 'Marketplace category seed values differ from the production reference catalog: % mismatches',v_count;
+  END IF;
+END;
+$marketplace_seed_assertions$;
 
 -- Directory publication must fail without a public source and succeed once linked.
 INSERT INTO public.directory_areas

@@ -3,6 +3,7 @@ set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103140155_asyut_aqar_production_schema_baseline.sql"
+MARKETPLACE_SEED_MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103140655_seed_asyut_aqar_marketplace_categories.sql"
 DIRECTORY_ADMIN_MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103141537_directory_admin_mutate_with_audit.sql"
 CONFIG_FILE="$ROOT_DIR/supabase/config.toml"
 STORAGE_BASELINE_FILE="$ROOT_DIR/supabase/bootstrap/storage-baseline.sql"
@@ -18,7 +19,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for required_file in "$MIGRATION_FILE" "$DIRECTORY_ADMIN_MIGRATION_FILE" "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE"; do
+for required_file in "$MIGRATION_FILE" "$MARKETPLACE_SEED_MIGRATION_FILE" "$DIRECTORY_ADMIN_MIGRATION_FILE" "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required rehearsal file is missing or empty: $required_file" >&2
     exit 1
@@ -61,8 +62,20 @@ path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 PY
 
 mkdir -p "$TEST_DIR/supabase/migrations"
-# Ask the pinned Supabase CLI to create the timestamped migration path, then
-# populate that path with the reviewed, catalog-derived production baseline.
+
+# Copy the 59 comment-only historical ledger markers first. They preserve the
+# production migration version keys but contain no guessed historical SQL.
+for history_file in "$ROOT_DIR"/supabase/migrations/*.sql; do
+  if [[ "$history_file" == "$MIGRATION_FILE" \
+     || "$history_file" == "$MARKETPLACE_SEED_MIGRATION_FILE" \
+     || "$history_file" == "$DIRECTORY_ADMIN_MIGRATION_FILE" ]]; then
+    continue
+  fi
+  cp "$history_file" "$TEST_DIR/supabase/migrations/"
+done
+
+# Ask the pinned Supabase CLI to create timestamped migration paths, then
+# populate them with the reviewed current-state baseline and incremental SQL.
 supabase migration new asyut_aqar_production_schema_baseline >/dev/null
 GENERATED_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_asyut_aqar_production_schema_baseline.sql' -print -quit)"
 if [[ -z "$GENERATED_MIGRATION" ]]; then
@@ -70,11 +83,20 @@ if [[ -z "$GENERATED_MIGRATION" ]]; then
   exit 1
 fi
 cp "$MIGRATION_FILE" "$GENERATED_MIGRATION"
-# Keep the generated CLI migration timestamps strictly ordered.
+# Keep generated CLI migration timestamps strictly ordered.
+sleep 1
+
+supabase migration new seed_asyut_aqar_marketplace_categories >/dev/null
+GENERATED_MARKETPLACE_SEED_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_seed_asyut_aqar_marketplace_categories.sql' -print -quit)"
+if [[ -z "$GENERATED_MARKETPLACE_SEED_MIGRATION" ]]; then
+  echo "Supabase CLI did not create the expected marketplace seed migration." >&2
+  exit 1
+fi
+cp "$MARKETPLACE_SEED_MIGRATION_FILE" "$GENERATED_MARKETPLACE_SEED_MIGRATION"
 sleep 1
 
 # The directory administration RPC is a distinct incremental migration and
-# must follow the catalog-derived application baseline in replay order.
+# must follow the baseline and stable marketplace seed in replay order.
 supabase migration new directory_admin_mutate_with_audit >/dev/null
 GENERATED_DIRECTORY_ADMIN_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_directory_admin_mutate_with_audit.sql' -print -quit)"
 if [[ -z "$GENERATED_DIRECTORY_ADMIN_MIGRATION" ]]; then

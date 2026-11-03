@@ -148,3 +148,33 @@ The only non-test invocation accepted by the CLI is a dry-run explicitly targete
 
 **Important:** this is a migration planning/validation rehearsal, not a production data migration tool. It proves fixture dependency and validation logic only. It has not copied actual Auth users, application rows, secrets, or Storage bytes, and it does not establish that a persistent staging destination exists. The production database remains unchanged.
 
+
+## 9. Migration history adoption proposal — no production action performed
+
+The production ledger currently contains 59 historical version/name rows. Their original SQL bodies were not recovered. The repository now preserves those 59 exact version/name keys as comment-only migration markers; do not describe them as restored historical SQL.
+
+The new clean-database chain is:
+1. 59 no-op historical ledger markers.
+2. Current-state application schema baseline `20261103140155_asyut_aqar_production_schema_baseline.sql`.
+3. Public marketplace category seed `20261103140655_seed_asyut_aqar_marketplace_categories.sql` (11 rows, exact names/descriptions/display order/active values captured from production, `ON CONFLICT(name) DO NOTHING`).
+4. Incremental directory RPC `20261103141537_directory_admin_mutate_with_audit.sql`.
+
+Because production already has the first 59 versions, already matches the schema baseline fingerprints, and already has the 11 category rows, the **proposed** production ledger-only adoption after fresh verification and explicit approval is:
+
+```bash
+supabase migration repair --status applied 20261103140155
+supabase migration repair --status applied 20261103140655
+supabase migration list
+supabase db push --dry-run
+```
+
+The two repair calls insert version records only; they do not execute the baseline or category seed SQL. The old 59 version records remain in place and match the local marker filenames. The dry run should then show only the directory-admin RPC migration pending. Applying the RPC still requires separate explicit approval.
+
+Before either repair command:
+- Confirm the production ledger still lists exactly the same 59 versions.
+- Re-run the production catalog fingerprint capture and compare with `_review/PRODUCTION_SCHEMA_CATALOG_FINGERPRINTS_20261103.md`.
+- Confirm the 11 marketplace category values still match the seed.
+- Verify a recoverable database backup and a rollback/restore path.
+- Review the exact PR diff and CI run.
+
+**No `migration repair`, `db push`, `db pull`, linked reset, production DDL, production data write, or deployment has been performed.** The PR remains Draft.

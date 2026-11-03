@@ -1,0 +1,9 @@
+-- HISTORICAL MIGRATION LEDGER MARKER ONLY — NOT ORIGINAL SQL.
+-- Production ledger version: 20261101223114
+-- Production ledger name: lock_push_subscriptions_to_edge_function
+-- The original SQL body for this migration was not recovered from available Git history.
+-- This file is intentionally a no-op marker to preserve the production version/name key.
+-- A clean database is constructed by the current-state baseline migration
+-- 20261103140155_asyut_aqar_production_schema_baseline.sql, followed by the
+-- explicit reference-data seed and later incremental migrations.
+-- Do not treat this marker as a reconstruction of the historical change.
