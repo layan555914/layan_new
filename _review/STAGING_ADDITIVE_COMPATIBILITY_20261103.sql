@@ -15,12 +15,6 @@ GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 
 GRANT USAGE ON SCHEMA private TO authenticated;
 
-CREATE SCHEMA IF NOT EXISTS private;
-
-GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
-
-GRANT USAGE ON SCHEMA private TO authenticated;
-
 -- 2. Create only application tables absent from the approved test project.
 -- The existing public.marketplace_listings table is intentionally not recreated.
 CREATE TABLE IF NOT EXISTS "private"."layan_admins" (
@@ -2839,6 +2833,12 @@ GRANT DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "pu
 GRANT DELETE, INSERT, SELECT ON TABLE "public"."user_favorite_offers" TO "authenticated";
 
 GRANT DELETE, INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE "public"."user_favorite_offers" TO "service_role";
+
+REVOKE ALL PRIVILEGES ON SEQUENCE "private"."project_decisions_id_seq" FROM anon, authenticated, service_role;
+
+REVOKE ALL PRIVILEGES ON SEQUENCE "public"."promotion_payments_id_seq" FROM anon, authenticated, service_role;
+
+REVOKE ALL PRIVILEGES ON SEQUENCE "public"."property_offers_id_seq" FROM anon, authenticated, service_role;
 
 GRANT SELECT, UPDATE, USAGE ON SEQUENCE public.property_offers_id_seq TO anon, authenticated, service_role;
 
