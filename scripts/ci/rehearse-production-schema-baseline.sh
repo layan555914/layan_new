@@ -106,4 +106,21 @@ unset DB_PASSWORD
 pg_isready --dbname "$DB_URL"
 psql "$DB_URL" -X -v ON_ERROR_STOP=1 -f "$ASSERTIONS_FILE"
 
-echo "PASS: full Supabase CLI baseline rehearsal, catalog assertions, directory RLS and Storage RLS."
+# Exercise Storage owner policies through the Storage HTTP API, never by deleting
+# rows directly from storage.objects (Supabase protects that table from SQL DELETE).
+status_value() {
+  local key="$1"
+  printf '%s\\n' "$STATUS_ENV" | sed -n "s/^${key}=//p" | head -n 1 | sed 's/^"//; s/"$//'
+}
+API_URL="$(status_value API_URL)"
+ANON_KEY="$(status_value ANON_KEY)"
+SERVICE_ROLE_KEY="$(status_value SERVICE_ROLE_KEY)"
+if [[ -z "$API_URL" || -z "$ANON_KEY" || -z "$SERVICE_ROLE_KEY" ]]; then
+  echo "Supabase CLI status is missing local API_URL/ANON_KEY/SERVICE_ROLE_KEY." >&2
+  exit 1
+fi
+export API_URL ANON_KEY SERVICE_ROLE_KEY
+node "$ROOT_DIR/tests/db/storage-api-baseline.mjs"
+unset SERVICE_ROLE_KEY ANON_KEY
+
+echo "PASS: full Supabase CLI baseline rehearsal, catalog assertions, directory RLS and Storage API RLS."
