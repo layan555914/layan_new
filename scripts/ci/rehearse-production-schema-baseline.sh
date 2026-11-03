@@ -70,6 +70,8 @@ if [[ -z "$GENERATED_MIGRATION" ]]; then
   exit 1
 fi
 cp "$MIGRATION_FILE" "$GENERATED_MIGRATION"
+# Keep the generated CLI migration timestamps strictly ordered.
+sleep 1
 
 # The directory administration RPC is a distinct incremental migration and
 # must follow the catalog-derived application baseline in replay order.
