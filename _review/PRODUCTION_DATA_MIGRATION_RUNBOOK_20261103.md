@@ -126,3 +126,25 @@ This CI rehearsal is schema/security verification only. It does **not** connect 
 - Real Auth/table/Storage data transfer: not performed and remains blocked pending a suitable persistent isolated destination.
 - Production: read-only; no schema, grants, policies, users, rows, Storage objects, secrets, or migration history changed.
 
+## 8. Synthetic-only migration planner (implemented)
+
+Added `scripts/ci/validate-synthetic-data-migration.mjs` and wired it into `.github/workflows/validate-static.yml`.
+
+The planner:
+- Contains an embedded, clearly marked synthetic fixture only; it does not read production exports or accept arbitrary input files.
+- Uses a reviewed table allowlist and checks primary-key presence/uniqueness, foreign-key completeness, table dependency order, and parent-before-child ordering for self-referencing areas.
+- Preserves source IDs in the plan; it does not generate replacement IDs.
+- Rejects secret-like fields and blocks `public.buyer_push_subscriptions` and `public.buyer_push_vapid_config`.
+- Represents two synthetic Storage objects as metadata only, validates owner-scoped paths and bucket allowlists, and records Storage API as the only permitted transport.
+- Has explicit negative tests for orphan references, duplicate primary keys, sensitive values, blocked push tables, SQL-based Storage transfer, production target selection, missing non-production confirmation, and attempted execute mode.
+
+Run locally/CI with:
+
+```bash
+node scripts/ci/validate-synthetic-data-migration.mjs --self-test
+```
+
+The only non-test invocation accepted by the CLI is a dry-run explicitly targeted at `synthetic-fixture` with `--confirm-non-production`. Any `--execute` request is rejected. The planner has no Supabase SDK, SQL driver, HTTP client, or database-write implementation.
+
+**Important:** this is a migration planning/validation rehearsal, not a production data migration tool. It proves fixture dependency and validation logic only. It has not copied actual Auth users, application rows, secrets, or Storage bytes, and it does not establish that a persistent staging destination exists. The production database remains unchanged.
+
