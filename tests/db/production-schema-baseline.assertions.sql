@@ -362,7 +362,7 @@ BEGIN
       AND c.relname <> 'directory_change_log'
   )
   SELECT md5(data::text) INTO v_actual FROM d;
-  IF v_actual IS DISTINCT FROM '7bd719f0dccb0c722b466213ed8f18dd' THEN
+  IF v_actual IS DISTINCT FROM 'd8e7f103f8811a0c70060e0a189af89b' THEN
     RAISE EXCEPTION 'Production table/view privilege fingerprint mismatch: %',v_actual;
   END IF;
 
