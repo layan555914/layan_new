@@ -172,7 +172,7 @@ BEGIN
     WHERE n.nspname IN ('public','private')
   )
   SELECT md5(data::text) INTO v_actual FROM d;
-  IF v_actual IS DISTINCT FROM '2daf1ac56bf3e3bf8b9fd0c1d53ec5f4' THEN
+  IF v_actual IS DISTINCT FROM '9e3514cdf8501484958912b30cd50195' THEN
     RAISE EXCEPTION 'Production constraint fingerprint mismatch: %',v_actual;
   END IF;
 
@@ -240,7 +240,7 @@ BEGIN
     FROM pg_policies WHERE schemaname IN ('public','private')
   )
   SELECT md5(data::text) INTO v_actual FROM d;
-  IF v_actual IS DISTINCT FROM '9e4df96d23e44d66b7a5965fb3f0b0bd' THEN
+  IF v_actual IS DISTINCT FROM '504e1190d8e9a1908346c9a79baf6c80' THEN
     RAISE EXCEPTION 'Production RLS policy fingerprint mismatch: %',v_actual;
   END IF;
 
@@ -358,7 +358,7 @@ BEGIN
     FROM pg_policies WHERE schemaname='storage' AND tablename='objects'
   )
   SELECT md5(data::text) INTO v_actual FROM d;
-  IF v_actual IS DISTINCT FROM 'c61735dca4ec3309648fb1d192755880' THEN
+  IF v_actual IS DISTINCT FROM 'ac22d229029b1feacf223767b37e122e' THEN
     RAISE EXCEPTION 'Production Storage policy fingerprint mismatch: %',v_actual;
   END IF;
 END;
