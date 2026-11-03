@@ -2,7 +2,8 @@
 set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-APP_BASELINE_FILE="$ROOT_DIR/_review/PRODUCTION_BASELINE_APP_20261103.sql"
+MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103140155_asyut_aqar_production_schema_baseline.sql"
+CONFIG_FILE="$ROOT_DIR/supabase/config.toml"
 STORAGE_BASELINE_FILE="$ROOT_DIR/_review/PRODUCTION_BASELINE_STORAGE_ADMIN_20261103.sql"
 ASSERTIONS_FILE="$ROOT_DIR/tests/db/production-schema-baseline.assertions.sql"
 TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/asyut-aqar-baseline.XXXXXX")"
@@ -16,7 +17,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for required_file in "$APP_BASELINE_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE"; do
+for required_file in "$MIGRATION_FILE" "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required rehearsal file is missing or empty: $required_file" >&2
     exit 1
@@ -29,6 +30,7 @@ mkdir -p "$TEST_DIR"
 cd "$TEST_DIR"
 
 supabase init
+cp "$CONFIG_FILE" "$TEST_DIR/supabase/config.toml"
 python3 - "$TEST_DIR/supabase/config.toml" <<'PY'
 from pathlib import Path
 import re
@@ -58,7 +60,15 @@ path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 PY
 
 mkdir -p "$TEST_DIR/supabase/migrations"
-cp "$APP_BASELINE_FILE" "$TEST_DIR/supabase/migrations/20261103000000_asyut_aqar_app_baseline.sql"
+# Ask the pinned Supabase CLI to create the timestamped migration path, then
+# populate that path with the reviewed, catalog-derived production baseline.
+supabase migration new asyut_aqar_production_schema_baseline >/dev/null
+GENERATED_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_asyut_aqar_production_schema_baseline.sql' -print -quit)"
+if [[ -z "$GENERATED_MIGRATION" ]]; then
+  echo "Supabase CLI did not create the expected baseline migration." >&2
+  exit 1
+fi
+cp "$MIGRATION_FILE" "$GENERATED_MIGRATION"
 
 echo "Starting an isolated local Supabase stack (no hosted project is linked)."
 supabase start -x "studio,edge-runtime,logflare,vector,postgres-meta,imgproxy"
