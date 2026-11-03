@@ -11,7 +11,7 @@
   const bucket = "layan_real_estat";
   const SESSION_KEY = "layanSupabaseSession";
   // Use the canonical production domain for all email-auth callbacks.
-  const AUTH_REDIRECT_URL = "https://layan-eg.com/";
+  const AUTH_REDIRECT_URL = window.location.origin + "/";
   let session = null;
   try { session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch (_) {}
   if (session?.expires_at && session.expires_at * 1000 < Date.now()) session = null;
