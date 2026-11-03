@@ -2,7 +2,8 @@
 set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-BASELINE_FILE="$ROOT_DIR/_review/PRODUCTION_BASELINE_COMPLETE_20261103.sql"
+APP_BASELINE_FILE="$ROOT_DIR/_review/PRODUCTION_BASELINE_APP_20261103.sql"
+STORAGE_BASELINE_FILE="$ROOT_DIR/_review/PRODUCTION_BASELINE_STORAGE_ADMIN_20261103.sql"
 ASSERTIONS_FILE="$ROOT_DIR/tests/db/production-schema-baseline.assertions.sql"
 TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/asyut-aqar-baseline.XXXXXX")"
 STACK_STARTED=0
@@ -15,7 +16,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for required_file in "$BASELINE_FILE" "$ASSERTIONS_FILE"; do
+for required_file in "$APP_BASELINE_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required rehearsal file is missing or empty: $required_file" >&2
     exit 1
@@ -57,7 +58,7 @@ path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 PY
 
 mkdir -p "$TEST_DIR/supabase/migrations"
-cp "$BASELINE_FILE" "$TEST_DIR/supabase/migrations/20261103000000_asyut_aqar_current_state_baseline.sql"
+cp "$APP_BASELINE_FILE" "$TEST_DIR/supabase/migrations/20261103000000_asyut_aqar_app_baseline.sql"
 
 echo "Starting an isolated local Supabase stack (no hosted project is linked)."
 supabase start -x "studio,edge-runtime,logflare,vector,postgres-meta,imgproxy,mailpit"
@@ -66,6 +67,17 @@ STACK_STARTED=1
 # Explicit --local: this resets only the disposable local database created above.
 supabase db reset --local --no-seed
 supabase migration list --local
+
+# Supabase-managed Storage relations are owned by supabase_storage_admin.
+# Apply only that managed-schema fragment as the local stack's superuser, inside
+# the disposable Docker database. App tables/functions above remain owned by postgres.
+DB_CONTAINER="$(docker ps --format '{{.Names}}' | grep -E '^supabase_db_' | head -n 1 || true)"
+if [[ -z "$DB_CONTAINER" ]]; then
+  echo "Could not locate the disposable local Supabase Postgres container." >&2
+  exit 1
+fi
+
+docker exec -i "$DB_CONTAINER" psql -U supabase_admin -d postgres -X -v ON_ERROR_STOP=1 < "$STORAGE_BASELINE_FILE"
 
 if ! command -v psql >/dev/null 2>&1; then
   sudo apt-get update
