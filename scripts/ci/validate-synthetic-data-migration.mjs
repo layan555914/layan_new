@@ -276,7 +276,7 @@ function runSelfTests() {
 
   const orphan = structuredClone(fixture);
   orphan.records["public.directory_sources"] = [];
-  assert.throws(()=>validateFixture(orphan),/has no matching public\\.directory_sources\\.id/);
+  assert.throws(()=>validateFixture(orphan),(error)=>error.message.includes("has no matching public.directory_sources.id"));
   const duplicate = structuredClone(fixture);
   duplicate.records["public.directory_entities"].push(structuredClone(duplicate.records["public.directory_entities"][0]));
   assert.throws(()=>validateFixture(duplicate),/duplicate primary key/);
