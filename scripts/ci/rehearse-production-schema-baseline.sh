@@ -68,6 +68,31 @@ STACK_STARTED=1
 supabase db reset --local --no-seed
 supabase migration list --local
 
+if ! command -v psql >/dev/null 2>&1; then
+  sudo apt-get update
+  sudo apt-get install -y postgresql-client
+fi
+
+# Resolve credentials created for this disposable local stack only.
+# The password is extracted in memory from the local CLI URL and never logged or committed.
+STATUS_ENV="$(supabase status -o env)"
+DB_URL="$(printf '%s\\n' "$STATUS_ENV" | awk -F= '$1 == "DB_URL" { print substr($0, index($0, "=") + 1); exit }')"
+DB_URL="${DB_URL#\\\"}"
+DB_URL="${DB_URL%\\\"}"
+if [[ -z "$DB_URL" ]]; then
+  echo "Supabase CLI did not return a local DB_URL." >&2
+  exit 1
+fi
+DB_PASSWORD="$(python3 - "$DB_URL" <<'PY'
+from urllib.parse import urlparse
+import sys
+password = urlparse(sys.argv[1]).password
+if not password:
+    raise SystemExit("Local database URL has no password component")
+print(password)
+PY
+)"
+
 # Supabase-managed Storage relations are owned by supabase_storage_admin.
 # Apply only that managed-schema fragment as the local stack's superuser, inside
 # the disposable Docker database. App tables/functions above remain owned by postgres.
@@ -77,21 +102,9 @@ if [[ -z "$DB_CONTAINER" ]]; then
   exit 1
 fi
 
-docker exec -i "$DB_CONTAINER" psql -U supabase_admin -d postgres -X -v ON_ERROR_STOP=1 < "$STORAGE_BASELINE_FILE"
-
-if ! command -v psql >/dev/null 2>&1; then
-  sudo apt-get update
-  sudo apt-get install -y postgresql-client
-fi
-
-STATUS_ENV="$(supabase status -o env)"
-DB_URL="$(printf '%s\n' "$STATUS_ENV" | awk -F= '$1 == "DB_URL" { print substr($0, index($0, "=") + 1); exit }')"
-DB_URL="${DB_URL#\"}"
-DB_URL="${DB_URL%\"}"
-if [[ -z "$DB_URL" ]]; then
-  echo "Supabase CLI did not return a local DB_URL." >&2
-  exit 1
-fi
+docker exec -e "PGPASSWORD=$DB_PASSWORD" -i "$DB_CONTAINER" \\
+  psql -h 127.0.0.1 -U supabase_admin -d postgres -X -v ON_ERROR_STOP=1 < "$STORAGE_BASELINE_FILE"
+unset DB_PASSWORD
 
 pg_isready --dbname "$DB_URL"
 psql "$DB_URL" -X -v ON_ERROR_STOP=1 -f "$ASSERTIONS_FILE"
