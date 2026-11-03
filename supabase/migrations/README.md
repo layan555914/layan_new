@@ -36,6 +36,6 @@ The repository contains 62 unique migration files: exactly 59 comment-only marke
 
 A new empty local Supabase stack replayed all 62 successfully. Assertions verified the 59 marker versions and the 11 marketplace categories, and the rest of the full database/API test suite passed.
 
-[CI #41659672694 — full success](https://github.com/layan555914/layan_new/actions/runs/41659672694)
+[CI #41660618571 — full success, 2026-11-03 15:09 UTC](https://github.com/layan555914/layan_new/actions/runs/41660618571)
 
 The production catalog was rechecked at 2026-11-03 15:05:44 UTC: all 15 fingerprints remained identical to the captured reference. The production ledger remains at 59 applied versions; no ledger repair or SQL write was made.
