@@ -668,16 +668,16 @@ CREATE OR REPLACE VIEW "public"."public_active_supplier_ads" WITH (security_invo
 
 -- Application triggers.
 
-CREATE TRIGGER company_profiles_owner_update_guard BEFORE UPDATE ON company_profiles FOR EACH ROW EXECUTE FUNCTION guard_company_owner_update() ON "public"."company_profiles";
+CREATE TRIGGER company_profiles_owner_update_guard BEFORE UPDATE ON "public"."company_profiles" FOR EACH ROW EXECUTE FUNCTION guard_company_owner_update();
 
-CREATE TRIGGER company_profiles_set_updated_at BEFORE UPDATE ON company_profiles FOR EACH ROW EXECUTE FUNCTION set_company_profiles_updated_at() ON "public"."company_profiles";
+CREATE TRIGGER company_profiles_set_updated_at BEFORE UPDATE ON "public"."company_profiles" FOR EACH ROW EXECUTE FUNCTION set_company_profiles_updated_at();
 
-CREATE TRIGGER directory_entities_require_source BEFORE INSERT OR UPDATE OF public_visible, verification_status ON directory_entities FOR EACH ROW EXECUTE FUNCTION directory_require_public_source() ON "public"."directory_entities";
+CREATE TRIGGER directory_entities_require_source BEFORE INSERT OR UPDATE OF public_visible, verification_status ON "public"."directory_entities" FOR EACH ROW EXECUTE FUNCTION directory_require_public_source();
 
-CREATE TRIGGER directory_opportunities_require_source BEFORE INSERT OR UPDATE OF public_visible, verification_status ON directory_opportunities FOR EACH ROW EXECUTE FUNCTION directory_require_public_source() ON "public"."directory_opportunities";
+CREATE TRIGGER directory_opportunities_require_source BEFORE INSERT OR UPDATE OF public_visible, verification_status ON "public"."directory_opportunities" FOR EACH ROW EXECUTE FUNCTION directory_require_public_source();
 
-CREATE TRIGGER directory_projects_require_source BEFORE INSERT OR UPDATE OF public_visible, verification_status ON directory_projects FOR EACH ROW EXECUTE FUNCTION directory_require_public_source() ON "public"."directory_projects";
+CREATE TRIGGER directory_projects_require_source BEFORE INSERT OR UPDATE OF public_visible, verification_status ON "public"."directory_projects" FOR EACH ROW EXECUTE FUNCTION directory_require_public_source();
 
-CREATE TRIGGER a_property_offer_promotion_guard BEFORE INSERT ON property_offers FOR EACH ROW EXECUTE FUNCTION guard_property_offer_promotion() ON "public"."property_offers";
+CREATE TRIGGER a_property_offer_promotion_guard BEFORE INSERT ON "public"."property_offers" FOR EACH ROW EXECUTE FUNCTION guard_property_offer_promotion();
 
-CREATE TRIGGER c_property_offer_company_limit BEFORE INSERT ON property_offers FOR EACH ROW EXECUTE FUNCTION enforce_company_property_ad_limit() ON "public"."property_offers";
+CREATE TRIGGER c_property_offer_company_limit BEFORE INSERT ON "public"."property_offers" FOR EACH ROW EXECUTE FUNCTION enforce_company_property_ad_limit();
