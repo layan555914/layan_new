@@ -12,6 +12,10 @@ test.describe("Hosted staging — create a disposable real Auth account", () => 
   test.use({ serviceWorkers: "block" });
   test.skip(!enabled, "Staging credentials are supplied only in the dedicated CI job.");
 
+  test("real platform signup is blocked by the hosted email send limit", async () => {
+    test.skip(true, "Hosted staging returned 429 over_email_send_rate_limit. This test stays disabled to avoid repeated signup requests; complete Auth and recovery are exercised against local Supabase + Mailpit.");
+  });
+
   test("real platform signup creates one isolated temporary account", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "desktop-chromium", "Create one disposable Auth account, not one per browser project.");
     const configSource = [

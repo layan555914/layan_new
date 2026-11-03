@@ -61,7 +61,7 @@ mkdir -p "$TEST_DIR/supabase/migrations"
 cp "$APP_BASELINE_FILE" "$TEST_DIR/supabase/migrations/20261103000000_asyut_aqar_app_baseline.sql"
 
 echo "Starting an isolated local Supabase stack (no hosted project is linked)."
-supabase start -x "studio,edge-runtime,logflare,vector,postgres-meta,imgproxy,mailpit"
+supabase start -x "studio,edge-runtime,logflare,vector,postgres-meta,imgproxy"
 STACK_STARTED=1
 
 # Explicit --local: this resets only the disposable local database created above.
@@ -120,7 +120,9 @@ if [[ -z "$API_URL" || -z "$ANON_KEY" || -z "$SERVICE_ROLE_KEY" ]]; then
   exit 1
 fi
 export API_URL ANON_KEY SERVICE_ROLE_KEY
+export DATABASE_URL="$DB_URL"
+export MAILPIT_URL="http://127.0.0.1:54324"
 node "$ROOT_DIR/tests/db/storage-api-baseline.mjs"
-unset SERVICE_ROLE_KEY ANON_KEY
+unset MAILPIT_URL DATABASE_URL SERVICE_ROLE_KEY ANON_KEY
 
 echo "PASS: full Supabase CLI baseline rehearsal, catalog assertions, directory RLS and Storage API RLS."

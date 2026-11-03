@@ -6,18 +6,23 @@
  */
 
 import { randomUUID, randomBytes } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 
 const apiUrl = process.env.API_URL;
 const anonKey = process.env.ANON_KEY;
 const serviceRoleKey = process.env.SERVICE_ROLE_KEY;
+const databaseUrl = process.env.DATABASE_URL;
+const mailpitUrl = String(process.env.MAILPIT_URL || 'http://127.0.0.1:54324').replace(/\/$/, '');
 
-if (!apiUrl || !anonKey || !serviceRoleKey) {
-  throw new Error('API_URL, ANON_KEY and SERVICE_ROLE_KEY are required from local Supabase CLI status.');
+if (!apiUrl || !anonKey || !serviceRoleKey || !databaseUrl) {
+  throw new Error('API_URL, ANON_KEY, SERVICE_ROLE_KEY and DATABASE_URL are required from local Supabase CLI status.');
 }
 
 const parsedUrl = new URL(apiUrl);
-if (!['127.0.0.1', 'localhost', '::1'].includes(parsedUrl.hostname)) {
-  throw new Error('Refusing to test Storage against a non-local Supabase host.');
+const parsedDatabaseUrl = new URL(databaseUrl);
+if (!['127.0.0.1', 'localhost', '::1'].includes(parsedUrl.hostname)
+    || !['127.0.0.1', 'localhost', '::1'].includes(parsedDatabaseUrl.hostname)) {
+  throw new Error('Refusing to run Auth, database or Storage tests against a non-local Supabase host.');
 }
 
 const bucketPhotos = 'layan_real_estat';
@@ -26,12 +31,16 @@ const runId = randomUUID();
 const password = `Aa!9${randomBytes(24).toString('hex')}`;
 const emailA = `baseline-a-${runId}@example.test`;
 const emailB = `baseline-b-${runId}@example.test`;
+const emailAdmin = `baseline-admin-${runId}@example.test`;
 let userA;
 let userB;
+let userAdmin;
 let tokenA;
 let tokenB;
+let tokenAdmin;
 const createdObjects = [];
 const createdMarketplaceListingIds = [];
+const createdPropertyOfferIds = [];
 
 function headers(apiKey, accessToken, extra = {}) {
   return {
@@ -67,11 +76,22 @@ async function createUser(email) {
   return body;
 }
 
-async function signIn(email) {
-  const { response, body } = await request('/auth/v1/token?grant_type=password', {
+async function signUp(email) {
+  const { response, body } = await request('/auth/v1/signup', {
     method: 'POST',
     headers: headers(anonKey, anonKey, { 'content-type': 'application/json' }),
     body: JSON.stringify({ email, password }),
+  });
+  assert(response.ok && body?.user?.id && body?.access_token,
+    `Local Auth sign-up did not create a session (HTTP ${response.status}).`);
+  return { user: body.user, token: body.access_token };
+}
+
+async function signIn(email, suppliedPassword = password) {
+  const { response, body } = await request('/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    headers: headers(anonKey, anonKey, { 'content-type': 'application/json' }),
+    body: JSON.stringify({ email, password: suppliedPassword }),
   });
   assert(response.ok && body?.access_token, `Could not sign in disposable local Auth user (HTTP ${response.status}).`);
   return body.access_token;
@@ -115,6 +135,84 @@ async function deleteUser(id) {
     method: 'DELETE',
     headers: headers(serviceRoleKey, serviceRoleKey),
   });
+}
+
+function runLocalSql(sql) {
+  return execFileSync('psql', [databaseUrl, '-X', '-v', 'ON_ERROR_STOP=1', '-At', '-c', sql], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).trim();
+}
+
+function setLocalAdmin(userId, enabled) {
+  assert(/^[0-9a-f-]{36}$/i.test(String(userId)), 'Refusing to modify the local admin allowlist with an invalid UUID.');
+  const statement = enabled
+    ? `INSERT INTO private.layan_admins(user_id) VALUES ('${userId}'::uuid) ON CONFLICT (user_id) DO NOTHING;`
+    : `DELETE FROM private.layan_admins WHERE user_id = '${userId}'::uuid;`;
+  runLocalSql(statement);
+}
+
+async function recoverPasswordThroughMailpit(email, oldPassword) {
+  const recover = await request('/auth/v1/recover', {
+    method: 'POST',
+    headers: headers(anonKey, anonKey, { 'content-type': 'application/json' }),
+    body: JSON.stringify({ email }),
+  });
+  assert(recover.response.ok, `Local Auth recovery request failed (HTTP ${recover.response.status}): ${JSON.stringify(recover.body)}`);
+
+  let message;
+  for (let attempt = 0; attempt < 20 && !message; attempt += 1) {
+    const listResponse = await fetch(mailpitUrl + '/api/v1/messages?start=0&limit=50');
+    assert(listResponse.ok, `Mailpit is not reachable at ${mailpitUrl} (HTTP ${listResponse.status}).`);
+    const list = await listResponse.json();
+    const candidate = (list.messages || []).find(item => JSON.stringify(item.To || []).toLowerCase().includes(email.toLowerCase()));
+    if (candidate?.ID) {
+      const detailResponse = await fetch(mailpitUrl + '/api/v1/message/' + encodeURIComponent(candidate.ID));
+      assert(detailResponse.ok, 'Mailpit did not return the recovery message details.');
+      message = await detailResponse.json();
+    } else {
+      await new Promise(resolve => setTimeout(resolve, 250));
+    }
+  }
+  assert(message, 'Local Auth accepted recovery but no matching message arrived in Mailpit.');
+
+  const html = String(message.HTML || '');
+  const textBody = String(message.Text || '');
+  const candidates = [
+    ...[...html.matchAll(/href=["']([^"']+)["']/gi)].map(match => match[1].replace(/&amp;/g, '&')),
+    ...[...textBody.matchAll(/https?:\/\/[^\s<>"]+/g)].map(match => match[0].replace(/&amp;/g, '&')),
+  ];
+  const recoveryUrl = candidates.find(value => {
+    try {
+      const url = new URL(value);
+      return url.pathname.endsWith('/auth/v1/verify') && url.searchParams.get('type') === 'recovery';
+    } catch { return false; }
+  });
+  assert(recoveryUrl, 'Recovery email did not contain a valid Supabase recovery verification link.');
+
+  const verification = await fetch(recoveryUrl, { redirect: 'manual' });
+  assert([301, 302, 303, 307, 308].includes(verification.status),
+    `Recovery verification did not redirect as expected (HTTP ${verification.status}).`);
+  const location = verification.headers.get('location');
+  assert(location, 'Recovery verification response did not include a redirect location.');
+  const redirectUrl = new URL(location, apiUrl);
+  const hashParams = new URLSearchParams(redirectUrl.hash.replace(/^#/, ''));
+  const queryParams = redirectUrl.searchParams;
+  const recoveryAccessToken = hashParams.get('access_token') || queryParams.get('access_token');
+  assert(recoveryAccessToken, 'Recovery link did not establish an access token.');
+
+  const newPassword = oldPassword + '-Recovered!';
+  const updateResponse = await fetch(new URL('/auth/v1/user', apiUrl), {
+    method: 'PUT',
+    headers: headers(anonKey, recoveryAccessToken, { 'content-type': 'application/json' }),
+    body: JSON.stringify({ password: newPassword }),
+  });
+  assert(updateResponse.ok,
+    `Password update via recovery session failed (HTTP ${updateResponse.status}): ${await updateResponse.text()}`);
+
+  const signedIn = await signIn(email, newPassword);
+  console.log('PASS: local Auth password recovery — Mailpit message delivered, recovery link verified, password updated, and new password sign-in succeeded.');
+  return { token: signedIn, password: newPassword };
 }
 
 
@@ -241,10 +339,17 @@ async function testMarketplaceSecurity() {
 }
 
 async function main() {
-  userA = await createUser(emailA);
+  const ownerSignup = await signUp(emailA);
+  userA = ownerSignup.user;
+  tokenA = ownerSignup.token;
   userB = await createUser(emailB);
-  tokenA = await signIn(emailA);
+  userAdmin = await createUser(emailAdmin);
   tokenB = await signIn(emailB);
+  tokenAdmin = await signIn(emailAdmin);
+  setLocalAdmin(userAdmin.id, true);
+
+  const recovered = await recoverPasswordThroughMailpit(emailA, password);
+  tokenA = recovered.token;
 
   await testMarketplaceSecurity();
 
@@ -256,6 +361,9 @@ async function main() {
   const photoUpload = await upload(bucketPhotos, photoA, tokenA, 'image/jpeg', Buffer.from([0xff, 0xd8, 0xff, 0xd9]));
   assert(photoUpload.ok, `Owner upload to own offer-photo folder failed (HTTP ${photoUpload.status}).`);
   createdObjects.push({ bucket: bucketPhotos, name: photoA, token: tokenA });
+
+  const photoUrl = `${apiUrl}/storage/v1/object/public/${bucketPhotos}/${photoA.split('/').map(encodeURIComponent).join('/')}`;
+  await testPropertyOfferLifecycle(photoUrl);
 
   const docUploadA = await upload(bucketDocuments, docA, tokenA, 'application/pdf', Buffer.from('%PDF-1.4 test owner A'));
   assert(docUploadA.ok, `Owner upload to own document folder failed (HTTP ${docUploadA.status}).`);
@@ -297,6 +405,20 @@ try {
   await main();
 } finally {
   // Best-effort cleanup inside the disposable local project; service_role is local-only.
+  for (const id of createdPropertyOfferIds.reverse()) {
+    try {
+      await restRequest(`/rest/v1/property_offers?id=eq.${encodeURIComponent(id)}`, {
+        method: 'DELETE', serviceRole: true, prefer: 'return=minimal',
+      });
+    } catch {
+      // The local stack is disposable and is stopped by the caller's EXIT trap.
+    }
+  }
+
+  if (userAdmin?.id) {
+    try { setLocalAdmin(userAdmin.id, false); } catch {}
+  }
+
   for (const id of createdMarketplaceListingIds.reverse()) {
     try {
       await restRequest(`/rest/v1/marketplace_listings?id=eq.${encodeURIComponent(id)}`, {
@@ -319,4 +441,5 @@ try {
   }
   await deleteUser(userA?.id);
   await deleteUser(userB?.id);
+  await deleteUser(userAdmin?.id);
 }
