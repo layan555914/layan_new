@@ -34,7 +34,7 @@ BEGIN
   FROM pg_proc p
   JOIN pg_namespace n ON n.oid=p.pronamespace
   WHERE n.nspname IN ('public','private') AND p.prokind IN ('f','p');
-  IF v_count <> 20 THEN RAISE EXCEPTION 'Expected 20 routines; found %', v_count; END IF;
+  IF v_count <> 21 THEN RAISE EXCEPTION 'Expected 21 routines after the directory admin RPC migration; found %', v_count; END IF;
 
   SELECT count(*) INTO v_count
   FROM pg_class c
@@ -105,6 +105,20 @@ BEGIN
   END IF;
   IF NOT has_function_privilege('authenticated','public.layan_is_admin()','EXECUTE') THEN
     RAISE EXCEPTION 'authenticated is missing public.layan_is_admin() execute';
+  END IF;
+  IF has_function_privilege('anon','public.directory_admin_mutate_with_audit(text,text,uuid,jsonb,text)','EXECUTE') THEN
+    RAISE EXCEPTION 'anon must not execute the directory admin mutation RPC';
+  END IF;
+  IF NOT has_function_privilege('authenticated','public.directory_admin_mutate_with_audit(text,text,uuid,jsonb,text)','EXECUTE') THEN
+    RAISE EXCEPTION 'authenticated is missing directory admin mutation RPC execute';
+  END IF;
+  SELECT count(*) INTO v_count
+  FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+  WHERE n.nspname='public'
+    AND p.proname='directory_admin_mutate_with_audit'
+    AND NOT p.prosecdef;
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'Directory admin mutation RPC must exist exactly once as SECURITY INVOKER';
   END IF;
   IF NOT has_sequence_privilege('anon','public.property_offers_id_seq','USAGE')
      OR NOT has_sequence_privilege('authenticated','public.property_offers_id_seq','UPDATE')
