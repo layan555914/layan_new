@@ -241,6 +241,14 @@ test("directory admin reviews, sources, publication and audit history", async ({
   await expect(page.locator("#dirAdminRecords [data-kind=entities]")).toHaveCount(1);
   await expect(page.locator("#dirAdminRecords")).toContainText("شركة أسيوط التجريبية");
 
+  const untouchedEntity = page.locator("#dirAdminRecords [data-kind=entities]");
+  await untouchedEntity.locator('[data-field="name_ar"]').fill("اسم يجب ألا يُحفظ");
+  await untouchedEntity.locator("[data-reason]").fill("force audit failure");
+  await untouchedEntity.locator("[data-save]").click();
+  await expect(page.locator("#dirAdminStatus")).toContainText("forced audit insert failure");
+  expect(db.directory_entities[0].name_ar).toBe("شركة أسيوط التجريبية");
+  expect(db.directory_change_log).toHaveLength(0);
+
   await page.locator("#dirAdminAreaFilter").selectOption("area-admin-1");
   await expect(page.locator("#dirAdminRecords [data-kind=entities]")).toHaveCount(1);
   await page.locator("#dirAdminSearch").fill("اسم غير موجود");
