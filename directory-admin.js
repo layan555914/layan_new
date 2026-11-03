@@ -61,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     logout.hidden = !ok;
   };
   const dateText = value => value ? new Date(value).toLocaleString("ar-EG") : "—";
-  const sessionUserId = () => session?.user?.id || auth?.getUser?.()?.id || null;
 
   async function fresh() {
     if (!session?.access_token) session = auth?.getSession?.() || null;
