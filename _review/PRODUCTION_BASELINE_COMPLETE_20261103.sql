@@ -1,9 +1,15 @@
--- ASYUT AQAR — complete current application schema baseline from production catalogs.
+-- ASYUT AQAR — complete current-state schema reference assembled from production catalogs.
 -- Source project: ebyhwqkmhxbgocngpqfe; PostgreSQL 17.11; captured 2026-11-03.
--- CLEAN SUPABASE PROJECT ONLY. DO NOT execute on the already populated production project.
--- This restores current application schema objects; it does not recreate the original 59-migration history.
--- Excludes user/business rows, Auth users, admin allowlist rows, project decision rows, VAPID secrets and Storage files.
--- Supabase-managed schemas/tables/roles (auth, storage, extensions) must already exist.
+-- CLEAN SUPABASE PROJECT ONLY. NEVER execute on the populated production database.
+-- IMPORTANT: this combined file is a review/reference bundle, NOT a single runnable migration.
+-- The app-owned phase is _review/PRODUCTION_BASELINE_APP_20261103.sql and is run by the local
+-- Supabase migration owner. The managed Storage phase is _review/PRODUCTION_BASELINE_STORAGE_ADMIN_20261103.sql
+-- and requires the managed Storage owner/superuser context in an isolated rebuild.
+-- The CI rehearsal executes these phases separately under their correct roles.
+-- This snapshot does not recreate the original 59-migration history.
+-- Excludes Auth users/sessions, application/business rows, admin allowlist rows, project decisions,
+-- private VAPID material, and Storage object metadata/file contents.
+-- Supabase-managed auth/storage/extensions schemas and their service roles must already exist.
 
 -- 0. Extensions and schema setup.
 CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
