@@ -41,6 +41,9 @@ let tokenAdmin;
 const createdObjects = [];
 const createdMarketplaceListingIds = [];
 const createdPropertyOfferIds = [];
+const createdDirectoryEntityIds = [];
+const createdDirectorySourceIds = [];
+const createdDirectoryAuditIds = [];
 
 function headers(apiKey, accessToken, extra = {}) {
   return {
@@ -452,6 +455,202 @@ async function testPropertyOfferLifecycle(photoUrl) {
   console.log('PASS: property lifecycle — local Auth owner submission, pending-state protection, owner isolation, admin approval/rejection, public visibility, and image access.');
 }
 
+
+async function testDirectoryAdminAtomicRpc() {
+  assert(userAdmin?.id && tokenAdmin, 'A disposable local admin identity is required for the directory RPC test.');
+  const entityId = randomUUID();
+  const slug = `ci-directory-admin-${randomUUID()}`;
+  createdDirectoryEntityIds.push(entityId);
+
+  runLocalSql(`
+    INSERT INTO public.directory_entities
+      (id, slug, name_ar, entity_type, verification_status, public_visible)
+    VALUES
+      ('${entityId}'::uuid, '${slug}', 'جهة اختبار الإدارة الذرية', 'developer', 'draft', false);
+  `);
+
+  const rpcPath = '/rest/v1/rpc/directory_admin_mutate_with_audit';
+  const deniedMember = await restRequest(rpcPath, {
+    method: 'POST',
+    token: tokenA,
+    payload: {
+      p_table_name: 'directory_entities',
+      p_operation: 'update',
+      p_record_id: entityId,
+      p_data: { description: 'يجب ألا ينجح تعديل المستخدم العادي' },
+      p_reason: 'CI non-admin denial',
+    },
+  });
+  assert(!deniedMember.response.ok, 'An authenticated non-admin user executed the directory mutation RPC.');
+
+  const deniedAnonymous = await restRequest(rpcPath, {
+    method: 'POST',
+    token: anonKey,
+    payload: {
+      p_table_name: 'directory_entities',
+      p_operation: 'update',
+      p_record_id: entityId,
+      p_data: { description: 'يجب ألا ينجح تعديل الزائر' },
+      p_reason: 'CI anonymous denial',
+    },
+  });
+  assert(!deniedAnonymous.response.ok, 'An anonymous visitor executed the directory mutation RPC.');
+
+  const update = await restRequest(rpcPath, {
+    method: 'POST',
+    token: tokenAdmin,
+    payload: {
+      p_table_name: 'directory_entities',
+      p_operation: 'update',
+      p_record_id: entityId,
+      p_data: { description: 'تحديث اصطناعي عبر RPC ذرية لاختبار CI المحلي.' },
+      p_reason: 'CI directory entity update',
+    },
+  });
+  assert(update.response.ok && update.body?.record?.id === entityId && update.body?.audit_id,
+    `Admin update did not return its saved record and audit id (HTTP ${update.response.status}).`);
+  createdDirectoryAuditIds.push(update.body.audit_id);
+
+  const savedEntity = await restRequest(
+    `/rest/v1/directory_entities?select=id,description&id=eq.${entityId}`,
+    { serviceRole: true },
+  );
+  assert(savedEntity.response.ok && savedEntity.body?.length === 1
+    && savedEntity.body[0].description === 'تحديث اصطناعي عبر RPC ذرية لاختبار CI المحلي.',
+    'The directory admin RPC did not persist the expected entity description.');
+
+  const forbiddenColumn = await restRequest(rpcPath, {
+    method: 'POST',
+    token: tokenAdmin,
+    payload: {
+      p_table_name: 'directory_entities',
+      p_operation: 'update',
+      p_record_id: entityId,
+      p_data: { id: randomUUID() },
+      p_reason: 'CI forbidden primary key mutation',
+    },
+  });
+  assert(!forbiddenColumn.response.ok, 'The directory admin RPC accepted a forbidden primary-key field.');
+
+  const sourceInsert = await restRequest(rpcPath, {
+    method: 'POST',
+    token: tokenAdmin,
+    payload: {
+      p_table_name: 'directory_sources',
+      p_operation: 'insert',
+      p_record_id: null,
+      p_data: {
+        title: 'مصدر اصطناعي لاختبار RPC المحلية',
+        publisher: 'ASYUT AQAR CI',
+        source_type: 'automated_test',
+        source_url: 'https://example.invalid/asyut-aqar-ci-directory-source',
+        confidence_level: 'unverified',
+        is_public: false,
+        notes: 'Synthetic CI-only source; deleted by the local test cleanup.',
+      },
+      p_reason: 'CI directory source insert',
+    },
+  });
+  const sourceId = sourceInsert.body?.record?.id;
+  assert(sourceInsert.response.ok && sourceId && sourceInsert.body?.audit_id,
+    `Admin source insert did not return its record and audit id (HTTP ${sourceInsert.response.status}).`);
+  createdDirectorySourceIds.push(sourceId);
+  createdDirectoryAuditIds.push(sourceInsert.body.audit_id);
+
+  const linkInsert = await restRequest(rpcPath, {
+    method: 'POST',
+    token: tokenAdmin,
+    payload: {
+      p_table_name: 'directory_entity_sources',
+      p_operation: 'insert',
+      p_record_id: entityId,
+      p_data: { entity_id: entityId, source_id: sourceId, claim_key: 'general' },
+      p_reason: 'CI directory source link',
+    },
+  });
+  assert(linkInsert.response.ok && linkInsert.body?.record?.entity_id === entityId
+    && linkInsert.body?.audit_id,
+    `Admin source link insert did not return its record and audit id (HTTP ${linkInsert.response.status}).`);
+  createdDirectoryAuditIds.push(linkInsert.body.audit_id);
+
+  const linked = await restRequest(
+    `/rest/v1/directory_entity_sources?select=entity_id,source_id&entity_id=eq.${entityId}&source_id=eq.${sourceId}`,
+    { serviceRole: true },
+  );
+  assert(linked.response.ok && linked.body?.length === 1,
+    'The source link was not persisted by the directory admin RPC.');
+
+  let guardInstalled = false;
+  try {
+    runLocalSql(`
+      CREATE OR REPLACE FUNCTION public.ci_force_directory_audit_failure()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      SET search_path TO ''
+      AS $function$
+      BEGIN
+        IF NEW.reason = 'CI forced audit failure' THEN
+          RAISE EXCEPTION 'forced CI directory audit failure';
+        END IF;
+        RETURN NEW;
+      END;
+      $function$;
+      DROP TRIGGER IF EXISTS ci_force_directory_audit_failure ON public.directory_change_log;
+      CREATE TRIGGER ci_force_directory_audit_failure
+      BEFORE INSERT ON public.directory_change_log
+      FOR EACH ROW EXECUTE FUNCTION public.ci_force_directory_audit_failure();
+    `);
+    guardInstalled = true;
+
+    const failedUpdate = await restRequest(rpcPath, {
+      method: 'POST',
+      token: tokenAdmin,
+      payload: {
+        p_table_name: 'directory_entities',
+        p_operation: 'update',
+        p_record_id: entityId,
+        p_data: { description: 'لا يجب حفظ هذا التعديل عند فشل التدقيق' },
+        p_reason: 'CI forced audit failure',
+      },
+    });
+    assert(!failedUpdate.response.ok, 'The forced directory audit insert failure did not fail the RPC.');
+
+    const afterFailure = await restRequest(
+      `/rest/v1/directory_entities?select=id,description&id=eq.${entityId}`,
+      { serviceRole: true },
+    );
+    assert(afterFailure.response.ok && afterFailure.body?.length === 1
+      && afterFailure.body[0].description === 'تحديث اصطناعي عبر RPC ذرية لاختبار CI المحلي.',
+      'Directory entity data changed even though its audit insert failed.');
+
+    const failedAuditCount = runLocalSql(`
+      SELECT count(*)
+      FROM public.directory_change_log
+      WHERE changed_by = '${userAdmin.id}'::uuid
+        AND reason = 'CI forced audit failure';
+    `);
+    assert(Number(failedAuditCount) === 0,
+      'A failed directory mutation unexpectedly left an audit row.');
+  } finally {
+    if (guardInstalled) {
+      runLocalSql(`
+        DROP TRIGGER IF EXISTS ci_force_directory_audit_failure ON public.directory_change_log;
+        DROP FUNCTION IF EXISTS public.ci_force_directory_audit_failure();
+      `);
+    }
+  }
+
+  const auditCount = runLocalSql(`
+    SELECT count(*)
+    FROM public.directory_change_log
+    WHERE id IN (${createdDirectoryAuditIds.map(id => `'${id}'::uuid`).join(',')});
+  `);
+  assert(Number(auditCount) === 3,
+    `Expected exactly three audit rows for the three successful RPC calls; found ${auditCount}.`);
+
+  console.log('PASS: directory admin RPC — non-admin/anon denial, allowlisted update, source insert/link, forbidden-column denial, atomic audit rollback, and three successful audit rows.');
+}
+
 async function main() {
   const ownerSignup = await signUp(emailA);
   userA = ownerSignup.user;
@@ -466,6 +665,7 @@ async function main() {
   tokenA = recovered.token;
 
   await testMarketplaceSecurity();
+  await testDirectoryAdminAtomicRpc();
 
   const photoA = `offers/${userA.id}/offer.jpg`;
   const docA = `documents/${userA.id}/contract.pdf`;
@@ -545,6 +745,25 @@ try {
     }
   }
 
+  // Remove local directory RPC fixtures and audit rows using the disposable local database only.
+  try {
+    const entityIds = createdDirectoryEntityIds.length
+      ? createdDirectoryEntityIds.map(id => `'${id}'::uuid`).join(',') : 'NULL::uuid';
+    const sourceIds = createdDirectorySourceIds.length
+      ? createdDirectorySourceIds.map(id => `'${id}'::uuid`).join(',') : 'NULL::uuid';
+    const auditIds = createdDirectoryAuditIds.length
+      ? createdDirectoryAuditIds.map(id => `'${id}'::uuid`).join(',') : 'NULL::uuid';
+    runLocalSql(`
+      DELETE FROM public.directory_entity_sources
+      WHERE entity_id IN (${entityIds}) OR source_id IN (${sourceIds});
+      DELETE FROM public.directory_change_log WHERE id IN (${auditIds});
+      DELETE FROM public.directory_sources WHERE id IN (${sourceIds});
+      DELETE FROM public.directory_entities WHERE id IN (${entityIds});
+    `);
+  } catch {
+    // A failure is detected by the zero-residual assertion below; the stack is disposable.
+  }
+
   // Best-effort cleanup through the Storage API before deleting temporary Auth users.
   for (const object of createdObjects.reverse()) {
     try {
@@ -569,8 +788,18 @@ try {
   const storagePredicate = createdObjects.length
     ? createdObjects.map(object => `(bucket_id = ${quoteSql(object.bucket)} AND name = ${quoteSql(object.name)})`).join(' OR ')
     : 'false';
+  const directoryEntityIds = createdDirectoryEntityIds.length
+    ? createdDirectoryEntityIds.map(id => `'${id}'::uuid`).join(',') : 'NULL::uuid';
+  const directorySourceIds = createdDirectorySourceIds.length
+    ? createdDirectorySourceIds.map(id => `'${id}'::uuid`).join(',') : 'NULL::uuid';
+  const directoryAuditIds = createdDirectoryAuditIds.length
+    ? createdDirectoryAuditIds.map(id => `'${id}'::uuid`).join(',') : 'NULL::uuid';
   const remaining = Number(runLocalSql(`
     SELECT
+      (SELECT count(*) FROM public.directory_entities WHERE id IN (${directoryEntityIds})) +
+      (SELECT count(*) FROM public.directory_sources WHERE id IN (${directorySourceIds})) +
+      (SELECT count(*) FROM public.directory_entity_sources WHERE entity_id IN (${directoryEntityIds}) OR source_id IN (${directorySourceIds})) +
+      (SELECT count(*) FROM public.directory_change_log WHERE id IN (${directoryAuditIds})) +
       (SELECT count(*) FROM auth.users WHERE id IN (${uuidList})) +
       (SELECT count(*) FROM auth.identities WHERE user_id IN (${uuidList})) +
       (SELECT count(*) FROM private.layan_admins WHERE user_id IN (${uuidList})) +
@@ -578,6 +807,6 @@ try {
       (SELECT count(*) FROM public.marketplace_listings WHERE id IN (${listingIdList})) +
       (SELECT count(*) FROM storage.objects WHERE ${storagePredicate});
   `));
-  assert(remaining === 0, `Temporary Auth users, identities, admin rows, property offers, marketplace listings or Storage objects remained after cleanup (count=${remaining}).`);
-  console.log('PASS: local test cleanup verified zero remaining Auth users/identities, admin rows, property offers, marketplace listings and Storage objects.');
+  assert(remaining === 0, `Temporary directory fixtures/audits, Auth users/identities, admin rows, property offers, marketplace listings or Storage objects remained after cleanup (count=${remaining}).`);
+  console.log('PASS: local test cleanup verified zero remaining directory fixtures/audits, Auth users/identities, admin rows, property offers, marketplace listings and Storage objects.');
 }
