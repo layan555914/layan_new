@@ -14,6 +14,7 @@ on:
       - fix/directory-data-cache-v108
       - fix/directory-opportunity-source-links
       - research/directory-assiut-batch-20261102
+      - feature/directory-maps-taxonomy-20261103
   workflow_dispatch:
 
 permissions:
@@ -139,6 +140,39 @@ jobs:
           }
           if (/images\.pexels\.com/.test(sponsor)) {
             errors.push('Sponsor cards must not use unrelated generic stock photos as advertiser images');
+          }
+
+          const directoryPage = fs.readFileSync('directory.html', 'utf8');
+          if (!/class=["']directory-map-frame["']/.test(directoryPage) || !/openstreetmap\.org\/export\/embed\.html/.test(directoryPage)) {
+            errors.push('Public real-estate directory must include its interactive Assiut map');
+          }
+          if (!/openstreetmap\.org\/copyright/.test(directoryPage) || !/google\.com\/maps\/search\/\?api=1/.test(directoryPage)) {
+            errors.push('Directory map must include OSM attribution and Google Maps area search links');
+          }
+
+          const companiesPage = fs.readFileSync('companies.html', 'utf8');
+          if (!/class=["']company-map-tools["']/.test(companiesPage) || !/openstreetmap\.org\/export\/embed\.html/.test(companiesPage)) {
+            errors.push('Company directory must include its interactive Assiut area map');
+          }
+          if (!/action=["']https:\/\/www\.google\.com\/maps\/search\/["']/.test(companiesPage) ||
+              !/name=["']api["'] value=["']1["']/.test(companiesPage) ||
+              !/name=["']query["']/.test(companiesPage)) {
+            errors.push('Company directory must offer a Google Maps search form using api=1 and query');
+          }
+          const readOptionValues = selector => {
+            const select = companiesPage.match(new RegExp('<select[^>]*' + selector + '[^>]*>([\\s\\S]*?)<\\/select>', 'i'));
+            if (!select) return [];
+            return [...select[1].matchAll(/<option[^>]*>([^<]+)<\/option>/gi)]
+              .map(option => option[1].trim())
+              .filter(Boolean);
+          };
+          const filterCategories = readOptionValues('id="companyCategoryFilter"').filter(value => value !== "كل المجالات");
+          const signupCategories = readOptionValues('name="category"').filter(value => value !== "اختر المجال");
+          if (!filterCategories.length || !signupCategories.length ||
+              new Set(filterCategories).size !== filterCategories.length ||
+              new Set(signupCategories).size !== signupCategories.length ||
+              JSON.stringify([...filterCategories].sort()) !== JSON.stringify([...signupCategories].sort())) {
+            errors.push('Company service filter and signup categories must stay unique and consistent');
           }
 
           const directoryAdmin = fs.readFileSync('directory-admin.html', 'utf8');

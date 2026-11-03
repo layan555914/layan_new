@@ -253,3 +253,36 @@ test("directory admin page has no horizontal overflow on a phone viewport", asyn
   }));
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 });
+
+
+test("public directory shows an attributed interactive Assiut area map without claiming a company pin", async ({page}) => {
+  await mockDirectoryApi(page);
+  await page.goto("/directory.html");
+  const map = page.locator(".directory-map-frame");
+  await expect(map).toBeVisible();
+  await expect(map).toHaveAttribute("src", /openstreetmap\.org\/export\/embed\.html/);
+  await expect(page.locator(".directory-map-shell")).toContainText("ليست موقع مطور أو مشروع أو شركة");
+  await expect(page.locator(".directory-map-attribution a").first()).toHaveAttribute("href", /openstreetmap\.org\/copyright/);
+  await expect(page.locator(".directory-map-areas a")).toHaveCount(6);
+  await expect(page.locator(".directory-map-areas a").first()).toHaveAttribute("href", /google\.com\/maps\/search\/\?api=1/);
+});
+
+test("company directory category filters and signup categories are unique and maps search by name", async ({page}) => {
+  await page.route(SUPABASE + "/rest/v1/**", route => route.fulfill({
+    status: 200, contentType: "application/json", body: "[]"
+  }));
+  await page.goto("/companies.html");
+  const filterValues = await page.locator("#companyCategoryFilter option").evaluateAll(nodes =>
+    nodes.map(node => node.value).filter(Boolean)
+  );
+  const signupValues = await page.locator("#companyRegisterForm select[name=category] option").evaluateAll(nodes =>
+    nodes.map(node => node.value).filter(Boolean)
+  );
+  expect(new Set(filterValues).size).toBe(filterValues.length);
+  expect(new Set(signupValues).size).toBe(signupValues.length);
+  expect([...signupValues].sort()).toEqual([...filterValues].sort());
+  await expect(page.locator(".company-map-tools iframe")).toBeVisible();
+  await expect(page.locator(".company-map-search-form")).toHaveAttribute("action", "https://www.google.com/maps/search/");
+  await expect(page.locator(".company-map-search-form input[name=api]")).toHaveValue("1");
+  await expect(page.locator(".company-map-search-form input[name=query]")).toBeVisible();
+});
