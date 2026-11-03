@@ -41,6 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const toolbar = $("#dirAdminToolbar");
   const sourcesPanel = $("#dirAdminSourcesPanel");
   const sourceForm = $("#dirAdminSourceForm");
+  const projectsPanel = $("#dirAdminProjectsPanel");
+  const projectForm = $("#dirAdminProjectForm");
   const searchInput = $("#dirAdminSearch");
   const statusFilter = $("#dirAdminStatusFilter");
   const areaFilter = $("#dirAdminAreaFilter");
@@ -155,6 +157,17 @@ document.addEventListener("DOMContentLoaded", () => {
       '<option value="' + esc(area.id) + '">' + esc(area.name_ar) + '</option>'
     ).join("");
     if ([...areaFilter.options].some(option => option.value === current)) areaFilter.value = current;
+
+    const projectArea = $("#dirProjectArea");
+    if (projectArea) {
+      const selectedProjectArea = projectArea.value;
+      projectArea.innerHTML = '<option value="">غير محدد</option>' + cache.areas.map(area =>
+        '<option value="' + esc(area.id) + '">' + esc(area.name_ar) + '</option>'
+      ).join("");
+      if ([...projectArea.options].some(option => option.value === selectedProjectArea)) {
+        projectArea.value = selectedProjectArea;
+      }
+    }
   }
 
   function selectedArea(value) {
@@ -360,6 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isHistory = view === "history";
     toolbar.hidden = isHistory;
     sourcesPanel.hidden = view !== "sources";
+    projectsPanel.hidden = view !== "projects";
     const previousStatus = statusFilter.value;
     const statusOptions = view === "sources" ? [
       ["", "كل المصادر"], ["public", "مصادر عامة"], ["internal", "مصادر داخلية"]
@@ -504,6 +518,67 @@ document.addEventListener("DOMContentLoaded", () => {
       say(error.message || "تعذر تنفيذ العملية.");
     } finally {
       button.disabled = false;
+    }
+  });
+
+
+  function makeProjectSlug(value) {
+    const normalized = String(value || "").trim().toLowerCase().normalize("NFKD")
+      .replace(/[\\u0300-\\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    return normalized || ("project-" + Date.now().toString(36) + "-" +
+      Math.random().toString(36).slice(2, 8));
+  }
+
+  projectForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const submit = projectForm.querySelector("button[type=submit]");
+    submit.disabled = true;
+    try {
+      await requireAdmin();
+      const form = new FormData(projectForm);
+      const sizeValueRaw = String(form.get("size_value") || "").trim();
+      const unitCountRaw = String(form.get("unit_count") || "").trim();
+      const sizeValue = sizeValueRaw === "" ? null : Number(sizeValueRaw);
+      const unitCount = unitCountRaw === "" ? null : Number(unitCountRaw);
+
+      if (sizeValue !== null && (!Number.isFinite(sizeValue) || sizeValue < 0)) {
+        throw new Error("المساحة يجب أن تكون رقمًا صفرًا أو أكبر.");
+      }
+      if (unitCount !== null && (!Number.isInteger(unitCount) || unitCount < 0)) {
+        throw new Error("عدد الوحدات يجب أن يكون عددًا صحيحًا صفرًا أو أكبر.");
+      }
+
+      const slugInput = String(form.get("slug") || "").trim();
+      const slugSource = slugInput || String(form.get("name_en") || "").trim();
+      const project = {
+        slug: makeProjectSlug(slugSource),
+        name_ar: String(form.get("name_ar") || "").trim(),
+        name_en: String(form.get("name_en") || "").trim() || null,
+        project_type: String(form.get("project_type") || "").trim(),
+        description: String(form.get("description") || "").trim() || null,
+        area_id: String(form.get("area_id") || "").trim() || null,
+        location_text: String(form.get("location_text") || "").trim() || null,
+        size_value: sizeValue,
+        size_unit: String(form.get("size_unit") || "").trim() || null,
+        unit_count: unitCount,
+        project_status: String(form.get("project_status") || "unknown")
+      };
+
+      if (!project.name_ar || !project.project_type) {
+        throw new Error("اسم المشروع بالعربية ونوع المشروع مطلوبان.");
+      }
+
+      const reason = String(form.get("reason") || "").trim() || "إضافة مشروع جديد كمسودة";
+      await mutateWithAudit("directory_projects", "insert", null, project, reason);
+      projectForm.reset();
+      say("تمت إضافة المشروع كمسودة مخفية. اربط به مصدرًا موثوقًا من بطاقته قبل اعتماده أو نشره.");
+      await load();
+    } catch (error) {
+      say(error.message || "تعذر إضافة المشروع.");
+    } finally {
+      submit.disabled = false;
     }
   });
 
