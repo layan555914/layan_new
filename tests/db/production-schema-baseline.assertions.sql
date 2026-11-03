@@ -134,6 +134,236 @@ BEGIN
 END;
 $catalog_assertions$;
 
+
+-- Exact catalog fingerprints captured from production on 2026-11-03.
+-- Keep search_path explicit so PostgreSQL deparsing is deterministic in CI.
+DO $production_fingerprint_assertions$
+DECLARE
+  v_actual text;
+BEGIN
+  PERFORM set_config('search_path','public, private, extensions, auth, storage',true);
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'table',c.relname,'attnum',a.attnum,'name',a.attname,
+      'type',format_type(a.atttypid,a.atttypmod),'not_null',a.attnotnull,
+      'default',pg_get_expr(ad.adbin,ad.adrelid,true),
+      'identity',a.attidentity,'generated',a.attgenerated
+    ) ORDER BY n.nspname,c.relname,a.attnum) data
+    FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid
+    JOIN pg_namespace n ON n.oid=c.relnamespace
+    LEFT JOIN pg_attrdef ad ON ad.adrelid=c.oid AND ad.adnum=a.attnum
+    WHERE n.nspname IN ('public','private') AND c.relkind IN ('r','p')
+      AND a.attnum>0 AND NOT a.attisdropped
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '423b58e02bebe5adb53963d02723998c' THEN
+    RAISE EXCEPTION 'Production column fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'table',c.relname,'name',co.conname,'type',co.contype,
+      'deferrable',co.condeferrable,'deferred',co.condeferred,'validated',co.convalidated,
+      'definition',pg_get_constraintdef(co.oid,true)
+    ) ORDER BY n.nspname,c.relname,co.conname) data
+    FROM pg_constraint co JOIN pg_class c ON c.oid=co.conrelid
+    JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname IN ('public','private')
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '2daf1ac56bf3e3bf8b9fd0c1d53ec5f4' THEN
+    RAISE EXCEPTION 'Production constraint fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'table',t.relname,'index',i.relname,
+      'definition',pg_get_indexdef(i.oid)
+    ) ORDER BY n.nspname,t.relname,i.relname) data
+    FROM pg_index x JOIN pg_class t ON t.oid=x.indrelid
+    JOIN pg_namespace n ON n.oid=t.relnamespace
+    JOIN pg_class i ON i.oid=x.indexrelid
+    WHERE n.nspname IN ('public','private')
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM 'ff1b1ac5ad852ef85f14b2b49d86ece7' THEN
+    RAISE EXCEPTION 'Production index fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'name',p.proname,'identity_args',pg_get_function_identity_arguments(p.oid),
+      'kind',p.prokind,'definition',pg_get_functiondef(p.oid)
+    ) ORDER BY n.nspname,p.proname,pg_get_function_identity_arguments(p.oid)) data
+    FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+    WHERE n.nspname IN ('public','private') AND p.prokind IN ('f','p')
+      AND p.proname <> 'directory_admin_mutate_with_audit'
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM 'ac34f483aa464955047f293b1f7e1fcf' THEN
+    RAISE EXCEPTION 'Production function fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'name',c.relname,'definition',pg_get_viewdef(c.oid,true),
+      'options',c.reloptions
+    ) ORDER BY n.nspname,c.relname) data
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname IN ('public','private') AND c.relkind='v'
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM 'a71ebf185b60c81add11b457a18e0d10' THEN
+    RAISE EXCEPTION 'Production view fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'table',c.relname,'name',t.tgname,
+      'definition',pg_get_triggerdef(t.oid,true),'enabled',t.tgenabled
+    ) ORDER BY n.nspname,c.relname,t.tgname) data
+    FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid
+    JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname IN ('public','private') AND NOT t.tgisinternal
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '233bb57017595a2d5340845235578329' THEN
+    RAISE EXCEPTION 'Production trigger fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',schemaname,'table',tablename,'name',policyname,'permissive',permissive,
+      'roles',roles,'command',cmd,'using',qual,'check',with_check
+    ) ORDER BY schemaname,tablename,policyname) data
+    FROM pg_policies WHERE schemaname IN ('public','private')
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '9e4df96d23e44d66b7a5965fb3f0b0bd' THEN
+    RAISE EXCEPTION 'Production RLS policy fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'table',c.relname,'rls',c.relrowsecurity,'force',c.relforcerowsecurity
+    ) ORDER BY n.nspname,c.relname) data
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname IN ('public','private') AND c.relkind IN ('r','p')
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '05cf3a01d0cf939e809c17f21aa2db14' THEN
+    RAISE EXCEPTION 'Production RLS-enabled table fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'relation',c.relname,'role',r.rolname,'privilege',p.privilege,
+      'granted',has_table_privilege(r.rolname,c.oid,p.privilege)
+    ) ORDER BY n.nspname,c.relname,r.rolname,p.privilege) data
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    CROSS JOIN (VALUES ('anon'),('authenticated'),('service_role')) rn(name)
+    JOIN pg_roles r ON r.rolname=rn.name
+    CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(privilege)
+    WHERE n.nspname IN ('public','private') AND c.relkind IN ('r','p','v','m')
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '7bd719f0dccb0c722b466213ed8f18dd' THEN
+    RAISE EXCEPTION 'Production table/view privilege fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'sequence',c.relname,'role',r.rolname,'privilege',p.privilege,
+      'granted',has_sequence_privilege(r.rolname,c.oid,p.privilege)
+    ) ORDER BY n.nspname,c.relname,r.rolname,p.privilege) data
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    CROSS JOIN (VALUES ('anon'),('authenticated'),('service_role')) rn(name)
+    JOIN pg_roles r ON r.rolname=rn.name
+    CROSS JOIN (VALUES ('USAGE'),('SELECT'),('UPDATE')) p(privilege)
+    WHERE n.nspname IN ('public','private') AND c.relkind='S'
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM 'd037ea954b9cb65164830db66329d539' THEN
+    RAISE EXCEPTION 'Production sequence privilege fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',n.nspname,'function',p.proname,
+      'args',pg_get_function_identity_arguments(p.oid),'role',r.rolname,
+      'execute',has_function_privilege(r.rolname,p.oid,'EXECUTE')
+    ) ORDER BY n.nspname,p.proname,pg_get_function_identity_arguments(p.oid),r.rolname) data
+    FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+    CROSS JOIN (VALUES ('anon'),('authenticated'),('service_role')) rn(name)
+    JOIN pg_roles r ON r.rolname=rn.name
+    WHERE n.nspname IN ('public','private') AND p.prokind IN ('f','p')
+      AND p.proname <> 'directory_admin_mutate_with_audit'
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '166494438099beab585204d7cf19a2d5' THEN
+    RAISE EXCEPTION 'Production function privilege fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'schema',s.schema_name,'role',r.rolname,
+      'usage',has_schema_privilege(r.rolname,s.schema_name,'USAGE'),
+      'create',has_schema_privilege(r.rolname,s.schema_name,'CREATE')
+    ) ORDER BY s.schema_name,r.rolname) data
+    FROM (VALUES ('public'),('private'),('storage')) s(schema_name)
+    CROSS JOIN (VALUES ('anon'),('authenticated'),('service_role')) rn(name)
+    JOIN pg_roles r ON r.rolname=rn.name
+    WHERE EXISTS (SELECT 1 FROM pg_namespace n WHERE n.nspname=s.schema_name)
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '5e8de6a131fb75266fc6ce20f79af2be' THEN
+    RAISE EXCEPTION 'Production schema privilege fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'relation',c.relname,'role',r.rolname,'privilege',p.privilege,
+      'granted',has_table_privilege(r.rolname,c.oid,p.privilege)
+    ) ORDER BY c.relname,r.rolname,p.privilege) data
+    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+    CROSS JOIN (VALUES ('anon'),('authenticated'),('service_role')) rn(name)
+    JOIN pg_roles r ON r.rolname=rn.name
+    CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(privilege)
+    WHERE n.nspname='storage' AND c.relname IN ('buckets','objects') AND c.relkind='r'
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '767fa03fcd34b45b270a38d855d01494' THEN
+    RAISE EXCEPTION 'Production Storage relation privilege fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'id',id,'name',name,'public',public,
+      'file_size_limit',file_size_limit,'allowed_mime_types',allowed_mime_types
+    ) ORDER BY id) data
+    FROM storage.buckets
+    WHERE id IN ('layan_real_estat','layan-property-documents')
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM '7daa6598baf8bbdb66ce8132992fa824' THEN
+    RAISE EXCEPTION 'Production Storage bucket configuration fingerprint mismatch: %',v_actual;
+  END IF;
+
+  WITH d AS (
+    SELECT jsonb_agg(jsonb_build_object(
+      'table',tablename,'name',policyname,'permissive',permissive,'roles',roles,
+      'command',cmd,'using',qual,'check',with_check
+    ) ORDER BY tablename,policyname) data
+    FROM pg_policies WHERE schemaname='storage' AND tablename='objects'
+  )
+  SELECT md5(data::text) INTO v_actual FROM d;
+  IF v_actual IS DISTINCT FROM 'c61735dca4ec3309648fb1d192755880' THEN
+    RAISE EXCEPTION 'Production Storage policy fingerprint mismatch: %',v_actual;
+  END IF;
+END;
+$production_fingerprint_assertions$;
+
 -- Directory publication must fail without a public source and succeed once linked.
 INSERT INTO public.directory_areas
   (id,slug,name_ar,area_type,is_active,verification_status,public_visible)
