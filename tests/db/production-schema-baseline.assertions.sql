@@ -9,8 +9,8 @@ DECLARE
   v_count integer;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 62 THEN
-    RAISE EXCEPTION 'Expected 62 local migration ledger rows (59 historical markers + baseline + seed + RPC); found %', v_count;
+  IF v_count <> 64 THEN
+    RAISE EXCEPTION 'Expected 64 local migration ledger rows (59 historical markers + baseline + seed + admin RPC + audit-log hardening + project creation); found %', v_count;
   END IF;
 
   SELECT count(*) INTO v_count
@@ -169,8 +169,27 @@ BEGIN
   IF NOT has_schema_privilege('authenticated','private','USAGE') THEN
     RAISE EXCEPTION 'authenticated is missing private schema usage';
   END IF;
-  IF NOT has_table_privilege('authenticated','public.directory_change_log','INSERT') THEN
-    RAISE EXCEPTION 'authenticated is missing the directory audit insert grant';
+  IF NOT has_table_privilege('authenticated','public.directory_change_log','SELECT')
+     OR NOT has_table_privilege('authenticated','public.directory_change_log','INSERT') THEN
+    RAISE EXCEPTION 'authenticated must retain SELECT and INSERT on the directory audit log';
+  END IF;
+  IF has_table_privilege('authenticated','public.directory_change_log','UPDATE')
+     OR has_table_privilege('authenticated','public.directory_change_log','DELETE')
+     OR has_table_privilege('authenticated','public.directory_change_log','TRUNCATE')
+     OR has_table_privilege('authenticated','public.directory_change_log','REFERENCES')
+     OR has_table_privilege('authenticated','public.directory_change_log','TRIGGER') THEN
+    RAISE EXCEPTION 'authenticated must not mutate or truncate the directory audit log';
+  END IF;
+  IF has_table_privilege('anon','public.directory_change_log','SELECT')
+     OR has_table_privilege('anon','public.directory_change_log','INSERT') THEN
+    RAISE EXCEPTION 'anon must not access the directory audit log';
+  END IF;
+  IF NOT has_table_privilege('service_role','public.directory_change_log','SELECT')
+     OR NOT has_table_privilege('service_role','public.directory_change_log','INSERT')
+     OR NOT has_table_privilege('service_role','public.directory_change_log','UPDATE')
+     OR NOT has_table_privilege('service_role','public.directory_change_log','DELETE')
+     OR NOT has_table_privilege('service_role','public.directory_change_log','TRUNCATE') THEN
+    RAISE EXCEPTION 'service_role audit-log privileges changed unexpectedly';
   END IF;
   IF has_function_privilege('anon','public.layan_is_admin()','EXECUTE') THEN
     RAISE EXCEPTION 'anon must not execute public.layan_is_admin()';
@@ -337,10 +356,13 @@ BEGIN
     CROSS JOIN (VALUES ('anon'),('authenticated'),('service_role')) rn(name)
     JOIN pg_roles r ON r.rolname=rn.name
     CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('REFERENCES'),('TRIGGER')) p(privilege)
+    -- The audit-log relation is excluded here because this change intentionally
+    -- tightens its authenticated grants; exact expected grants are asserted above.
     WHERE n.nspname IN ('public','private') AND c.relkind IN ('r','p','v','m')
+      AND c.relname <> 'directory_change_log'
   )
   SELECT md5(data::text) INTO v_actual FROM d;
-  IF v_actual IS DISTINCT FROM '7bd719f0dccb0c722b466213ed8f18dd' THEN
+  IF v_actual IS DISTINCT FROM 'd8e7f103f8811a0c70060e0a189af89b' THEN
     RAISE EXCEPTION 'Production table/view privilege fingerprint mismatch: %',v_actual;
   END IF;
 
@@ -651,6 +673,148 @@ BEGIN
   END IF;
 END;
 $storage_anon_test$;
+RESET ROLE;
+
+-- Exercise the real audited directory RPC as an authenticated synthetic admin.
+-- The entire assertions file runs in one transaction and is rolled back below.
+INSERT INTO auth.users (
+  id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, is_super_admin, created_at, updated_at, is_anonymous
+) VALUES (
+  'f0000000-0000-4000-8000-000000000003'::uuid,
+  'authenticated','authenticated','ci-rollback-admin@asyut-aqar.invalid','!',
+  now(),'{"provider":"email","providers":["email"]}'::jsonb,'{}'::jsonb,
+  false,now(),now(),false
+);
+INSERT INTO private.layan_admins(user_id)
+VALUES ('f0000000-0000-4000-8000-000000000003'::uuid);
+SELECT set_config('request.jwt.claim.sub','f0000000-0000-4000-8000-000000000003',true);
+SELECT set_config('request.jwt.claims','{"sub":"f0000000-0000-4000-8000-000000000003","role":"authenticated","aal":"aal1"}',true);
+SET LOCAL ROLE authenticated;
+
+DO $directory_admin_rpc_integration_test$
+DECLARE
+  v_source_result jsonb;
+  v_project_result jsonb;
+  v_link_result jsonb;
+  v_source_id uuid;
+  v_project_id uuid;
+  v_audit_count integer;
+  v_update_blocked boolean := false;
+  v_delete_blocked boolean := false;
+  v_truncate_blocked boolean := false;
+BEGIN
+  IF auth.uid() IS DISTINCT FROM 'f0000000-0000-4000-8000-000000000003'::uuid
+     OR NOT public.layan_is_admin() THEN
+    RAISE EXCEPTION 'Synthetic rollback-only admin principal was not recognized';
+  END IF;
+
+  v_source_result := public.directory_admin_mutate_with_audit(
+    'directory_sources','insert',NULL,
+    jsonb_build_object(
+      'title','مصدر اصطناعي لاختبار CI',
+      'publisher','ASYUT AQAR CI',
+      'source_type','synthetic_test',
+      'source_url','https://example.invalid/asyut-aqar-ci',
+      'confidence_level','official',
+      'is_public',true,
+      'notes','Synthetic source used only inside the rollback-only CI transaction'
+    ),
+    'إضافة مصدر اصطناعي لاختبار CI'
+  );
+  v_source_id := (v_source_result #>> '{record,id}')::uuid;
+  IF v_source_id IS NULL OR NULLIF(v_source_result->>'audit_id','') IS NULL THEN
+    RAISE EXCEPTION 'Source creation did not return record and audit IDs';
+  END IF;
+
+  v_project_result := public.directory_admin_mutate_with_audit(
+    'directory_projects','insert',NULL,
+    jsonb_build_object(
+      'slug','ci-rollback-project-asqa-20261103',
+      'name_ar','مشروع اختبار مؤقت - لا يُحفظ',
+      'name_en','Temporary rollback test project',
+      'project_type','residential',
+      'description','Synthetic integration test; this transaction is rolled back.',
+      'area_id',NULL,
+      'location_text','أسيوط الجديدة - اختبار مؤقت',
+      'size_value',1250,
+      'size_unit','متر مربع',
+      'unit_count',24,
+      'project_status','unknown'
+    ),
+    'اختبار تكاملي مؤقت داخل معاملة متراجعة'
+  );
+  v_project_id := (v_project_result #>> '{record,id}')::uuid;
+  IF v_project_id IS NULL OR NULLIF(v_project_result->>'audit_id','') IS NULL THEN
+    RAISE EXCEPTION 'Project creation did not return record and audit IDs';
+  END IF;
+
+  v_link_result := public.directory_admin_mutate_with_audit(
+    'directory_project_sources','insert',v_project_id,
+    jsonb_build_object(
+      'project_id',v_project_id,
+      'source_id',v_source_id,
+      'claim_key','integration_test'
+    ),
+    'ربط مصدر اصطناعي في اختبار متراجع'
+  );
+  IF NULLIF(v_link_result->>'audit_id','') IS NULL THEN
+    RAISE EXCEPTION 'Project-source link did not return an audit ID';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.directory_projects
+    WHERE id=v_project_id AND verification_status='draft' AND public_visible=false
+  ) THEN
+    RAISE EXCEPTION 'Project must be inserted as a hidden draft';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM public.directory_project_sources
+    WHERE project_id=v_project_id AND source_id=v_source_id AND claim_key='integration_test'
+  ) THEN
+    RAISE EXCEPTION 'Project source relationship was not inserted';
+  END IF;
+  SELECT count(*) INTO v_audit_count
+  FROM public.directory_change_log
+  WHERE (table_name='directory_sources' AND record_id=v_source_id)
+     OR (table_name IN ('directory_projects','directory_project_sources') AND record_id=v_project_id);
+  IF v_audit_count <> 3 THEN
+    RAISE EXCEPTION 'Expected three audit entries (source, project, link); found %',v_audit_count;
+  END IF;
+
+  BEGIN
+    UPDATE public.directory_change_log SET reason=reason WHERE false;
+    RAISE EXCEPTION 'Audit log UPDATE unexpectedly permitted';
+  EXCEPTION WHEN insufficient_privilege THEN v_update_blocked := true;
+  END;
+  BEGIN
+    DELETE FROM public.directory_change_log WHERE false;
+    RAISE EXCEPTION 'Audit log DELETE unexpectedly permitted';
+  EXCEPTION WHEN insufficient_privilege THEN v_delete_blocked := true;
+  END;
+  BEGIN
+    EXECUTE 'TRUNCATE TABLE public.directory_change_log';
+    RAISE EXCEPTION 'Audit log TRUNCATE unexpectedly permitted';
+  EXCEPTION WHEN insufficient_privilege THEN v_truncate_blocked := true;
+  END;
+  IF NOT (v_update_blocked AND v_delete_blocked AND v_truncate_blocked) THEN
+    RAISE EXCEPTION 'Audit log append-only access checks did not all block mutation';
+  END IF;
+END;
+$directory_admin_rpc_integration_test$;
+
+RESET ROLE;
+SET LOCAL ROLE anon;
+DO $directory_admin_public_visibility_test$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM public.directory_projects
+    WHERE slug='ci-rollback-project-asqa-20261103'
+  ) THEN
+    RAISE EXCEPTION 'anon must not see a draft project';
+  END IF;
+END;
+$directory_admin_public_visibility_test$;
 RESET ROLE;
 
 ROLLBACK;

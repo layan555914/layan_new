@@ -5,6 +5,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103140155_asyut_aqar_production_schema_baseline.sql"
 MARKETPLACE_SEED_MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103140655_seed_asyut_aqar_marketplace_categories.sql"
 DIRECTORY_ADMIN_MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103141537_directory_admin_mutate_with_audit.sql"
+AUDIT_LOG_MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103150000_directory_audit_log_immutability.sql"
+PROJECT_CREATE_MIGRATION_FILE="$ROOT_DIR/supabase/migrations/20261103164032_directory_project_insert_with_audit_20261103.sql"
 CONFIG_FILE="$ROOT_DIR/supabase/config.toml"
 STORAGE_BASELINE_FILE="$ROOT_DIR/supabase/bootstrap/storage-baseline.sql"
 ASSERTIONS_FILE="$ROOT_DIR/tests/db/production-schema-baseline.assertions.sql"
@@ -19,7 +21,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for required_file in "$MIGRATION_FILE" "$MARKETPLACE_SEED_MIGRATION_FILE" "$DIRECTORY_ADMIN_MIGRATION_FILE" "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE"; do
+for required_file in "$MIGRATION_FILE" "$MARKETPLACE_SEED_MIGRATION_FILE" "$DIRECTORY_ADMIN_MIGRATION_FILE" "$AUDIT_LOG_MIGRATION_FILE" "$PROJECT_CREATE_MIGRATION_FILE" "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required rehearsal file is missing or empty: $required_file" >&2
     exit 1
@@ -68,7 +70,16 @@ mkdir -p "$TEST_DIR/supabase/migrations"
 for history_file in "$ROOT_DIR"/supabase/migrations/*.sql; do
   if [[ "$history_file" == "$MIGRATION_FILE" \
      || "$history_file" == "$MARKETPLACE_SEED_MIGRATION_FILE" \
-     || "$history_file" == "$DIRECTORY_ADMIN_MIGRATION_FILE" ]]; then
+     || "$history_file" == "$DIRECTORY_ADMIN_MIGRATION_FILE" \
+     || "$history_file" == "$AUDIT_LOG_MIGRATION_FILE" \
+     || "$history_file" == "$PROJECT_CREATE_MIGRATION_FILE" ]]; then
+    continue
+  fi
+  # The catalog-derived current-state baseline below replaces historical
+  # executable DDL. Replay only comment-only version markers before it; older
+  # executable migrations may depend on tables that the baseline will create.
+  if grep -Eq '^[[:space:]]*[^-[:space:]]' "$history_file"; then
+    echo "Skipping executable historical migration (covered by schema snapshot): $(basename "$history_file")"
     continue
   fi
   cp "$history_file" "$TEST_DIR/supabase/migrations/"
@@ -87,7 +98,9 @@ cp "$MIGRATION_FILE" "$GENERATED_MIGRATION"
 sleep 1
 
 supabase migration new seed_asyut_aqar_marketplace_categories >/dev/null
-GENERATED_MARKETPLACE_SEED_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_seed_asyut_aqar_marketplace_categories.sql' -print -quit)"
+# Several historical migrations share this suffix; choose the newest CLI-created
+# path so the new seed never overwrites an older ledger marker.
+GENERATED_MARKETPLACE_SEED_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_seed_asyut_aqar_marketplace_categories.sql' -print | sort | tail -n 1)"
 if [[ -z "$GENERATED_MARKETPLACE_SEED_MIGRATION" ]]; then
   echo "Supabase CLI did not create the expected marketplace seed migration." >&2
   exit 1
@@ -104,6 +117,29 @@ if [[ -z "$GENERATED_DIRECTORY_ADMIN_MIGRATION" ]]; then
   exit 1
 fi
 cp "$DIRECTORY_ADMIN_MIGRATION_FILE" "$GENERATED_DIRECTORY_ADMIN_MIGRATION"
+sleep 1
+
+# The audit-log hardening migration depends on directory_change_log from the
+# schema baseline and must run after the generated RPC migration, not as an
+# earlier historical marker.
+supabase migration new directory_audit_log_immutability >/dev/null
+GENERATED_AUDIT_LOG_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_directory_audit_log_immutability.sql' -print -quit)"
+if [[ -z "$GENERATED_AUDIT_LOG_MIGRATION" ]]; then
+  echo "Supabase CLI did not create the expected audit-log migration." >&2
+  exit 1
+fi
+cp "$AUDIT_LOG_MIGRATION_FILE" "$GENERATED_AUDIT_LOG_MIGRATION"
+sleep 1
+
+# Project creation extends the audited RPC and therefore follows the core
+# audit-log schema, RPC setup, and append-only privilege migration.
+supabase migration new directory_project_insert_with_audit >/dev/null
+GENERATED_PROJECT_CREATE_MIGRATION="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_directory_project_insert_with_audit.sql' -print -quit)"
+if [[ -z "$GENERATED_PROJECT_CREATE_MIGRATION" ]]; then
+  echo "Supabase CLI did not create the expected project-create migration." >&2
+  exit 1
+fi
+cp "$PROJECT_CREATE_MIGRATION_FILE" "$GENERATED_PROJECT_CREATE_MIGRATION"
 
 echo "Starting an isolated local Supabase stack (no hosted project is linked)."
 supabase start -x "studio,edge-runtime,logflare,vector,postgres-meta,imgproxy"
