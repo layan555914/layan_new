@@ -2,6 +2,9 @@
 -- Does not copy or modify storage.objects file contents.
 -- Apply only to a clean Supabase project after Storage is enabled.
 
+-- Storage schema API roles have usage in the source Supabase project.
+GRANT USAGE ON SCHEMA storage TO anon, authenticated, service_role;
+
 -- Match the source project's Storage API table ACLs; RLS policies remain the row-level boundary.
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE storage.buckets TO anon, authenticated;
 GRANT ALL PRIVILEGES ON TABLE storage.buckets TO service_role;
