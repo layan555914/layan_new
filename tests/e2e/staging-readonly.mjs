@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Read-only HTTP smoke tests against the isolated hosted ASYUT AQAR staging project.
- * Uses only its public publishable key. No Auth session, service-role key, writes,
- * test accounts, or Storage object changes are used.
+ * Public HTTP smoke tests against the isolated hosted ASYUT AQAR staging project.
+ * Uses only its public publishable key. No Auth session, service-role key, writes
+ * that are allowed to persist, test accounts, or Storage object changes are used.
  */
 import assert from "node:assert/strict";
 
@@ -70,8 +70,8 @@ async function expectRpcDenied(name, payload) {
 }
 
 async function main() {
-  // This project is intentionally data-empty. The test verifies that its published
-  // endpoints and PostgREST API remain reachable without requiring fixture rows.
+  // The project contains only explicitly labelled synthetic test fixtures.
+  // Exact counts ensure pages read the intended fixture rows and nothing else.
   await expectRows("marketplace_categories?select=name,is_active,description&is_active=eq.true&order=display_order.asc", "active marketplace categories", 11);
   await expectRows("property_offers?select=id,title,status&status=eq.available", "available staging property offers", 2);
   await expectRows("marketplace_listings?select=id,title,status&status=eq.approved", "approved staging marketplace listings", 1);
@@ -122,7 +122,7 @@ async function main() {
     "The asyut-admin Edge Function must reject requests without a user JWT; got HTTP " + edge.response.status);
   console.log("PASS: asyut-admin Edge Function rejects requests without a user JWT (HTTP 401).");
 
-  console.log("PASS: hosted staging HTTP smoke tests completed. No writes, Auth sessions, or Storage changes were issued.");
+  console.log("PASS: hosted staging HTTP smoke tests completed. Only anonymous denied-upload was attempted; no Auth sessions or successful Storage writes were used.");
 }
 
 main().catch((error) => {
