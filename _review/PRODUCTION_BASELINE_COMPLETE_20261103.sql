@@ -1915,10 +1915,10 @@ GRANT SELECT, UPDATE, USAGE ON SEQUENCE public.promotion_payments_id_seq TO anon
 -- Does not copy or modify storage.objects file contents.
 -- Apply only to a clean Supabase project after Storage is enabled.
 
--- Storage schema API roles have usage in the source Supabase project.
+-- Match the source project's Storage API schema and table access model.
 GRANT USAGE ON SCHEMA storage TO anon, authenticated, service_role;
-
--- Match the source project's Storage API table ACLs; RLS policies remain the row-level boundary.
+ALTER TABLE storage.buckets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE storage.buckets TO anon, authenticated;
 GRANT ALL PRIVILEGES ON TABLE storage.buckets TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE storage.objects TO anon, authenticated;
