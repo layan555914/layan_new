@@ -166,7 +166,17 @@ async function mockDirectoryAdmin(page, { isAdmin = true } = {}) {
       let record;
       let recordId = p_record_id || null;
       let oldValues = {};
-      if (p_operation === "insert" && p_table_name === "directory_sources") {
+      if (p_operation === "insert" && p_table_name === "directory_projects") {
+        record = {
+          id:"project-admin-new",
+          project_status:"unknown",
+          verification_status:"draft",
+          public_visible:false,
+          ...p_data
+        };
+        db.directory_projects.push(record);
+        recordId = record.id;
+      } else if (p_operation === "insert" && p_table_name === "directory_sources") {
         record = {
           id:"source-admin-1",
           accessed_at:"2026-11-03T08:00:00Z",
@@ -174,9 +184,12 @@ async function mockDirectoryAdmin(page, { isAdmin = true } = {}) {
         };
         db.directory_sources.push(record);
         recordId = record.id;
-      } else if (p_operation === "insert" && p_table_name === "directory_entity_sources") {
+      } else if (p_operation === "insert" &&
+          (p_table_name === "directory_entity_sources" || p_table_name === "directory_project_sources")) {
         record = { ...p_data };
-        db.directory_entity_sources.push(record);
+        const linkTable = p_table_name === "directory_entity_sources"
+          ? db.directory_entity_sources : db.directory_project_sources;
+        linkTable.push(record);
       } else if (p_operation === "update") {
         record = (db[p_table_name] || []).find(item => item.id === p_record_id);
         if (!record) {
@@ -277,6 +290,64 @@ test("directory admin reviews, sources, publication and audit history", async ({
   await page.locator("[data-view=history]").click();
   await expect(page.locator(".dir-admin-log")).toHaveCount(3);
   await expect(page.locator("#dirAdminRecords")).toContainText("اعتماد ونشر سجل");
+});
+
+
+test("directory admin creates a draft project, links a source and records both audit events", async ({page}) => {
+  const db = await mockDirectoryAdmin(page,{isAdmin:true});
+  await page.goto("/directory-admin.html");
+  await page.locator("#dirAdminEmail").fill("admin@example.test");
+  await page.locator("#dirAdminPassword").fill("admin-test-password");
+  await page.locator("#dirAdminLogin button[type=submit]").click();
+  await expect(page.locator("#dirAdminPanel")).toBeVisible();
+
+  await page.locator("[data-view=sources]").click();
+  await page.locator("#dirAdminSourceForm [name=title]").fill("مرجع المشروع الرسمي");
+  await page.locator("#dirAdminSourceForm [name=publisher]").fill("جهة اختبار");
+  await page.locator("#dirAdminSourceForm [name=source_type]").fill("موقع رسمي");
+  await page.locator("#dirAdminSourceForm [name=source_url]").fill("https://example.org/project");
+  await page.locator("#dirAdminSourceForm [name=confidence_level]").selectOption("official");
+  await page.locator("#dirAdminSourceForm [name=is_public]").check();
+  await page.locator("#dirAdminSourceForm button[type=submit]").click();
+  await expect(page.locator("#dirAdminRecords [data-kind=sources]")).toHaveCount(1);
+
+  await page.locator("[data-view=projects]").click();
+  await expect(page.locator("#dirAdminProjectsPanel")).toBeVisible();
+  await page.locator("#dirAdminProjectForm [name=name_ar]").fill("مشروع جديد للاختبار");
+  await page.locator("#dirAdminProjectForm [name=name_en]").fill("New Assiut Test Project");
+  await page.locator("#dirAdminProjectForm [name=project_type]").selectOption("residential");
+  await page.locator("#dirAdminProjectForm [name=project_status]").selectOption("under_construction");
+  await page.locator("#dirAdminProjectForm [name=area_id]").selectOption("area-admin-1");
+  await page.locator("#dirAdminProjectForm [name=location_text]").fill("أسيوط الجديدة");
+  await page.locator("#dirAdminProjectForm [name=size_value]").fill("1250");
+  await page.locator("#dirAdminProjectForm [name=size_unit]").fill("متر مربع");
+  await page.locator("#dirAdminProjectForm [name=unit_count]").fill("24");
+  await page.locator("#dirAdminProjectForm [name=description]").fill("وصف تجريبي لا يمثل مشروعًا حقيقيًا.");
+  await page.locator("#dirAdminProjectForm [name=reason]").fill("اختبار إدخال مسودة");
+  await page.locator("#dirAdminProjectForm button[type=submit]").click();
+
+  await expect(page.locator("#dirAdminStatus")).toContainText("تمت إضافة المشروع كمسودة");
+  const project = page.locator('#dirAdminRecords [data-kind="projects"][data-id="project-admin-new"]');
+  await expect(project).toBeVisible();
+  await expect(project).toContainText("مشروع جديد للاختبار");
+  expect(db.directory_projects).toHaveLength(2);
+  expect(db.directory_projects.find(item => item.id === "project-admin-new").verification_status).toBe("draft");
+  expect(db.directory_projects.find(item => item.id === "project-admin-new").public_visible).toBe(false);
+  expect(db.directory_change_log).toHaveLength(2);
+
+  await project.locator("[data-link-source]").selectOption("source-admin-1");
+  await project.locator("[data-link-record]").click();
+  await expect(page.locator("#dirAdminStatus")).toContainText("تم ربط المصدر بالسجل وتسجيل العملية.");
+  expect(db.directory_project_sources).toHaveLength(1);
+  expect(db.directory_project_sources[0]).toMatchObject({
+    project_id:"project-admin-new",source_id:"source-admin-1",claim_key:"general"
+  });
+  expect(db.directory_change_log).toHaveLength(3);
+
+  await page.locator("[data-view=history]").click();
+  await expect(page.locator(".dir-admin-log")).toHaveCount(3);
+  await expect(page.locator("#dirAdminRecords")).toContainText("إضافة مشروع للاختبار");
+  await expect(page.locator("#dirAdminRecords")).toContainText("ربط مصدر بالسجل");
 });
 
 test("directory admin page has no horizontal overflow on a phone viewport", async ({page}) => {
