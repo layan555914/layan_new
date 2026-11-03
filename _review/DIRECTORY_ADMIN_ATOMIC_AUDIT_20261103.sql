@@ -22,7 +22,7 @@ DECLARE
   v_assignments text;
   v_columns text;
   v_values text;
-  v_before jsonb := '{}'::jsonb;
+  v_before jsonb;
   v_after jsonb;
   v_old_values jsonb := '{}'::jsonb;
   v_new_values jsonb;
