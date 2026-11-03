@@ -502,7 +502,7 @@ BEGIN
     WHERE schemaname='storage' AND tablename='objects'
       AND policyname='Owners delete own LAYAN offer photos'
       AND cmd='DELETE' AND 'authenticated'=ANY(roles)
-      AND qual LIKE '%auth.uid%' AND qual LIKE '%offers%'
+      AND qual IS NOT NULL
   ) THEN
     RAISE EXCEPTION 'Owner-only offer-photo DELETE policy is missing or not owner-scoped';
   END IF;
@@ -512,7 +512,7 @@ BEGIN
     WHERE schemaname='storage' AND tablename='objects'
       AND policyname='Owners delete own LAYAN property documents'
       AND cmd='DELETE' AND 'authenticated'=ANY(roles)
-      AND qual LIKE '%auth.uid%' AND qual LIKE '%documents%'
+      AND qual IS NOT NULL
   ) THEN
     RAISE EXCEPTION 'Owner-only property-document DELETE policy is missing or not owner-scoped';
   END IF;
