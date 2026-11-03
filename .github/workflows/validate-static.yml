@@ -20,6 +20,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: asyut-aqar-validation-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -178,3 +182,27 @@ jobs:
 
       - name: Verify live Supabase reads and anonymous permission boundaries
         run: node tests/e2e/live-supabase-readonly.mjs
+
+  rehearse-full-supabase-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out review branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js for Supabase CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pinned Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 2.84.2
+
+      - name: Confirm local Docker runtime
+        run: docker version
+
+      - name: Rebuild disposable local Supabase and verify baseline
+        shell: bash
+        run: bash scripts/ci/rehearse-production-schema-baseline.sh
