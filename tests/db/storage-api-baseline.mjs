@@ -131,10 +131,12 @@ async function remove(bucket, names, token) {
 
 async function deleteUser(id) {
   if (!id) return;
-  await request(`/auth/v1/admin/users/${id}`, {
+  const { response, body } = await request(`/auth/v1/admin/users/${id}`, {
     method: 'DELETE',
     headers: headers(serviceRoleKey, serviceRoleKey),
   });
+  assert([200, 204, 404].includes(response.status),
+    `Could not delete disposable local Auth user ${id} (HTTP ${response.status}): ${JSON.stringify(body)}`);
 }
 
 function runLocalSql(sql) {
@@ -554,4 +556,28 @@ try {
   await deleteUser(userA?.id);
   await deleteUser(userB?.id);
   await deleteUser(userAdmin?.id);
+
+  // Verify every created test artifact was removed before the disposable stack exits.
+  const userIds = [userA?.id, userB?.id, userAdmin?.id].filter(Boolean);
+  for (const id of userIds) assert(/^[0-9a-f-]{36}$/i.test(String(id)), 'Invalid cleanup Auth user UUID.');
+  const uuidList = userIds.length ? userIds.map(id => `'${id}'::uuid`).join(',') : 'NULL::uuid';
+  const propertyIdList = createdPropertyOfferIds.length
+    ? createdPropertyOfferIds.map(id => String(Number(id))).join(',') : 'NULL::bigint';
+  const listingIdList = createdMarketplaceListingIds.length
+    ? createdMarketplaceListingIds.map(id => `'${String(id)}'::uuid`).join(',') : 'NULL::uuid';
+  const quoteSql = value => "'" + String(value).replace(/'/g, "''") + "'";
+  const storagePredicate = createdObjects.length
+    ? createdObjects.map(object => `(bucket_id = ${quoteSql(object.bucket)} AND name = ${quoteSql(object.name)})`).join(' OR ')
+    : 'false';
+  const remaining = Number(runLocalSql(`
+    SELECT
+      (SELECT count(*) FROM auth.users WHERE id IN (${uuidList})) +
+      (SELECT count(*) FROM auth.identities WHERE user_id IN (${uuidList})) +
+      (SELECT count(*) FROM private.layan_admins WHERE user_id IN (${uuidList})) +
+      (SELECT count(*) FROM public.property_offers WHERE id IN (${propertyIdList})) +
+      (SELECT count(*) FROM public.marketplace_listings WHERE id IN (${listingIdList})) +
+      (SELECT count(*) FROM storage.objects WHERE ${storagePredicate});
+  `));
+  assert.equal(remaining, 0, 'Temporary Auth users, admin rows, test listings or Storage objects remained after cleanup.');
+  console.log('PASS: local test cleanup verified zero remaining Auth users/identities, admin rows, property offers, marketplace listings and Storage objects.');
 }
