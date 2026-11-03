@@ -1,157 +1,150 @@
 # ASYUT AQAR — layan-claude-test compatibility audit
 
 **Date:** 2026-11-03  
-**User decision:** Approved temporary use of `layan-claude-test` as a candidate test environment, with explicit preservation of its existing user, migrations, Edge Function, and all existing data.  
-**Execution status:** Two reviewed, staging-only migrations applied. Production was not changed.
-**Audit mode:** Initial review was read-only; subsequent schema changes were limited to the approved test project. No data, Auth identities, admin memberships, Edge Function code, secrets or Storage objects were copied or changed.
+**Environment:** Supabase test project `wisnmlbefdrkcbbqvdlg` (`layan-claude-test`)  
+**User decision:** Approved temporary use as a test environment, preserving the existing Auth user, identities, private records, Edge Function, existing table/policy objects and Storage configuration.  
+**Production:** `ebyhwqkmhxbgocngpqfe` — read-only throughout this work.  
+**Current conclusion:** The application schema is now present in staging, but staging is **not yet safe to use for full behavioural parity testing**. Specific marketplace policy and supplier-ad RPC differences remain and require a separate approval before changing permissions or functions.
 
-## Executive result
+## Current verified inventory
 
-The project is healthy, but **not yet compatible with the current production application schema**. Keep it intact. Do not run the production baseline SQL directly against this project, and do not mark it as ready for full-platform testing yet.
-
-## Verified inventory
-
-| Item | Current test project |
+| Item | Staging now |
 |---|---:|
-| Supabase project state | ACTIVE_HEALTHY |
+| Project state | ACTIVE_HEALTHY |
 | PostgreSQL | 17.11 |
-| Migration records | 19 |
-| Public application base tables | 1 |
-| Private application base tables | 0 |
-| Auth users | 1 |
-| Auth identities | 1 |
-| `marketplace_listings` rows | 0 |
-| Storage object rows | 0 |
+| Migration records | 22 (19 original + 3 staging migrations) |
+| Public application tables | 26 |
+| Private application tables | 2 |
+| Application tables with RLS enabled | 28 / 28 |
+| Application constraints | 137 |
+| Secondary indexes | 33 |
+| Functions/procedures | 21 |
+| Public views | 2 |
+| Application triggers | 7 |
+| RLS policies | 81 |
+| Auth users / identities | 1 / 1 |
+| Rows in all 28 application tables | 0 |
+| Storage objects | 0 |
 | Storage buckets | 2 |
-| Storage object RLS policies | 6 |
-| Public application RLS policies | 5 |
-| Application constraints | 7 |
-| Secondary application indexes | 3 |
-| Application routines (functions/procedures) | 9 |
-| Application views | 0 |
-| Application triggers | 0 |
-| Edge Functions | 1 active: `asyut-admin` (JWT verification enabled) |
+| Edge Functions | `asyut-admin` ACTIVE, JWT verification enabled |
 
-The single public application table is `marketplace_listings`. The production project currently has 28 application tables (26 public and 2 private), plus 59 migration records in its migration history. The test project therefore lacks 27 of the current production application tables.
+The private tables were initially missed by an `information_schema` query because they are not visible through that query context. A direct PostgreSQL catalog check confirmed that both `private.layan_admins` and `private.project_decisions` already existed before the additive public-schema work. Both remain empty and RLS-enabled.
 
+## Staging migrations recorded
 
-### Additional object-level comparison
-
-The test project currently exposes 9 routines across `public` and `private`, 7 application constraints, and 3 secondary indexes; it has no application views or triggers. The current production baseline expects 20 routines, 135 constraints, 32 secondary indexes, 2 public views and 7 application triggers. The existing marketplace table also has a distinct column definition and must be reconciled field by field.
-
-The checked-in production baseline is a clean-stack rehearsal script, not an additive migration. It contains 28 `CREATE TABLE` statements, including a second `marketplace_listings` creation, 22 `CREATE OR REPLACE` definitions, and a broad set of grants and policies. It therefore must not be applied directly to this populated test project.
-
-## Blocking compatibility differences
-
-1. **Migration history divergence.** The test project has a separate 19-entry migration history. The production history has 59 entries. Some migration names overlap, but the histories cannot be assumed to be interchangeable. Never insert guessed rows into `supabase_migrations.schema_migrations` or replay a guessed sequence.
-
-2. **Admin allowlist table missing.** The test project has no `private.layan_admins` table. Its `public.layan_is_admin()` wrapper calls `private.asyut_aqar_is_admin()`, which queries that missing table. The current `asyut-admin` Edge Function checks this RPC before its privileged user-list operation. As a result, the admin authorization path is not ready for an authenticated functional test. Do not grant admin status to the existing Auth user by assumption.
-
-3. **Application schema absent.** Directory, offers, company profile, advertising, promotion, buyer preference/favorites/alerts and private admin/decision tables are missing from the test project's current schema. The test project's existing `marketplace_listings` table must be preserved and compared rather than replaced.
-
-4. **Photo bucket configuration differs.** The test bucket `layan_real_estat` currently accepts JPEG only (5 MB, public). Production accepts JPEG, PNG and WebP (5 MB, public). The private documents bucket matches the production file-size and MIME constraints. No Storage objects exist in the test project. Do not update bucket metadata by direct SQL; use the Storage API/configuration route after approval and verification.
-
-5. **Security/performance observations.** Supabase advisors report leaked-password protection disabled and multiple permissive RLS policies on `public.marketplace_listings` (three warning findings). The two marketplace secondary indexes are currently reported unused. These are review findings, not automatic change instructions. Do not weaken RLS or remove indexes merely to clear notices.
-
-## Edge Function review
-
-The deployed `asyut-admin` function:
-- is active, version 1, and has JWT verification enabled;
-- accepts POST and OPTIONS;
-- restricts browser origins to the configured LAYAN domains;
-- validates the bearer token through Supabase Auth;
-- checks `public.layan_is_admin()` before calling Auth Admin APIs.
-
-Only source logic was inspected. Runtime invocation was not attempted because it requires an authorized admin session. No environment variables or secret values were read or copied.
-
-## Safe execution sequence
-
-1. Preserve this project as-is, including its existing Auth user, 19 migration records, active Edge Function and Storage buckets.
-2. Build and verify the current production schema in a **disposable local Supabase stack** using the repository's baseline rehearsal script and rollback-only assertions. This is not a migration into the hosted test project.
-3. Compare the existing test `marketplace_listings` definition, indexes, constraints, grants and RLS policies against the production baseline before designing any additive reconciliation.
-4. Prepare an additive, reviewed staging migration which avoids dropping/replacing existing objects and does not create or assign admin identities. Run it only after a separate change review.
-5. Resolve the admin allowlist identity with the project owner before any admin membership change. Test the Edge Function only with an explicitly authorized admin account.
-6. Apply Storage bucket MIME configuration only through the supported Storage API/configuration workflow, then verify with harmless test uploads and cleanup through the Storage API.
-7. Run app-level and two-user RLS/Storage checks. Keep all production data and files out of the test project unless separately approved.
-
-## Current status and boundaries
-
-- Temporary candidate staging environment: approved by user.
-- Compatibility audit: completed read-only.
-## Applied staging-only schema work
-
-The original baseline SQL was not run directly. A separate additive migration was prepared, rehearsed inside a transaction with rollback, and then applied to this project only:
+The Supabase migration ledger currently contains these three staging-only migrations after the original 19 entries:
 
 - `20261103093854 staging_additive_compatibility_20261103`
 - `20261103094114 staging_cleanup_duplicate_marketplace_checks_20261103`
+- `20261103094836 align_marketplace_listing_type_default`
 
-Tracked SQL files:
-- `_review/STAGING_ADDITIVE_COMPATIBILITY_20261103.sql`
-- `_review/STAGING_COMPATIBILITY_CLEANUP_20261103.sql`
+The first two restored the missing public application schema while retaining the existing marketplace objects. The third migration aligned the `marketplace_listings.listing_type` default with production. Its exact SQL is recorded separately at `_review/STAGING_ALIGN_MARKETPLACE_LISTING_TYPE_DEFAULT_20261103.sql`.
 
-The migration created the 27 missing application tables and preserved the existing `public.marketplace_listings` table. It added three missing columns to that existing table and aligned its effective validation with production while keeping its pre-existing checks and policies. The cleanup removed only six redundant check constraints created by the first compatibility draft.
+The final default was verified as `'خدمة'::text`. A read-only structural comparison found 321 application columns in both environments; before the third migration, the only column-level difference was this default.
 
-### Verified post-application inventory
+## Data and identity preservation
 
-| Object | Staging after migration | Production snapshot |
+Exact row counts were checked for all 28 application tables:
+
+- All 28 application tables: **0 rows**.
+- Auth users: **1**; identities: **1**.
+- `private.layan_admins`: **0 rows**.
+- `private.project_decisions`: **0 rows**.
+- `public.marketplace_listings`: **0 rows**.
+- Storage objects: **0**.
+
+No Auth user was added/deleted, no administrator was assigned, no production rows were copied, and no Storage object or file bytes were transferred. The deployed Edge Function source/settings were not changed.
+
+## Structural comparison with production
+
+| Object | Staging | Production |
 |---|---:|---:|
-| Public application tables | 26 | 26 |
-| Private application tables | 2 | 2 |
-| Application constraints | 137 | 135 |
+| Public/private application tables | 26 + 2 | 26 + 2 |
+| RLS-enabled app tables | 28 | 28 |
+| Constraints | 137 | 135 |
 | Secondary indexes | 33 | 32 |
 | Functions/procedures | 21 | 20 |
-| Public views | 2 | 2 |
-| Application triggers | 7 | 7 |
-| Application RLS policies | 81 | 80 |
-| App tables missing RLS | 0 | 0 |
+| Views | 2 | 2 |
+| Triggers | 7 | 7 |
+| Policies | 81 | 80 |
+| Table grants for anon/authenticated/service_role | 334 | 334 |
 
-The small count differences are deliberately retained test-project objects:
-- Two additional constraints on `marketplace_listings`: the pre-existing details-object check and a stricter compatibility check retained under a separate name. The original weaker description check was not dropped.
-- One pre-existing test-only `marketplace_listings_public_idx` index.
-- One test-only `private.asyut_aqar_is_admin()` routine.
-- One extra pre-existing marketplace RLS policy. No existing policy was removed or rewritten.
+The table-grant inventory was compared entry by entry and is identical to production (334 entries). The remaining count differences are from preserved test-project objects:
 
-The three production marketplace columns `featured_until`, `latitude`, and `longitude` now exist in staging. Its column-name list matches the production snapshot.
+- One extra index: `marketplace_listings_public_idx`.
+- Two extra constraints on `marketplace_listings`: the preserved `details` JSON-object check and a separately named production-compatible description-length check. The pre-existing broader description check remains in place; no existing constraint was dropped.
+- One extra routine: `private.asyut_aqar_is_admin()`.
+- One extra marketplace policy; the full policy definitions are detailed below.
 
-### Preserved data and service boundaries
+The staging `marketplace_listings.reviewed_by` foreign key uses `ON DELETE SET NULL`, whereas production uses the default `NO ACTION`. This is a behavioural difference to review; it was not changed.
 
-- Auth users: 1 before and after.
-- Auth identities: 1 before and after.
-- `private.layan_admins`: 0 rows; no account was granted administrator status.
-- `public.marketplace_listings`: 0 rows.
-- Directory entities and sources: 0 rows.
-- Storage objects: 0; no file bytes or object records were transferred.
-- Storage object policies: 6 before and after.
-- Edge Function `asyut-admin`: still ACTIVE, version 1, JWT verification enabled. Its source and settings were not changed.
-- The read-only admin check returns `false` for an identity not present in the admin allowlist.
+## Outstanding security and behaviour gaps
 
-### Remaining compatibility gaps
+### 1. Marketplace RLS policy definitions differ
 
-1. The photo bucket `layan_real_estat` still accepts JPEG only in staging. Production accepts JPEG, PNG and WebP. The Storage bucket was intentionally not changed because no supported Storage management action is available in this connected toolset; do not change bucket metadata by direct SQL.
-2. Two existing staging public functions were preserved rather than replaced:
-   - `public.layan_activate_supplier_ad(uuid, integer, numeric)` returns `void` in staging versus `jsonb` in production, and the definitions differ.
-   - `public.layan_reject_supplier_ad(uuid, text)` returns `void` in staging versus `jsonb` in production, and the definitions differ.
-   The current admin UI calls both RPCs but does not consume their return bodies. Their actual admin action behavior remains untested because no administrator identity was assigned.
-3. Supabase security advisors still report four RLS-enabled/no-policy tables (`private.layan_admins`, `private.project_decisions`, `public.buyer_push_subscriptions`, and `public.buyer_push_vapid_config`). These are preserved deny-all boundaries; no public policies were added.
-4. Leaked-password protection remains disabled. It was not changed.
-5. Performance advisors report 31 unused indexes and four multiple-permissive-policy findings. The index notices are expected on empty/new tables; policies were not weakened or removed.
+Although RLS is enabled and the aggregate table grants exactly match production, the five existing staging marketplace policies are **not equivalent** to the four production policies.
 
-### Test coverage and limitations
+The staging owner INSERT policy only checks that `owner_id` matches `auth.uid()` and status is pending. It does not enforce the production checks that prevent a new owner-submitted row from setting administrative fields such as `is_featured`, `reviewed_at`, `reviewed_by`, or `admin_notes`.
 
-- The full additive DDL was executed once inside a transaction with assertions for table counts, RLS coverage, policies, routines, views, triggers, marketplace compatibility columns, unchanged Auth row counts and absence of admin assignments. The transaction was rolled back, and a subsequent read-only check confirmed the test project returned to its original one-table state before the permanent migration.
-- The actual staging migrations then applied successfully and their versions appeared in Supabase migration history.
-- Post-application read-only checks confirmed all 28 application tables, 0 missing-RLS tables, 2 views, 7 triggers, 81 policies, 21 routines, preserved Auth counts, zero data import, and the six original Storage policies.
-- A later attempt to run synthetic directory insert/update trigger tests was blocked by the tool's safety checks before execution. No such test data was inserted.
-- No browser E2E, Storage HTTP upload, administrator action, or load test has been run against this hosted test project.
-- GitHub Actions results for the current PR head are not visible through the connected status lookup; CI is **not claimed as passed**.
+The staging owner UPDATE policy also has weaker `WITH CHECK` conditions than production. In addition, staging's approved-listing read policy includes authenticated users, and a separate owner-read policy exists; production uses a separate authenticated read-scope policy and an anon-only public-read policy.
 
-## Current status and decision
+This requires a reviewed policy replacement on staging. **No policy was changed in this continuation.** Do not treat the test marketplace RLS as production-equivalent until the policy definitions are reconciled.
 
-- Temporary test environment: retained and now schema-expanded.
-- Additive compatibility migrations: applied to `layan-claude-test` only.
-- Existing Auth account, identity, Edge Function, existing marketplace rows/policies/indexes/functions, and Storage bucket settings: preserved.
-- Production database and Storage: untouched.
-- No production rows or files copied.
+### 2. Supplier-ad RPC definitions are stale
+
+The production functions `public.layan_activate_supplier_ad(uuid, integer, numeric)` and `public.layan_reject_supplier_ad(uuid, text)` return `jsonb`. Their staging counterparts return `void` and use older update logic.
+
+The inspected staging activation function references `supplier_ads.agreed_price`, which is not a column in the current `supplier_ads` table. The staging rejection function references `admin_notes`, `reviewed_at`, and `reviewed_by`, which are also absent from the current `supplier_ads` table. These RPC paths are therefore expected to fail at runtime when those update statements execute.
+
+Production's versions return structured JSON and update the columns that exist in the current schema. Replacing a PostgreSQL function with a different return type requires dropping/recreating that function or another reviewed migration approach; it must not be attempted casually.
+
+### 3. Function execution grants are broader in staging
+
+The aggregate table grants match production, but function ACLs do not. Staging has additional `PUBLIC` and `anon` EXECUTE privileges on the two stale supplier-ad RPCs and several admin RPC wrappers. Production's corresponding public supplier-ad functions are restricted to `authenticated`, `service_role`, and `postgres`.
+
+The public admin wrapper also points to `private.asyut_aqar_is_admin()` in staging, whereas production points to `private.layan_is_admin()`. Both helpers check the private admin allowlist, but the staging helper and wrapper need to be reconciled with production after dependency review.
+
+**No function body, function grant, schema grant, table grant, or role membership was changed in this continuation.**
+
+### 4. Storage bucket configuration still differs
+
+- Staging `layan_real_estat`: public, 5 MB, JPEG only.
+- Production `layan_real_estat`: public, 5 MB, JPEG + PNG + WebP.
+- The private `layan-property-documents` bucket matches the production file-size and MIME restrictions.
+
+No Storage objects exist in staging. Bucket metadata was not changed; any future change must use the supported Storage configuration/API path, not direct SQL against managed Storage tables.
+
+## Supabase advisor findings after schema restoration
+
+Security:
+- Four RLS-enabled tables have no policies: `private.layan_admins`, `private.project_decisions`, `public.buyer_push_subscriptions`, and `public.buyer_push_vapid_config`. These are preserved deny-all boundaries, not an instruction to add broad policies.
+- Leaked Password Protection remains disabled.
+
+Performance:
+- Four multiple-permissive-policy findings: `company_profiles` and three marketplace actions (INSERT, SELECT, UPDATE).
+- 31 indexes are currently reported unused. Most application tables are empty; this is informational and not a reason to drop indexes.
+
+## Test limitations
+
+- Schema, column, constraint, index, RLS, policy, grant, routine, view and trigger inventories were compared through read-only catalog queries.
+- No administrator identity was assigned. The admin allowlist is empty, so authenticated admin operations were not exercised.
+- No browser E2E, authenticated Storage HTTP upload, two-user Storage isolation test, supplier-ad RPC execution, or load test has been completed on the hosted staging project.
+- GitHub Actions status for the current PR head is not confirmed by the connected status lookup; CI is not claimed as passed.
+
+## Required next work — approval boundary
+
+1. Prepare a reviewed staging-only migration to replace the marketplace owner INSERT/UPDATE/read policies with the production-equivalent conditions.
+2. Prepare a reviewed migration to reconcile the public supplier-ad RPC return types, update logic and EXECUTE grants. Review dependent UI/function callers before dropping or recreating anything.
+3. Align the public admin wrapper with the production helper while preserving the empty admin allowlist. Do not add the user's account to `private.layan_admins` without separate explicit approval.
+4. Align the photo bucket MIME allowlist using the supported Storage API/configuration route.
+5. After those changes are separately approved and tested, run authenticated/browser/Storage tests with disposable test accounts only.
+
+## Current boundaries
+
+- Staging project retained and schema-expanded; no production data copied.
+- Existing Auth user, identity, two private tables, Edge Function and Storage objects preserved.
+- Existing policies/functions were not modified in this continuation.
+- Production database, Storage and Edge Functions untouched.
 - PR #42 remains Draft and unmerged; no deployment performed.
 
-**Decision:** The test project is now a useful schema-level staging environment, but not yet a complete behavioral clone of production. Resolve the two function-definition differences and photo-bucket MIME configuration before claiming full feature parity.
+**Decision:** Staging is a useful schema-level test environment, but it is not yet a faithful functional clone of production. The marketplace RLS policies and supplier-ad RPCs are the main blockers before calling it ready for end-to-end testing.
