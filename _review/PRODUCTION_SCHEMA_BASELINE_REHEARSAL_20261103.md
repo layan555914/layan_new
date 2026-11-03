@@ -134,3 +134,22 @@
 - دالة `directory_admin_mutate_with_audit` غير مطبقة على الإنتاج.
 
 **لا دمج ولا نشر:** PR #42 ما زال مسودة، و`main` والإنتاج لم يتغيرا في هذه المهمة.
+
+
+## Addendum — approved metadata-only migration ledger alignment (2026-11-03 17:35 Egypt time)
+
+The user explicitly approved adding the baseline and marketplace-seed migration records to the production migration ledger only.
+
+Immediately before the change, all 15 production catalog fingerprints matched the reviewed baseline; all 11 marketplace category rows matched the seed exactly; the two versions were absent; and the directory-admin RPC was absent.
+
+The two records were added to `supabase_migrations.schema_migrations` using the same metadata upsert fields and SQL-statement parsing behavior as Supabase CLI v2.84.2 `migration repair --status applied`. The CLI executable itself was not run because a linked CLI/database-password session was unavailable; the metadata-only operation was performed through the authorized Supabase SQL connection.
+
+Post-change checks:
+- Migration ledger count is 61.
+- The exact baseline and category-seed version/name records are present.
+- The 11 category rows remain unchanged.
+- The directory-admin RPC migration version `20261103141537` is still pending.
+- The directory-admin RPC itself remains absent.
+- No SQL from the two repaired migration files was executed; no application data, users, files, schema objects or policies were changed.
+
+The repository has 62 migration files, so the only file not yet represented in the production ledger is `20261103141537_directory_admin_mutate_with_audit.sql`. A literal `supabase db push --dry-run` was not available in this session; the pending state was derived from the verified repository file list and the production migration ledger. No push, merge or deployment was performed.
