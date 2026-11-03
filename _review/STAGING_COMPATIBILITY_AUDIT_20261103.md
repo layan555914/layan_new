@@ -24,9 +24,21 @@ The project is healthy, but **not yet compatible with the current production app
 | Storage buckets | 2 |
 | Storage object RLS policies | 6 |
 | Public application RLS policies | 5 |
+| Application constraints | 7 |
+| Secondary application indexes | 3 |
+| Application routines (functions/procedures) | 9 |
+| Application views | 0 |
+| Application triggers | 0 |
 | Edge Functions | 1 active: `asyut-admin` (JWT verification enabled) |
 
 The single public application table is `marketplace_listings`. The production project currently has 28 application tables (26 public and 2 private), plus 59 migration records in its migration history. The test project therefore lacks 27 of the current production application tables.
+
+
+### Additional object-level comparison
+
+The test project currently exposes 9 routines across `public` and `private`, 7 application constraints, and 3 secondary indexes; it has no application views or triggers. The current production baseline expects 20 routines, 135 constraints, 32 secondary indexes, 2 public views and 7 application triggers. The existing marketplace table also has a distinct column definition and must be reconciled field by field.
+
+The checked-in production baseline is a clean-stack rehearsal script, not an additive migration. It contains 28 `CREATE TABLE` statements, including a second `marketplace_listings` creation, 22 `CREATE OR REPLACE` definitions, and a broad set of grants and policies. It therefore must not be applied directly to this populated test project.
 
 ## Blocking compatibility differences
 
