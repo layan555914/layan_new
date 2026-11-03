@@ -524,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function makeProjectSlug(value) {
     const normalized = String(value || "").trim().toLowerCase().normalize("NFKD")
-      .replace(/[\\u0300-\\u036f]/g, "")
+      .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
     return normalized || ("project-" + Date.now().toString(36) + "-" +
