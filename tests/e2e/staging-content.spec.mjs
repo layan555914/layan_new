@@ -32,10 +32,18 @@ test.describe("Hosted staging — real public pages and Auth rejection", () => {
     await expect(page.locator("#offersGrid")).toContainText("اختبار واجهة — شقة وهمية");
     await expect(page.locator("#offersGrid")).toContainText("اختبار واجهة — محل تجاري وهمي");
 
+    const detailResponsePromise = page.waitForResponse(response =>
+      response.url().includes("/rest/v1/property_offers?") && response.request().method() === "GET"
+    );
+    page.on("pageerror", error => console.log("STAGING PROPERTY PAGE ERROR:", error.message));
     await cards.filter({ hasText: "اختبار واجهة — شقة وهمية" })
       .getByRole("link", { name: "عرض التفاصيل" }).click();
 
     await expect(page).toHaveURL(/property\.html\?id=[1-9][0-9]*/);
+    const detailResponse = await detailResponsePromise;
+    console.log("STAGING PROPERTY DETAIL HTTP:", detailResponse.status(), detailResponse.url());
+    console.log("STAGING PROPERTY DETAIL BODY:", (await detailResponse.text()).slice(0, 1800));
+    console.log("STAGING PROPERTY DETAIL PAGE:", (await page.locator("#propertyDetailsRoot").innerText()).slice(0, 1400));
     await expect(page.locator("#propertyDetailsRoot"))
       .toContainText("اختبار واجهة — شقة وهمية");
     await expect(page.locator("#propertyDetailsRoot"))
