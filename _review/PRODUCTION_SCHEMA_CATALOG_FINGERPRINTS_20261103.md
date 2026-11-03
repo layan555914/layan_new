@@ -1,6 +1,7 @@
 # ASYUT AQAR production catalog fingerprints
 
-**Captured:** 2026-11-03 14:35 UTC  
+**Initial capture:** 2026-11-03 14:35 UTC  
+**Reconfirmed:** 2026-11-03 15:05:44 UTC; all fingerprints below remained identical.  
 **Source:** production Supabase project `ebyhwqkmhxbgocngpqfe`  
 **Method:** read-only catalog queries, with explicit `search_path = public, private, extensions, auth, storage` so PostgreSQL deparsing is consistent with the local CI assertions.
 
@@ -56,3 +57,9 @@ No Storage object paths, object metadata rows, or file bytes are included in thi
 CI run [#41658175755](https://github.com/layan555914/layan_new/actions/runs/41658175755) rebuilt the application schema locally and passed all catalog fingerprints, the stable marketplace category data assertions, Auth recovery, property/marketplace workflows, directory admin atomic RPC, Storage owner isolation, and cleanup verification.
 
 The exact expected fingerprints are embedded in `tests/db/production-schema-baseline.assertions.sql`. Any production schema change should trigger a fresh catalog capture before reusing this baseline.
+
+## Reconfirmation
+
+The catalog was queried again after the 62-file local migration replay and successful CI #41659672694. All 15 hashes and object counts above remained unchanged. The production migration ledger remained at 59 rows with latest version `20261102180739`; the 11 marketplace categories remained active and unchanged.
+
+The latest replay and verification result is [CI #41659672694](https://github.com/layan555914/layan_new/actions/runs/41659672694).

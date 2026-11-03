@@ -178,3 +178,16 @@ Before either repair command:
 - Review the exact PR diff and CI run.
 
 **No `migration repair`, `db push`, `db pull`, linked reset, production DDL, production data write, or deployment has been performed.** The PR remains Draft.
+
+## 10. Final current-state verification — 2026-11-03
+
+- The repository contains **62 uniquely timestamped migration SQL files**: 59 comment-only historical markers that match the production ledger versions and names, plus the current-state baseline, 11-category seed, and directory admin RPC migrations.
+- The production ledger was re-read after the local test: still **59 versions**, latest `20261102180739`.
+- The public marketplace reference table still contains **11 active categories**, ordered 1 through 11, with descriptions matching the checked-in seed.
+- A new production catalog capture at 15:05:44 UTC preserved all 15 fingerprints documented in `_review/PRODUCTION_SCHEMA_CATALOG_FINGERPRINTS_20261103.md`.
+- CI **#41659672694** passed both jobs, including replay of the complete 62-file chain from an empty local Supabase database and all Auth, marketplace, property, directory admin atomicity, Storage RLS, and cleanup checks.
+- PR #42 remains open, Draft, and unmerged.
+
+[CI #41659672694 — full success](https://github.com/layan555914/layan_new/actions/runs/41659672694)
+
+**Production write status:** no migration repair, db push, db pull, reset, DDL, DML, Auth changes, Storage changes, merge, or deployment was performed. The two ledger-only repair commands remain a proposal requiring explicit approval.
