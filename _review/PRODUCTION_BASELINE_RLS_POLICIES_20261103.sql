@@ -2,6 +2,36 @@
 
 -- Apply only after the matching schema and function definitions exist.
 
+-- All 28 app-owned tables had RLS enabled in production.
+ALTER TABLE "private"."layan_admins" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "private"."project_decisions" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."buyer_offer_alerts" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."buyer_preferences" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."buyer_push_subscriptions" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."buyer_push_vapid_config" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."company_profiles" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."company_property_ads" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_areas" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_change_log" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_entities" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_entity_areas" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_entity_private" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_entity_sources" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_opportunities" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_opportunity_sources" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_project_entities" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_project_private" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_project_sources" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_projects" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."directory_sources" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."marketplace_categories" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."marketplace_listings" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."partner_ad_slots" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."promotion_payments" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."property_offers" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."supplier_ads" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."user_favorite_offers" ENABLE ROW LEVEL SECURITY;
+
 -- Review before use in any environment.
 
 CREATE POLICY "Users can create own buyer alerts" ON "public"."buyer_offer_alerts" AS PERMISSIVE FOR INSERT TO "authenticated" WITH CHECK ((( SELECT auth.uid() AS uid) = user_id));
