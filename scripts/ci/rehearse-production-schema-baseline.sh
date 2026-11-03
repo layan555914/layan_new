@@ -76,9 +76,7 @@ fi
 # Resolve credentials created for this disposable local stack only.
 # The password is extracted in memory from the local CLI URL and never logged or committed.
 STATUS_ENV="$(supabase status -o env)"
-DB_URL="$(printf '%s\\n' "$STATUS_ENV" | awk -F= '$1 == "DB_URL" { print substr($0, index($0, "=") + 1); exit }')"
-DB_URL="${DB_URL#\\\"}"
-DB_URL="${DB_URL%\\\"}"
+DB_URL="$(echo "$STATUS_ENV" | sed -n 's/^DB_URL=//p' | head -n 1 | tr -d '"')"
 if [[ -z "$DB_URL" ]]; then
   echo "Supabase CLI did not return a local DB_URL." >&2
   exit 1
@@ -102,8 +100,7 @@ if [[ -z "$DB_CONTAINER" ]]; then
   exit 1
 fi
 
-docker exec -e "PGPASSWORD=$DB_PASSWORD" -i "$DB_CONTAINER" \\
-  psql -h 127.0.0.1 -U supabase_admin -d postgres -X -v ON_ERROR_STOP=1 < "$STORAGE_BASELINE_FILE"
+docker exec -e "PGPASSWORD=$DB_PASSWORD" -i "$DB_CONTAINER" psql -h 127.0.0.1 -U supabase_admin -d postgres -X -v ON_ERROR_STOP=1 < "$STORAGE_BASELINE_FILE"
 unset DB_PASSWORD
 
 pg_isready --dbname "$DB_URL"
