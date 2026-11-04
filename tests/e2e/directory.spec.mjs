@@ -13,7 +13,7 @@ const fixtures = {
   ],
   directory_areas: [
     { id:"area-1",slug:"new-asyut",name_ar:"أسيوط الجديدة",name_en:"New Assiut",area_type:"new_city",parent_id:null,verification_status:"published",public_visible:true,is_active:true,latitude:null,longitude:null,location_public:false },
-    { id:"area-2",slug:"verified-zone",name_ar:"منطقة اختبار موثقة",name_en:"Verified Test Zone",area_type:"district",parent_id:"area-1",latitude:27.2100,longitude:31.1600,location_precision:"district_centroid",location_source_id:"source-1",location_verified_at:"2026-11-04",location_public:true,verification_status:"published",public_visible:true,is_active:true }
+    { id:"area-2",slug:"verified-zone",name_ar:"منطقة اختبار موثقة",name_en:"Verified Test Zone",area_type:"district",parent_id:"area-1",latitude:27.2100,longitude:31.1600,location_precision:"area_centroid",location_source_id:"source-1",location_verified_at:"2026-11-04",location_public:true,verification_status:"published",public_visible:true,is_active:true }
   ],
   directory_sources: [
     { id:"source-1",title:"المصدر الرسمي التجريبي",publisher:"جهة اختبار",source_type:"مصدر رسمي",source_url:"https://example.org/source",accessed_at:"2026-11-02",confidence_level:"official",is_public:true }
