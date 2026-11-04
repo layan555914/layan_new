@@ -96,7 +96,7 @@ test("directory map searches the selected published area without inventing a loc
     "href",
     "https://www.google.com/maps/search/?api=1&query="+query
   );
-  await expect(page.locator("#directoryMapNote")).toContainText("بحثًا استرشاديًا");
+  await expect(page.locator("#directoryMapNote")).toContainText("بحث استرشادي");
   await expect(page.locator("#directoryMapNote")).toContainText("ليس دبوسًا جغرافيًا معتمدًا");
   await page.locator("#directoryMapArea").selectOption("");
   await expect(page.locator("#directoryMapOpen")).toContainText("نطاق أسيوط");
