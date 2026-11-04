@@ -119,9 +119,11 @@ function linkedSources(id,kind){
   return u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(s.title||s.publisher||"مصدر")+'</a>':"";
  }).filter(Boolean).join(" · ");
 }
-function card(title,desc,tag,detail,url,refs){
+function card(title,desc,tag,detail,url,refs,recordId){
  const u=safeUrl(url);
- return '<article class="directory-card"><div class="directory-card-meta">'+(tag?'<span class="directory-tag">'+esc(tag)+'</span>':"")+'</div><h3>'+esc(title)+'</h3>'+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
+ const recordKey=recordId==null?"":String(recordId);
+ const shareUrl=recordKey?new URL("#directory-record-"+encodeURIComponent(recordKey),location.href).href:"";
+ return '<article class="directory-card"'+(recordKey?' id="directory-record-'+esc(encodeURIComponent(recordKey))+'" data-share-url="'+esc(shareUrl)+'"':"")+'><div class="directory-card-meta">'+(tag?'<span class="directory-tag">'+esc(tag)+'</span>':"")+'</div><h3>'+esc(title)+'</h3>'+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
 }
 function setFilterAvailability(){
  $("#directoryTypeFilter").disabled=state.view!=="entities";
@@ -133,21 +135,25 @@ function render(){
  let rows=[],out="";
  if(state.view==="entities"){
   rows=state.data.entities.filter(x=>matches(x,"entities"));
-  out=rows.map(x=>card(x.name_ar,x.description,labels[x.entity_type]||x.entity_type,areaNames.get(String(x.primary_area_id))||x.area_name||"معلومات عامة منشورة",x.website_url,linkedSources(x.id,"entities"))).join("");
+  out=rows.map(x=>card(x.name_ar,x.description,labels[x.entity_type]||x.entity_type,areaNames.get(String(x.primary_area_id))||x.area_name||"معلومات عامة منشورة",x.website_url,linkedSources(x.id,"entities"),x.id)).join("");
  }else if(state.view==="projects"){
   rows=state.data.projects.filter(x=>matches(x,"projects"));
-  out=rows.map(x=>card(x.name_ar,x.description,labels[x.project_type]||x.project_type,[x.location_text,labels[x.project_status]].filter(Boolean).join(" · "),null,linkedSources(x.id,"projects"))).join("");
+  out=rows.map(x=>card(x.name_ar,x.description,labels[x.project_type]||x.project_type,[x.location_text,labels[x.project_status]].filter(Boolean).join(" · "),null,linkedSources(x.id,"projects"),x.id)).join("");
  }else if(state.view==="areas"){
   rows=state.data.areas.filter(x=>matches(x,"areas"));
-  out=rows.map(x=>card(x.name_ar,x.name_en,labels[x.area_type]||"نطاق جغرافي","قاعدة المناطق الجغرافية للمحافظة")).join("");
+  out=rows.map(x=>card(x.name_ar,x.name_en,labels[x.area_type]||"نطاق جغرافي","قاعدة المناطق الجغرافية للمحافظة",null,null,x.id)).join("");
  }else if(state.view==="opportunities"){
   rows=(state.data.opportunities||[]).filter(x=>matches(x,"opportunities"));
-  out=rows.map(x=>card(x.name_ar,x.activity,x.opportunity_type||"طرح حكومي",[x.city,x.size_description,x.terms_as_published,x.announcement_date,x.source_claimed_status].filter(Boolean).join(" · "),null,linkedSources(x.id,"opportunities"))).join("");
+  out=rows.map(x=>card(x.name_ar,x.activity,x.opportunity_type||"طرح حكومي",[x.city,x.size_description,x.terms_as_published,x.announcement_date,x.source_claimed_status].filter(Boolean).join(" · "),null,linkedSources(x.id,"opportunities"),x.id)).join("");
  }else{
   rows=state.data.sources.filter(x=>matches(x,"sources"));
-  out=rows.map(x=>card(x.title,x.publisher,x.source_type||"مصدر عام",x.id||"مرجع عام",x.source_url)).join("");
+  out=rows.map(x=>card(x.title,x.publisher,x.source_type||"مصدر عام",x.id||"مرجع عام",x.source_url,null,x.id)).join("");
  }
  $("#directoryResults").innerHTML=out;
+ const sharedRecord=decodeURIComponent(location.hash.slice(1));
+ if(sharedRecord.startsWith("directory-record-")){
+  requestAnimationFrame(()=>document.getElementById(sharedRecord)?.scrollIntoView({behavior:"smooth",block:"center"}));
+ }
  $("#directoryEmpty").hidden=rows.length>0;
  setFilterAvailability();
  if(rows.length===0){
