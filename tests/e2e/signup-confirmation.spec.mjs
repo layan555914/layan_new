@@ -132,6 +132,14 @@ test("signup PKCE callback without its same-browser verifier is rejected without
   expect(result.message).toContain("بيانات التحقق الخاصة بالمتصفح غير موجودة");
 });
 
+test("early auth callback results are replayed when the main UI attaches", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.LAYAN_AUTH_CALLBACK_RESULT = { success: true, type: "signup" };
+  });
+  await page.goto("/");
+  await expect(page.locator("#statusMessage")).toContainText("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح");
+});
+
 test("legacy implicit email-confirmation callbacks remain supported", async ({ page }) => {
   await page.route(SUPABASE + "/auth/v1/user", async route => {
     expect(route.request().headers().authorization).toBe("Bearer legacy-confirmation-access");
