@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const SUPABASE = "https://ebyhwqkmhxbgocngpqfe.supabase.co";
+const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 const USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const EMAIL = "journey-test@example.invalid";
 const PASSWORD = "Test-Only-Password-123!";
