@@ -103,7 +103,10 @@
   }
 
   function addCategoryShares(root = document) {
-    root.querySelectorAll(".category-grid .category-tile[data-market-category]").forEach((tile) => {
+    const tiles = [];
+    if (root.matches?.(".category-grid .category-tile[data-market-category]")) tiles.push(root);
+    tiles.push(...root.querySelectorAll(".category-grid .category-tile[data-market-category]"));
+    tiles.forEach((tile) => {
       if (tile.parentElement?.classList.contains("asyut-category-share-wrap")) return;
       const category = tile.dataset.marketCategory;
       if (!category) return;
