@@ -13,11 +13,11 @@ async function loadBusinessRequests(){
  try{
   const session=await auth.requireAuthenticated(),owner=encodeURIComponent(session.user.id);
   const tasks=[];
-  if(companyGrid)tasks.push(api("company_profiles?select=id,company_name,category,status,admin_notes,update_status,update_notes,created_at&owner_id=eq."+owner+"&order=created_at.desc"));
+  if(companyGrid)tasks.push(api("rpc/layan_company_owner_profile",{method:"POST",body:"{}"}));
   else tasks.push(Promise.resolve(null));
   if(supplierGrid)tasks.push(api("supplier_ads?select=id,business_name,category,title,status,created_at&owner_id=eq."+owner+"&order=created_at.desc"));
   else tasks.push(Promise.resolve(null));
-  const [companies,suppliers]=await Promise.all(tasks);
+  const [companyProfile,suppliers]=await Promise.all(tasks);const companies=companyProfile?[companyProfile]:[];
   const labels={pending:"قيد المراجعة",active:"منشور",needs_changes:"مطلوب استكمال البيانات",rejected:"مرفوض",paused:"موقوف"};
   if(companyGrid)companyGrid.innerHTML=companies?.length?companies.map(x=>'<article class="my-listing-card"><div class="my-listing-top"><span class="my-listing-status">'+esc(labels[x.status]||x.status||"غير محدد")+'</span><small>'+esc(x.category||"")+'</small></div><h3>'+esc(x.company_name)+'</h3>'+(x.admin_notes?'<p class="my-listing-note"><strong>ملاحظة الإدارة:</strong> '+esc(x.admin_notes)+'</p>':"")+(x.update_status?'<p>حالة التعديلات: '+esc(labels[x.update_status]||x.update_status)+'</p>':"")+(x.update_notes?'<p class="my-listing-note"><strong>ملاحظات التعديلات:</strong> '+esc(x.update_notes)+'</p>':"")+'<a href="./companies.html">متابعة ملف الشركة</a></article>').join(""):'<p class="my-listings-empty">لا توجد طلبات ملفات شركات مرتبطة بحسابك.</p>';
   if(supplierGrid)supplierGrid.innerHTML=suppliers?.length?suppliers.map(x=>'<article class="my-listing-card"><div class="my-listing-top"><span class="my-listing-status">'+esc(labels[x.status]||x.status||"غير محدد")+'</span><small>'+esc(x.category||"")+'</small></div><h3>'+esc(x.title)+'</h3><p><strong>النشاط:</strong> '+esc(x.business_name)+'</p><p>طلب الإعلان محفوظ للمراجعة. لا يوجد دفع إلكتروني أو حجز تلقائي ضمن هذا الطلب.</p></article>').join(""):'<p class="my-listings-empty">لا توجد طلبات إعلانات موردين مرتبطة بحسابك.</p>';
