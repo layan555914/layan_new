@@ -205,6 +205,26 @@ async function mockDirectoryAdmin(page, { isAdmin = true } = {}) {
   return db;
 }
 
+
+test("company directory general map and outbound Google Maps link remain visible on mobile", async ({page})=>{
+  await page.route(SUPABASE + "/rest/v1/company_profiles_public**", route =>
+    route.fulfill({status:200,contentType:"application/json",body:"[]"})
+  );
+  await page.setViewportSize({width:375,height:812});
+  await page.goto("/companies.html");
+  await expect(page.locator(".company-map-panel h2")).toHaveText("خريطة نطاق أسيوط");
+  await expect(page.locator(".company-map-frame iframe")).toHaveAttribute("title","خريطة عامة لمدينة أسيوط");
+  await expect(page.locator(".company-map-panel a")).toHaveAttribute(
+    "href",
+    "https://www.google.com/maps/search/?api=1&query=Assiut%2C%20Egypt"
+  );
+  const dimensions=await page.evaluate(()=>({
+    clientWidth:document.documentElement.clientWidth,
+    scrollWidth:document.documentElement.scrollWidth
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth+1);
+});
+
 test("directory admin blocks an authenticated account without the admin role", async ({page}) => {
   await mockDirectoryAdmin(page,{isAdmin:false});
   await page.goto("/directory-admin.html");
