@@ -16,6 +16,7 @@ on:
       - research/directory-assiut-batch-20261102
       - fix/company-profile-security-flow-20261104
       - fix/auth-recovery-pkce-flow-20261104
+      - fix/signup-confirmation-pkce-20261104
   workflow_dispatch:
 
 permissions:
@@ -172,6 +173,29 @@ jobs:
           const authClientJs = fs.readFileSync('gubabase.js', 'utf8');
           const resetPasswordHtml = fs.readFileSync('reset-password.html', 'utf8');
           const resetPasswordTests = fs.readFileSync('tests/e2e/reset-password.spec.mjs', 'utf8');
+          const signupTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
+          if (!authClientJs.includes('SIGNUP_PKCE_STORAGE_KEY') ||
+              !authClientJs.includes('code_challenge: pkce.codeChallenge') ||
+              !authClientJs.includes('code_challenge_method: "s256"')) {
+            errors.push('Email signups must send an S256 PKCE challenge and preserve its verifier');
+          }
+          if (!authClientJs.includes('resend?redirect_to=') ||
+              authClientJs.includes('options: { emailRedirectTo: redirectTo }')) {
+            errors.push('Signup confirmation resend must use the Auth REST redirect_to query and retain the original verifier');
+          }
+          if (!authClientJs.includes('token?grant_type=pkce') ||
+              !authClientJs.includes('SIGNUP_PKCE_STORAGE_KEY') ||
+              !authClientJs.includes('LAYAN_AUTH_CALLBACK_RESULT')) {
+            errors.push('Signup confirmation callback must exchange PKCE code and expose the result to late UI listeners');
+          }
+          if (!signupTests.includes('signup sends an S256 PKCE challenge') ||
+              !signupTests.includes('email confirmation PKCE code creates a session') ||
+              !signupTests.includes('resend confirmation retains the original signup verifier') ||
+              !signupTests.includes('legacy implicit email-confirmation callbacks remain supported')) {
+            errors.push('Signup confirmation PKCE browser regression tests are incomplete');
+          }
+
+
           if (!authClientJs.includes('code_challenge_method: "s256"') ||
               !authClientJs.includes('code_challenge: codeChallenge') ||
               !authClientJs.includes('RECOVERY_PKCE_STORAGE_KEY')) {
