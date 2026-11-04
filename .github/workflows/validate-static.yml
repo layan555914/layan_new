@@ -134,6 +134,10 @@ jobs:
           const directoryJs = fs.readFileSync('directory.js', 'utf8');
           const directoryHtml = fs.readFileSync('directory.html', 'utf8');
           const directorySpecs = fs.readFileSync('tests/e2e/directory.spec.mjs', 'utf8');
+          const directoryAdminJs = fs.readFileSync('directory-admin.js', 'utf8');
+          const mapCoordinateMigration = fs.readFileSync('supabase/migrations/20261104051622_verified_directory_map_coordinates.sql', 'utf8');
+          const mapTriggerFixMigration = fs.readFileSync('supabase/migrations/20261104051952_fix_directory_map_location_trigger_row_shape.sql', 'utf8');
+
           function configForHost(hostname) {
             const context = { window: { location: { hostname } } };
             vm.runInNewContext(configSource, context, { timeout: 1000 });
@@ -156,6 +160,20 @@ jobs:
               !directoryJs.includes('encodeURIComponent(query)') ||
               !directorySpecs.includes('directory map searches the selected published area')) {
             errors.push('Directory map must use published-area selection and test its approximate map search behavior');
+          }
+          if (!mapCoordinateMigration.includes('location_source_id') ||
+              !mapCoordinateMigration.includes("confidence_level NOT IN ('high','official')") ||
+              !mapCoordinateMigration.includes('location_public') ||
+              !mapCoordinateMigration.includes('location_verified_at') ||
+              !mapCoordinateMigration.includes('directory_guard_public_map_source')) {
+            errors.push('Verified map coordinates must require a trusted public source, verification date and explicit publication approval');
+          }
+          if (!mapTriggerFixMigration.includes("TG_TABLE_NAME = 'directory_areas'") ||
+              !directoryAdminJs.includes('function mapLocationFields(type, record)') ||
+              !directoryAdminJs.includes('function prepareMapLocationPatch(type, patch)') ||
+              !directoryJs.includes('function validPublicMapPoint(record)') ||
+              !directorySpecs.includes('only public points backed by an official source')) {
+            errors.push('Admin and public map flows must expose only source-verified map coordinates');
           }
           const app = fs.readFileSync('app.js', 'utf8');
           const marketplace = fs.readFileSync('marketplace.js', 'utf8');
