@@ -119,10 +119,13 @@ function linkedSources(id,kind){
   return u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(s.title||s.publisher||"مصدر")+'</a>':"";
  }).filter(Boolean).join(" · ");
 }
-function card(title,desc,tag,detail,url,refs,recordId){
+function card(title,desc,tag,detail,url,refs,recordId,recordType){
  const u=safeUrl(url);
  const recordKey=recordId==null?"":String(recordId);
- const shareUrl=recordKey?new URL("#directory-record-"+encodeURIComponent(recordKey),location.href).href:"";
+ const shareTarget=new URL(location.href);
+ if(recordType)shareTarget.searchParams.set("view",recordType);
+ shareTarget.hash=recordKey?"directory-record-"+encodeURIComponent(recordKey):"";
+ const shareUrl=recordKey?shareTarget.href:"";
  return '<article class="directory-card"'+(recordKey?' id="directory-record-'+esc(encodeURIComponent(recordKey))+'" data-share-url="'+esc(shareUrl)+'"':"")+'><div class="directory-card-meta">'+(tag?'<span class="directory-tag">'+esc(tag)+'</span>':"")+'</div><h3>'+esc(title)+'</h3>'+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
 }
 function setFilterAvailability(){
@@ -135,19 +138,19 @@ function render(){
  let rows=[],out="";
  if(state.view==="entities"){
   rows=state.data.entities.filter(x=>matches(x,"entities"));
-  out=rows.map(x=>card(x.name_ar,x.description,labels[x.entity_type]||x.entity_type,areaNames.get(String(x.primary_area_id))||x.area_name||"معلومات عامة منشورة",x.website_url,linkedSources(x.id,"entities"),x.id)).join("");
+  out=rows.map(x=>card(x.name_ar,x.description,labels[x.entity_type]||x.entity_type,areaNames.get(String(x.primary_area_id))||x.area_name||"معلومات عامة منشورة",x.website_url,linkedSources(x.id,"entities"),x.id,"entities")).join("");
  }else if(state.view==="projects"){
   rows=state.data.projects.filter(x=>matches(x,"projects"));
-  out=rows.map(x=>card(x.name_ar,x.description,labels[x.project_type]||x.project_type,[x.location_text,labels[x.project_status]].filter(Boolean).join(" · "),null,linkedSources(x.id,"projects"),x.id)).join("");
+  out=rows.map(x=>card(x.name_ar,x.description,labels[x.project_type]||x.project_type,[x.location_text,labels[x.project_status]].filter(Boolean).join(" · "),null,linkedSources(x.id,"projects"),x.id,"projects")).join("");
  }else if(state.view==="areas"){
   rows=state.data.areas.filter(x=>matches(x,"areas"));
-  out=rows.map(x=>card(x.name_ar,x.name_en,labels[x.area_type]||"نطاق جغرافي","قاعدة المناطق الجغرافية للمحافظة",null,null,x.id)).join("");
+  out=rows.map(x=>card(x.name_ar,x.name_en,labels[x.area_type]||"نطاق جغرافي","قاعدة المناطق الجغرافية للمحافظة",null,null,x.id,"areas")).join("");
  }else if(state.view==="opportunities"){
   rows=(state.data.opportunities||[]).filter(x=>matches(x,"opportunities"));
-  out=rows.map(x=>card(x.name_ar,x.activity,x.opportunity_type||"طرح حكومي",[x.city,x.size_description,x.terms_as_published,x.announcement_date,x.source_claimed_status].filter(Boolean).join(" · "),null,linkedSources(x.id,"opportunities"),x.id)).join("");
+  out=rows.map(x=>card(x.name_ar,x.activity,x.opportunity_type||"طرح حكومي",[x.city,x.size_description,x.terms_as_published,x.announcement_date,x.source_claimed_status].filter(Boolean).join(" · "),null,linkedSources(x.id,"opportunities"),x.id,"opportunities")).join("");
  }else{
   rows=state.data.sources.filter(x=>matches(x,"sources"));
-  out=rows.map(x=>card(x.title,x.publisher,x.source_type||"مصدر عام",x.id||"مرجع عام",x.source_url,null,x.id)).join("");
+  out=rows.map(x=>card(x.title,x.publisher,x.source_type||"مصدر عام",x.id||"مرجع عام",x.source_url,null,x.id,"sources")).join("");
  }
  $("#directoryResults").innerHTML=out;
  const sharedRecord=location.hash.slice(1);
@@ -168,6 +171,16 @@ function render(){
  }else{
   setStatus("عدد النتائج: "+rows.length+" · السجلات المعروضة منشورة ومعتمدة فقط.");
  }
+}
+const requestedView=new URLSearchParams(location.search).get("view");
+const validViews=["entities","projects","areas","opportunities","sources"];
+if(validViews.includes(requestedView)){
+ state.view=requestedView;
+ document.querySelectorAll(".directory-tabs button").forEach(tab=>{
+  const active=tab.dataset.view===requestedView;
+  tab.classList.toggle("is-active",active);
+  tab.setAttribute("aria-selected",String(active));
+ });
 }
 document.querySelectorAll(".directory-tabs button").forEach(b=>b.addEventListener("click",()=>{
  document.querySelectorAll(".directory-tabs button").forEach(t=>{
