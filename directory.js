@@ -39,10 +39,10 @@ async function refresh(){
  try{
   const d=await staticData();
   const [e,p,a,s,o,es,ps,os]=await Promise.all([
-   table("directory_entities","select=id,name_ar,entity_type,description,website_url,primary_area_id,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
-   table("directory_projects","select=id,name_ar,project_type,description,location_text,project_status,area_id,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
-   table("directory_areas","select=id,slug,name_ar,name_en,area_type,parent_id,verification_status,public_visible,is_active&public_visible=eq.true&verification_status=eq.published&is_active=eq.true&order=name_ar.asc"),
-   table("directory_sources","select=id,title,publisher,source_type,source_url,accessed_at,is_public&is_public=eq.true&order=accessed_at.desc"),
+   table("directory_entities","select=id,name_ar,entity_type,description,website_url,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
+   table("directory_projects","select=id,name_ar,project_type,description,location_text,project_status,area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
+   table("directory_areas","select=id,slug,name_ar,name_en,area_type,parent_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,is_active&public_visible=eq.true&verification_status=eq.published&is_active=eq.true&order=name_ar.asc"),
+   table("directory_sources","select=id,title,publisher,source_type,source_url,accessed_at,confidence_level,is_public&is_public=eq.true&order=accessed_at.desc"),
    table("directory_opportunities","select=id,name_ar,city,activity,size_description,terms_as_published,announcement_date,opportunity_type,source_claimed_status,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=announcement_date.desc"),
    table("directory_entity_sources","select=entity_id,source_id,claim_key"),
    table("directory_project_sources","select=project_id,source_id,claim_key"),
@@ -75,6 +75,26 @@ function stats(){
  $("#statSources").textContent=c.sources??state.data.sources.length;
 }
 
+function validPublicMapPoint(record){
+ if(!record||record.location_public!==true||record.latitude==null||record.longitude==null||!record.location_source_id)return false;
+ const source=state.data.sources.find(item=>String(item.id)===String(record.location_source_id));
+ return Boolean(source&&source.is_public===true&&["high","official"].includes(source.confidence_level));
+}
+function precisionLabel(value){
+ return ({
+  building:"مبنى / مدخل محدد",
+  street:"شارع",
+  district_centroid:"مركز حي تقريبي",
+  area_centroid:"مركز منطقة تقريبي"
+ })[value]||"دقة غير محددة";
+}
+function verifiedLocationHtml(record){
+ if(!validPublicMapPoint(record))return "";
+ const source=state.data.sources.find(item=>String(item.id)===String(record.location_source_id));
+ const query=String(record.latitude)+","+String(record.longitude);
+ const href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(query);
+ return '<div class="directory-verified-location"><a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">عرض الموقع المعتمد على الخريطة ↗</a><small>الدقة: '+esc(precisionLabel(record.location_precision))+' · المصدر: '+esc(source?.title||"مصدر عام موثوق")+' · تحقق: '+esc(record.location_verified_at||"غير مسجل")+'</small></div>';
+}
 function updateDirectoryMap(){
  const select=$("#directoryMapArea");
  const frame=$("#directoryMapFrame");
@@ -82,14 +102,26 @@ function updateDirectoryMap(){
  const note=$("#directoryMapNote");
  if(!select||!frame||!link||!note)return;
  const chosen=state.data?.areas.find(a=>String(a.id||a.slug||a.name_ar)===select.value);
- const query=chosen?(chosen.name_ar+", Assiut, Egypt"):"Assiut, Egypt";
+ const trustedPoint=validPublicMapPoint(chosen);
+ const query=trustedPoint
+  ?(String(chosen.latitude)+","+String(chosen.longitude))
+  :(chosen?(chosen.name_ar+", Assiut, Egypt"):"Assiut, Egypt");
  frame.src="https://maps.google.com/maps?q="+encodeURIComponent(query)+"&output=embed";
- frame.title=chosen?("بحث خريطة استرشادي لمنطقة "+chosen.name_ar):"خريطة بحث عامة لمدينة أسيوط";
+ frame.title=trustedPoint
+  ?("خريطة مركز "+chosen.name_ar+" وفق مصدر موثق")
+  :(chosen?("بحث خريطة استرشادي لمنطقة "+chosen.name_ar):"خريطة بحث عامة لمدينة أسيوط");
  link.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(query);
- link.textContent=chosen?("فتح بحث "+chosen.name_ar+" في خرائط Google ↗"):"فتح بحث نطاق أسيوط في خرائط Google ↗";
- note.textContent=chosen
-  ?("يعرض Google Maps نتائج بحث باسم «"+chosen.name_ar+"» داخل نطاق أسيوط. هذا بحث استرشادي وليس دبوسًا جغرافيًا معتمدًا أو تأكيدًا لمقر شركة أو مشروع.")
-  :"الخريطة تعرض بحثًا عامًا في نطاق أسيوط. لا تُنشأ علامات لمواقع غير موثقة.";
+ link.textContent=trustedPoint
+  ?("فتح مركز "+chosen.name_ar+" على الخريطة ↗")
+  :(chosen?("فتح بحث "+chosen.name_ar+" في خرائط Google ↗"):"فتح بحث نطاق أسيوط في خرائط Google ↗");
+ if(trustedPoint){
+  const source=state.data.sources.find(item=>String(item.id)===String(chosen.location_source_id));
+  note.textContent="مركز منطقة موثق وفق مصدر "+(source?.confidence_level==="official"?"رسمي":"عالي الثقة")+" («"+(source?.title||"مصدر عام")+"»)، بدقة "+precisionLabel(chosen.location_precision)+" وتحقق بتاريخ "+chosen.location_verified_at+".";
+ }else{
+  note.textContent=chosen
+   ?("يعرض Google Maps نتائج بحث باسم «"+chosen.name_ar+"» داخل نطاق أسيوط. هذا بحث استرشادي وليس دبوسًا جغرافيًا معتمدًا أو تأكيدًا لمقر شركة أو مشروع.")
+   :"الخريطة تعرض بحثًا عامًا في نطاق أسيوط. لا تُنشأ علامات لمواقع غير موثقة.";
+ }
 }
 function mapAreaOptions(){
  const select=$("#directoryMapArea");
@@ -154,9 +186,9 @@ function linkedSources(id,kind){
   return u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(s.title||s.publisher||"مصدر")+'</a>':"";
  }).filter(Boolean).join(" · ");
 }
-function card(title,desc,tag,detail,url,refs){
+function card(title,desc,tag,detail,url,refs,record){
  const u=safeUrl(url);
- return '<article class="directory-card"><div class="directory-card-meta">'+(tag?'<span class="directory-tag">'+esc(tag)+'</span>':"")+'</div><h3>'+esc(title)+'</h3>'+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
+ return '<article class="directory-card"><div class="directory-card-meta">'+(tag?'<span class="directory-tag">'+esc(tag)+'</span>':"")+'</div><h3>'+esc(title)+'</h3>'+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(record?verifiedLocationHtml(record):"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
 }
 function setFilterAvailability(){
  $("#directoryTypeFilter").disabled=state.view!=="entities";
@@ -168,13 +200,13 @@ function render(){
  let rows=[],out="";
  if(state.view==="entities"){
   rows=state.data.entities.filter(x=>matches(x,"entities"));
-  out=rows.map(x=>card(x.name_ar,x.description,labels[x.entity_type]||x.entity_type,areaNames.get(String(x.primary_area_id))||x.area_name||"معلومات عامة منشورة",x.website_url,linkedSources(x.id,"entities"))).join("");
+  out=rows.map(x=>card(x.name_ar,x.description,labels[x.entity_type]||x.entity_type,areaNames.get(String(x.primary_area_id))||x.area_name||"معلومات عامة منشورة",x.website_url,linkedSources(x.id,"entities"),x)).join("");
  }else if(state.view==="projects"){
   rows=state.data.projects.filter(x=>matches(x,"projects"));
-  out=rows.map(x=>card(x.name_ar,x.description,labels[x.project_type]||x.project_type,[x.location_text,labels[x.project_status]].filter(Boolean).join(" · "),null,linkedSources(x.id,"projects"))).join("");
+  out=rows.map(x=>card(x.name_ar,x.description,labels[x.project_type]||x.project_type,[x.location_text,labels[x.project_status]].filter(Boolean).join(" · "),null,linkedSources(x.id,"projects"),x)).join("");
  }else if(state.view==="areas"){
   rows=state.data.areas.filter(x=>matches(x,"areas"));
-  out=rows.map(x=>card(x.name_ar,x.name_en,labels[x.area_type]||"نطاق جغرافي","قاعدة المناطق الجغرافية للمحافظة")).join("");
+  out=rows.map(x=>card(x.name_ar,x.name_en,labels[x.area_type]||"نطاق جغرافي","قاعدة المناطق الجغرافية للمحافظة",null,null,x)).join("");
  }else if(state.view==="opportunities"){
   rows=(state.data.opportunities||[]).filter(x=>matches(x,"opportunities"));
   out=rows.map(x=>card(x.name_ar,x.activity,x.opportunity_type||"طرح حكومي",[x.city,x.size_description,x.terms_as_published,x.announcement_date,x.source_claimed_status].filter(Boolean).join(" · "),null,linkedSources(x.id,"opportunities"))).join("");
