@@ -13,13 +13,13 @@ async function load(){try{companies=await api("company_profiles_public?select=id
 
 async function loadMyProfile(){
  profileLookupComplete=false;existingProfileId=null;existingStatus=null;supportsDraft=false;
- let s;try{s=await verifiedSession()}catch(_){return false}
+ try{await verifiedSession()}catch(_){return false}
  try{
-  // Read only this signed-in owner's row; RLS scopes the query to auth.uid().
-  const rows=await api("company_profiles?select=id,owner_id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,status,admin_notes,reviewed_at,reviewed_by,pending_update,update_status,update_notes&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=2");
-  if((rows||[]).length>1){status.textContent="وجدنا أكثر من ملف شركة مرتبطًا بحسابك. أوقفنا التعديل مؤقتًا لتجنب تعديل ملف غير مقصود؛ يلزم مراجعة الإدارة.";return false}
-  const c=rows?.[0]||null;profileLookupComplete=true;if(!c)return true;
-  existingProfileId=c.id;existingStatus=c.status;supportsDraft=Object.prototype.hasOwnProperty.call(c,"pending_update");
+  // The owner RPC returns only the current account's profile and owner-facing review state.
+  const c=await api("rpc/layan_company_owner_profile",{method:"POST",body:"{}"});
+  if(!c){profileLookupComplete=true;return true}
+  if(typeof c!=="object"||Array.isArray(c)||!c.id)throw Error("تعذر قراءة بيانات ملف الشركة بصيغة صحيحة.");
+  profileLookupComplete=true;existingProfileId=c.id;existingStatus=c.status;supportsDraft=Object.prototype.hasOwnProperty.call(c,"pending_update");
   const draft=(supportsDraft&&c.pending_update&&typeof c.pending_update==="object")?c.pending_update:null;const src=draft?{...c,...draft}:c;
   const values={company_name:src.company_name,category:src.category,description:src.description,services:(src.services||[]).join("، "),city:src.city,address:src.address||"",phone:src.phone,whatsapp:src.whatsapp||"",website:src.website||"",logo_url:src.logo_url||"",gallery_urls:(src.gallery_urls||[]).join("\n"),projects:(src.projects||[]).map(p=>(p.title||"")+" — "+(p.description||"")).join("\n")};
   for(const [name,value] of Object.entries(values)){const field=form.elements.namedItem(name);if(field)field.value=value;}
@@ -37,16 +37,27 @@ async function loadMyProfile(){
 }
 async function open(){try{await verifiedSession();if(!profileLookupComplete){const ok=await loadMyProfile();if(!ok){dialog.showModal();return}}dialog.showModal()}catch(_){sessionStorage.setItem("layanCompanyRegistrationPending","1");window.location.href="./?company-register=1"}}
 $("companyRegisterOpen")?.addEventListener("click",open);$("companyRegisterOpenBottom")?.addEventListener("click",open);$("companyDialogClose")?.addEventListener("click",()=>dialog.close());dialog?.addEventListener("click",e=>{if(e.target===dialog)dialog.close()});$("companyDirectorySearch")?.addEventListener("input",render);$("companyCategoryFilter")?.addEventListener("change",render);
-form?.addEventListener("submit",async e=>{e.preventDefault();if(!form.reportValidity())return;let s;try{s=await verifiedSession()}catch(err){status.textContent=err.message||"سجّل الدخول أولًا ثم أعد المحاولة.";return}if(!profileLookupComplete){const lookupOk=await loadMyProfile();if(!lookupOk||!profileLookupComplete){status.textContent="لا يمكن إرسال الطلب قبل التأكد من عدم وجود ملف شركة سابق. حدّث الصفحة وحاول مرة أخرى.";return}}if(existingProfileId&&existingStatus==="paused"){status.textContent="ملف شركتك موقوف مؤقتًا. لا يمكن إرسال تعديلات قبل مراجعة الإدارة.";return}const d=new FormData(form);const website=safeUrl(d.get("website")),logo=safeUrl(d.get("logo_url"));if(d.get("website")&&!website||d.get("logo_url")&&!logo){status.textContent="تحقق من روابط الموقع والشعار؛ يجب أن تبدأ بـ https:// أو http://.";return}
+form?.addEventListener("submit",async e=>{
+e.preventDefault();if(!form.reportValidity())return;
+try{await verifiedSession()}catch(err){status.textContent=err.message||"سجّل الدخول أولًا ثم أعد المحاولة.";return}
+if(!profileLookupComplete){const lookupOk=await loadMyProfile();if(!lookupOk||!profileLookupComplete){status.textContent="لا يمكن إرسال الطلب قبل التأكد من عدم وجود ملف شركة سابق. حدّث الصفحة وحاول مرة أخرى.";return}}
+if(existingProfileId&&existingStatus==="paused"){status.textContent="ملف شركتك موقوف مؤقتًا. لا يمكن إرسال تعديلات قبل مراجعة الإدارة.";return}
+const d=new FormData(form);const website=safeUrl(d.get("website")),logo=safeUrl(d.get("logo_url"));if(d.get("website")&&!website||d.get("logo_url")&&!logo){status.textContent="تحقق من روابط الموقع والشعار؛ يجب أن تبدأ بـ https:// أو http://.";return}
 const gallery=String(d.get("gallery_urls")||"").split(/\n+/).map(x=>x.trim()).filter(Boolean);if(gallery.some(x=>!safeUrl(x))){status.textContent="يوجد رابط صورة غير صحيح في معرض الأعمال.";return}
 const projects=String(d.get("projects")||"").split(/\n+/).map(x=>x.trim()).filter(Boolean).map(line=>{const p=line.split("—");return {title:(p.shift()||"عمل سابق").trim(),description:p.join("—").trim()}});
-const payload={owner_id:s.user.id,company_name:String(d.get("company_name")).trim(),category:String(d.get("category")),description:String(d.get("description")).trim(),services:String(d.get("services")||"").split(/[،,]/).map(x=>x.trim()).filter(Boolean),city:String(d.get("city")||"أسيوط").trim(),address:String(d.get("address")||"").trim()||null,phone:String(d.get("phone")).trim(),whatsapp:String(d.get("whatsapp")||"").trim()||null,website:website||null,logo_url:logo||null,gallery_urls:gallery.map(safeUrl),projects,status:"pending",reviewed_at:null,reviewed_by:null,admin_notes:null};
-const btn=form.querySelector('button[type="submit"]');btn.disabled=true;status.textContent="جارٍ إرسال ملف الشركة للمراجعة...";try{let savedRows,usedDraft=false;if(existingProfileId){
-const liveFields=(({company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects})=>({company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects}))(payload);
-if(supportsDraft&&existingStatus==="active"){usedDraft=true;savedRows=await api("company_profiles?id=eq."+encodeURIComponent(existingProfileId)+"&status=eq.active",{method:"PATCH",headers:{Prefer:"return=representation"},body:JSON.stringify({pending_update:liveFields,update_status:"pending",update_notes:null})});}
-else{if(existingStatus==="active"&&!window.confirm("تنبيه: إرسال التعديلات سيُخفي ملف شركتك من الدليل مؤقتًا حتى تعتمده الإدارة. هل تريد المتابعة؟")){status.textContent="تم إلغاء الإرسال ولم يتغير ملفك المنشور.";return}
-savedRows=await api("company_profiles?id=eq."+encodeURIComponent(existingProfileId)+"&status=in.(pending,active,needs_changes,rejected)",{method:"PATCH",headers:{Prefer:"return=representation"},body:JSON.stringify(payload)});}
-}else{savedRows=await api("company_profiles",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify(payload)});}if(!Array.isArray(savedRows)||savedRows.length!==1)throw Error("لم يؤكد النظام حفظ الطلب. حدّث الصفحة وتحقق من حالة ملف الشركة قبل إعادة الإرسال.");if(!usedDraft)existingStatus="pending";if(!existingProfileId){try{await loadMyProfile()}catch(_){}}submissionSaved=true;btn.disabled=true;btn.textContent="تم الإرسال للمراجعة";const ref=existingProfileId?" رقم الطلب: "+existingProfileId+".":"";status.textContent=(existingProfileId?"تم استلام طلبك بنجاح.":"تم إرسال طلبك بنجاح.")+" طلب الشركة الآن قيد مراجعة إدارة أسيوط عقار، ولن تظهر البيانات الجديدة في الدليل قبل الاعتماد."+(usedDraft?" ملفك المعتمد الحالي يبقى ظاهرًا حتى اعتماد التعديلات.":"")+ref+" احتفظ بهذه الصفحة لمتابعة الطلب.";}catch(err){status.textContent=err.message||"تعذر إرسال الطلب."}finally{if(!submissionSaved)btn.disabled=false}});
+const payload={company_name:String(d.get("company_name")).trim(),category:String(d.get("category")),description:String(d.get("description")).trim(),services:String(d.get("services")||"").split(/[،,]/).map(x=>x.trim()).filter(Boolean),city:String(d.get("city")||"أسيوط").trim(),address:String(d.get("address")||"").trim()||null,phone:String(d.get("phone")).trim(),whatsapp:String(d.get("whatsapp")||"").trim()||null,website:website||null,logo_url:logo||null,gallery_urls:gallery.map(safeUrl),projects};
+const wasExistingProfile=Boolean(existingProfileId);const btn=form.querySelector('button[type="submit"]');btn.disabled=true;status.textContent="جارٍ إرسال ملف الشركة للمراجعة...";
+try{
+ const saved=await api("rpc/layan_submit_company_profile",{method:"POST",body:JSON.stringify({p_payload:payload})});
+ if(!saved||typeof saved!=="object"||Array.isArray(saved)||!saved.id)throw Error("لم يؤكد النظام حفظ الطلب. حدّث الصفحة وتحقق من حالة ملف الشركة قبل إعادة الإرسال.");
+ const usedDraft=saved.status==="active"&&saved.update_status==="pending";
+ existingProfileId=saved.id;existingStatus=saved.status;supportsDraft=Object.prototype.hasOwnProperty.call(saved,"pending_update");profileLookupComplete=true;
+ submissionSaved=true;btn.disabled=true;btn.textContent="تم الإرسال للمراجعة";
+ const ref=" رقم الطلب: "+saved.id+".";
+ status.textContent=(wasExistingProfile?"تم استلام تحديث ملف شركتك بنجاح.":"تم إرسال طلبك بنجاح.")+" طلب الشركة الآن قيد مراجعة إدارة أسيوط عقار، ولن تظهر البيانات الجديدة في الدليل قبل الاعتماد."+(usedDraft?" ملفك المعتمد الحالي يبقى ظاهرًا حتى اعتماد التعديلات.":"")+ref+" احتفظ بهذه الصفحة لمتابعة الطلب.";
+}catch(err){status.textContent=err.message||"تعذر إرسال الطلب."}finally{if(!submissionSaved)btn.disabled=false}
+});
+
 form?.addEventListener("input",()=>{if(!submissionSaved)return;submissionSaved=false;const btn=form.querySelector('button[type="submit"]');if(btn){btn.disabled=false;btn.textContent="إرسال التعديلات للمراجعة";}status.textContent="تم تعديل البيانات بعد آخر إرسال. أرسل التعديلات مرة أخرى لتصل إلى إدارة أسيوط عقار."});
 load();loadMyProfile().finally(async()=>{if(new URLSearchParams(location.search).get("resumeCompanyRegistration")==="1"){history.replaceState(null,"",location.pathname);try{await verifiedSession();dialog.showModal()}catch(_){sessionStorage.setItem("layanCompanyRegistrationPending","1");window.location.href="./?company-register=1";}}});
 });
