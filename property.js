@@ -1,6 +1,18 @@
 document.addEventListener("DOMContentLoaded", async () => {
   "use strict";
 
+  // Remove inbound campaign tags before a visitor copies or shares the current page URL.
+  // Keep functional parameters such as the property ID (?id=...).
+  const cleanTrackingUrl = new URL(window.location.href);
+  const trackingKeys = Array.from(cleanTrackingUrl.searchParams.keys()).filter(key => /^utm_/i.test(key));
+  if (trackingKeys.length) {
+    trackingKeys.forEach(key => cleanTrackingUrl.searchParams.delete(key));
+    const cleanPath = cleanTrackingUrl.pathname
+      + (cleanTrackingUrl.search ? "?" + cleanTrackingUrl.searchParams.toString() : "")
+      + cleanTrackingUrl.hash;
+    window.history.replaceState(window.history.state, "", cleanPath);
+  }
+
   const root = document.getElementById("propertyDetailsRoot");
   const config = window.LAYAN_CONFIG || {};
   const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
