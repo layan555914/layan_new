@@ -134,7 +134,7 @@ jobs:
           const sponsor = fs.readFileSync('sponsor.js', 'utf8');
           const vm = require('node:vm');
           const configSource = fs.readFileSync('config.js', 'utf8');
-          const privateCompanyMigration = fs.readFileSync('supabase/migrations/20261104051500_move_company_profile_definers_to_private.sql', 'utf8');
+          const privateCompanyMigration = fs.readFileSync('supabase/migrations/20261104045129_move_company_profile_definers_to_private.sql', 'utf8');
           function configForHost(hostname) {
             const context = { window: { location: { hostname } } };
             vm.runInNewContext(configSource, context, { timeout: 1000 });
