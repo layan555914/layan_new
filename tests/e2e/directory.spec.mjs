@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const SUPABASE = "https://ebyhwqkmhxbgocngpqfe.supabase.co";
+const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 
 const fixtures = {
   directory_entities: [
@@ -80,6 +80,26 @@ test("all five directory tabs search, filter and open sources correctly", async 
   await page.locator("#directorySearch").fill("المصدر الرسمي التجريبي");
   await expect(page.locator("#directoryResults .directory-card")).toHaveCount(1);
   await expect(page.locator("#directoryResults a[href='https://example.org/source']")).toBeVisible();
+});
+
+
+test("directory map searches the selected published area without inventing a location pin", async ({page})=>{
+  await mockDirectoryApi(page);
+  await page.goto("/directory.html");
+  await page.locator("#directoryMapArea").selectOption("area-1");
+  const query=encodeURIComponent("أسيوط الجديدة, Assiut, Egypt");
+  await expect(page.locator("#directoryMapFrame")).toHaveAttribute(
+    "src",
+    "https://maps.google.com/maps?q="+query+"&output=embed"
+  );
+  await expect(page.locator("#directoryMapOpen")).toHaveAttribute(
+    "href",
+    "https://www.google.com/maps/search/?api=1&query="+query
+  );
+  await expect(page.locator("#directoryMapNote")).toContainText("بحثًا استرشاديًا");
+  await expect(page.locator("#directoryMapNote")).toContainText("ليس دبوسًا جغرافيًا معتمدًا");
+  await page.locator("#directoryMapArea").selectOption("");
+  await expect(page.locator("#directoryMapOpen")).toContainText("نطاق أسيوط");
 });
 
 test("directory layout has no horizontal overflow on mobile", async ({page})=>{
