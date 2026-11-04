@@ -82,6 +82,15 @@ async function installBackendMocks(page) {
     if (path.startsWith("/rest/v1/rpc/")) {
       const rpc = path.split("/").pop();
       if (rpc === "layan_is_admin") return reply(route, true);
+      if (rpc === "layan_company_owner_profile") return reply(route, {
+        id: "c1111111-1111-4111-8111-111111111111",
+        company_name: "شركة اختبار أسيوط",
+        category: "شركات عقارية",
+        status: "needs_changes",
+        admin_notes: "يرجى استكمال بيانات العنوان",
+        update_status: null,
+        update_notes: null
+      });
       if (rpc === "layan_admin_review_property_offer" && method === "POST") {
         const body = request.postDataJSON();
         const offer = offers.find(item => String(item.id) === String(body.p_id));
@@ -223,6 +232,8 @@ test("customer can search, open, save, submit, track and admin-review a property
   await page.goto("/my-listings.html");
   await expect(page.locator("#myPropertyOffersGrid")).toContainText("إعلان اختبار رحلة المستخدم");
   await expect(page.locator("#myPropertyOffersGrid")).toContainText("قيد المراجعة");
+  await expect(page.locator("#myCompanyRequestsGrid")).toContainText("شركة اختبار أسيوط");
+  await expect(page.locator("#myCompanyRequestsGrid")).toContainText("يرجى استكمال بيانات العنوان");
 
   // 6. The admin panel checks the server-side allowlist and publishes the pending offer.
   await page.goto("/admin.html");
