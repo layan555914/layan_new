@@ -24,6 +24,10 @@ WHERE status = 'active';
 REVOKE ALL ON TABLE public.company_profiles_public FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON TABLE public.company_profiles_public TO anon, authenticated;
 
+-- Enforce the one-company-profile-per-account rule already expected by the UI.
+CREATE UNIQUE INDEX IF NOT EXISTS company_profiles_owner_id_uidx
+  ON public.company_profiles (owner_id);
+
 CREATE OR REPLACE FUNCTION public.layan_is_admin()
 RETURNS boolean
 LANGUAGE sql
