@@ -59,6 +59,7 @@ async function refresh(){
   state.data=d;
   stats();
   areaOptions();
+  mapAreaOptions();
   render();
  }catch(_){
   setStatus("تعذر تحميل الدليل. أعد المحاولة لاحقًا.");
@@ -73,6 +74,40 @@ function stats(){
  $("#statAreas").textContent=c.areas??state.data.areas.length;
  $("#statSources").textContent=c.sources??state.data.sources.length;
 }
+
+function updateDirectoryMap(){
+ const select=$("#directoryMapArea");
+ const frame=$("#directoryMapFrame");
+ const link=$("#directoryMapOpen");
+ const note=$("#directoryMapNote");
+ if(!select||!frame||!link||!note)return;
+ const chosen=state.data?.areas.find(a=>String(a.id||a.slug||a.name_ar)===select.value);
+ const query=chosen?(chosen.name_ar+", Assiut, Egypt"):"Assiut, Egypt";
+ frame.src="https://maps.google.com/maps?q="+encodeURIComponent(query)+"&output=embed";
+ frame.title=chosen?("بحث خريطة استرشادي لمنطقة "+chosen.name_ar):"خريطة بحث عامة لمدينة أسيوط";
+ link.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(query);
+ link.textContent=chosen?("فتح بحث "+chosen.name_ar+" في خرائط Google ↗"):"فتح بحث نطاق أسيوط في خرائط Google ↗";
+ note.textContent=chosen
+  ?("يعرض Google Maps نتائج بحث باسم «"+chosen.name_ar+"» داخل نطاق أسيوط. هذا بحث استرشادي وليس دبوسًا جغرافيًا معتمدًا أو تأكيدًا لمقر شركة أو مشروع.")
+  :"الخريطة تعرض بحثًا عامًا في نطاق أسيوط. لا تُنشأ علامات لمواقع غير موثقة.";
+}
+function mapAreaOptions(){
+ const select=$("#directoryMapArea");
+ if(!select)return;
+ const selected=select.value;
+ select.innerHTML="";
+ const first=document.createElement("option");
+ first.value="";first.textContent="كل نطاق أسيوط";select.append(first);
+ state.data.areas.forEach(area=>{
+  const option=document.createElement("option");
+  option.value=String(area.id||area.slug||area.name_ar);
+  option.textContent=area.name_ar;
+  select.append(option);
+ });
+ if([...select.options].some(option=>option.value===selected))select.value=selected;
+ updateDirectoryMap();
+}
+
 function areaOptions(){
  const select=$("#directoryAreaFilter"),selected=select.value;
  select.innerHTML="";
@@ -172,6 +207,7 @@ document.querySelectorAll(".directory-tabs button").forEach(b=>b.addEventListene
 }));
 $("#directorySearch").addEventListener("input",e=>{state.query=e.target.value;render();});
 $("#directoryAreaFilter").addEventListener("change",e=>{state.area=e.target.value;render();});
+$("#directoryMapArea").addEventListener("change",updateDirectoryMap);
 $("#directoryTypeFilter").addEventListener("change",e=>{state.type=e.target.value;render();});
 $("#directoryRefresh").addEventListener("click",refresh);
 refresh();
