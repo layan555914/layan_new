@@ -10,8 +10,37 @@
   const key = config.SUPABASE_PUBLISHABLE_KEY;
   const bucket = "layan_real_estat";
   const SESSION_KEY = "layanSupabaseSession";
-  // Use the canonical production domain for all email-auth callbacks.
-  const AUTH_REDIRECT_URL = "https://layan-eg.com/";
+  // Production callbacks stay on the production domain; preview/local callbacks stay in TEST.
+  const AUTH_REDIRECT_URL = config.ENVIRONMENT === "production"
+    ? "https://layan-eg.com/"
+    : (window.location.origin.replace(/\/$/, "") + "/");
+  const RECOVERY_PKCE_STORAGE_KEY = "layanRecoveryCodeVerifier:" + new URL(url).hostname.split(".")[0];
+
+  function base64UrlEncode(bytes) {
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  }
+
+  async function createRecoveryPkceChallenge() {
+    if (!window.crypto?.getRandomValues || !window.crypto?.subtle) {
+      throw new Error("المتصفح لا يدعم التحقق الآمن لرابط الاستعادة. حدّث Chrome وحاول مرة أخرى.");
+    }
+    const random = new Uint8Array(32);
+    window.crypto.getRandomValues(random);
+    const verifier = base64UrlEncode(random);
+    const digest = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+    const challenge = base64UrlEncode(new Uint8Array(digest));
+    try {
+      localStorage.setItem(RECOVERY_PKCE_STORAGE_KEY, JSON.stringify({
+        code_verifier: verifier,
+        created_at: Date.now()
+      }));
+    } catch (_) {
+      throw new Error("تعذر حفظ بيانات التحقق الآمن على هذا المتصفح. اسمح بالتخزين المحلي ثم حاول مرة أخرى.");
+    }
+    return challenge;
+  }
   let session = null;
   try { session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch (_) {}
   if (session?.expires_at && session.expires_at * 1000 < Date.now()) session = null;
@@ -78,8 +107,21 @@
     });
   }
   async function resetPasswordForEmail(email) {
+    const cleanEmail = normalizeEmail(email);
+    if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
     const redirectTo = AUTH_REDIRECT_URL + "reset-password.html";
-    return authRequest("recover?redirect_to=" + encodeURIComponent(redirectTo), { email: normalizeEmail(email) });
+    const codeChallenge = await createRecoveryPkceChallenge();
+    const query = "recover?redirect_to=" + encodeURIComponent(redirectTo);
+    try {
+      return await authRequest(query, {
+        email: cleanEmail,
+        code_challenge: codeChallenge,
+        code_challenge_method: "s256"
+      });
+    } catch (error) {
+      try { localStorage.removeItem(RECOVERY_PKCE_STORAGE_KEY); } catch (_) {}
+      throw error;
+    }
   }
   async function signIn(email, password) {
     const data = await authRequest("token?grant_type=password", { email: normalizeEmail(email), password });
