@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const SUPABASE = "https://ebyhwqkmhxbgocngpqfe.supabase.co";
+const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 
 const fixtures = {
   directory_entities: [
