@@ -132,6 +132,32 @@ jobs:
           const app = fs.readFileSync('app.js', 'utf8');
           const marketplace = fs.readFileSync('marketplace.js', 'utf8');
           const sponsor = fs.readFileSync('sponsor.js', 'utf8');
+          const vm = require('node:vm');
+          const configSource = fs.readFileSync('config.js', 'utf8');
+          const privateCompanyMigration = fs.readFileSync('supabase/migrations/20261104051500_move_company_profile_definers_to_private.sql', 'utf8');
+          function configForHost(hostname) {
+            const context = { window: { location: { hostname } } };
+            vm.runInNewContext(configSource, context, { timeout: 1000 });
+            return context.window.LAYAN_CONFIG;
+          }
+          const productionConfig = configForHost('layan-eg.com');
+          const previewConfig = configForHost('preview-branch.vercel.app');
+          const localConfig = configForHost('localhost');
+          if (productionConfig.ENVIRONMENT !== 'production' ||
+              productionConfig.SUPABASE_URL !== 'https://ebyhwqkmhxbgocngpqfe.supabase.co') {
+            errors.push('The production domain must remain pinned to the production Supabase project');
+          }
+          if (previewConfig.ENVIRONMENT !== 'test' ||
+              previewConfig.SUPABASE_URL !== 'https://wisnmlbefdrkcbbqvdlg.supabase.co' ||
+              localConfig.ENVIRONMENT !== 'test') {
+            errors.push('Vercel previews and local hosts must use the isolated TEST Supabase project');
+          }
+          if (!privateCompanyMigration.includes('SECURITY INVOKER') ||
+              !privateCompanyMigration.includes('private.layan_submit_company_profile') ||
+              !privateCompanyMigration.includes('private.layan_review_company_profile')) {
+            errors.push('Privileged company profile functions must be isolated behind private SECURITY DEFINER helpers');
+          }
+
           if (!/forgotButton\.hidden\s*=\s*mode\s*!==\s*["']login["']/.test(app)) {
             errors.push('Main auth dialog must hide password recovery outside login mode');
           }
