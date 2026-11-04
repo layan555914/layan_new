@@ -1,6 +1,6 @@
 // ASYUT AQAR — production domain uses production Supabase only.
 // Preview, localhost and every unknown host fail over to the isolated TEST project.
-const asyutAqarHost = String(window.location.hostname || "").toLowerCase();
+const asyutAqarHost = String(window.location?.hostname || "").toLowerCase();
 const asyutAqarProductionHost = ["layan-eg.com", "www.layan-eg.com"].includes(asyutAqarHost);
 
 window.LAYAN_CONFIG = asyutAqarProductionHost
