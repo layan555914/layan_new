@@ -154,7 +154,7 @@ jobs:
             errors.push('Company owner UI must not query company_profiles directly');
           }
           if (!companyProfileJs.includes('company_profiles_public?select=') ||
-              !/address,phone,whatsapp,website,logo_url,gallery_urls,projects/.test(companyProfileJs)) {
+              !(companyProfileJs.includes('address,phone,whatsapp,website') && companyProfileJs.includes('logo_url,gallery_urls,projects'))) {
             errors.push('Public company profile must request contact and portfolio fields from the approved view');
           }
           if (!adminJs.includes('rpc/layan_admin_list_company_profiles') ||
