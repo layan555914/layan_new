@@ -14,6 +14,7 @@ on:
       - fix/directory-data-cache-v108
       - fix/directory-opportunity-source-links
       - research/directory-assiut-batch-20261102
+      - fix/company-profile-security-flow-20261104
   workflow_dispatch:
 
 permissions:
@@ -139,6 +140,38 @@ jobs:
           }
           if (/images\.pexels\.com/.test(sponsor)) {
             errors.push('Sponsor cards must not use unrelated generic stock photos as advertiser images');
+          }
+
+          const companiesJs = fs.readFileSync('companies.js', 'utf8');
+          const companyProfileJs = fs.readFileSync('company-profile.js', 'utf8');
+          const adminJs = fs.readFileSync('admin.js', 'utf8');
+          const companySecurityMigration = fs.readFileSync('supabase/migrations/20261104062300_company_profiles_rpc_access_hardening.sql', 'utf8');
+          const companyViewMigration = fs.readFileSync('supabase/migrations/20261104063000_company_profiles_public_view_column_grants.sql', 'utf8');
+          if (!companiesJs.includes('rpc/layan_company_owner_profile') || !companiesJs.includes('rpc/layan_submit_company_profile')) {
+            errors.push('Company owner reads and submissions must use scoped RPC functions');
+          }
+          if (/company_profiles\\?(?:select|owner_id)|company_profiles\\?[^\\n]*owner_id/.test(companiesJs)) {
+            errors.push('Company owner UI must not query company_profiles directly');
+          }
+          if (!companyProfileJs.includes('company_profiles_public?select=') ||
+              !/address,phone,whatsapp,website,logo_url,gallery_urls,projects/.test(companyProfileJs)) {
+            errors.push('Public company profile must request contact and portfolio fields from the approved view');
+          }
+          if (!adminJs.includes('rpc/layan_admin_list_company_profiles') ||
+              !adminJs.includes('rpc/layan_review_company_profile') ||
+              !adminJs.includes('rpc/layan_admin_pending_company_profile_count') ||
+              /\\/rest\\/v1\\/company_profiles\\?/.test(adminJs)) {
+            errors.push('Company administration must use admin RPCs, not direct base-table reads or writes');
+          }
+          if (!companySecurityMigration.includes('REVOKE ALL PRIVILEGES ON TABLE public.company_profiles') ||
+              !companySecurityMigration.includes('layan_submit_company_profile') ||
+              !companySecurityMigration.includes('auth.uid()')) {
+            errors.push('Company profile hardening migration is missing owner-scoped access controls');
+          }
+          if (!companyViewMigration.includes('security_invoker = true') ||
+              !companyViewMigration.includes('GRANT SELECT (') ||
+              !companyViewMigration.includes("USING (status = 'active')")) {
+            errors.push('Public company view must retain invoker security, column-only grants and active-only RLS');
           }
 
           const directoryAdmin = fs.readFileSync('directory-admin.html', 'utf8');
