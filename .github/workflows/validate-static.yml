@@ -129,6 +129,34 @@ jobs:
             errors.push('sw.js: ' + error.message);
           }
 
+          const vm = require('node:vm');
+          const configSource = fs.readFileSync('config.js', 'utf8');
+          const directoryJs = fs.readFileSync('directory.js', 'utf8');
+          const directoryHtml = fs.readFileSync('directory.html', 'utf8');
+          const directorySpecs = fs.readFileSync('tests/e2e/directory.spec.mjs', 'utf8');
+          function configForHost(hostname) {
+            const context = { window: { location: { hostname } } };
+            vm.runInNewContext(configSource, context, { timeout: 1000 });
+            return context.window.LAYAN_CONFIG;
+          }
+          const productionConfig = configForHost('layan-eg.com');
+          const previewConfig = configForHost('maps-preview.vercel.app');
+          if (productionConfig.ENVIRONMENT !== 'production' ||
+              productionConfig.SUPABASE_URL !== 'https://ebyhwqkmhxbgocngpqfe.supabase.co') {
+            errors.push('Production domain must stay connected to the production Supabase project');
+          }
+          if (previewConfig.ENVIRONMENT !== 'test' ||
+              previewConfig.SUPABASE_URL !== 'https://wisnmlbefdrkcbbqvdlg.supabase.co') {
+            errors.push('Vercel previews and other non-production hosts must use isolated TEST Supabase');
+          }
+          if (!directoryHtml.includes('id="directoryMapArea"') ||
+              !directoryHtml.includes('id="directoryMapFrame"') ||
+              !directoryHtml.includes('id="directoryMapOpen"') ||
+              !directoryJs.includes('function mapAreaOptions()') ||
+              !directoryJs.includes('encodeURIComponent(query)') ||
+              !directorySpecs.includes('directory map searches the selected published area')) {
+            errors.push('Directory map must use published-area selection and test its approximate map search behavior');
+          }
           const app = fs.readFileSync('app.js', 'utf8');
           const marketplace = fs.readFileSync('marketplace.js', 'utf8');
           const sponsor = fs.readFileSync('sponsor.js', 'utf8');
