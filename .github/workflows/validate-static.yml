@@ -145,12 +145,12 @@ jobs:
           const companiesJs = fs.readFileSync('companies.js', 'utf8');
           const companyProfileJs = fs.readFileSync('company-profile.js', 'utf8');
           const adminJs = fs.readFileSync('admin.js', 'utf8');
-          const companySecurityMigration = fs.readFileSync('supabase/migrations/20261104062300_company_profiles_rpc_access_hardening.sql', 'utf8');
-          const companyViewMigration = fs.readFileSync('supabase/migrations/20261104063000_company_profiles_public_view_column_grants.sql', 'utf8');
+          const companySecurityMigration = fs.readFileSync('supabase/migrations/20261104042819_company_profiles_rpc_access_hardening.sql', 'utf8');
+          const companyViewMigration = fs.readFileSync('supabase/migrations/20261104042906_company_profiles_public_view_column_grants.sql', 'utf8');
           if (!companiesJs.includes('rpc/layan_company_owner_profile') || !companiesJs.includes('rpc/layan_submit_company_profile')) {
             errors.push('Company owner reads and submissions must use scoped RPC functions');
           }
-          if (/company_profiles\\?(?:select|owner_id)|company_profiles\\?[^\\n]*owner_id/.test(companiesJs)) {
+          if (companiesJs.includes('company_profiles?')) {
             errors.push('Company owner UI must not query company_profiles directly');
           }
           if (!companyProfileJs.includes('company_profiles_public?select=') ||
@@ -160,7 +160,7 @@ jobs:
           if (!adminJs.includes('rpc/layan_admin_list_company_profiles') ||
               !adminJs.includes('rpc/layan_review_company_profile') ||
               !adminJs.includes('rpc/layan_admin_pending_company_profile_count') ||
-              /\\/rest\\/v1\\/company_profiles\\?/.test(adminJs)) {
+              adminJs.includes('/rest/v1/company_profiles?')) {
             errors.push('Company administration must use admin RPCs, not direct base-table reads or writes');
           }
           if (!companySecurityMigration.includes('REVOKE ALL PRIVILEGES ON TABLE public.company_profiles') ||
