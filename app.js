@@ -2,6 +2,15 @@
 document.addEventListener("DOMContentLoaded", async () => {
   "use strict";
 
+  // Strip campaign tags from outbound share links only; keep inbound analytics intact.
+  const cleanShareUrl = value => {
+    const url = new URL(String(value), window.location.href);
+    for (const key of Array.from(url.searchParams.keys())) {
+      if (/^utm_/i.test(key)) url.searchParams.delete(key);
+    }
+    return url.href;
+  };
+
   const $ = (id) => document.getElementById(id);
   // Category cards filter offers by broad use, not by an exact property subtype.
   document.querySelectorAll("[data-category-kind]").forEach((tile) => {
@@ -870,14 +879,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       const shareUrl = new URL("./property.html", window.location.href);
       if (o.id != null) shareUrl.searchParams.set("id", String(o.id));
       else { shareUrl.pathname = "./"; shareUrl.hash = "offers"; }
-      const shareData = {title: "ASYUT AQAR | " + o.title, text: "إعلان عقاري على أسيوط عقار: " + o.title + " — كود الإعلان " + offerCode(o), url: shareUrl.toString()};
+      const cleanUrl = cleanShareUrl(shareUrl);
+      const shareData = {title: "ASYUT AQAR | " + o.title, text: "إعلان عقاري على أسيوط عقار: " + o.title + " — كود الإعلان " + offerCode(o), url: cleanUrl};
       try {
         if (navigator.share) await navigator.share(shareData);
         else if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(shareData.text + "\\n" + shareUrl.toString());
+          await navigator.clipboard.writeText(shareData.text + "\n" + cleanUrl);
           setStatus("تم نسخ تفاصيل الإعلان ورابط أسيوط عقار للمشاركة.");
         } else {
-          window.prompt("انسخ تفاصيل الإعلان ورابط أسيوط عقار:", shareData.text + "\\n" + shareUrl.toString());
+          window.prompt("انسخ تفاصيل الإعلان ورابط أسيوط عقار:", shareData.text + "\n" + cleanUrl);
         }
       } catch (error) {
         if (error?.name !== "AbortError") setStatus("تعذرت المشاركة تلقائيًا. يمكنك نسخ رابط أسيوط عقار ومشاركة كود الإعلان: " + offerCode(o));

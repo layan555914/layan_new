@@ -1,6 +1,15 @@
 document.addEventListener("DOMContentLoaded", async () => {
   "use strict";
 
+  // Strip campaign tags from outbound share links only; keep inbound analytics intact.
+  const cleanShareUrl = value => {
+    const url = new URL(String(value), window.location.href);
+    for (const key of Array.from(url.searchParams.keys())) {
+      if (/^utm_/i.test(key)) url.searchParams.delete(key);
+    }
+    return url.href;
+  };
+
   const root = document.getElementById("propertyDetailsRoot");
   const config = window.LAYAN_CONFIG || {};
   const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
@@ -64,6 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const whatsapp = phoneForWhatsApp(phone);
     const shareURL = new URL("./property.html", window.location.href);
     shareURL.searchParams.set("id", row.id);
+    const shareHref = cleanShareUrl(shareURL.href);
     const shareText = "إعلان على أسيوط عقار: " + title + " — كود " + offerCode(row);
     const isFeatured = row.is_featured === true && (!row.featured_until || new Date(row.featured_until) > new Date());
     const locationText = [row.city, row.area].filter(Boolean).join(" · ") || "أسيوط";
@@ -75,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelector('meta[name="description"]')?.setAttribute("content", description);
     document.querySelector('meta[property="og:title"]')?.setAttribute("content", title + " | أسيوط عقار");
     document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
-    document.querySelector('meta[property="og:url"]')?.setAttribute("content", shareURL.href);
+    document.querySelector('meta[property="og:url"]')?.setAttribute("content", shareHref);
     if (images[0]) document.querySelector('meta[property="og:image"]')?.setAttribute("content", images[0]);
     let schema = document.getElementById("propertyStructuredData");
     if (!schema) {
@@ -89,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "@type":"RealEstateListing",
       "name":title,
       "description":description,
-      "url":shareURL.href,
+      "url":shareHref,
       "datePosted":row.created_at || undefined,
       "image":images.length ? images : undefined,
       "address":{"@type":"PostalAddress","addressLocality":row.city || "أسيوط","addressRegion":row.governorate || "أسيوط","addressCountry":"EG"},
@@ -97,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
-    canonical.href = shareURL.href;
+    canonical.href = shareHref;
 
     const mainImage = images.length
       ? '<img id="propertyMainImage" src="' + escapeHTML(images[0]) + '" alt="' + escapeHTML(title) + ' — الصورة الرئيسية" fetchpriority="high">'
@@ -109,7 +119,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ).join("") + '</div>' : "";
     const contactActions = phone
       ? '<div class="property-contact-actions"><a class="property-action property-action-gold" href="tel:' + escapeHTML(tel) + '">اتصال بصاحب الإعلان</a>' +
-        (whatsapp ? '<a class="property-action" href="https://wa.me/' + escapeHTML(whatsapp) + '?text=' + encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + title + " — كود " + offerCode(row) + " من منصة أسيوط عقار. " + shareURL.href) + '" target="_blank" rel="noopener noreferrer">واتساب صاحب الإعلان</a>' : '') +
+        (whatsapp ? '<a class="property-action" href="https://wa.me/' + escapeHTML(whatsapp) + '?text=' + encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + title + " — كود " + offerCode(row) + " من منصة أسيوط عقار. " + shareHref) + '" target="_blank" rel="noopener noreferrer">واتساب صاحب الإعلان</a>' : '') +
         '</div>' : '<p class="property-contact-note">لم يضف صاحب الإعلان رقم تواصل متاحًا حتى الآن.</p>';
     const facts = [
       makeFact("نوع العقار", row.property_type),
@@ -199,17 +209,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     root.querySelector("#mobileShareFallback")?.addEventListener("click", share);
 
     function share() {
-      const data = {title: title + " | أسيوط عقار", text: shareText, url: shareURL.href};
+      const data = {title: title + " | أسيوط عقار", text: shareText, url: shareHref};
       if (navigator.share) {
         navigator.share(data).catch(error => { if (error?.name !== "AbortError") copyShare(); });
       } else copyShare();
     }
     async function copyShare() {
       try {
-        await navigator.clipboard.writeText(shareText + "\n" + shareURL.href);
+        await navigator.clipboard.writeText(shareText + "\n" + shareHref);
         showToast("تم نسخ رابط الإعلان للمشاركة.");
       } catch (_) {
-        window.prompt("انسخ رابط الإعلان:", shareURL.href);
+        window.prompt("انسخ رابط الإعلان:", shareHref);
       }
     }
     function showToast(message) {
