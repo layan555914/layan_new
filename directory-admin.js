@@ -118,9 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
     listStatus.textContent = "جارٍ تحميل قاعدة البيانات...";
     try {
       const result = await Promise.all([
-        rows("directory_entities", "id,legacy_code,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc"),
-        rows("directory_projects", "id,legacy_code,name_ar,name_en,project_type,description,location_text,project_status,area_id,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc"),
-        rows("directory_areas", "id,legacy_code,slug,name_ar,name_en,area_type,parent_id,description,is_active,verification_status,public_visible,last_verified_at,next_review_at,notes", "name_ar.asc"),
+        rows("directory_entities", "id,legacy_code,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc"),
+        rows("directory_projects", "id,legacy_code,name_ar,name_en,project_type,description,location_text,project_status,area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc"),
+        rows("directory_areas", "id,legacy_code,slug,name_ar,name_en,area_type,parent_id,description,is_active,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at,notes", "name_ar.asc"),
         rows("directory_opportunities", "id,legacy_code,name_ar,city,activity,size_description,terms_as_published,announcement_date,opportunity_type,source_claimed_status,verification_status,public_visible,notes", "name_ar.asc"),
         rows("directory_sources", "id,source_code,title,publisher,source_type,source_url,publication_date,accessed_at,confidence_level,is_public,notes", "accessed_at.desc"),
         rows("directory_entity_private", "entity_id,internal_address,internal_phone,verification_label,confidence_level,notes,next_review_at"),
@@ -167,8 +167,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function inputField(name, label, value, wide, type) {
+    const inputType = type || "text";
+    const step = inputType === "number" ? ' step="any"' : "";
     return '<label class="' + (wide ? "wide" : "") + '">' + esc(label) +
-      '<input data-field="' + esc(name) + '" type="' + (type || "text") + '" value="' + esc(value || "") + '">' +
+      '<input data-field="' + esc(name) + '" type="' + inputType + '"' + step + ' value="' + esc(value ?? "") + '">' +
       '</label>';
   }
 
@@ -223,6 +225,34 @@ document.addEventListener("DOMContentLoaded", () => {
       options + '</select></label></div><div class="dir-admin-actions"><button type="button" class="btn btn-outline-dark" data-link-record>ربط المصدر بالسجل</button></div></div>';
   }
 
+  function mapLocationFields(type, record) {
+    const linked = type === "areas" ? null : linksFor(type, record.id).map(source => source.id);
+    const trustedSources = cache.sources.filter(source =>
+      source.is_public === true &&
+      ["high", "official"].includes(source.confidence_level) &&
+      (!linked || linked.includes(source.id))
+    );
+    const sourceOptions = [["", "اختر مصدرًا عامًا موثوقًا"]].concat(
+      trustedSources.map(source => [source.id, source.title + " — " + (source.confidence_level === "official" ? "رسمي" : "ثقة مرتفعة")])
+    );
+    const precisionOptions = [
+      ["building", "مبنى / مدخل محدد"],
+      ["street", "شارع"],
+      ["district_centroid", "مركز حي — تقريبي"],
+      ["area_centroid", "مركز منطقة — تقريبي"]
+    ];
+    return '<div class="dir-admin-map-fields wide"><strong>الموقع الجغرافي الموثق</strong>' +
+      '<p>لن تظهر الإحداثيات على خريطة الزوار إلا عند إدخالها مع مصدر عام رسمي أو عالي الثقة وتاريخ تحقق، ثم تفعيل إظهار الموقع. لا تستخدم مركز الحي أو المنطقة كعنوان مبنى.</p>' +
+      '<div class="dir-admin-fields">' +
+      inputField("latitude", "خط العرض (Latitude)", record.latitude, false, "number") +
+      inputField("longitude", "خط الطول (Longitude)", record.longitude, false, "number") +
+      selectField("location_precision", "دقة تحديد الموقع", record.location_precision, [["", "اختر الدقة"], ...precisionOptions]) +
+      selectField("location_source_id", "مصدر الإحداثيات", record.location_source_id, sourceOptions) +
+      inputField("location_verified_at", "تاريخ التحقق من الإحداثيات", record.location_verified_at, false, "date") +
+      checkField("location_public", "إظهار الموقع على الخريطة العامة بعد التحقق", record.location_public) +
+      '</div><small>إذا تم إخفاء السجل أو سحب المصدر الموثوق، تُزال علامة الموقع من الخريطة.</small></div>';
+  }
+
   function recordCard(type, record) {
     const privateRecord = type === "entities" ?
       cache.privateEntities.find(item => item.entity_id === record.id) :
@@ -237,7 +267,8 @@ document.addEventListener("DOMContentLoaded", () => {
         inputField("public_phone", "هاتف معلن رسميًا", record.public_phone) +
         inputField("public_email", "بريد معلن رسميًا", record.public_email, false, "email") +
         inputField("public_address", "عنوان معلن رسميًا", record.public_address, true) +
-        '<label>المنطقة الرئيسية' + selectedArea(record.primary_area_id) + '</label>';
+        '<label>المنطقة الرئيسية' + selectedArea(record.primary_area_id) + '</label>' +
+        mapLocationFields(type, record);
       extra = '<p><strong>التصنيف:</strong> ' + esc(record.entity_type) + ' · <strong>الكود:</strong> ' + esc(record.legacy_code || "—") + '</p>';
       if (privateRecord) extra += '<div class="dir-admin-sources"><strong>ملاحظات داخلية (لا تُنشر)</strong><p>العنوان المرشح: ' +
         esc(privateRecord.internal_address || "غير مسجل") + ' · الهاتف المرشح: ' +
@@ -255,6 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ["unknown", "غير معلومة"], ["announced", "معلن"], ["planned", "مخطط"], ["under_construction", "تحت الإنشاء"],
           ["partially_delivered", "تم تسليم جزء"], ["completed", "مكتمل"], ["operating", "يعمل"], ["stalled", "متوقف"]
         ]) +
+        mapLocationFields(type, record) +
         checkField("public_visible", "السجل ظاهر للعامة", record.public_visible);
       extra = '<p><strong>النوع:</strong> ' + esc(record.project_type) + ' · <strong>الكود:</strong> ' + esc(record.legacy_code || "—") + '</p>';
       if (privateRecord) extra += '<div class="dir-admin-sources"><strong>تفاصيل داخلية من المصدر</strong><p>المساحة كما وردت: ' +
@@ -281,6 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
         inputField("area_type", "نوع المنطقة", record.area_type) +
         textField("description", "وصف المنطقة", record.description, true) +
         textField("notes", "ملاحظات داخلية", record.notes, true) +
+        mapLocationFields(type, record) +
         checkField("is_active", "المنطقة نشطة", record.is_active) +
         checkField("public_visible", "المنطقة ظاهرة للعامة", record.public_visible);
       extra = '<p><strong>الكود:</strong> ' + esc(record.legacy_code || "—") + ' · ' +
@@ -423,7 +456,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function prepareMapLocationPatch(type, patch) {
+    if (!["areas", "entities", "projects"].includes(type)) return patch;
+    const clearLocation = () => {
+      patch.latitude = null;
+      patch.longitude = null;
+      patch.location_precision = null;
+      patch.location_source_id = null;
+      patch.location_verified_at = null;
+      patch.location_public = false;
+    };
+    if (patch.public_visible === false || (type === "areas" && patch.is_active === false) ||
+        patch.location_public !== true) {
+      clearLocation();
+      return patch;
+    }
+    const latitude = Number(patch.latitude);
+    const longitude = Number(patch.longitude);
+    if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+        !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+      throw new Error("أدخل خط عرض بين -90 و90 وخط طول بين -180 و180.");
+    }
+    if (!patch.location_precision || !patch.location_source_id || !patch.location_verified_at) {
+      throw new Error("قبل إظهار الموقع، اختر دقة التحديد والمصدر الموثوق وتاريخ التحقق.");
+    }
+    if (type === "areas" && !["area_centroid", "district_centroid"].includes(patch.location_precision)) {
+      throw new Error("موقع المنطقة يجب أن يكون مركز منطقة أو مركز حي، وليس عنوان مبنى.");
+    }
+    patch.latitude = latitude;
+    patch.longitude = longitude;
+    return patch;
+  }
+
   async function updateRecord(type, recordId, patch, reason) {
+    prepareMapLocationPatch(type, patch);
     const table = tables[type];
     const oldRecord = (cache[type] || []).find(item => item.id === recordId) || {};
     const beforeAfter = changedValues(oldRecord, patch);
