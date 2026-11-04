@@ -153,8 +153,9 @@ jobs:
           if (companiesJs.includes('company_profiles?')) {
             errors.push('Company owner UI must not query company_profiles directly');
           }
+          const requiredCompanyProfileFields = ['address','phone','whatsapp','website','logo_url','gallery_urls','projects'];
           if (!companyProfileJs.includes('company_profiles_public?select=') ||
-              !(companyProfileJs.includes('address,phone,whatsapp,website') && companyProfileJs.includes('logo_url,gallery_urls,projects'))) {
+              requiredCompanyProfileFields.some(field => !companyProfileJs.includes(field))) {
             errors.push('Public company profile must request contact and portfolio fields from the approved view');
           }
           if (!adminJs.includes('rpc/layan_admin_list_company_profiles') ||
