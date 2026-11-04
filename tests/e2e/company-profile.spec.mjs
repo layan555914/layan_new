@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
+const SUPABASE = "https://ebyhwqkmhxbgocngpqfe.supabase.co";
 const COMPANY_ID = "c1111111-1111-4111-8111-111111111111";
 
 const approvedCompany = {
