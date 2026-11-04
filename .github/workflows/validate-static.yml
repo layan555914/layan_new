@@ -173,11 +173,28 @@ jobs:
           const authClientJs = fs.readFileSync('gubabase.js', 'utf8');
           const resetPasswordHtml = fs.readFileSync('reset-password.html', 'utf8');
           const resetPasswordTests = fs.readFileSync('tests/e2e/reset-password.spec.mjs', 'utf8');
+          const signupClientTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
+          const appAuthJs = fs.readFileSync('app.js', 'utf8');
+
           const signupTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
           if (!authClientJs.includes('SIGNUP_PKCE_STORAGE_KEY') ||
               !authClientJs.includes('code_challenge: pkce.codeChallenge') ||
               !authClientJs.includes('code_challenge_method: "s256"')) {
             errors.push('Email signups must send an S256 PKCE challenge and preserve its verifier');
+          }
+          if (!authClientJs.includes('resend?redirect_to=') ||
+              !authClientJs.includes('token?grant_type=pkce') ||
+              !authClientJs.includes('emitAuthCallback') ||
+              !appAuthJs.includes('window.LAYAN_AUTH_CALLBACK_RESULT') ||
+              !appAuthJs.includes('handleAuthCallback({ detail: window.LAYAN_AUTH_CALLBACK_RESULT })')) {
+            errors.push('Signup confirmation must use the correct resend redirect and replay PKCE callback results to the UI');
+          }
+          if (!signupClientTests.includes('signup sends an S256 PKCE challenge') ||
+              !signupClientTests.includes('email confirmation PKCE code creates a session') ||
+              !signupClientTests.includes('resend confirmation retains the original signup verifier') ||
+              !signupClientTests.includes('callback results are replayed') ||
+              !signupClientTests.includes('legacy implicit email-confirmation callbacks remain supported')) {
+            errors.push('Signup confirmation PKCE browser regression tests are incomplete');
           }
           if (!authClientJs.includes('resend?redirect_to=') ||
               authClientJs.includes('options: { emailRedirectTo: redirectTo }')) {
