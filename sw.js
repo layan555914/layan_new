@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v119-auth-callback-20261104";
+const CACHE_NAME = "asyut-aqar-shell-v120-auth-config-refresh-20261104";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -34,7 +34,7 @@ const APP_SHELL = [
   "./buyer.css",
   "./sponsor.css",
   "./ai.css",
-  "./config.js",
+  "./config.js?v=auth-env-aware-20261104-2",
   "./gubabase.js?v=auth-env-aware-callback-20261104-1",
   "./app.js",
   "./map.js",
