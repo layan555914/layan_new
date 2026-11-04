@@ -88,9 +88,14 @@ test("email confirmation PKCE code creates a session and completes the signup ca
   await expect(page).toHaveURL(/\/$/);
   const callback = await page.evaluate(() => window.LAYAN_AUTH_CALLBACK_RESULT);
   expect(callback).toMatchObject({ success: true, type: "signup" });
-  const session = await page.evaluate(() => JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null"));
-  expect(session.access_token).toBe("fixture-signup-access-token");
-  expect(session.user.email_confirmed_at).toBeTruthy();
+  const sessionSnapshot = await page.evaluate(() => ({
+    clientSession: window.LAYAN_SUPABASE.getSession(),
+    storedSession: sessionStorage.getItem("layanSupabaseSession"),
+    sessionKeys: Object.keys(sessionStorage)
+  }));
+  expect(sessionSnapshot.clientSession?.access_token, JSON.stringify(sessionSnapshot)).toBe("fixture-signup-access-token");
+  expect(sessionSnapshot.clientSession.user.email_confirmed_at).toBeTruthy();
+  expect(sessionSnapshot.storedSession).toContain("fixture-signup-access-token");
   expect(await page.evaluate(key => localStorage.getItem(key), SIGNUP_KEY)).toBeNull();
 });
 
@@ -173,7 +178,12 @@ test("legacy implicit email-confirmation callbacks remain supported", async ({ p
   await page.goto("/#access_token=legacy-confirmation-access&refresh_token=legacy-refresh-token&token_type=bearer");
   await page.waitForFunction(() => window.LAYAN_AUTH_CALLBACK_RESULT?.success === true);
   await expect(page).toHaveURL(/\/$/);
-  const session = await page.evaluate(() => JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null"));
-  expect(session.access_token).toBe("legacy-confirmation-access");
-  expect(session.refresh_token).toBe("legacy-refresh-token");
+  const sessionSnapshot = await page.evaluate(() => ({
+    clientSession: window.LAYAN_SUPABASE.getSession(),
+    storedSession: sessionStorage.getItem("layanSupabaseSession"),
+    sessionKeys: Object.keys(sessionStorage)
+  }));
+  expect(sessionSnapshot.clientSession?.access_token, JSON.stringify(sessionSnapshot)).toBe("legacy-confirmation-access");
+  expect(sessionSnapshot.clientSession.refresh_token).toBe("legacy-refresh-token");
+  expect(sessionSnapshot.storedSession).toContain("legacy-confirmation-access");
 });
