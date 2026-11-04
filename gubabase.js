@@ -14,7 +14,10 @@
   const AUTH_REDIRECT_URL = config.ENVIRONMENT === "production"
     ? "https://layan-eg.com/"
     : (window.location.origin.replace(/\/$/, "") + "/");
-  const RECOVERY_PKCE_STORAGE_KEY = "layanRecoveryCodeVerifier:" + new URL(url).hostname.split(".")[0];
+  const PROJECT_KEY_SUFFIX = new URL(url).hostname.split(".")[0];
+  const RECOVERY_PKCE_STORAGE_KEY = "layanRecoveryCodeVerifier:" + PROJECT_KEY_SUFFIX;
+  const SIGNUP_PKCE_STORAGE_KEY = "layanSignupCodeVerifier:" + PROJECT_KEY_SUFFIX;
+  const PKCE_VERIFIER_MAX_AGE_MS = 60 * 60 * 1000;
 
   function base64UrlEncode(bytes) {
     let binary = "";
@@ -22,24 +25,50 @@
     return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
   }
 
-  async function createRecoveryPkceChallenge() {
+  async function codeChallengeForVerifier(verifier, context) {
+    if (!window.crypto?.subtle) {
+      throw new Error("المتصفح لا يدعم التحقق الآمن لـ" + context + ". حدّث Chrome وحاول مرة أخرى.");
+    }
+    const digest = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+    return base64UrlEncode(new Uint8Array(digest));
+  }
+
+  async function createPkceChallenge(storageKey, context, reuseExisting = false) {
     if (!window.crypto?.getRandomValues || !window.crypto?.subtle) {
-      throw new Error("المتصفح لا يدعم التحقق الآمن لرابط الاستعادة. حدّث Chrome وحاول مرة أخرى.");
+      throw new Error("المتصفح لا يدعم التحقق الآمن لـ" + context + ". حدّث Chrome وحاول مرة أخرى.");
+    }
+    if (reuseExisting) {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+        const age = Date.now() - Number(saved?.created_at || 0);
+        if (typeof saved?.code_verifier === "string" &&
+            /^[A-Za-z0-9_-]{43,128}$/.test(saved.code_verifier) &&
+            age >= 0 && age < PKCE_VERIFIER_MAX_AGE_MS) {
+          return {
+            codeChallenge: await codeChallengeForVerifier(saved.code_verifier, context),
+            reusedExisting: true
+          };
+        }
+      } catch (_) {}
     }
     const random = new Uint8Array(32);
     window.crypto.getRandomValues(random);
     const verifier = base64UrlEncode(random);
-    const digest = await window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
-    const challenge = base64UrlEncode(new Uint8Array(digest));
+    const codeChallenge = await codeChallengeForVerifier(verifier, context);
     try {
-      localStorage.setItem(RECOVERY_PKCE_STORAGE_KEY, JSON.stringify({
+      localStorage.setItem(storageKey, JSON.stringify({
         code_verifier: verifier,
         created_at: Date.now()
       }));
     } catch (_) {
       throw new Error("تعذر حفظ بيانات التحقق الآمن على هذا المتصفح. اسمح بالتخزين المحلي ثم حاول مرة أخرى.");
     }
-    return challenge;
+    return { codeChallenge, reusedExisting: false };
+  }
+
+  async function createRecoveryPkceChallenge() {
+    const result = await createPkceChallenge(RECOVERY_PKCE_STORAGE_KEY, "استعادة كلمة المرور", false);
+    return result.codeChallenge;
   }
   let session = null;
   try { session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch (_) {}
@@ -93,17 +122,37 @@
     const cleanEmail = normalizeEmail(email);
     if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
     if (String(password || "").length < 6) throw new Error("Password should be at least 6 characters.");
+    const pkce = await createPkceChallenge(SIGNUP_PKCE_STORAGE_KEY, "تأكيد البريد الإلكتروني", true);
     const redirectTo = AUTH_REDIRECT_URL;
-    const data = await authRequest("signup?redirect_to=" + encodeURIComponent(redirectTo), { email: cleanEmail, password });
-    normalizeSession(data);
-    return { user: data?.user || null, session: session, needsEmailConfirmation: !data?.access_token };
+    try {
+      const data = await authRequest("signup?redirect_to=" + encodeURIComponent(redirectTo), {
+        email: cleanEmail,
+        password,
+        code_challenge: pkce.codeChallenge,
+        code_challenge_method: "s256"
+      });
+      normalizeSession(data);
+      const needsEmailConfirmation = !data?.access_token;
+      if (!needsEmailConfirmation) {
+        try { localStorage.removeItem(SIGNUP_PKCE_STORAGE_KEY); } catch (_) {}
+      }
+      return { user: data?.user || null, session: session, needsEmailConfirmation };
+    } catch (error) {
+      if (!pkce.reusedExisting) {
+        try { localStorage.removeItem(SIGNUP_PKCE_STORAGE_KEY); } catch (_) {}
+      }
+      throw error;
+    }
   }
   async function resendConfirmation(email) {
+    const cleanEmail = normalizeEmail(email);
+    if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
+    // Supabase's resend endpoint reuses the signup flow already stored for the user.
+    // Keep the original verifier and pass the redirect as the REST redirect_to query.
     const redirectTo = AUTH_REDIRECT_URL;
-    return authRequest("resend", {
+    return authRequest("resend?redirect_to=" + encodeURIComponent(redirectTo), {
       type: "signup",
-      email: normalizeEmail(email),
-      options: { emailRedirectTo: redirectTo }
+      email: cleanEmail
     });
   }
   async function resetPasswordForEmail(email) {
@@ -136,16 +185,68 @@
     }
     saveSession(null);
   }
+  function emitAuthCallback(detail) {
+    window.LAYAN_AUTH_CALLBACK_RESULT = detail;
+    window.dispatchEvent(new CustomEvent("layan-auth-callback", { detail }));
+  }
+  function cleanAuthCallbackUrl(removeQueryKeys = []) {
+    const cleaned = new URL(window.location.href);
+    removeQueryKeys.forEach(name => cleaned.searchParams.delete(name));
+    cleaned.hash = "";
+    history.replaceState(null, "", cleaned.pathname + cleaned.search);
+  }
   async function consumeAuthCallback() {
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const params = new URLSearchParams(window.location.search);
+    const authCode = params.get("code");
     const accessToken = hash.get("access_token");
     const refreshToken = hash.get("refresh_token");
-    const authError = hash.get("error_description") || hash.get("error");
+    const authError = hash.get("error_description") || hash.get("error") ||
+      params.get("error_description") || params.get("error");
     if (authError) {
-      history.replaceState(null, "", window.location.pathname + window.location.search);
-      window.dispatchEvent(new CustomEvent("layan-auth-callback", { detail: { success: false, message: authError } }));
+      cleanAuthCallbackUrl(["code", "error", "error_description", "error_code"]);
+      emitAuthCallback({ success: false, message: authError });
       return;
     }
+
+    // Signup/email confirmation PKCE callback. Recovery is handled by reset-password.html.
+    if (authCode) {
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem(SIGNUP_PKCE_STORAGE_KEY) || "null"); } catch (_) {}
+      const verifier = typeof saved?.code_verifier === "string" ? saved.code_verifier : "";
+      const age = Date.now() - Number(saved?.created_at || 0);
+      const verifierFresh = age >= 0 && age < PKCE_VERIFIER_MAX_AGE_MS;
+      cleanAuthCallbackUrl(["code"]);
+      if (!verifier || !verifierFresh) {
+        try { localStorage.removeItem(SIGNUP_PKCE_STORAGE_KEY); } catch (_) {}
+        emitAuthCallback({
+          success: false,
+          message: "وصل رابط التأكيد الآمن، لكن بيانات التحقق الخاصة بالمتصفح غير موجودة أو انتهت. اطلب إعادة إرسال رسالة التأكيد وافتحها في نفس المتصفح الذي أنشأت منه الحساب."
+        });
+        return;
+      }
+      try {
+        const response = await fetch(url + "/auth/v1/token?grant_type=pkce", {
+          method: "POST",
+          headers: { apikey: key, "Content-Type": "application/json" },
+          body: JSON.stringify({ auth_code: authCode, code_verifier: verifier })
+        });
+        const data = await readResponse(response);
+        if (!data?.access_token || !data?.user) {
+          throw new Error("لم يرجع خادم المصادقة جلسة صالحة بعد تأكيد البريد.");
+        }
+        normalizeSession(data);
+        try { localStorage.removeItem(SIGNUP_PKCE_STORAGE_KEY); } catch (_) {}
+        emitAuthCallback({ success: true, type: "signup" });
+        return;
+      } catch (error) {
+        try { localStorage.removeItem(SIGNUP_PKCE_STORAGE_KEY); } catch (_) {}
+        emitAuthCallback({ success: false, message: error.message || "تعذر إكمال تأكيد البريد." });
+        return;
+      }
+    }
+
+    // Legacy implicit confirmation links remain supported for accounts created before PKCE.
     if (!accessToken) return;
     try {
       const response = await fetch(url + "/auth/v1/user", {
@@ -160,11 +261,11 @@
           (hash.get("expires_in") ? Math.floor(Date.now()/1000) + Number(hash.get("expires_in")) : null),
         user
       });
-      history.replaceState(null, "", window.location.pathname + window.location.search);
-      window.dispatchEvent(new CustomEvent("layan-auth-callback", { detail: { success: true } }));
+      cleanAuthCallbackUrl();
+      emitAuthCallback({ success: true, type: "legacy" });
     } catch (error) {
       console.error("LAYAN: تعذر إكمال تأكيد البريد:", error);
-      window.dispatchEvent(new CustomEvent("layan-auth-callback", { detail: { success: false, message: error.message } }));
+      emitAuthCallback({ success: false, message: error.message });
     }
   }
   consumeAuthCallback();
