@@ -9,9 +9,11 @@
   const url = config.SUPABASE_URL.replace(/\/$/, "");
   const key = config.SUPABASE_PUBLISHABLE_KEY;
   const bucket = "layan_real_estat";
-  const SESSION_KEY = "layanSupabaseSession";
-  // Use the canonical production domain for all email-auth callbacks.
-  const AUTH_REDIRECT_URL = "https://layan-eg.com/";
+  const SESSION_KEY = "layanSupabaseSession:" + (config.ENVIRONMENT || "production");
+  // Keep auth email callbacks on the same host and base path that initiated the request.
+  // This preserves the Production/TEST project pairing selected by config.js.
+  const AUTH_REDIRECT_URL = new URL("./", window.location.href).toString();
+  const AUTH_RESET_REDIRECT_URL = new URL("reset-password.html", AUTH_REDIRECT_URL).toString();
   let session = null;
   try { session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch (_) {}
   if (session?.expires_at && session.expires_at * 1000 < Date.now()) session = null;
@@ -78,7 +80,7 @@
     });
   }
   async function resetPasswordForEmail(email) {
-    const redirectTo = AUTH_REDIRECT_URL + "reset-password.html";
+    const redirectTo = AUTH_RESET_REDIRECT_URL;
     return authRequest("recover?redirect_to=" + encodeURIComponent(redirectTo), { email: normalizeEmail(email) });
   }
   async function signIn(email, password) {

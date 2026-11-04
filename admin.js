@@ -390,9 +390,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // Draft update on a published profile: server-side function (admin-only) merges or rejects it.
         await request("/rest/v1/rpc/layan_review_company_profile", { method: "POST", body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes }) });
       } else {
-        const done = await requestOneRow("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
-          method: "PATCH",
-          body: JSON.stringify({ status: action === "approve" ? "active" : action === "request_changes" ? "needs_changes" : "rejected", admin_notes: action === "approve" ? null : notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
+        await request("/rest/v1/rpc/layan_review_company_profile", {
+          method: "POST",
+          body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes })
         });
 
       }
