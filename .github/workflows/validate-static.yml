@@ -14,6 +14,11 @@ on:
       - fix/directory-data-cache-v108
       - fix/directory-opportunity-source-links
       - research/directory-assiut-batch-20261102
+      - fix/company-profile-security-flow-20261104
+      - fix/auth-recovery-pkce-flow-20261104
+      - fix/signup-confirmation-pkce-20261104
+      - feature/assyut-directory-maps-taxonomy-refresh-20261104
+      - feature/verified-directory-map-coordinates-20261104
   workflow_dispatch:
 
 permissions:
@@ -128,9 +133,74 @@ jobs:
             errors.push('sw.js: ' + error.message);
           }
 
+          const vm = require('node:vm');
+          const configSource = fs.readFileSync('config.js', 'utf8');
+          const directoryJs = fs.readFileSync('directory.js', 'utf8');
+          const directoryHtml = fs.readFileSync('directory.html', 'utf8');
+          const directorySpecs = fs.readFileSync('tests/e2e/directory.spec.mjs', 'utf8');
+          const directoryAdminJs = fs.readFileSync('directory-admin.js', 'utf8');
+          const mapCoordinateMigration = fs.readFileSync('supabase/migrations/20261104051622_verified_directory_map_coordinates.sql', 'utf8');
+          const mapTriggerFixMigration = fs.readFileSync('supabase/migrations/20261104051952_fix_directory_map_location_trigger_row_shape.sql', 'utf8');
+
+          function configForHost(hostname) {
+            const context = { window: { location: { hostname } } };
+            vm.runInNewContext(configSource, context, { timeout: 1000 });
+            return context.window.LAYAN_CONFIG;
+          }
+          const productionConfig = configForHost('layan-eg.com');
+          const previewConfig = configForHost('maps-preview.vercel.app');
+          if (productionConfig.ENVIRONMENT !== 'production' ||
+              productionConfig.SUPABASE_URL !== 'https://ebyhwqkmhxbgocngpqfe.supabase.co') {
+            errors.push('Production domain must stay connected to the production Supabase project');
+          }
+          if (previewConfig.ENVIRONMENT !== 'test' ||
+              previewConfig.SUPABASE_URL !== 'https://wisnmlbefdrkcbbqvdlg.supabase.co') {
+            errors.push('Vercel previews and other non-production hosts must use isolated TEST Supabase');
+          }
+          if (!directoryHtml.includes('id="directoryMapArea"') ||
+              !directoryHtml.includes('id="directoryMapFrame"') ||
+              !directoryHtml.includes('id="directoryMapOpen"') ||
+              !directoryJs.includes('function mapAreaOptions()') ||
+              !directoryJs.includes('encodeURIComponent(query)') ||
+              !directorySpecs.includes('directory map searches the selected published area')) {
+            errors.push('Directory map must use published-area selection and test its approximate map search behavior');
+          }
+          if (!mapCoordinateMigration.includes('location_source_id') ||
+              !mapCoordinateMigration.includes("confidence_level NOT IN ('high','official')") ||
+              !mapCoordinateMigration.includes('location_public') ||
+              !mapCoordinateMigration.includes('location_verified_at') ||
+              !mapCoordinateMigration.includes('directory_guard_public_map_source')) {
+            errors.push('Verified map coordinates must require a trusted public source, verification date and explicit publication approval');
+          }
+          if (!mapTriggerFixMigration.includes("TG_TABLE_NAME = 'directory_areas'") ||
+              !directoryAdminJs.includes('function mapLocationFields(type, record)') ||
+              !directoryAdminJs.includes('function prepareMapLocationPatch(type, patch)') ||
+              !directoryJs.includes('function validPublicMapPoint(record)') ||
+              !directorySpecs.includes('only public points backed by an official source')) {
+            errors.push('Admin and public map flows must expose only source-verified map coordinates');
+          }
           const app = fs.readFileSync('app.js', 'utf8');
           const marketplace = fs.readFileSync('marketplace.js', 'utf8');
           const sponsor = fs.readFileSync('sponsor.js', 'utf8');
+          // vm, configSource, configForHost and productionConfig are declared above (directory map checks).
+          const privateCompanyMigration = fs.readFileSync('supabase/migrations/20261104045129_move_company_profile_definers_to_private.sql', 'utf8');
+          const branchPreviewConfig = configForHost('preview-branch.vercel.app');
+          const localConfig = configForHost('localhost');
+          if (productionConfig.ENVIRONMENT !== 'production' ||
+              productionConfig.SUPABASE_URL !== 'https://ebyhwqkmhxbgocngpqfe.supabase.co') {
+            errors.push('The production domain must remain pinned to the production Supabase project');
+          }
+          if (branchPreviewConfig.ENVIRONMENT !== 'test' ||
+              branchPreviewConfig.SUPABASE_URL !== 'https://wisnmlbefdrkcbbqvdlg.supabase.co' ||
+              localConfig.ENVIRONMENT !== 'test') {
+            errors.push('Vercel previews and local hosts must use the isolated TEST Supabase project');
+          }
+          if (!privateCompanyMigration.includes('SECURITY INVOKER') ||
+              !privateCompanyMigration.includes('private.layan_submit_company_profile') ||
+              !privateCompanyMigration.includes('private.layan_review_company_profile')) {
+            errors.push('Privileged company profile functions must be isolated behind private SECURITY DEFINER helpers');
+          }
+
           if (!/forgotButton\.hidden\s*=\s*mode\s*!==\s*["']login["']/.test(app)) {
             errors.push('Main auth dialog must hide password recovery outside login mode');
           }
@@ -139,6 +209,103 @@ jobs:
           }
           if (/images\.pexels\.com/.test(sponsor)) {
             errors.push('Sponsor cards must not use unrelated generic stock photos as advertiser images');
+          }
+
+          const authClientJs = fs.readFileSync('gubabase.js', 'utf8');
+          const resetPasswordHtml = fs.readFileSync('reset-password.html', 'utf8');
+          const resetPasswordTests = fs.readFileSync('tests/e2e/reset-password.spec.mjs', 'utf8');
+          const signupClientTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
+          const appAuthJs = fs.readFileSync('app.js', 'utf8');
+
+          const signupTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
+          if (!authClientJs.includes('SIGNUP_PKCE_STORAGE_KEY') ||
+              !authClientJs.includes('code_challenge: pkce.codeChallenge') ||
+              !authClientJs.includes('code_challenge_method: "s256"')) {
+            errors.push('Email signups must send an S256 PKCE challenge and preserve its verifier');
+          }
+          if (!authClientJs.includes('resend?redirect_to=') ||
+              !authClientJs.includes('token?grant_type=pkce') ||
+              !authClientJs.includes('emitAuthCallback') ||
+              !appAuthJs.includes('window.LAYAN_AUTH_CALLBACK_RESULT') ||
+              !appAuthJs.includes('handleAuthCallback({ detail: window.LAYAN_AUTH_CALLBACK_RESULT })')) {
+            errors.push('Signup confirmation must use the correct resend redirect and replay PKCE callback results to the UI');
+          }
+          if (!signupClientTests.includes('signup sends an S256 PKCE challenge') ||
+              !signupClientTests.includes('email confirmation PKCE code creates a session') ||
+              !signupClientTests.includes('resend confirmation retains the original signup verifier') ||
+              !signupClientTests.includes('callback results are replayed') ||
+              !signupClientTests.includes('legacy implicit email-confirmation callbacks remain supported')) {
+            errors.push('Signup confirmation PKCE browser regression tests are incomplete');
+          }
+          if (!authClientJs.includes('resend?redirect_to=') ||
+              authClientJs.includes('options: { emailRedirectTo: redirectTo }')) {
+            errors.push('Signup confirmation resend must use the Auth REST redirect_to query and retain the original verifier');
+          }
+          if (!authClientJs.includes('token?grant_type=pkce') ||
+              !authClientJs.includes('SIGNUP_PKCE_STORAGE_KEY') ||
+              !authClientJs.includes('LAYAN_AUTH_CALLBACK_RESULT')) {
+            errors.push('Signup confirmation callback must exchange PKCE code and expose the result to late UI listeners');
+          }
+          if (!signupTests.includes('signup sends an S256 PKCE challenge') ||
+              !signupTests.includes('email confirmation PKCE code creates a session') ||
+              !signupTests.includes('resend confirmation retains the original signup verifier') ||
+              !signupTests.includes('legacy implicit email-confirmation callbacks remain supported')) {
+            errors.push('Signup confirmation PKCE browser regression tests are incomplete');
+          }
+
+
+          if (!authClientJs.includes('code_challenge_method: "s256"') ||
+              !authClientJs.includes('code_challenge: codeChallenge') ||
+              !authClientJs.includes('RECOVERY_PKCE_STORAGE_KEY')) {
+            errors.push('Password recovery requests must create and send a PKCE challenge and preserve its verifier');
+          }
+          if (!resetPasswordHtml.includes('token?grant_type=pkce') ||
+              !resetPasswordHtml.includes('auth_code: authCode') ||
+              !resetPasswordHtml.includes('code_verifier: verifier') ||
+              !resetPasswordHtml.includes('token_hash')) {
+            errors.push('Password recovery callback must exchange PKCE codes and retain legacy token_hash support');
+          }
+          if (!resetPasswordTests.includes('password recovery request sends a PKCE challenge') ||
+              !resetPasswordTests.includes('PKCE recovery callback exchanges the one-time code') ||
+              !resetPasswordTests.includes('legacy token_hash recovery links remain supported')) {
+            errors.push('Password recovery browser regression tests are incomplete');
+          }
+
+          const companiesJs = fs.readFileSync('companies.js', 'utf8');
+          const companyProfileJs = fs.readFileSync('company-profile.js', 'utf8');
+          const adminJs = fs.readFileSync('admin.js', 'utf8');
+          const myListingsJs = fs.readFileSync('my-listings.js', 'utf8');
+          const companySecurityMigration = fs.readFileSync('supabase/migrations/20261104042819_company_profiles_rpc_access_hardening.sql', 'utf8');
+          const companyViewMigration = fs.readFileSync('supabase/migrations/20261104042906_company_profiles_public_view_column_grants.sql', 'utf8');
+          if (!companiesJs.includes('rpc/layan_company_owner_profile') || !companiesJs.includes('rpc/layan_submit_company_profile')) {
+            errors.push('Company owner reads and submissions must use scoped RPC functions');
+          }
+          if (companiesJs.includes('company_profiles?')) {
+            errors.push('Company owner UI must not query company_profiles directly');
+          }
+          if (!myListingsJs.includes('rpc/layan_company_owner_profile') || myListingsJs.includes('company_profiles?')) {
+            errors.push('My Listings must load company requests via the owner-scoped RPC, not the base table');
+          }
+          const requiredCompanyProfileFields = ['address','phone','whatsapp','website','logo_url','gallery_urls','projects'];
+          if (!companyProfileJs.includes('company_profiles_public?select=') ||
+              requiredCompanyProfileFields.some(field => !companyProfileJs.includes(field))) {
+            errors.push('Public company profile must request contact and portfolio fields from the approved view');
+          }
+          if (!adminJs.includes('rpc/layan_admin_list_company_profiles') ||
+              !adminJs.includes('rpc/layan_review_company_profile') ||
+              !adminJs.includes('rpc/layan_admin_pending_company_profile_count') ||
+              adminJs.includes('/rest/v1/company_profiles?')) {
+            errors.push('Company administration must use admin RPCs, not direct base-table reads or writes');
+          }
+          if (!companySecurityMigration.includes('REVOKE ALL PRIVILEGES ON TABLE public.company_profiles') ||
+              !companySecurityMigration.includes('layan_submit_company_profile') ||
+              !companySecurityMigration.includes('auth.uid()')) {
+            errors.push('Company profile hardening migration is missing owner-scoped access controls');
+          }
+          if (!companyViewMigration.includes('security_invoker = true') ||
+              !companyViewMigration.includes('GRANT SELECT (') ||
+              !companyViewMigration.includes("USING (status = 'active')")) {
+            errors.push('Public company view must retain invoker security, column-only grants and active-only RLS');
           }
 
           const directoryAdmin = fs.readFileSync('directory-admin.html', 'utf8');

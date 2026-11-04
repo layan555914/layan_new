@@ -151,7 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
       propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
     }
   }
-  const COMPANY_COLS = "id,company_name,category,description,services,city,address,phone,whatsapp,website,logo_url,gallery_urls,projects,created_at";
   let companyDraftSupported = false;
   async function loadPendingCompanyProfiles() {
     if (!companyProfilesList) return;
@@ -267,15 +266,15 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadAdminStats() {
     const panel=document.getElementById("adminStats");
     const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value);};
-    const [properties,marketPending,companies,marketApproved]=await Promise.all([
+    const [properties,marketPending,companyPending,marketApproved]=await Promise.all([
       request("/rest/v1/property_offers?select=id&status=eq.pending"),
       request("/rest/v1/marketplace_listings?select=id&status=eq.pending"),
-      request("/rest/v1/company_profiles?select=id&status=eq.pending"),
+      request("/rest/v1/rpc/layan_admin_pending_company_profile_count",{method:"POST",body:"{}"}),
       request("/rest/v1/marketplace_listings?select=id&status=eq.approved")
     ]);
     set("statPendingProperties",Array.isArray(properties)?properties.length:0);
     set("statPendingMarketplace",Array.isArray(marketPending)?marketPending.length:0);
-    set("statPendingCompanies",Array.isArray(companies)?companies.length:0);
+    set("statPendingCompanies",Number(companyPending)||0);
     set("statApprovedMarketplace",Array.isArray(marketApproved)?marketApproved.length:0);
     if(panel)panel.hidden=false;
   }
@@ -386,16 +385,11 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (!window.confirm(card.dataset.companyKind === "update" ? "اعتماد التعديلات وتحديث النسخة العامة لملف الشركة؟" : "اعتماد ملف الشركة ونشره في دليل أسيوط عقار؟")) return;
     button.disabled = true;
     try {
-      if (card.dataset.companyKind === "update") {
-        // Draft update on a published profile: server-side function (admin-only) merges or rejects it.
-        await request("/rest/v1/rpc/layan_review_company_profile", { method: "POST", body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes }) });
-      } else {
-        const done = await requestOneRow("/rest/v1/company_profiles?id=eq." + encodeURIComponent(id) + "&status=eq.pending", {
-          method: "PATCH",
-          body: JSON.stringify({ status: action === "approve" ? "active" : action === "request_changes" ? "needs_changes" : "rejected", admin_notes: action === "approve" ? null : notes, reviewed_at: new Date().toISOString(), reviewed_by: session.user.id })
-        });
-
-      }
+      // All new-company and published-profile decisions use the same admin-only database RPC.
+      await request("/rest/v1/rpc/layan_review_company_profile", {
+        method: "POST",
+        body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes })
+      });
       setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }

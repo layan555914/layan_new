@@ -1480,16 +1480,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   syncFavoritesToAccount();
 
-  window.addEventListener("layan-auth-callback", event => {
+  function handleAuthCallback(event) {
     if (event.detail?.success) {
       updateAuthButton();
       if (continueCompanyRegistration()) return;
       setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في أسيوط عقار.");
     } else if (event.detail?.message) {
-      setStatus("تعذر إكمال تأكيد البريد. جرّب فتح رابط التأكيد مرة أخرى أو سجّل الدخول بعد التأكيد.");
+      setStatus("تعذر إكمال تأكيد البريد. افتح أحدث رسالة تأكيد في نفس المتصفح الذي أنشأت منه الحساب، أو اضغط إعادة الإرسال.");
       console.warn("ASYUT AQAR auth callback:", event.detail.message);
     }
-  });
+  }
+  window.addEventListener("layan-auth-callback", handleAuthCallback);
+  // The Supabase client may finish exchanging the callback code before app.js attaches its listener.
+  if (window.LAYAN_AUTH_CALLBACK_RESULT) {
+    handleAuthCallback({ detail: window.LAYAN_AUTH_CALLBACK_RESULT });
+  }
   updateAuthButton();
   if (new URLSearchParams(window.location.search).get("company-register") === "1") {
     sessionStorage.setItem("layanCompanyRegistrationPending", "1");
