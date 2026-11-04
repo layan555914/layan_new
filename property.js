@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const whatsapp = phoneForWhatsApp(phone);
     const shareURL = new URL("./property.html", window.location.href);
     shareURL.searchParams.set("id", row.id);
-    const shareHref = cleanShareUrl(shareHref);
+    const shareHref = cleanShareUrl(shareURL.href);
     const shareText = "إعلان على أسيوط عقار: " + title + " — كود " + offerCode(row);
     const isFeatured = row.is_featured === true && (!row.featured_until || new Date(row.featured_until) > new Date());
     const locationText = [row.city, row.area].filter(Boolean).join(" · ") || "أسيوط";
