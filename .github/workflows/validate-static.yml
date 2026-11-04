@@ -145,6 +145,7 @@ jobs:
           const companiesJs = fs.readFileSync('companies.js', 'utf8');
           const companyProfileJs = fs.readFileSync('company-profile.js', 'utf8');
           const adminJs = fs.readFileSync('admin.js', 'utf8');
+          const myListingsJs = fs.readFileSync('my-listings.js', 'utf8');
           const companySecurityMigration = fs.readFileSync('supabase/migrations/20261104042819_company_profiles_rpc_access_hardening.sql', 'utf8');
           const companyViewMigration = fs.readFileSync('supabase/migrations/20261104042906_company_profiles_public_view_column_grants.sql', 'utf8');
           if (!companiesJs.includes('rpc/layan_company_owner_profile') || !companiesJs.includes('rpc/layan_submit_company_profile')) {
@@ -152,6 +153,9 @@ jobs:
           }
           if (companiesJs.includes('company_profiles?')) {
             errors.push('Company owner UI must not query company_profiles directly');
+          }
+          if (!myListingsJs.includes('rpc/layan_company_owner_profile') || myListingsJs.includes('company_profiles?')) {
+            errors.push('My Listings must load company requests via the owner-scoped RPC, not the base table');
           }
           const requiredCompanyProfileFields = ['address','phone','whatsapp','website','logo_url','gallery_urls','projects'];
           if (!companyProfileJs.includes('company_profiles_public?select=') ||
