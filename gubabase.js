@@ -9,7 +9,7 @@
   const url = config.SUPABASE_URL.replace(/\/$/, "");
   const key = config.SUPABASE_PUBLISHABLE_KEY;
   const bucket = "layan_real_estat";
-  const SESSION_KEY = "layanSupabaseSession";
+  const SESSION_KEY = "layanSupabaseSession:" + (config.ENVIRONMENT || "production");
   // Keep auth email callbacks on the same host and base path that initiated the request.
   // This preserves the Production/TEST project pairing selected by config.js.
   const AUTH_REDIRECT_URL = new URL("./", window.location.href).toString();
