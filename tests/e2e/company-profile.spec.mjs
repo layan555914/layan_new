@@ -40,7 +40,7 @@ test("approved company profile page reads public contact and portfolio fields fr
   await expect(page.locator("#companyProfileRoot")).toContainText("شارع الجمهورية");
   await expect(page.locator("#companyProfileRoot a[href='tel:01012345678']")).toBeVisible();
   await expect(page.locator("#companyProfileRoot a[href='https://wa.me/01012345678']")).toBeVisible();
-  await expect(page.locator("#companyProfileRoot a[href='https://example.com']")).toBeVisible();
+  await expect(page.locator("#companyProfileRoot a[href='https://example.com/']")).toBeVisible();
   await expect(page.locator("#companyProfileRoot .company-gallery img").first()).toHaveAttribute("src", approvedCompany.gallery_urls[0]);
 });
 
