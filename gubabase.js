@@ -17,7 +17,6 @@
   const PROJECT_KEY_SUFFIX = new URL(url).hostname.split(".")[0];
   const RECOVERY_PKCE_STORAGE_KEY = "layanRecoveryCodeVerifier:" + PROJECT_KEY_SUFFIX;
   const SIGNUP_PKCE_STORAGE_KEY = "layanSignupCodeVerifier:" + PROJECT_KEY_SUFFIX;
-  const PKCE_VERIFIER_MAX_AGE_MS = 60 * 60 * 1000;
 
   function base64UrlEncode(bytes) {
     let binary = "";
@@ -40,10 +39,9 @@
     if (reuseExisting) {
       try {
         const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
-        const age = Date.now() - Number(saved?.created_at || 0);
         if (typeof saved?.code_verifier === "string" &&
             /^[A-Za-z0-9_-]{43,128}$/.test(saved.code_verifier) &&
-            age >= 0 && age < PKCE_VERIFIER_MAX_AGE_MS) {
+            Number(saved?.created_at || 0) > 0) {
           return {
             codeChallenge: await codeChallengeForVerifier(saved.code_verifier, context),
             reusedExisting: true
@@ -214,10 +212,8 @@
       let saved = null;
       try { saved = JSON.parse(localStorage.getItem(SIGNUP_PKCE_STORAGE_KEY) || "null"); } catch (_) {}
       const verifier = typeof saved?.code_verifier === "string" ? saved.code_verifier : "";
-      const age = Date.now() - Number(saved?.created_at || 0);
-      const verifierFresh = age >= 0 && age < PKCE_VERIFIER_MAX_AGE_MS;
       cleanAuthCallbackUrl(["code"]);
-      if (!verifier || !verifierFresh) {
+      if (!verifier || Number(saved?.created_at || 0) <= 0) {
         try { localStorage.removeItem(SIGNUP_PKCE_STORAGE_KEY); } catch (_) {}
         emitAuthCallback({
           success: false,
@@ -240,7 +236,7 @@
         emitAuthCallback({ success: true, type: "signup" });
         return;
       } catch (error) {
-        try { localStorage.removeItem(SIGNUP_PKCE_STORAGE_KEY); } catch (_) {}
+        // Keep the original verifier so a resend/retry can complete this same signup flow.
         emitAuthCallback({ success: false, message: error.message || "تعذر إكمال تأكيد البريد." });
         return;
       }
