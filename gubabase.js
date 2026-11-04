@@ -13,13 +13,13 @@
   // Production callbacks stay on the production domain; preview/local callbacks stay in TEST.
   const AUTH_REDIRECT_URL = config.ENVIRONMENT === "production"
     ? "https://layan-eg.com/"
-    : (window.location.origin.replace(/\\/$/, "") + "/");
+    : (window.location.origin.replace(/\/$/, "") + "/");
   const RECOVERY_PKCE_STORAGE_KEY = "layanRecoveryCodeVerifier:" + new URL(url).hostname.split(".")[0];
 
   function base64UrlEncode(bytes) {
     let binary = "";
     for (const byte of bytes) binary += String.fromCharCode(byte);
-    return btoa(binary).replace(/\\+/g, "-").replace(/\\//g, "_").replace(/=+$/g, "");
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
   }
 
   async function createRecoveryPkceChallenge() {
