@@ -4,7 +4,7 @@ const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 
 const fixtures = {
   directory_entities: [
-    { id:"entity-1",name_ar:"شركة اختبار التطوير",entity_type:"developer",description:"مطور عقاري تجريبي",website_url:"https://developer.example",primary_area_id:"area-1",verification_status:"published",public_visible:true },
+    { id:"entity-1",name_ar:"شركة اختبار التطوير",entity_type:"developer",description:"مطور عقاري تجريبي",website_url:"https://developer.example",primary_area_id:"area-1",latitude:27.2050,longitude:31.1540,location_precision:"street",location_source_id:"source-1",location_verified_at:"2026-11-04",location_public:true,verification_status:"published",public_visible:true },
     { id:"entity-2",name_ar:"هيئة اختبار عامة",entity_type:"public_authority",description:"جهة عامة تجريبية",website_url:"https://authority.example",primary_area_id:"area-1",verification_status:"published",public_visible:true },
     { id:"entity-3",name_ar:"مكتب استشارات تجريبي",entity_type:"consultant",description:"استشارات عقارية",website_url:"",primary_area_id:"area-1",verification_status:"published",public_visible:true }
   ],
@@ -12,10 +12,11 @@ const fixtures = {
     { id:"project-1",name_ar:"مشروع اختبار النخيل",project_type:"residential",description:"مشروع سكني تجريبي",location_text:"أسيوط الجديدة",project_status:"unknown",area_id:"area-1",verification_status:"published",public_visible:true }
   ],
   directory_areas: [
-    { id:"area-1",slug:"new-asyut",name_ar:"أسيوط الجديدة",name_en:"New Assiut",area_type:"new_city",parent_id:null,verification_status:"published",public_visible:true,is_active:true }
+    { id:"area-1",slug:"new-asyut",name_ar:"أسيوط الجديدة",name_en:"New Assiut",area_type:"new_city",parent_id:null,verification_status:"published",public_visible:true,is_active:true,latitude:null,longitude:null,location_public:false },
+    { id:"area-2",slug:"verified-zone",name_ar:"منطقة اختبار موثقة",name_en:"Verified Test Zone",area_type:"district",parent_id:"area-1",latitude:27.2100,longitude:31.1600,location_precision:"area_centroid",location_source_id:"source-1",location_verified_at:"2026-11-04",location_public:true,verification_status:"published",public_visible:true,is_active:true }
   ],
   directory_sources: [
-    { id:"source-1",title:"المصدر الرسمي التجريبي",publisher:"جهة اختبار",source_type:"مصدر رسمي",source_url:"https://example.org/source",accessed_at:"2026-11-02",is_public:true }
+    { id:"source-1",title:"المصدر الرسمي التجريبي",publisher:"جهة اختبار",source_type:"مصدر رسمي",source_url:"https://example.org/source",accessed_at:"2026-11-02",confidence_level:"official",is_public:true }
   ],
   directory_opportunities: [
     { id:"opportunity-1",name_ar:"طرح مخازن تجارية بأسيوط الجديدة",city:"أسيوط الجديدة",activity:"مخازن تجارية",size_description:"مساحة تجريبية",terms_as_published:"تفاصيل الطرح التجريبي",announcement_date:"2026-11-01",opportunity_type:"طرح حكومي",source_claimed_status:"معلن",verification_status:"published",public_visible:true }
@@ -80,6 +81,48 @@ test("all five directory tabs search, filter and open sources correctly", async 
   await page.locator("#directorySearch").fill("المصدر الرسمي التجريبي");
   await expect(page.locator("#directoryResults .directory-card")).toHaveCount(1);
   await expect(page.locator("#directoryResults a[href='https://example.org/source']")).toBeVisible();
+});
+
+
+test("directory map searches the selected published area without inventing a location pin", async ({page})=>{
+  await mockDirectoryApi(page);
+  await page.goto("/directory.html");
+  await page.locator("#directoryMapArea").selectOption("area-1");
+  const query=encodeURIComponent("أسيوط الجديدة, Assiut, Egypt");
+  await expect(page.locator("#directoryMapFrame")).toHaveAttribute(
+    "src",
+    "https://maps.google.com/maps?q="+query+"&output=embed"
+  );
+  await expect(page.locator("#directoryMapOpen")).toHaveAttribute(
+    "href",
+    "https://www.google.com/maps/search/?api=1&query="+query
+  );
+  await expect(page.locator("#directoryMapNote")).toContainText("بحث استرشادي");
+  await expect(page.locator("#directoryMapNote")).toContainText("ليس دبوسًا جغرافيًا معتمدًا");
+  await page.locator("#directoryMapArea").selectOption("");
+  await expect(page.locator("#directoryMapOpen")).toContainText("نطاق أسيوط");
+});
+
+test("only public points backed by an official source create map links", async ({page})=>{
+  await mockDirectoryApi(page);
+  await page.goto("/directory.html");
+  await page.locator("#directoryMapArea").selectOption("area-2");
+  const query=encodeURIComponent("27.21,31.16");
+  await expect(page.locator("#directoryMapFrame")).toHaveAttribute(
+    "src","https://maps.google.com/maps?q="+query+"&output=embed"
+  );
+  await expect(page.locator("#directoryMapNote")).toContainText("مركز منطقة تقريبي");
+  await expect(page.locator("#directoryMapNote")).toContainText("المصدر الرسمي التجريبي");
+
+  await page.locator("[data-view='entities']").click();
+  const verifiedCard=page.locator("#directoryResults .directory-card").filter({hasText:"شركة اختبار التطوير"});
+  await expect(verifiedCard.locator(".directory-verified-location a")).toHaveAttribute(
+    "href","https://www.google.com/maps/search/?api=1&query="+encodeURIComponent("27.205,31.154")
+  );
+  await expect(verifiedCard.locator(".directory-verified-location")).toContainText("المصدر الرسمي التجريبي");
+
+  const unverifiedCard=page.locator("#directoryResults .directory-card").filter({hasText:"هيئة اختبار عامة"});
+  await expect(unverifiedCard.locator(".directory-verified-location")).toHaveCount(0);
 });
 
 test("directory layout has no horizontal overflow on mobile", async ({page})=>{
@@ -185,6 +228,26 @@ async function mockDirectoryAdmin(page, { isAdmin = true } = {}) {
   return db;
 }
 
+
+test("company directory general map and outbound Google Maps link remain visible on mobile", async ({page})=>{
+  await page.route(SUPABASE + "/rest/v1/company_profiles_public**", route =>
+    route.fulfill({status:200,contentType:"application/json",body:"[]"})
+  );
+  await page.setViewportSize({width:375,height:812});
+  await page.goto("/companies.html");
+  await expect(page.locator(".company-map-panel h2")).toHaveText("خريطة نطاق أسيوط");
+  await expect(page.locator(".company-map-frame iframe")).toHaveAttribute("title","خريطة عامة لمدينة أسيوط");
+  await expect(page.locator(".company-map-panel a")).toHaveAttribute(
+    "href",
+    "https://www.google.com/maps/search/?api=1&query=Assiut%2C%20Egypt"
+  );
+  const dimensions=await page.evaluate(()=>({
+    clientWidth:document.documentElement.clientWidth,
+    scrollWidth:document.documentElement.scrollWidth
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth+1);
+});
+
 test("directory admin blocks an authenticated account without the admin role", async ({page}) => {
   await mockDirectoryAdmin(page,{isAdmin:false});
   await page.goto("/directory-admin.html");
@@ -232,10 +295,21 @@ test("directory admin reviews, sources, publication and audit history", async ({
   await expect(entity.locator(".dir-admin-sources")).toContainText("الموقع الرسمي التجريبي");
   expect(db.directory_entity_sources).toHaveLength(1);
 
+  // Map coordinates are not public by default; publish only with an official linked source.
+  await entity.locator("[data-field=latitude]").fill("27.205");
+  await entity.locator("[data-field=longitude]").fill("31.154");
+  await entity.locator("[data-field=location_precision]").selectOption("street");
+  await entity.locator("[data-field=location_source_id]").selectOption("source-admin-1");
+  await entity.locator("[data-field=location_verified_at]").fill("2026-11-04");
+  await entity.locator("[data-field=location_public]").check();
+
   page.on("dialog",dialog => dialog.accept());
   await entity.locator("[data-confirm]").check();
   await entity.locator("[data-publish]").click();
   await expect(page.locator("#dirAdminRecords [data-kind=entities]")).toContainText("منشور");
+  expect(db.directory_entities[0].location_public).toBe(true);
+  expect(Number(db.directory_entities[0].latitude)).toBeCloseTo(27.205,6);
+  expect(db.directory_entities[0].location_source_id).toBe("source-admin-1");
   expect(db.directory_change_log).toHaveLength(3);
 
   await page.locator("[data-view=history]").click();

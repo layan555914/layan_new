@@ -17,6 +17,8 @@ on:
       - fix/company-profile-security-flow-20261104
       - fix/auth-recovery-pkce-flow-20261104
       - fix/signup-confirmation-pkce-20261104
+      - feature/assyut-directory-maps-taxonomy-refresh-20261104
+      - feature/verified-directory-map-coordinates-20261104
   workflow_dispatch:
 
 permissions:
@@ -131,26 +133,65 @@ jobs:
             errors.push('sw.js: ' + error.message);
           }
 
-          const app = fs.readFileSync('app.js', 'utf8');
-          const marketplace = fs.readFileSync('marketplace.js', 'utf8');
-          const sponsor = fs.readFileSync('sponsor.js', 'utf8');
           const vm = require('node:vm');
           const configSource = fs.readFileSync('config.js', 'utf8');
-          const privateCompanyMigration = fs.readFileSync('supabase/migrations/20261104045129_move_company_profile_definers_to_private.sql', 'utf8');
+          const directoryJs = fs.readFileSync('directory.js', 'utf8');
+          const directoryHtml = fs.readFileSync('directory.html', 'utf8');
+          const directorySpecs = fs.readFileSync('tests/e2e/directory.spec.mjs', 'utf8');
+          const directoryAdminJs = fs.readFileSync('directory-admin.js', 'utf8');
+          const mapCoordinateMigration = fs.readFileSync('supabase/migrations/20261104051622_verified_directory_map_coordinates.sql', 'utf8');
+          const mapTriggerFixMigration = fs.readFileSync('supabase/migrations/20261104051952_fix_directory_map_location_trigger_row_shape.sql', 'utf8');
+
           function configForHost(hostname) {
             const context = { window: { location: { hostname } } };
             vm.runInNewContext(configSource, context, { timeout: 1000 });
             return context.window.LAYAN_CONFIG;
           }
           const productionConfig = configForHost('layan-eg.com');
-          const previewConfig = configForHost('preview-branch.vercel.app');
+          const previewConfig = configForHost('maps-preview.vercel.app');
+          if (productionConfig.ENVIRONMENT !== 'production' ||
+              productionConfig.SUPABASE_URL !== 'https://ebyhwqkmhxbgocngpqfe.supabase.co') {
+            errors.push('Production domain must stay connected to the production Supabase project');
+          }
+          if (previewConfig.ENVIRONMENT !== 'test' ||
+              previewConfig.SUPABASE_URL !== 'https://wisnmlbefdrkcbbqvdlg.supabase.co') {
+            errors.push('Vercel previews and other non-production hosts must use isolated TEST Supabase');
+          }
+          if (!directoryHtml.includes('id="directoryMapArea"') ||
+              !directoryHtml.includes('id="directoryMapFrame"') ||
+              !directoryHtml.includes('id="directoryMapOpen"') ||
+              !directoryJs.includes('function mapAreaOptions()') ||
+              !directoryJs.includes('encodeURIComponent(query)') ||
+              !directorySpecs.includes('directory map searches the selected published area')) {
+            errors.push('Directory map must use published-area selection and test its approximate map search behavior');
+          }
+          if (!mapCoordinateMigration.includes('location_source_id') ||
+              !mapCoordinateMigration.includes("confidence_level NOT IN ('high','official')") ||
+              !mapCoordinateMigration.includes('location_public') ||
+              !mapCoordinateMigration.includes('location_verified_at') ||
+              !mapCoordinateMigration.includes('directory_guard_public_map_source')) {
+            errors.push('Verified map coordinates must require a trusted public source, verification date and explicit publication approval');
+          }
+          if (!mapTriggerFixMigration.includes("TG_TABLE_NAME = 'directory_areas'") ||
+              !directoryAdminJs.includes('function mapLocationFields(type, record)') ||
+              !directoryAdminJs.includes('function prepareMapLocationPatch(type, patch)') ||
+              !directoryJs.includes('function validPublicMapPoint(record)') ||
+              !directorySpecs.includes('only public points backed by an official source')) {
+            errors.push('Admin and public map flows must expose only source-verified map coordinates');
+          }
+          const app = fs.readFileSync('app.js', 'utf8');
+          const marketplace = fs.readFileSync('marketplace.js', 'utf8');
+          const sponsor = fs.readFileSync('sponsor.js', 'utf8');
+          // vm, configSource, configForHost and productionConfig are declared above (directory map checks).
+          const privateCompanyMigration = fs.readFileSync('supabase/migrations/20261104045129_move_company_profile_definers_to_private.sql', 'utf8');
+          const branchPreviewConfig = configForHost('preview-branch.vercel.app');
           const localConfig = configForHost('localhost');
           if (productionConfig.ENVIRONMENT !== 'production' ||
               productionConfig.SUPABASE_URL !== 'https://ebyhwqkmhxbgocngpqfe.supabase.co') {
             errors.push('The production domain must remain pinned to the production Supabase project');
           }
-          if (previewConfig.ENVIRONMENT !== 'test' ||
-              previewConfig.SUPABASE_URL !== 'https://wisnmlbefdrkcbbqvdlg.supabase.co' ||
+          if (branchPreviewConfig.ENVIRONMENT !== 'test' ||
+              branchPreviewConfig.SUPABASE_URL !== 'https://wisnmlbefdrkcbbqvdlg.supabase.co' ||
               localConfig.ENVIRONMENT !== 'test') {
             errors.push('Vercel previews and local hosts must use the isolated TEST Supabase project');
           }
