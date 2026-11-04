@@ -138,8 +138,13 @@ test("early auth callback results are replayed when the main UI attaches", async
     document.addEventListener("DOMContentLoaded", () => {
       const status = document.getElementById("statusMessage");
       if (!status) return;
-      const observer = new MutationObserver(() => {
-        if (status.textContent.includes("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح")) {
+      const successText = "تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح";
+      const observer = new MutationObserver(records => {
+        const sawSuccess = status.textContent.includes(successText) ||
+          records.some(record => Array.from(record.addedNodes).some(node =>
+            String(node.textContent || "").includes(successText)
+          ));
+        if (sawSuccess) {
           window.__signupCallbackUiWasUpdated = true;
           observer.disconnect();
         }
