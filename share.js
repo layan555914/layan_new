@@ -71,8 +71,8 @@
     root.querySelectorAll(selectors.join(",")).forEach((card) => {
       if (card.querySelector(":scope > .asyut-item-share")) return;
       const link = card.querySelector('a[href*="property.html"], a[href*="company.html"], a[data-share-url]');
-      if (!link) return;
-      const url = link.dataset.shareUrl || link.href;
+      const url = card.dataset.shareUrl || link?.dataset.shareUrl || link?.href;
+      if (!url) return;
       const button = document.createElement("button");
       button.type = "button";
       button.className = "asyut-item-share";
