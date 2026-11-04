@@ -884,10 +884,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         if (navigator.share) await navigator.share(shareData);
         else if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(shareData.text + "\\n" + cleanUrl);
+          await navigator.clipboard.writeText(shareData.text + "\n" + cleanUrl);
           setStatus("تم نسخ تفاصيل الإعلان ورابط أسيوط عقار للمشاركة.");
         } else {
-          window.prompt("انسخ تفاصيل الإعلان ورابط أسيوط عقار:", shareData.text + "\\n" + cleanUrl);
+          window.prompt("انسخ تفاصيل الإعلان ورابط أسيوط عقار:", shareData.text + "\n" + cleanUrl);
         }
       } catch (error) {
         if (error?.name !== "AbortError") setStatus("تعذرت المشاركة تلقائيًا. يمكنك نسخ رابط أسيوط عقار ومشاركة كود الإعلان: " + offerCode(o));
