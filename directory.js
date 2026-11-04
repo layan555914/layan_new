@@ -150,7 +150,7 @@ function render(){
   out=rows.map(x=>card(x.title,x.publisher,x.source_type||"مصدر عام",x.id||"مرجع عام",x.source_url,null,x.id)).join("");
  }
  $("#directoryResults").innerHTML=out;
- const sharedRecord=decodeURIComponent(location.hash.slice(1));
+ const sharedRecord=location.hash.slice(1);
  if(sharedRecord.startsWith("directory-record-")){
   requestAnimationFrame(()=>document.getElementById(sharedRecord)?.scrollIntoView({behavior:"smooth",block:"center"}));
  }
