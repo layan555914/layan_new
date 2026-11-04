@@ -20,3 +20,9 @@
 .directory-map-controls label{display:grid;gap:7px;width:min(100%,420px);color:#102746;font-size:13px;font-weight:800}
 .directory-map-controls select{width:100%;min-height:44px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#172b43;font:inherit}
 .directory-map-controls select:focus-visible{outline:3px solid #c8963e;outline-offset:2px}
+
+.directory-verified-location{display:grid;gap:4px;margin-top:9px;padding:9px 11px;border:1px solid #d9e4dc;border-radius:9px;background:#f3f8f4}
+.directory-verified-location a{font-size:12px;font-weight:800;color:#245a3a;text-decoration:none}
+.directory-verified-location a:hover{text-decoration:underline}
+.directory-verified-location small{font-size:10px;line-height:1.7;color:#536b5a}
+.directory-map-note{line-height:1.8}
