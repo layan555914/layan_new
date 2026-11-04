@@ -135,9 +135,20 @@ test("signup PKCE callback without its same-browser verifier is rejected without
 test("early auth callback results are replayed when the main UI attaches", async ({ page }) => {
   await page.addInitScript(() => {
     window.LAYAN_AUTH_CALLBACK_RESULT = { success: true, type: "signup" };
+    document.addEventListener("DOMContentLoaded", () => {
+      const status = document.getElementById("statusMessage");
+      if (!status) return;
+      const observer = new MutationObserver(() => {
+        if (status.textContent.includes("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح")) {
+          window.__signupCallbackUiWasUpdated = true;
+          observer.disconnect();
+        }
+      });
+      observer.observe(status, { childList: true, subtree: true, characterData: true });
+    });
   });
   await page.goto("/");
-  await expect(page.locator("#statusMessage")).toContainText("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح");
+  await page.waitForFunction(() => window.__signupCallbackUiWasUpdated === true);
 });
 
 test("legacy implicit email-confirmation callbacks remain supported", async ({ page }) => {
