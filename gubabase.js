@@ -100,6 +100,18 @@
     });
     return readResponse(response);
   }
+  // Read the "exp" claim from a JWT access token; returns seconds since epoch or null.
+  function jwtExpiry(token) {
+    try {
+      const part = String(token || "").split(".")[1];
+      if (!part) return null;
+      const json = JSON.parse(atob(part.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(part.length / 4) * 4, "=")));
+      const exp = Number(json?.exp);
+      return Number.isFinite(exp) && exp > 0 ? exp : null;
+    } catch (_) {
+      return null;
+    }
+  }
   function normalizeSession(data) {
     if (data?.access_token && data?.user) {
       saveSession({
@@ -254,7 +266,7 @@
         refresh_token: refreshToken,
         token_type: hash.get("token_type") || "bearer",
         expires_at: hash.get("expires_at") ? Number(hash.get("expires_at")) :
-          (hash.get("expires_in") ? Math.floor(Date.now()/1000) + Number(hash.get("expires_in")) : null),
+          (hash.get("expires_in") ? Math.floor(Date.now()/1000) + Number(hash.get("expires_in")) : jwtExpiry(accessToken)),
         user
       });
       cleanAuthCallbackUrl();
@@ -270,7 +282,10 @@
 
   async function ensureFreshSession() {
     if (!session?.access_token) return;
-    const expiresAt = Number(session.expires_at || 0);
+    const expiresAt = Number(session.expires_at || 0) || jwtExpiry(session.access_token) || 0;
+    // Unknown expiry is not the same as expired: let the server reject an invalid token
+    // instead of forcing a refresh that logs out a freshly confirmed user.
+    if (!expiresAt) return;
     if (expiresAt > Math.floor(Date.now() / 1000) + 60) return;
     if (!session.refresh_token) {
       saveSession(null);
