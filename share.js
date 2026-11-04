@@ -91,6 +91,9 @@
       .asyut-share-button,.asyut-item-share{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 15px;border:1px solid #c8963e;border-radius:10px;background:#102746;color:#fff;font:700 14px Tahoma,Arial,sans-serif;cursor:pointer;touch-action:manipulation}
       .asyut-share-button{position:fixed;z-index:40;left:16px;bottom:16px;box-shadow:0 5px 18px #10274635}
       .asyut-item-share{margin:10px 12px 12px}
+      .asyut-category-share-wrap{display:grid;grid-template-rows:1fr auto;gap:6px;min-width:0}
+      .asyut-category-share-wrap>.category-tile{width:100%;height:100%}
+      .asyut-category-share{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:7px 12px;border:1px solid #c8963e;border-radius:9px;background:#fff;color:#102746;font:700 13px Tahoma,Arial,sans-serif;cursor:pointer;touch-action:manipulation}
       .company-directory-card,.offer-card,.directory-card,.marketplace-listing-card,.listing-card{position:relative}
       #asyutShareStatus{position:fixed;z-index:100;right:50%;bottom:72px;transform:translateX(50%);max-width:calc(100% - 24px);padding:10px 16px;border-radius:9px;background:#102746;color:#fff;font:14px Tahoma,Arial,sans-serif;box-shadow:0 5px 18px #10274635}
       #asyutShareStatus[hidden]{display:none}
@@ -99,15 +102,44 @@
     document.head.appendChild(style);
   }
 
+  function addCategoryShares(root = document) {
+    root.querySelectorAll(".category-grid .category-tile[data-market-category]").forEach((tile) => {
+      if (tile.parentElement?.classList.contains("asyut-category-share-wrap")) return;
+      const category = tile.dataset.marketCategory;
+      if (!category) return;
+      const wrapper = document.createElement("div");
+      wrapper.className = "asyut-category-share-wrap";
+      tile.parentNode.insertBefore(wrapper, tile);
+      wrapper.appendChild(tile);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "asyut-category-share";
+      button.textContent = "مشاركة القسم";
+      button.setAttribute("aria-label", "مشاركة قسم " + category);
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const url = new URL(window.location.href);
+        url.searchParams.set("category", category);
+        url.hash = "";
+        share(category, url.href);
+      });
+      wrapper.appendChild(button);
+    });
+  }
+
   function init() {
     installStyles();
     addPageShare();
     addItemShares();
+    addCategoryShares();
     const observer = new MutationObserver((records) => {
       for (const record of records) {
         for (const node of record.addedNodes) {
           if (node.nodeType !== 1) continue;
-          addItemShares(node.matches?.("article") ? node.parentElement || document : node);
+          const root = node.matches?.("article") ? node.parentElement || document : node;
+          addItemShares(root);
+          addCategoryShares(root);
         }
       }
     });
