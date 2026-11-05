@@ -1,0 +1,304 @@
+/* ASYUT AQAR — premium identity layer (Nov 2026)
+   Loaded after every existing stylesheet. Appearance only: no IDs, data
+   attributes or behaviour depend on this file. Palette: espresso, sand,
+   terracotta, copper. Images use straight edges with soft corners. */
+
+:root {
+  --navy: #2B211B;
+  --blue: #3A2D25;
+  --gold: #C98A64;
+  --gold-light: #EBD9C8;
+  --red: #A4472A;
+  --white: #ffffff;
+  --bg: #F6F1E9;
+  --text: #2B211B;
+  --muted: #6B5D52;
+  --border: #E6DACB;
+  --shadow: 0 14px 36px rgba(43, 33, 27, .10);
+
+  --aa-espresso: #2B211B;
+  --aa-espresso-2: #3A2D25;
+  --aa-sand: #F3ECE1;
+  --aa-cream: #FFF8F0;
+  --aa-terracotta: #A4472A;
+  --aa-terracotta-dark: #8C3A21;
+  --aa-peach: #E9B08F;
+  --aa-copper: #C98A64;
+  --aa-line: #E6DACB;
+  --aa-radius: 16px;
+  --aa-radius-lg: 22px;
+  --aa-head: "Alexandria", "Readex Pro", Tahoma, Arial, sans-serif;
+  --aa-body: "Readex Pro", "Alexandria", Tahoma, Arial, sans-serif;
+}
+
+/* Typography */
+body { font-family: var(--aa-body); background: var(--bg); color: var(--text); }
+h1, h2, h3, h4, .brand small, .topbar nav, .btn, .eyebrow { font-family: var(--aa-head); }
+h1, h2, h3 { letter-spacing: 0; }
+.eyebrow, .section-heading .eyebrow { color: var(--aa-terracotta); letter-spacing: .02em; }
+
+/* Header */
+body .topbar {
+  background: var(--aa-espresso);
+  border-bottom: 1px solid rgba(201, 138, 100, .28);
+  box-shadow: 0 6px 24px rgba(30, 23, 18, .18);
+}
+body .topbar nav a { color: #E8DDD1; }
+body .topbar nav a:hover,
+body .topbar nav a.active,
+body .topbar nav a[aria-current="page"] { color: var(--aa-peach); }
+body .brand-logo { border-radius: 12px; }
+body .brand strong { font-family: var(--aa-head); font-weight: 800; color: var(--aa-sand); }
+body .brand small { color: var(--aa-peach); }
+
+/* Buttons */
+body .btn { border-radius: 12px; font-weight: 700; }
+body .btn-gold,
+body .btn-red {
+  background: var(--aa-terracotta);
+  border-color: var(--aa-terracotta);
+  color: var(--aa-cream);
+  box-shadow: none;
+}
+body .btn-gold:hover,
+body .btn-red:hover { background: var(--aa-terracotta-dark); border-color: var(--aa-terracotta-dark); color: var(--aa-cream); }
+body .topbar .btn-outline,
+body .footer .btn-outline { color: var(--aa-sand); border-color: rgba(243, 236, 225, .38); background: transparent; }
+body .btn-outline-dark { color: var(--aa-espresso); border-color: var(--aa-espresso); }
+body :focus-visible { outline: 3px solid rgba(164, 71, 42, .45); outline-offset: 2px; }
+
+/* Hero — cinematic: full photo on one side, espresso scrim, thin copper frame */
+body .design-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 560px;
+  background: var(--aa-espresso);
+  overflow: visible;
+}
+body .design-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 66%;
+  z-index: -2;
+  background: url("../demo/hero-villa.jpg") center 40% / cover no-repeat;
+}
+body .design-hero::after {
+  content: "";
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(270deg, var(--aa-espresso) 0%, var(--aa-espresso) 36%, rgba(43, 33, 27, .84) 52%, rgba(43, 33, 27, 0) 82%);
+}
+body .design-hero-content {
+  max-width: 640px;
+  margin-inline-start: 0;
+  position: relative;
+}
+body .design-hero-content::before {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 3px;
+  background: var(--aa-peach);
+  margin-bottom: 18px;
+}
+body .design-hero-content .eyebrow { color: var(--aa-peach); letter-spacing: .06em; }
+body .design-hero-content h1 { font-family: var(--aa-head); font-weight: 800; color: var(--aa-sand); line-height: 1.25; }
+body .design-hero-content h1 span { color: var(--aa-peach); }
+body .design-hero-lead { color: var(--aa-sand); font-family: var(--aa-head); font-weight: 700; }
+body .design-hero-sub { color: #D9CCBC; }
+body .design-hero .hero-actions .btn-outline,
+body .design-hero .hero-actions #addOfferBtn {
+  color: var(--aa-sand);
+  border: 1px solid rgba(243, 236, 225, .45);
+  background: rgba(43, 33, 27, .35);
+}
+body .design-hero .hero-actions a.btn-gold { background: var(--aa-terracotta); color: var(--aa-cream); border-color: var(--aa-terracotta); }
+
+/* Thin copper frame inside the hero, drawn with shadows so it never covers the search card */
+body .design-hero { box-shadow: inset 0 0 0 18px var(--aa-espresso), inset 0 0 0 19px rgba(233, 176, 143, .42); }
+
+/* Quick search card */
+body .design-hero-search {
+  background: #fff;
+  border: 1px solid var(--aa-line);
+  border-radius: var(--aa-radius-lg);
+  box-shadow: 0 22px 54px rgba(30, 23, 18, .22);
+}
+body .design-hero-search label { color: var(--aa-espresso); font-family: var(--aa-head); font-weight: 600; }
+body .design-hero-search select,
+body .design-hero-search input { border-color: var(--aa-line); border-radius: 12px; color: var(--aa-espresso); }
+body .design-hero-search select:focus,
+body .design-hero-search input:focus { border-color: var(--aa-terracotta); box-shadow: 0 0 0 3px rgba(164, 71, 42, .16); }
+
+/* Cards and imagery: straight edges, soft corners, no arches */
+body .offer-card,
+body .category-tile,
+body .deal-purpose-card,
+body .land-market-card,
+body .marketplace-card,
+body .how-card,
+body .audience-card,
+body .pricing-card,
+body .company-card,
+body .calculator-card {
+  border-radius: var(--aa-radius-lg);
+  border-color: var(--aa-line);
+  box-shadow: 0 8px 26px rgba(43, 33, 27, .06);
+}
+body .offer-card:hover,
+body .marketplace-card:hover,
+body .category-tile:hover { box-shadow: 0 18px 40px rgba(43, 33, 27, .12); }
+body .offer-image,
+body .offer-card-media,
+body .details-image,
+body .details-thumb,
+body .partner-ad-art { border-radius: 14px; }
+body .offer-card-media { overflow: hidden; }
+body .offer-type,
+body .featured-badge,
+body .offer-published-badge { border-radius: 8px; font-family: var(--aa-head); }
+body .offer-price-main,
+body .details-price-highlight { color: var(--aa-terracotta); font-family: var(--aa-head); font-weight: 800; }
+
+/* Dark feature panels use the cinematic palette */
+body .land-market-card,
+body .marketplace-join,
+body .launch-campaign {
+  border-radius: var(--aa-radius-lg);
+}
+
+/* Footer and mobile navigation */
+body .footer { background: var(--aa-espresso); color: #D9CCBC; border-top: 1px solid rgba(201, 138, 100, .25); }
+body .footer a { color: #E8DDD1; }
+body .mobile-nav { background: #fff; border-top: 1px solid var(--aa-line); box-shadow: 0 -8px 24px rgba(43, 33, 27, .08); }
+body .mobile-nav a,
+body .mobile-nav button { color: var(--aa-espresso); }
+
+/* Dialogs and forms */
+body dialog { border-radius: var(--aa-radius-lg); border: 1px solid var(--aa-line); }
+body input:focus,
+body select:focus,
+body textarea:focus { border-color: var(--aa-terracotta); box-shadow: 0 0 0 3px rgba(164, 71, 42, .14); outline: none; }
+
+@media (max-width: 760px) {
+  body .design-hero { min-height: 0; box-shadow: none; }
+  body .design-hero::before { inset: 0 0 auto 0; width: 100%; height: 300px; background-position: center 45%; }
+  body .design-hero::after {
+    background: linear-gradient(180deg, rgba(43, 33, 27, .10) 0px, rgba(43, 33, 27, .55) 200px, var(--aa-espresso) 300px, var(--aa-espresso) 100%);
+  }
+  body .design-hero-content { padding-top: 210px; }
+}
+
+/* ---- Overrides for earlier layers that use !important ---- */
+body .hero.design-hero {
+  background: var(--aa-espresso) !important;
+  border-bottom: 0 !important;
+  padding: 72px clamp(20px, 5vw, 72px) 44px !important;
+  min-height: 600px;
+}
+body .hero.design-hero::before {
+  inset: 0 auto 0 0 !important;
+  width: 64% !important; height: auto !important;
+  z-index: -2 !important;
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+  background: url("../demo/hero-villa.jpg") center 42% / cover no-repeat !important;
+  background-image: image-set(url("../demo/hero-villa.webp") type("image/webp"), url("../demo/hero-villa.jpg") type("image/jpeg")) !important;
+}
+body .hero.design-hero::after {
+  display: block !important;
+  inset: 0 !important; left: 0 !important; bottom: 0 !important;
+  width: auto !important; height: auto !important;
+  z-index: -1 !important;
+  border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+  background: linear-gradient(270deg, var(--aa-espresso) 0%, var(--aa-espresso) 38%, rgba(43, 33, 27, .86) 54%, rgba(43, 33, 27, 0) 84%) !important;
+}
+body .hero.design-hero .design-hero-content { max-width: 600px !important; align-self: flex-start; padding: 0 !important; }
+body .hero.design-hero h1,
+body .hero.design-hero p,
+body .hero.design-hero .eyebrow { text-shadow: none !important; }
+body .hero.design-hero h1 { color: var(--aa-sand) !important; font-size: clamp(36px, 4.6vw, 62px) !important; }
+body .hero.design-hero h1 span { color: var(--aa-peach) !important; }
+body .hero.design-hero .design-hero-lead { color: var(--aa-sand) !important; }
+body .hero.design-hero .design-hero-sub { color: #D9CCBC !important; max-width: 560px; }
+body .hero.design-hero .eyebrow { color: var(--aa-peach) !important; border-color: rgba(233, 176, 143, .4) !important; background: rgba(43, 33, 27, .4) !important; }
+body .hero.design-hero .design-hero-search { margin-top: 26px !important; }
+
+body .btn-gold,
+body .btn-red,
+body .top-actions .btn-gold,
+body .hero-actions .btn-gold,
+body .hero.design-hero .hero-actions a.btn-gold {
+  background: var(--aa-terracotta) !important;
+  color: var(--aa-cream) !important;
+  border: 1px solid var(--aa-terracotta) !important;
+  box-shadow: none !important;
+}
+body .btn-gold:hover,
+body .btn-red:hover { background: var(--aa-terracotta-dark) !important; border-color: var(--aa-terracotta-dark) !important; }
+body .btn-outline { border-color: #D2BFAB !important; color: var(--aa-espresso) !important; background: #fff; }
+body .topbar .btn-outline,
+body .hero .btn-outline,
+body .launch-campaign .btn-outline,
+body .footer .btn-outline {
+  color: var(--aa-sand) !important;
+  border-color: rgba(243, 236, 225, .42) !important;
+  background: rgba(43, 33, 27, .3) !important;
+}
+
+/* Brand lockup: Arabic name first, Latin underneath */
+body .brand > span { display: flex; flex-direction: column-reverse; gap: 2px; }
+body .brand small { font-family: var(--aa-head); font-weight: 800; font-size: 22px; line-height: 1.15; color: var(--aa-sand); letter-spacing: 0; }
+body .brand strong { font-family: var(--aa-head); font-weight: 600; font-size: 10px; letter-spacing: .3em; color: var(--aa-peach); }
+body .brand-logo { background: transparent; }
+
+@media (max-width: 760px) {
+  body .hero.design-hero { padding: 0 16px 28px !important; min-height: 0; }
+  body .hero.design-hero::before { inset: 0 0 auto 0 !important; width: 100% !important; height: 290px !important; }
+  body .hero.design-hero::after {
+    background: linear-gradient(180deg, rgba(43, 33, 27, .05) 0, rgba(43, 33, 27, .6) 190px, var(--aa-espresso) 290px, var(--aa-espresso) 100%) !important;
+  }
+  body .hero.design-hero .design-hero-content { padding-top: 200px !important; }
+  body .hero.design-hero h1 { font-size: 34px !important; }
+}
+
+/* Share buttons (styles injected by share.js) */
+body .asyut-share-button,
+body .asyut-item-share,
+body .asyut-category-share {
+  background: var(--aa-espresso) !important;
+  color: var(--aa-sand) !important;
+  border: 1px solid rgba(201, 138, 100, .55) !important;
+  border-radius: 12px !important;
+  font-family: var(--aa-head);
+}
+body .asyut-item-share { background: #fff !important; color: var(--aa-espresso) !important; border-color: #D2BFAB !important; }
+
+/* Cards: even border on all sides */
+body .offer-card,
+body .offer-card:has(.featured-badge) { border: 1px solid var(--aa-line) !important; }
+body .offer-card:has(.featured-badge) { box-shadow: 0 0 0 2px rgba(164, 71, 42, .25), 0 14px 34px rgba(43, 33, 27, .10) !important; }
+body .design-search-button span[aria-hidden="true"] { display: none; }
+body .topbar nav a.active { background: rgba(233, 176, 143, .14) !important; color: var(--aa-peach) !important; }
+
+body .offer-card::before { display: none !important; }
+
+/* Dark header panels on inner pages: light text, cinematic palette */
+body .companies-hero,
+body .company-profile-hero { background: var(--aa-espresso) !important; box-shadow: inset 0 0 0 1px rgba(233, 176, 143, .28); }
+body .companies-hero h1,
+body .companies-hero h2,
+body .company-profile-hero h1 { color: var(--aa-sand) !important; text-shadow: none !important; }
+body .companies-hero .eyebrow,
+body .company-profile-hero .eyebrow { color: var(--aa-peach) !important; }
+body .companies-hero p,
+body .company-profile-hero p { color: #D9CCBC !important; }
+body .company-contact-primary { background: var(--aa-terracotta) !important; color: var(--aa-cream) !important; }
+
+/* Footer info links */
+body .footer-legal { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 8px; font-size: 14px; }
+body .footer-legal a { color: var(--aa-peach); }
