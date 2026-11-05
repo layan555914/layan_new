@@ -81,7 +81,7 @@ body .design-hero::before {
   inset: 0 auto 0 0;
   width: 66%;
   z-index: -2;
-  background: url("../demo/hero-villa.jpg") center 40% / cover no-repeat;
+  background: url("../demo/hero-villa.jpg?v=20261105-3") center 40% / cover no-repeat;
 }
 body .design-hero::after {
   content: "";
@@ -206,8 +206,8 @@ body .hero.design-hero::before {
   width: 64% !important; height: auto !important;
   z-index: -2 !important;
   border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
-  background: url("../demo/hero-villa.jpg") center 42% / cover no-repeat !important;
-  background-image: image-set(url("../demo/hero-villa.webp") type("image/webp"), url("../demo/hero-villa.jpg") type("image/jpeg")) !important;
+  background: url("../demo/hero-villa.jpg?v=20261105-3") center 42% / cover no-repeat !important;
+  background-image: image-set(url("../demo/hero-villa.webp?v=20261105-3") type("image/webp"), url("../demo/hero-villa.jpg?v=20261105-3") type("image/jpeg")) !important;
 }
 body .hero.design-hero::after {
   display: block !important;
