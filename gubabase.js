@@ -351,6 +351,54 @@
       encodeURIComponent(session.user.id) + "&order=created_at.desc");
     return Array.isArray(rows) ? rows : [];
   }
+  // Stamp the ASYUT AQAR mark on listing photos before upload so copies keep the source,
+  // and cap very large photos at 2000px to keep pages fast. Falls back to the original file.
+  async function watermarkJpeg(file) {
+    if (typeof createImageBitmap !== "function" || typeof document === "undefined") return file;
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 2000 / Math.max(bitmap.width, bitmap.height));
+    const width = Math.round(bitmap.width * scale);
+    const height = Math.round(bitmap.height * scale);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close?.();
+    const unit = Math.max(12, Math.round(Math.min(width, height) * 0.026));
+    const pad = Math.round(unit * 0.9);
+    const label = "أسيوط عقار · layan-eg.com";
+    ctx.font = "700 " + unit + "px Alexandria, Tahoma, Arial, sans-serif";
+    const textWidth = ctx.measureText(label).width;
+    const markSize = Math.round(unit * 1.5);
+    const boxWidth = textWidth + markSize + pad * 2.6;
+    const boxHeight = markSize + pad;
+    const x = pad;
+    const y = height - boxHeight - pad;
+    ctx.globalAlpha = 0.45;
+    ctx.fillStyle = "#2B211B";
+    if (typeof ctx.roundRect === "function") { ctx.beginPath(); ctx.roundRect(x, y, boxWidth, boxHeight, unit * 0.4); ctx.fill(); }
+    else ctx.fillRect(x, y, boxWidth, boxHeight);
+    ctx.globalAlpha = 0.85;
+    const mark = new Path2D("M32 4.5L61.5 58H2.5ZM32 23L47 39.5V58H17V39.5Z");
+    ctx.save();
+    ctx.translate(x + pad * 0.7, y + (boxHeight - markSize) / 2);
+    ctx.scale(markSize / 64, markSize / 64);
+    ctx.fillStyle = "#F3ECE1";
+    ctx.fill(mark, "evenodd");
+    ctx.fillStyle = "#C98A64";
+    ctx.fill(new Path2D("M26.8 58V49.6a5.2 5.2 0 0 1 10.4 0V58Z"));
+    ctx.restore();
+    ctx.fillStyle = "#F3ECE1";
+    ctx.textBaseline = "middle";
+    ctx.direction = "rtl";
+    ctx.textAlign = "right";
+    ctx.fillText(label, x + boxWidth - pad * 0.8, y + boxHeight / 2);
+    ctx.globalAlpha = 1;
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.86));
+    return blob && blob.size > 4 ? blob : file;
+  }
   async function uploadImages(files) {
     if (!isAuthenticated()) throw new Error("سجّل الدخول أولًا قبل رفع صور العرض.");
     const uploaded = [];
@@ -370,8 +418,8 @@
       const path = "offers/" + session.user.id + "/" + Date.now() + "-" + uniqueId + "-" + safeName;
       const response = await fetch(url + "/storage/v1/object/" + bucket + "/" + path, {
         method: "POST",
-        headers: { ...authHeaders(), "Content-Type": file.type, "x-upsert": "false" },
-        body: file
+        headers: { ...authHeaders(), "Content-Type": "image/jpeg", "x-upsert": "false" },
+        body: await watermarkJpeg(file).catch(() => file)
       });
       if (!response.ok) {
         const body = await response.text();

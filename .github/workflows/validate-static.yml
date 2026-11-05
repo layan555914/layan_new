@@ -61,7 +61,7 @@ jobs:
           const path = require('node:path');
 
           const errors = [];
-          const ignored = new Set(['.git', 'node_modules', '.vercel']);
+          const ignored = new Set(['.git', 'node_modules', '.vercel', 'email-templates']);
 
           function walk(directory) {
             const files = [];
@@ -76,11 +76,38 @@ jobs:
           }
 
           const allFiles = walk('.');
+
+          // CSS bundles (assets/build/*.min.css) must match their source stylesheets.
+          {
+            const crypto = require('node:crypto');
+            const buildSource = fs.readFileSync('scripts/build-css.mjs', 'utf8');
+            const bundleBlock = buildSource.match(/export const BUNDLES = \{([\s\S]*?)\n\};/);
+            const theme = buildSource.match(/const THEME = "([^"]+)"/)[1];
+            for (const line of (bundleBlock ? bundleBlock[1].split('\n') : [])) {
+              const m = line.match(/^\s*(\w+):\s*\[(.*)\]/);
+              if (!m) continue;
+              const files = m[2].split(',').map(x => x.trim()).map(x => x === 'THEME' ? theme : x.replace(/^"|"$/g, ''));
+              const hash = crypto.createHash('sha256');
+              for (const file of files) hash.update(file + '\n' + fs.readFileSync(file, 'utf8') + '\n');
+              const expected = hash.digest('hex').slice(0, 16);
+              const bundle = 'assets/build/' + m[1] + '.min.css';
+              const header = fs.existsSync(bundle) ? fs.readFileSync(bundle, 'utf8').split('\n', 1)[0] : '';
+              if (!header.includes('sources:' + expected)) errors.push(bundle + ' is out of date: run node scripts/build-css.mjs');
+            }
+          }
           const htmlFiles = allFiles.filter(file => file.endsWith('.html'));
           const cssFiles = allFiles.filter(file => file.endsWith('.css'));
           if (!htmlFiles.includes('index.html')) errors.push('index.html is missing');
           if (!htmlFiles.includes('admin.html')) errors.push('admin.html is missing');
           if (!htmlFiles.includes('property.html')) errors.push('property.html is missing');
+
+          // Generated listing pages (ads/<id>.html) use <base href="/"> so their links resolve from the site root.
+          const baseCache = new Map();
+          function rootBased(file) {
+            if (!file.endsWith('.html')) return false;
+            if (!baseCache.has(file)) baseCache.set(file, /<base href="\/">/.test(fs.readFileSync(file, 'utf8')));
+            return baseCache.get(file);
+          }
 
           function checkLocalReference(file, rawReference) {
             let ref = String(rawReference || '').trim();
@@ -89,8 +116,8 @@ jobs:
             if (!ref) return;
             let target = ref.startsWith('/')
               ? ref.slice(1)
-              : path.posix.normalize(path.posix.join(path.posix.dirname(file), ref));
-            if (target === '.' || target.endsWith('/')) target = path.posix.join(target, 'index.html');
+              : path.posix.normalize(path.posix.join(rootBased(file) ? '.' : path.posix.dirname(file), ref));
+            if (target === '' || target === '.' || target.endsWith('/')) target = path.posix.join(target, 'index.html');
             if (!fs.existsSync(target)) errors.push(file + ' -> ' + rawReference + ' (missing ' + target + ')');
           }
 

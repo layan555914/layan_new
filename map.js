@@ -73,7 +73,7 @@
       const location = document.createElement("span");
       location.textContent = [offer.city, offer.area].filter(Boolean).join(" · ") || "أسيوط";
       const price = document.createElement("span");
-      price.textContent = Number(offer.total_price || 0).toLocaleString("ar-EG") + " جنيه";
+      price.textContent = Number(offer.total_price || 0).toLocaleString("ar-EG-u-nu-latn") + " جنيه";
       const open = document.createElement("button");
       open.type = "button";
       open.textContent = "عرض التفاصيل";

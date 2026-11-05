@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
   const key = config.SUPABASE_PUBLISHABLE_KEY || "";
   const params = new URLSearchParams(window.location.search);
-  const id = String(params.get("id") || "").trim();
+  const id = String(params.get("id") || window.ASYUT_PROPERTY_ID || "").trim();
   const fields = [
     "id","title","governorate","listing_purpose","land_ownership_authority",
     "land_permit_details","land_utilities","land_zoning","city","area","area_m2",
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "total_price","down_payment","paid_amount","remaining_amount","assignment_fee",
     "assignment_fee_percentage","discount_amount","discount_percent","developer_name",
     "project_name","image_urls","is_featured","featured_until","contact_phone",
-    "latitude","longitude","created_at"
+    "latitude","longitude","created_at","updated_at"
   ].join(",");
 
   const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (value === null || value === undefined || value === "") return "غير محدد";
     const amount = Number(value);
     if (!Number.isFinite(amount)) return "غير محدد";
-    return new Intl.NumberFormat("ar-EG", {maximumFractionDigits:0}).format(amount) + " جنيه";
+    return new Intl.NumberFormat("ar-EG-u-nu-latn", {maximumFractionDigits:0}).format(amount) + " جنيه";
   };
   const valueOrUnknown = value => value === null || value === undefined || value === "" ? "غير محدد" : String(value);
   const offerCode = offer => "ASY-" + String(offer.id || "").replace(/-/g,"").slice(0,8).toUpperCase();
@@ -63,6 +63,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     root.querySelector("#retryPropertyLoad")?.addEventListener("click", loadProperty);
   }
 
+  const formatDate = value => {
+    const date = new Date(value || "");
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("ar-EG-u-nu-latn", { day: "numeric", month: "long", year: "numeric" });
+  };
+  const listingDates = row => {
+    const posted = formatDate(row.created_at);
+    const updated = formatDate(row.updated_at);
+    if (!posted && !updated) return "";
+    return '<p class="property-dates">' +
+      (posted ? '<span>نُشر في <time datetime="' + escapeHTML(row.created_at) + '">' + escapeHTML(posted) + '</time></span>' : "") +
+      (updated && updated !== posted ? '<span>آخر تحديث <time datetime="' + escapeHTML(row.updated_at) + '">' + escapeHTML(updated) + '</time></span>' : "") +
+      '</p>';
+  };
+
   function renderProperty(row) {
     const title = String(row.title || "إعلان عقاري على أسيوط عقار");
     const purpose = String(row.listing_purpose || "بيع");
@@ -71,8 +86,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const phone = String(row.contact_phone || "");
     const tel = phone.replace(/[^0-9+]/g, "");
     const whatsapp = phoneForWhatsApp(phone);
-    const shareURL = new URL("./property.html", window.location.href);
-    shareURL.searchParams.set("id", row.id);
+    // Each listing has its own static page (ads/<id>.html) so shared links show the listing photo and price.
+    const shareURL = new URL("./ads/" + encodeURIComponent(String(row.id)) + ".html", document.baseURI);
     const shareHref = cleanShareUrl(shareURL.href);
     const shareText = "إعلان على أسيوط عقار: " + title + " — كود " + offerCode(row);
     const isFeatured = row.is_featured === true && (!row.featured_until || new Date(row.featured_until) > new Date());
@@ -101,6 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "description":description,
       "url":shareHref,
       "datePosted":row.created_at || undefined,
+      "dateModified":row.updated_at || undefined,
       "image":images.length ? images : undefined,
       "address":{"@type":"PostalAddress","addressLocality":row.city || "أسيوط","addressRegion":row.governorate || "أسيوط","addressCountry":"EG"},
       "offers":Number.isFinite(Number(row.total_price)) ? {"@type":"Offer","price":Number(row.total_price),"priceCurrency":"EGP","availability":"https://schema.org/InStock"} : undefined
@@ -131,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("المساحة", row.area_m2 ? row.area_m2 + " م²" : ""),
       makeFact("غرف النوم", row.bedrooms),
       makeFact("الحمامات", row.bathrooms),
-      makeFact("إجمالي المدفوع", money(row.paid_amount)),
+      makeFact("إجمالي المدفوع", Number(row.paid_amount) > 0 ? money(row.paid_amount) : ""),
       makeFact("القسط الشهري", row.monthly_installment ? money(row.monthly_installment) : ""),
       makeFact("رسوم التنازل", purpose.includes("تنازل") ? (Number(row.assignment_fee) > 0 ? money(row.assignment_fee) : "تحدد من الجهة المختصة") : ""),
       makeFact("قيمة الخصم", Number(row.discount_amount) > 0 ? money(row.discount_amount) : ""),
@@ -157,6 +173,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             <h2>وصف الإعلان</h2>
             <p class="property-description">${escapeHTML(row.description || "لا يوجد وصف إضافي من صاحب الإعلان.")}</p>
           </section>
+          <section class="property-section-card property-services" aria-labelledby="propertyServicesTitle">
+            <div class="property-services-head"><h2 id="propertyServicesTitle">خدمات تحتاجها لهذا العقار</h2><a href="./advertise.html">أعلن هنا</a></div>
+            <div class="property-services-grid">
+              <a href="./marketplace.html?category=${encodeURIComponent("مواد البناء والتشطيب")}"><b>تشطيب ومواد بناء</b><small>سيراميك، دهانات، مقاولون</small></a>
+              <a href="./marketplace.html?category=${encodeURIComponent("الأثاث والفرش وتجهيز الوحدات")}"><b>أثاث وتجهيز</b><small>غرف، مطابخ، أجهزة</small></a>
+              <a href="./marketplace.html?category=${encodeURIComponent("الصيانة وإدارة العقارات")}"><b>صيانة وإدارة</b><small>كهرباء، سباكة، نقل</small></a>
+              <a href="./marketplace.html?category=${encodeURIComponent("الاستشارات والخدمات العقارية")}"><b>استشارات وعقود</b><small>قانونية وهندسية</small></a>
+            </div>
+          </section>
           <p class="property-disclaimer">تنبيه مهم: أسيوط عقار منصة إعلانات وربط بين المهتم وصاحب الإعلان، ولا تتدخل في التعاقد أو تحصيل ثمن العقار. راجع الملكية والعقد وجدول الأقساط ورسوم التنازل، وتحقق من موافقة الجهة أو المطوّر المختص قبل دفع أي مبالغ.</p>
         </div>
         <aside class="property-summary-card">
@@ -165,24 +190,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             ${isFeatured ? '<span class="property-featured-badge">★ إعلان مميز</span>' : ""}
           </div>
           <p class="property-listing-code">كود الإعلان: <strong>${escapeHTML(offerCode(row))}</strong></p>
+          ${listingDates(row)}
           <h1>${escapeHTML(title)}</h1>
           <p class="property-location">⌖ ${escapeHTML(locationText)} ${mapURL ? ' · <a href="' + escapeHTML(mapURL) + '" target="_blank" rel="noopener noreferrer">عرض الموقع</a>' : ""}</p>
           <div class="property-price-highlight"><span>${purpose.includes("إيجار") ? "قيمة الإيجار المعلنة" : "السعر المعلن"}</span><strong>${money(row.total_price)}</strong></div>
-          <div class="property-key-figures">
-            <div class="property-key-figure"><span>المقدم عند التعاقد</span><strong>${money(row.down_payment)}</strong></div>
-            <div class="property-key-figure"><span>المبلغ المتبقي</span><strong>${money(row.remaining_amount)}</strong></div>
-          </div>
+          ${(Number(row.down_payment) > 0 || Number(row.remaining_amount) > 0) ? `<div class="property-key-figures">
+            ${Number(row.down_payment) > 0 ? `<div class="property-key-figure"><span>المقدم عند التعاقد</span><strong>${money(row.down_payment)}</strong></div>` : ""}
+            ${Number(row.remaining_amount) > 0 ? `<div class="property-key-figure"><span>المبلغ المتبقي</span><strong>${money(row.remaining_amount)}</strong></div>` : ""}
+          </div>` : ""}
           ${contactActions}
           <p class="property-contact-note">التواصل والاتفاق يتمان مباشرة بين صاحب الإعلان والمهتم بالعقار. لا تفرض المنصة عمولة على إتمام الصفقة.</p>
           <div class="property-footer-actions">
             <button class="property-action property-action-outline" type="button" id="sharePropertyBtn">مشاركة الإعلان</button>
             <a class="property-action property-action-outline" href="https://wa.me/201007044265?text=${encodeURIComponent("أرغب في الإبلاغ عن إعلان على أسيوط عقار: " + title + " — كود " + offerCode(row))}" target="_blank" rel="noopener noreferrer">الإبلاغ عن الإعلان</a>
-            <a class="property-action property-action-outline" href="./#offers">العودة إلى العقارات</a>
+            <a class="property-action property-action-outline" href="./offers.html">العودة إلى العقارات</a>
           </div>
         </aside>
       </div>
       <div class="property-mobile-contact">
-        ${phone ? '<a class="property-action property-action-gold" href="tel:' + escapeHTML(tel) + '">اتصال</a>' : '<a class="property-action property-action-gold" href="./#offers">عقارات أخرى</a>'}
+        ${phone ? '<a class="property-action property-action-gold" href="tel:' + escapeHTML(tel) + '">اتصال</a>' : '<a class="property-action property-action-gold" href="./offers.html">عقارات أخرى</a>'}
         ${whatsapp ? '<a class="property-action" href="https://wa.me/' + escapeHTML(whatsapp) + '?text=' + encodeURIComponent("مرحبًا، أنا مهتم بإعلانك: " + title + " — كود " + offerCode(row)) + '" target="_blank" rel="noopener noreferrer">واتساب</a>' : '<button class="property-action" id="mobileShareFallback" type="button">مشاركة الإعلان</button>'}
       </div>
     `;
