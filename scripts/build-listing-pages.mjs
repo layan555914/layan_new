@@ -31,6 +31,23 @@ const STATIC_PAGES = [
   ["/privacy.html", "yearly", "0.3"]
 ];
 
+// One landing page per Assiut center: areas/<slug>.html (offers page preset to that city).
+export const AREAS = [
+  ["assiut-city", "مدينة أسيوط", "عاصمة المحافظة وأكبر سوق عقاري فيها: شقق قريبة من الجامعة والمستشفيات والخدمات، ومحلات ومكاتب وعيادات في الشوارع التجارية."],
+  ["new-assiut", "أسيوط الجديدة", "أحياء مخططة ومشروعات إسكان وتنازلات عن وحدات وأراضٍ، مع تفاصيل المقدم والمدفوع والمتبقي والأقساط لكل عرض."],
+  ["dairut", "ديروط", "شقق وبيوت وأراضٍ ومحلات في مركز ديروط شمال محافظة أسيوط، للبيع والإيجار والتنازل."],
+  ["el-qusiya", "القوصية", "عقارات مركز القوصية: شقق وبيوت وأراضٍ زراعية وسكنية ومحلات للبيع والإيجار."],
+  ["manfalut", "منفلوط", "عقارات مركز منفلوط شمال مدينة أسيوط: شقق وبيوت وأراضٍ ومحلات للبيع والإيجار والتنازل."],
+  ["abnub", "أبنوب", "عقارات مركز أبنوب: شقق وبيوت وأراضٍ ومحلات معروضة للبيع والإيجار."],
+  ["el-fath", "الفتح", "عقارات مركز الفتح: شقق وبيوت وأراضٍ ومحلات للبيع والإيجار والتنازل."],
+  ["sahel-selim", "ساحل سليم", "عقارات مركز ساحل سليم: شقق وبيوت وأراضٍ ومحلات للبيع والإيجار."],
+  ["el-badari", "البداري", "عقارات مركز البداري: شقق وبيوت وأراضٍ ومحلات للبيع والإيجار والتنازل."],
+  ["abu-tig", "أبو تيج", "عقارات مركز أبو تيج جنوب المحافظة: شقق وبيوت وأراضٍ ومحلات للبيع والإيجار."],
+  ["sidfa", "صدفا", "عقارات مركز صدفا: شقق وبيوت وأراضٍ ومحلات للبيع والإيجار والتنازل."],
+  ["el-ghanayem", "الغنايم", "عقارات مركز الغنايم: شقق وبيوت وأراضٍ ومحلات للبيع والإيجار."]
+];
+const AREAS_DIR = path.join(root, "areas");
+
 const FIELDS = [
   "id", "title", "governorate", "listing_purpose", "city", "area", "area_m2", "bedrooms", "bathrooms",
   "property_type", "description", "total_price", "down_payment", "remaining_amount", "monthly_installment",
@@ -137,11 +154,41 @@ function listingPage(template, row) {
   return html;
 }
 
+function areaPage(template, [slug, name, intro], rows) {
+  const pageUrl = `${SITE}/areas/${slug}.html`;
+  const title = `عقارات ${name} للبيع والإيجار والتنازل`;
+  const description = `${intro} تصفح العروض المنشورة في ${name} على أسيوط عقار وتواصل مباشرة مع المعلن بدون عمولة.`.slice(0, 160);
+  let html = template;
+  const swap = (pattern, value) => {
+    if (!pattern.test(html)) throw new Error("Offers template is missing " + pattern);
+    html = html.replace(pattern, value);
+  };
+  swap(/<meta charset="utf-8">/, '<meta charset="utf-8">\n  <base href="/">');
+  swap(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${esc(description)}">`);
+  swap(/<link rel="canonical" href="[^"]*">/, `<link rel="canonical" href="${pageUrl}">`);
+  swap(/<meta property="og:url" content="[^"]*">/, `<meta property="og:url" content="${pageUrl}">`);
+  swap(/<meta property="og:title" content="[^"]*">/, `<meta property="og:title" content="${esc(title)} | أسيوط عقار">`);
+  swap(/<meta property="og:description" content="[^"]*">/, `<meta property="og:description" content="${esc(description)}">`);
+  swap(/<meta name="twitter:title" content="[^"]*">/, `<meta name="twitter:title" content="${esc(title)} | أسيوط عقار">`);
+  swap(/<title>[^<]*<\/title>/, `<title>${esc(title)} | أسيوط عقار</title>`);
+  swap(/<span class="eyebrow">العقارات · محافظة أسيوط<\/span>/, `<span class="eyebrow">العقارات · ${esc(name)}</span>`);
+  swap(/<h1 id="offersPageTitle">[\s\S]*?<\/h1>/, `<h1 id="offersPageTitle">عقارات ${esc(name)} <span>للبيع والإيجار والتنازل</span></h1>`);
+  swap(/(<h1 id="offersPageTitle">[\s\S]*?<\/h1>\s*<p>)[^<]*(<\/p>)/, `$1${esc(intro)}$2`);
+  const local = rows.filter(row => String(row.city || "").trim() === name);
+  const links = local.map(row => `<li><a href="/ads/${row.id}.html">${esc(row.title || "إعلان عقاري")}${money(row.total_price) ? " — " + esc(money(row.total_price)) : ""}</a></li>`).join("");
+  swap(/<\/head>/, `  <script>window.ASYUT_PRESET_FILTERS = ${JSON.stringify({ city: name })};</script>\n</head>`);
+  swap(/(<section class="offers-section" id="offers">)/, `<noscript><ul class="area-static-links">${links || "<li>لا توجد عروض منشورة في " + esc(name) + " حاليًا.</li>"}</ul></noscript>\n$1`);
+  return html;
+}
+
 function sitemap(rows) {
   const today = new Date().toISOString().slice(0, 10);
   const urls = STATIC_PAGES
     .filter(([p]) => p === "/" || fs.existsSync(path.join(root, p.slice(1))))
     .map(([p, freq, pr]) => `  <url><loc>${SITE}${p}</loc><lastmod>${today}</lastmod><changefreq>${freq}</changefreq><priority>${pr}</priority></url>`);
+  for (const [slug] of AREAS) {
+    urls.push(`  <url><loc>${SITE}/areas/${slug}.html</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`);
+  }
   for (const row of rows) {
     const day = isoDay(row.updated_at || row.created_at) || today;
     urls.push(`  <url><loc>${SITE}/ads/${row.id}.html</loc><lastmod>${day}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`);
@@ -168,10 +215,20 @@ for (const name of previous) {
   if (!written.includes(name) && /^[0-9]+\.html$/.test(name)) fs.rmSync(path.join(ADS_DIR, name), { force: true });
 }
 fs.writeFileSync(MANIFEST, JSON.stringify({ files: written.sort((a, b) => parseInt(a) - parseInt(b)) }, null, 2) + "\n");
+// Area landing pages
+const offersTemplate = fs.readFileSync(path.join(root, "offers.html"), "utf8");
+fs.mkdirSync(AREAS_DIR, { recursive: true });
+for (const area of AREAS) {
+  const html = areaPage(offersTemplate, area, rows);
+  const target = path.join(AREAS_DIR, area[0] + ".html");
+  if (!fs.existsSync(target) || fs.readFileSync(target, "utf8") !== html) fs.writeFileSync(target, html);
+}
+
 const map = sitemap(rows.filter(row => written.includes(`${row.id}.html`)));
 const current = fs.existsSync(path.join(root, "sitemap.xml")) ? fs.readFileSync(path.join(root, "sitemap.xml"), "utf8") : "";
 // Keep lastmod of static pages stable unless the listing set changed, to avoid empty commits.
 if (current.replace(/<lastmod>[^<]*<\/lastmod>/g, "") !== map.replace(/<lastmod>[^<]*<\/lastmod>/g, "")) {
   fs.writeFileSync(path.join(root, "sitemap.xml"), map);
 }
+console.log(`Area pages: ${AREAS.length}.`);
 console.log(`Listing pages: ${written.length} written, ${previous.filter(n => !written.includes(n)).length} removed.`);

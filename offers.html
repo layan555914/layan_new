@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/build/home.min.css?v=6738f3a5fe82f8fa">
+  <link rel="stylesheet" href="./assets/build/home.min.css?v=7a5e45f8e4a4f5cb">
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
   <meta property="og:site_name" content="أسيوط عقار | ASYUT AQAR">
@@ -216,17 +216,18 @@
     </section>
 
 <section class="layan-ai-section" id="layan-ai" aria-labelledby="layanAiTitle">
-      <div class="layan-ai-head"><div><h2 id="layanAiTitle">مساعد أسيوط عقار الذكي</h2><p>ابحث عن الفرصة المناسبة، أو افتح أدوات الإرشاد الإداري للحسابات المخوّلة.</p></div><span aria-hidden="true">✦ ASYUT AQAR AI</span></div>
+      <div class="layan-ai-head"><div><h2 id="layanAiTitle">مساعد أسيوط عقار الذكي</h2><p>اسأل عن أي شيء في الموقع: البحث عن عقار، إضافة إعلان، العمولة، التنازل ورسومه، التوثيق، الحساب، وسوق الخدمات.</p></div><span aria-hidden="true">✦ ASYUT AQAR AI</span></div>
       <div class="layan-ai-tabs" role="group" aria-label="نوع المساعد">
         <button type="button" data-ai-mode="search" aria-pressed="true">مساعد البحث العقاري</button>
         <button type="button" data-ai-mode="admin" aria-pressed="false">مساعد الإدارة</button>
       </div>
       <form id="layanAiForm" class="layan-ai-form">
-        <textarea id="layanAiPrompt" maxlength="1200" required placeholder="مثال: عايز شقة في أسيوط بمقدم أقل من 300 ألف..." aria-label="اكتب سؤالك لمساعد أسيوط عقار"></textarea>
+        <textarea id="layanAiPrompt" maxlength="1200" required placeholder="اسأل عن أي شيء في الموقع، أو اكتب طلبك: شقة إيجار في ديروط بمقدم 200 ألف..." aria-label="اكتب سؤالك لمساعد أسيوط عقار"></textarea>
         <button class="btn btn-gold" id="layanAiSend" type="submit">اسأل أسيوط عقار</button>
       </form>
+      <div class="layan-ai-suggest"><button type="button" data-ai-suggest>شقة للبيع في أسيوط الجديدة حدود مليون ونص</button><button type="button" data-ai-suggest>إزاي أضيف إعلاني؟</button><button type="button" data-ai-suggest>هل فيه عمولة؟</button><button type="button" data-ai-suggest>يعني إيه تنازل؟</button></div>
       <div id="layanAiAnswer" class="layan-ai-answer" role="status" aria-live="polite"></div>
-      <small class="layan-ai-note">الإجابات مساعدة وليست ضمانًا لصحة الإعلان. تحقق من التفاصيل مباشرة مع صاحب العرض. مساعد الإدارة محمي بصلاحية إدارية على الخادم.</small>
+      <small class="layan-ai-note">الإجابات إرشادية وليست ضمانًا لصحة أي إعلان؛ تحقق من التفاصيل مع صاحب العرض قبل أي اتفاق. مساعد الإدارة متاح للحسابات المخوّلة فقط.</small>
     </section>
 
   </main>
@@ -467,13 +468,14 @@
 
   <script src="config.js?v=20261105-7"></script>
   <script src="gubabase.js?v=20261105-7"></script>
-  <script src="app.js?v=20261105-7"></script>
+  <script src="app.js?v=20261105-8"></script>
   <script src="map.js?v=20261105-7"></script>
   <script src="buyer.js?v=20261105-7"></script>
-  <script src="sponsor.js?v=20261105-7"></script>
-  <script src="ai.js?v=asyut-aqar-20261031-2"></script>
+  <script src="sponsor.js?v=20261105-8"></script>
+  <script src="ai.js?v=20261105-8"></script>
 <script src="admin-entry.js?v=admin-auth-refresh-20261101-1"></script>
   <script src="pwa.js?v=20261105-7" defer></script>
   <script src="./share.js?v=20261105-7"></script>
+  <script src="./assistant.js?v=20261105-8" defer></script>
 </body>
 </html>

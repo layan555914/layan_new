@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v126-section-heroes-20261105";
+const CACHE_NAME = "asyut-aqar-shell-v127-assistant-areas-20261105";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -42,6 +42,7 @@ const APP_SHELL = [
   "./buyer.js",
   "./sponsor.js",
   "./ai.js",
+  "./assistant.js",
   "./manifest.json",
   "./pwa.js",
   "./icon.svg",

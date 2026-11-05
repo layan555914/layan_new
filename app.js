@@ -52,8 +52,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     : row?.trust_badge === "company" ? '<span class="trust-badge trust-badge-company" title="شركة تحققت منها الإدارة">شركة موثّقة</span>' : "";
   const applyUrlFilters = () => {
     const params = new URLSearchParams(window.location.search);
+    // Area landing pages (areas/<slug>.html) preset their city.
+    const preset = window.ASYUT_PRESET_FILTERS || {};
     FILTER_PARAMS.forEach(([key, id]) => {
-      const value = params.get(key);
+      const value = params.get(key) ?? preset[key] ?? null;
       const field = $(id);
       if (value != null && field) field.value = value;
     });
