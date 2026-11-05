@@ -78,6 +78,18 @@ test("email confirmation PKCE code creates a session and completes the signup ca
     });
   });
 
+  // The home page verifies the session in the background (admin entry check).
+  // Answer it with the same fixture user so CI never depends on the real TEST project.
+  await page.route(SUPABASE + "/auth/v1/user", route => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({
+      id: "22222222-2222-4222-8222-222222222222",
+      email: "signup-test@example.invalid",
+      email_confirmed_at: "2026-11-04T08:00:00.000Z"
+    })
+  }));
+
   await page.goto("/?code=single-use-signup-fixture-code");
   await page.waitForFunction(() => window.LAYAN_AUTH_CALLBACK_RESULT?.success === true);
 
