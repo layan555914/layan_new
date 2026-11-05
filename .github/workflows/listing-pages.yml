@@ -1,0 +1,52 @@
+name: Listing pages
+
+# Regenerates ads/<id>.html (one page per published listing) and sitemap.xml so
+# shared links show each listing's photo and price and search engines can index them.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - property.html
+      - scripts/build-listing-pages.mjs
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: listing-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate listing pages
+        run: node scripts/build-listing-pages.mjs
+      - name: Commit changes
+        id: commit
+        run: |
+          git add ads sitemap.xml
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No listing changes."
+          else
+            git config user.name "asyut-aqar-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: refresh listing pages and sitemap"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Publish to GitHub Pages
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages build request failed; the next push will publish the pages."

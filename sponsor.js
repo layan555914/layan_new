@@ -63,6 +63,41 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ads.length) grid.innerHTML = '<p class="company-directory-state">لا توجد إعلانات تجارية معتمدة حاليًا.</p>';
   }
 
+  // Native placement inside the listings grid (offers page): approved ads after every 6 listings,
+  // or one "advertise here" card when no ad is approved yet. Re-applied after each filter render.
+  const offersGrid = document.body.classList.contains("page-offers") ? document.getElementById("offersGrid") : null;
+  function inlineCard(ad) {
+    return renderCard(ad).replace('class="offer-card sponsor-card"', 'class="offer-card sponsor-card sponsor-inline" data-sponsor-inline');
+  }
+  function placeInlineAds() {
+    if (!offersGrid) return;
+    const listings = Array.from(offersGrid.children).filter(node => node.matches?.(".offer-card") && !node.hasAttribute("data-sponsor-inline"));
+    offersGrid.querySelectorAll("[data-sponsor-inline]").forEach(node => node.remove());
+    if (listings.length < 3) return;
+    const slots = [];
+    for (let i = 6; i <= listings.length && slots.length < 2; i += 6) slots.push(i);
+    if (!slots.length) slots.push(listings.length);
+    slots.forEach((position, index) => {
+      const html = ads.length
+        ? inlineCard(ads[index % ads.length])
+        : '<article class="offer-card sponsor-card sponsor-inline sponsor-cta" data-sponsor-inline>' +
+          '<span class="sponsor-label">مساحة إعلانية</span>' +
+          '<div class="offer-card-content"><h3>اعرض نشاطك هنا أمام الباحثين عن عقار في أسيوط</h3>' +
+          '<p>شركات التشطيب والديكور والأثاث ومواد البناء والمطورون: إعلانك يظهر بين العقارات التي يتصفحها العملاء الآن.</p>' +
+          '<div class="sponsor-actions"><a class="btn btn-gold" href="./advertise.html">تفاصيل الإعلان</a>' +
+          '<a class="btn btn-outline-dark" href="https://wa.me/201007044265?text=' + encodeURIComponent("مرحبًا، أرغب في الإعلان داخل صفحة العقارات على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer">تواصل واتساب</a></div></div></article>';
+      listings[position - 1].insertAdjacentHTML("afterend", html);
+    });
+  }
+  if (offersGrid) {
+    let scheduled = false;
+    new MutationObserver(() => {
+      if (scheduled || offersGrid.querySelector("[data-sponsor-inline]")) return;
+      scheduled = true;
+      requestAnimationFrame(() => { scheduled = false; if (!offersGrid.querySelector("[data-sponsor-inline]")) placeInlineAds(); });
+    }).observe(offersGrid, { childList: true });
+  }
+
   async function loadAds() {
     if (!base || !key) return;
     try {
@@ -71,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Only show real advertisements that have been approved by ASYUT AQAR administration.
       ads = approvedAds;
       placeAds();
+      placeInlineAds();
     } catch (error) {
       console.warn("ASYUT AQAR sponsored ads:", error.message);
     }

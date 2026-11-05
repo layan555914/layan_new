@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cards = $("buyerMatchCards");
   const count = $("buyerMatchCount");
   const loginNote = $("buyerLoginNote");
-  const money = n => Number(n || 0).toLocaleString("ar-EG", {maximumFractionDigits:0}) + " ج.م";
+  const money = n => Number(n || 0).toLocaleString("ar-EG-u-nu-latn", {maximumFractionDigits:0}) + " ج.م";
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const authService = () => window.LAYAN_SUPABASE || null;
   const getSession = () => authService()?.getSession?.() || null;
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const unread=alerts.filter(row=>!row.read_at).length;
     alertCount.textContent=unread?unread+" تنبيه غير مقروء":(alerts.length?"لا توجد تنبيهات جديدة غير مقروءة.":"لا توجد تنبيهات حتى الآن.");
     markAlertsReadButton.hidden=unread===0;
-    alertList.innerHTML=alerts.length?alerts.map(row=>'<article class="buyer-alert-item '+(row.read_at?"is-read":"is-unread")+'"><a href="./?offer='+encodeURIComponent(row.offer_id)+'"><strong>'+esc(row.title_snapshot)+'</strong><span>'+esc([row.city_snapshot,row.area_snapshot].filter(Boolean).join(" · ")||"أسيوط")+'</span><small>'+new Date(row.created_at).toLocaleString("ar-EG")+'</small></a></article>').join(""):'<div class="buyer-empty">عند ظهور عقار جديد يناسب طلبك، سنضيف تنبيهًا هنا.</div>';
+    alertList.innerHTML=alerts.length?alerts.map(row=>'<article class="buyer-alert-item '+(row.read_at?"is-read":"is-unread")+'"><a href="./?offer='+encodeURIComponent(row.offer_id)+'"><strong>'+esc(row.title_snapshot)+'</strong><span>'+esc([row.city_snapshot,row.area_snapshot].filter(Boolean).join(" · ")||"أسيوط")+'</span><small>'+new Date(row.created_at).toLocaleString("ar-EG-u-nu-latn")+'</small></a></article>').join(""):'<div class="buyer-empty">عند ظهور عقار جديد يناسب طلبك، سنضيف تنبيهًا هنا.</div>';
   }
   async function loadAlerts() {
     const api=authService();

@@ -61,12 +61,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261105-2">
-  <link rel="stylesheet" href="buyer.css?v=20261105-2">
-  <link rel="stylesheet" href="sponsor.css?v=20261105-2">
-  <link rel="stylesheet" href="ai.css?v=20261105-2">
-  <link rel="stylesheet" href="companies.css?v=20261105-2">
-  <link rel="stylesheet" href="marketplace.css?v=20261105-2">
+  <link rel="stylesheet" href="./assets/build/home.min.css?v=7d139707eb360628">
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
   <meta property="og:site_name" content="أسيوط عقار | ASYUT AQAR">
@@ -78,9 +73,8 @@
   <meta property="og:image:alt" content="أسيوط عقار — كل فرص أسيوط العقارية في مكان واحد">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://layan-eg.com/assets/brand/og-image.jpg">
-  <link rel="stylesheet" href="./assets/theme/asyut-premium.css?v=20261105-4">
 </head>
-<body>
+<body class="page-home">
   <div class="install-app-banner" id="installAppBanner" hidden>
     <span><strong>ثبّت أسيوط عقار على موبايلك</strong><small>افتح المنصة بسهولة من شاشة التطبيقات</small></span>
     <button class="btn btn-gold" id="installAppBtn" type="button">تثبيت</button>
@@ -98,7 +92,7 @@
 
     <nav aria-label="القائمة الرئيسية">
       <a class="active" href="./" aria-current="page">الرئيسية</a>
-      <a href="#offers">العقارات</a>
+      <a href="./offers.html">العقارات</a>
       <a href="./marketplace.html">سوق الخدمات</a>
       <a href="./companies.html">الشركات</a>
       <a href="./directory.html">الدليل العقاري</a>
@@ -125,7 +119,7 @@
         <p class="design-hero-lead">كل فرص أسيوط العقارية في مكان واحد</p>
         <p class="design-hero-sub">ابحث عن شقة أو محل أو أرض للبيع والإيجار والتنازل. قارن المقدم والمدفوع والمتبقي والأقساط، ثم تواصل مباشرة مع صاحب الإعلان. لا عمولة على إتمام البيع أو التنازل.</p>
         <div class="hero-actions">
-          <a class="btn btn-gold" href="#offers">تصفح العروض</a>
+          <a class="btn btn-gold" href="./offers.html">تصفح العروض</a>
           <button class="btn btn-outline" id="addOfferBtn" type="button">اعرض وحدتك</button>
         </div>
       </div>
@@ -184,7 +178,7 @@
         <small>الإعلان العادي مجاني. التمييز والإعلانات التجارية خدمات اختيارية، وتُرسل تفاصيلها وأسعارها عبر واتساب بعد التواصل مع الإدارة.</small>
         <div class="launch-actions">
           <a class="btn btn-gold" href="#accounts">اختَر نوع حسابك</a>
-          <a class="btn btn-outline" href="#offers">تصفّح العروض</a>
+          <a class="btn btn-outline" href="./offers.html">تصفّح العروض</a>
         </div>
       </div>
       <div class="launch-benefits" aria-label="مزايا منصة أسيوط عقار">
@@ -249,17 +243,18 @@
       <div class="category-trust-strip">
         <span class="trust-mark" aria-hidden="true">✓</span>
         <div><strong>تنازل بدون عمولة لأسيوط عقار</strong><p>أسيوط عقار لا تحصل على عمولة عند إتمام التنازل. راجع المقدم والمبلغ المتبقي والأقساط ورسوم التنازل التي يحددها المطوّر قبل الاتفاق.</p></div>
-        <a class="btn btn-gold" href="#offers">تصفح كل العروض</a>
+        <a class="btn btn-gold" href="./offers.html">تصفح كل العروض</a>
       </div>
     </section>
 
-<section class="offers-section" id="offers">
+<section class="offers-section offers-preview" id="offers">
       <div class="section-heading">
         <div>
           <span class="eyebrow">فرص عقارية</span>
-          <h2>قائمة العروض</h2>
-          <p>تصفح عقارات أسيوط للبيع والإيجار والتنازل، واختر نوع الفرصة المناسبة لك.</p>
+          <h2>أحدث العروض</h2>
+          <p>أحدث عقارات أسيوط المنشورة للبيع والإيجار والتنازل. للبحث بالفلاتر والخريطة افتح صفحة العقارات.</p>
         </div>
+        <a class="btn btn-gold offers-preview-all" href="./offers.html">عرض كل العقارات</a>
       </div>
 
       <div class="filters" id="propertySearchFilters">
@@ -424,27 +419,27 @@
 
       <div class="how-grid">
         <article class="how-card">
-          <h3>١. ابحث عن فرصتك</h3>
+          <h3>1. ابحث عن فرصتك</h3>
           <p>تصفح عروض التنازل العقاري، واستخدم البحث والفلاتر للوصول إلى المنطقة ونوع العقار المناسبين لك.</p>
         </article>
         <article class="how-card">
-          <h3>٢. راجع تفاصيل العرض</h3>
+          <h3>2. راجع تفاصيل العرض</h3>
           <p>افتح «عرض التفاصيل» لمراجعة السعر الإجمالي والمقدم والمبلغ المدفوع والمتبقي ورسوم التنازل والوصف والصور المتاحة.</p>
         </article>
         <article class="how-card">
-          <h3>٣. تواصل مباشرة مع المعلن</h3>
+          <h3>3. تواصل مباشرة مع المعلن</h3>
           <p>من تفاصيل الإعلان، اتصل بصاحب العرض أو راسله عبر واتساب باستخدام بيانات التواصل التي أضافها بنفسه. أسيوط عقار لا تتوسط في التفاوض أو الاتفاق.</p>
         </article>
         <article class="how-card">
-          <h3>٤. أضف عرضك العقاري</h3>
+          <h3>4. أضف عرضك العقاري</h3>
           <p>اضغط «أضف عرضك»، واملأ بيانات الوحدة والسعر والمبالغ والصور وبيانات التواصل، ثم أرسل العرض للمراجعة.</p>
         </article>
         <article class="how-card">
-          <h3>٥. راجع بيانات الوحدة قبل الاتفاق</h3>
+          <h3>5. راجع بيانات الوحدة قبل الاتفاق</h3>
           <p>تحقق بنفسك من العقد والأقساط والالتزامات وموافقة المطوّر أو الجهة المالكة على التنازل قبل دفع أي مبلغ أو توقيع اتفاق.</p>
         </article>
         <article class="how-card">
-          <h3>٦. الإعلانات المميزة</h3>
+          <h3>6. الإعلانات المميزة</h3>
           <p>يمكن طلب الخدمات التجارية وتمييز الإعلان عبر واتساب إدارة أسيوط عقار لمعرفة التفاصيل. لا تُعرض أسعار أو باقات أو وسائل دفع على هذه الصفحة.</p>
         </article>
       </div>
@@ -556,7 +551,7 @@
 
   <nav class="mobile-nav" aria-label="التنقل السريع">
     <a href="./" aria-label="الرئيسية"><span>⌂</span><small>الرئيسية</small></a>
-    <a href="#offers" aria-label="العقارات"><span>▦</span><small>العقارات</small></a>
+    <a href="./offers.html" aria-label="العقارات"><span>▦</span><small>العقارات</small></a>
     <a href="./marketplace.html" aria-label="سوق الخدمات"><span>◇</span><small>الخدمات</small></a>
     <a href="./favorites.html" aria-label="المفضلة"><span>☆</span><small>المفضلة</small></a>
     <button type="button" id="mobileAddOfferBtn" aria-label="إضافة عرض"><span>＋</span><small>أضف عرضك</small></button>
@@ -589,6 +584,8 @@
       <a href="./terms.html">شروط الاستخدام</a>
       <a href="./privacy.html">سياسة الخصوصية</a>
       <a href="./payment.html">الإعلانات المميزة</a>
+      <a href="./guide.html">دليل المعلن</a>
+      <a href="./advertise.html">أعلن معنا</a>
     </nav>
   </footer>
 

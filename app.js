@@ -12,6 +12,51 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const $ = (id) => document.getElementById(id);
+  // The home page shows a short preview; any search there opens the full offers page with the same filters.
+  const isHomePreview = document.body.classList.contains("page-home");
+  const FILTER_PARAMS = [["q","searchInput"],["purpose","purposeFilter"],["type","typeFilter"],["city","cityFilter"],["area","areaFilter"],["max","totalPriceMaxFilter"],["down","downPaymentMaxFilter"],["monthly","monthlyMaxFilter"],["beds","minBedroomsFilter"],["sort","sortFilter"]];
+  const showResults = () => {
+    if (isHomePreview) {
+      const params = new URLSearchParams();
+      FILTER_PARAMS.forEach(([key, id]) => {
+        const value = $(id)?.value;
+        if (value && !(key === "sort" && value === "newest")) params.set(key, value);
+      });
+      if (activeKind) params.set("kind", activeKind);
+      if (activeDealKind) params.set("deal", activeDealKind);
+      const query = params.toString();
+      window.location.href = "./offers.html" + (query ? "?" + query : "");
+      return;
+    }
+    render();
+    $("offers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  // "Posted today / 3 days ago" on listing cards (falls back to the old label).
+  const postedAgo = value => {
+    const time = new Date(value || "").getTime();
+    if (!Number.isFinite(time)) return "إعلان منشور";
+    const days = Math.floor((Date.now() - time) / 86400000);
+    if (days <= 0) return "نُشر اليوم";
+    if (days === 1) return "نُشر أمس";
+    if (days === 2) return "نُشر منذ يومين";
+    if (days <= 10) return "نُشر منذ " + days + " أيام";
+    if (days < 30) return "نُشر منذ " + days + " يومًا";
+    const months = Math.floor(days / 30);
+    if (months === 1) return "نُشر منذ شهر";
+    if (months === 2) return "نُشر منذ شهرين";
+    if (months <= 10) return "نُشر منذ " + months + " أشهر";
+    return "نُشر منذ أكثر من " + months + " شهرًا";
+  };
+  const applyUrlFilters = () => {
+    const params = new URLSearchParams(window.location.search);
+    FILTER_PARAMS.forEach(([key, id]) => {
+      const value = params.get(key);
+      const field = $(id);
+      if (value != null && field) field.value = value;
+    });
+    if (params.get("kind")) activeKind = params.get("kind");
+    if (params.get("deal")) activeDealKind = params.get("deal");
+  };
   // Category cards filter offers by broad use, not by an exact property subtype.
   document.querySelectorAll("[data-category-kind]").forEach((tile) => {
     tile.addEventListener("click", () => {
@@ -26,8 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         item.classList.toggle("active", item === tile);
         item.setAttribute("aria-pressed", item === tile ? "true" : "false");
       });
-      render();
-      $("offers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      showResults();
     });
   });
   const grid = $("offersGrid");
@@ -61,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const remainingField = form?.querySelector('[name="remaining_installments"]');
   remainingField?.closest("label")?.insertAdjacentElement("afterend", financeNote);
   const financeFields = ["total_price", "paid_amount", "remaining_installments"].map(name => form?.querySelector('[name="' + name + '"]')).filter(Boolean);
-  const formatFinance = value => new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 0 }).format(value) + " جنيه";
+  const formatFinance = value => new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 0 }).format(value) + " جنيه";
   function updateFinanceCheck() {
     if (!financeNote || !form) return;
     const read = name => Number(form.querySelector('[name="' + name + '"]')?.value || 0);
@@ -388,7 +432,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   const money = (v) =>
-    num(v).toLocaleString("ar-EG", {
+    num(v).toLocaleString("ar-EG-u-nu-latn", {
       maximumFractionDigits: 2
     }) + " ج.م";
 
@@ -436,8 +480,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   function compareValue(value,kind) {
     if(value===null||value===undefined||value==="")return "غير متاح";
     if(kind==="money")return Number(value)>0?money(value):"غير محدد";
-    if(kind==="area")return Number(value)>0?Number(value).toLocaleString("ar-EG")+" م²":"غير متاح";
-    if(kind==="count")return Number(value)>0?Number(value).toLocaleString("ar-EG"):"غير متاح";
+    if(kind==="area")return Number(value)>0?Number(value).toLocaleString("ar-EG-u-nu-latn")+" م²":"غير متاح";
+    if(kind==="count")return Number(value)>0?Number(value).toLocaleString("ar-EG-u-nu-latn"):"غير متاح";
     return esc(value);
   }
   function openPropertyComparison() {
@@ -658,7 +702,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="offer-card-content">
             <div class="offer-card-topline">
               <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
-              <span class="offer-published-badge">إعلان منشور</span>
+              <span class="offer-published-badge">${postedAgo(o.created_at)}</span>
             </div>
             <h3>${esc(o.title)}</h3>
             <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join(" · ") || "أسيوط")}</p>
@@ -876,9 +920,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const shareButton = $("shareOfferBtn");
     shareButton?.addEventListener("click", async () => {
-      const shareUrl = new URL("./property.html", window.location.href);
-      if (o.id != null) shareUrl.searchParams.set("id", String(o.id));
-      else { shareUrl.pathname = "./"; shareUrl.hash = "offers"; }
+      // Share the listing's own page so WhatsApp/Facebook show its photo, title and price.
+      const shareUrl = o.id != null
+        ? new URL("./ads/" + encodeURIComponent(String(o.id)) + ".html", window.location.href)
+        : new URL("./offers.html", window.location.href);
       const cleanUrl = cleanShareUrl(shareUrl);
       const shareData = {title: "ASYUT AQAR | " + o.title, text: "إعلان عقاري على أسيوط عقار: " + o.title + " — كود الإعلان " + offerCode(o), url: cleanUrl};
       try {
@@ -979,7 +1024,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const date = document.createElement("small");
         const parsed = offer.created_at ? new Date(offer.created_at) : null;
         date.textContent = parsed && !Number.isNaN(parsed.getTime())
-          ? "تاريخ الإرسال: " + parsed.toLocaleDateString("ar-EG")
+          ? "تاريخ الإرسال: " + parsed.toLocaleDateString("ar-EG-u-nu-latn")
           : "تاريخ الإرسال غير متاح";
         card.append(heading, meta, location);
         if (financials.childElementCount) card.appendChild(financials);
@@ -1054,8 +1099,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const companySearch = $("companySearchInput");
     if (companySearch) companySearch.value = "";
     renderCompanies();
-    render();
-    $("offers")?.scrollIntoView({behavior:"smooth",block:"start"});
+    showResults();
   });
   $("closeDialog")?.addEventListener("click", closeDialog);
 
@@ -1089,7 +1133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { activeDealKind = button.dataset.dealKind || ""; activeKind = ""; render(); $("offers")?.scrollIntoView({behavior:"smooth",block:"start"}); }));
+  document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { activeDealKind = button.dataset.dealKind || ""; activeKind = ""; showResults(); }));
   const listingPurpose = form?.querySelector('[name="listing_purpose"]');
   const landDetails = $("landDetailsFields");
   const updateLandFields = () => { if (landDetails) landDetails.hidden = !String(form?.querySelector('[name="property_type"]')?.value || "").includes("أرض"); };
@@ -1161,14 +1205,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       tile.classList.remove("active");
       tile.setAttribute("aria-pressed", "false");
     });
-    render();
-    $("offers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    showResults();
   });
 
   const calcContract = $("calcContract");
   const calcPaid = $("calcPaid");
   const calcFees = $("calcFees");
-  const formatCalc = (value) => num(value).toLocaleString("ar-EG", { maximumFractionDigits: 2 }) + " ج.م";
+  const formatCalc = (value) => num(value).toLocaleString("ar-EG-u-nu-latn", { maximumFractionDigits: 2 }) + " ج.م";
   function updateCalculator() {
     if (!calcContract || !calcPaid || !calcFees) return;
     const contract = num(calcContract.value);
@@ -1413,6 +1456,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       offers = rows.map(normalize);
       updateAreaFilter();
+      applyUrlFilters();
       renderCompanies();
       render();
 
@@ -1428,7 +1472,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       } else {
         setStatus(
           offers.length
-            ? `تم تحميل ${offers.length} عرض.`
+            ? "" // the results count above the grid already says how many offers are shown
             : "لا توجد عروض منشورة حاليًا."
         );
       }
@@ -1442,7 +1486,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  $("offersPagination")?.addEventListener("click", event => { const button=event.target.closest("[data-page-nav]"); if(!button||button.disabled)return; offersPage+=button.dataset.pageNav==="next"?1:-1; render(); $("offers")?.scrollIntoView({behavior:"smooth",block:"start"}); });
+  $("offersPagination")?.addEventListener("click", event => { const button=event.target.closest("[data-page-nav]"); if(!button||button.disabled)return; offersPage+=button.dataset.pageNav==="next"?1:-1; showResults(); });
   $("offersGrid")?.addEventListener("click", event => {
     const compareButton = event.target.closest("[data-compare-id]");
     if (compareButton) { toggleCompare(compareButton.dataset.compareId); return; }

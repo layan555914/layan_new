@@ -1,7 +1,8 @@
-const CACHE_NAME = "asyut-aqar-shell-v124-hero-photo-20261105";
+const CACHE_NAME = "asyut-aqar-shell-v125-platform-upgrade-20261105";
 const APP_SHELL = [
   "./",
   "./index.html",
+  "./offers.html",
   "./property.html",
   "./property.css",
   "./property.js",
@@ -43,7 +44,10 @@ const APP_SHELL = [
   "./ai.js",
   "./manifest.json",
   "./pwa.js",
-  "./icon.svg"
+  "./icon.svg",
+  "./assets/build/home.min.css",
+  "./assets/build/property.min.css",
+  "./assets/build/base.min.css"
 ];
 
 self.addEventListener("install", event => {

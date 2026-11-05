@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     panel.hidden = !ok;
     logout.hidden = !ok;
   };
-  const dateText = value => value ? new Date(value).toLocaleString("ar-EG") : "—";
+  const dateText = value => value ? new Date(value).toLocaleString("ar-EG-u-nu-latn") : "—";
   const sessionUserId = () => session?.user?.id || auth?.getUser?.()?.id || null;
 
   async function fresh() {
