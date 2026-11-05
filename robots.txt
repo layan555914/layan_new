@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /directory-admin.html
+Disallow: /my-listings.html
+Disallow: /reset-password.html
+Disallow: /favorites.html
+
+Sitemap: https://layan-eg.com/sitemap.xml

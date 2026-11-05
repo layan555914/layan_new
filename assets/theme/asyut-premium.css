@@ -2,7 +2,6 @@
    Loaded after every existing stylesheet. Appearance only: no IDs, data
    attributes or behaviour depend on this file. Palette: espresso, sand,
    terracotta, copper. Images use straight edges with soft corners. */
-@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap");
 
 :root {
   --navy: #2B211B;
@@ -208,6 +207,7 @@ body .hero.design-hero::before {
   z-index: -2 !important;
   border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
   background: url("../demo/hero-villa.jpg") center 42% / cover no-repeat !important;
+  background-image: image-set(url("../demo/hero-villa.webp") type("image/webp"), url("../demo/hero-villa.jpg") type("image/jpeg")) !important;
 }
 body .hero.design-hero::after {
   display: block !important;
@@ -298,3 +298,7 @@ body .company-profile-hero .eyebrow { color: var(--aa-peach) !important; }
 body .companies-hero p,
 body .company-profile-hero p { color: #D9CCBC !important; }
 body .company-contact-primary { background: var(--aa-terracotta) !important; color: var(--aa-cream) !important; }
+
+/* Footer info links */
+body .footer-legal { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 8px; font-size: 14px; }
+body .footer-legal a { color: var(--aa-peach); }
