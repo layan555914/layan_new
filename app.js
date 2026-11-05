@@ -666,9 +666,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             ${(o.area_m2 || o.bedrooms || o.bathrooms) ? `<p class="offer-specs">${o.area_m2 ? `<span>المساحة <b>${esc(o.area_m2)} م²</b></span>` : ""}${o.bedrooms ? `<span>غرف النوم <b>${esc(o.bedrooms)}</b></span>` : ""}${o.bathrooms ? `<span>الحمامات <b>${esc(o.bathrooms)}</b></span>` : ""}</p>` : ""}
             <div class="offer-price-main"><span>${priceLabel}</span><strong>${money(o.total_price)}</strong></div>
             <div class="offer-details">
-              <div><span>المقدم عند التعاقد</span><strong>${money(o.down_payment)}</strong></div>
-              <div><span>إجمالي المدفوع</span><strong>${money(o.paid_amount)}</strong></div>
-              <div><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></div>
+              ${num(o.down_payment)>0 ? `<div><span>المقدم عند التعاقد</span><strong>${money(o.down_payment)}</strong></div>` : ""}
+              ${num(o.paid_amount)>0 ? `<div><span>إجمالي المدفوع</span><strong>${money(o.paid_amount)}</strong></div>` : ""}
+              ${num(o.remaining_amount)>0 ? `<div><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></div>` : ""}
               ${o.monthly_installment ? `<div><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></div>` : ""}
               ${isAssignment ? `<div><span>رسوم التنازل</span><strong>${num(o.assignment_fee)>0 ? money(o.assignment_fee) : "تحدد من الجهة المختصة"}</strong></div>` : ""}
             </div>

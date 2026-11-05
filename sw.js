@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v122-asset-refresh-20261105";
+const CACHE_NAME = "asyut-aqar-shell-v123-layout-polish-20261105";
 const APP_SHELL = [
   "./",
   "./index.html",
