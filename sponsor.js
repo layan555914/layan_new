@@ -60,7 +60,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!grid) return;
     grid.querySelectorAll("[data-sponsor-card]").forEach(node => node.remove());
     ads.forEach(ad => grid.insertAdjacentHTML("beforeend", renderCard(ad)));
-    if (!ads.length) grid.innerHTML = '<p class="company-directory-state">لا توجد إعلانات تجارية معتمدة حاليًا.</p>';
+    if (!ads.length) {
+      // No approved ad yet: show the available slots so companies see where their ad would appear.
+      const slots = [
+        ["تشطيب وديكور", "اعرض أعمال التشطيب والتصميم الداخلي أمام أصحاب الوحدات الجديدة."],
+        ["أثاث وأجهزة", "منتجاتك أمام من اشترى أو استأجر عقارًا ويجهّز بيته الآن."],
+        ["مواد بناء", "سيراميك ودهانات وأدوات صحية لمن يبني أو يشطب في أسيوط."]
+      ];
+      grid.innerHTML = slots.map(([category, text]) =>
+        '<article class="offer-card sponsor-card sponsor-cta sponsor-slot"><span class="sponsor-label">مساحة إعلانية متاحة</span>' +
+        '<div class="offer-card-content"><h3>' + esc(category) + '</h3><p>' + esc(text) + '</p>' +
+        '<div class="sponsor-actions"><a class="btn btn-gold" href="./advertise.html">احجز المساحة</a></div></div></article>').join("");
+    }
   }
 
   // Native placement inside the listings grid (offers page): approved ads after every 6 listings,
