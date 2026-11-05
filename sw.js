@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v121-premium-identity-20261105";
+const CACHE_NAME = "asyut-aqar-shell-v122-asset-refresh-20261105";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -49,7 +49,7 @@ const APP_SHELL = [
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
+      .then(cache => cache.addAll(APP_SHELL.map(path => new Request(path, { cache: "reload" }))))
       .then(() => self.skipWaiting())
   );
 });
@@ -119,7 +119,8 @@ self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached;
-      return fetch(request).then(response => {
+      // Revalidate with the server so a stale HTTP-cache copy is never pinned in the shell cache.
+      return fetch(request, { cache: "no-cache" }).then(response => {
         if (response && response.ok) {
           const copy = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
