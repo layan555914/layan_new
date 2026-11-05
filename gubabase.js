@@ -342,7 +342,14 @@
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","latitude","longitude","created_at"
     ].join(",");
-    const rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
+    let rows;
+    try {
+      // trust_badge («مالك موثّق» / «شركة موثّقة») is set by the admin only; older databases may not have it yet.
+      rows = await request("property_offers?select=" + fields + ",trust_badge&status=eq.available&order=created_at.desc");
+    } catch (error) {
+      if (!/trust_badge/.test(String(error?.message || error))) throw error;
+      rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
+    }
     return Array.isArray(rows) ? rows : [];
   }
   async function getMyOffers() {

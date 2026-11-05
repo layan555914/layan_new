@@ -188,6 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="property-summary-top">
             <span class="property-purpose-badge">${escapeHTML(row.property_type || "عقار")} · ${escapeHTML(purpose)}</span>
             ${isFeatured ? '<span class="property-featured-badge">★ إعلان مميز</span>' : ""}
+            ${row.trust_badge === "owner" ? '<span class="trust-badge" title="تحققت الإدارة من ملكية المعلن">مالك موثّق</span>' : row.trust_badge === "company" ? '<span class="trust-badge trust-badge-company" title="شركة تحققت منها الإدارة">شركة موثّقة</span>' : ""}
           </div>
           <p class="property-listing-code">كود الإعلان: <strong>${escapeHTML(offerCode(row))}</strong></p>
           ${listingDates(row)}
@@ -269,8 +270,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     showState("جارٍ تحميل الإعلان", "نحمّل بيانات العقار وصوره من قاعدة البيانات...");
     try {
-      const endpoint = base + "/rest/v1/property_offers?select=" + fields + "&id=eq." + encodeURIComponent(id) + "&status=eq.available&limit=1";
-      const response = await fetch(endpoint, {headers:{apikey:key,Authorization:"Bearer " + key},cache:"no-store"});
+      const endpointFor = list => base + "/rest/v1/property_offers?select=" + list + "&id=eq." + encodeURIComponent(id) + "&status=eq.available&limit=1";
+      const headers = {headers:{apikey:key,Authorization:"Bearer " + key},cache:"no-store"};
+      let response = await fetch(endpointFor(fields + ",trust_badge"), headers);
+      // Databases without the admin trust badge column still load the listing.
+      if (response.status === 400) response = await fetch(endpointFor(fields), headers);
       if (!response.ok) throw new Error("تعذر تحميل الإعلان.");
       const rows = await response.json();
       if (!Array.isArray(rows) || !rows.length) {

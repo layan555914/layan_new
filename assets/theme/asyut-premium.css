@@ -661,3 +661,114 @@ body .sponsor-cta h3 { font-family: var(--aa-head); font-size: 21px; line-height
 body .sponsor-cta p { margin: 0; color: #5A4C42; line-height: 1.8; }
 body .sponsor-cta .sponsor-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 body .sponsor-inline .sponsor-label { align-self: flex-start; margin: 14px 16px 0; padding: 4px 10px; border-radius: 8px; background: rgba(164, 71, 42, .1); color: var(--aa-terracotta); font-size: 12px; font-weight: 700; }
+
+/* ---- Photo heroes on section pages (same idea as the offers page) ---- */
+body .marketplace-page > .hero,
+body .favorites-hero,
+body .directory-hero,
+body .companies-hero {
+  position: relative;
+  overflow: hidden;
+  color: var(--aa-sand) !important;
+  border: 0 !important;
+  border-radius: 24px !important;
+  box-shadow: 0 22px 50px rgba(43, 33, 27, .18) !important;
+  background-color: var(--aa-espresso) !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
+body .marketplace-page > .hero {
+  background-image:
+    linear-gradient(270deg, rgba(43, 33, 27, .97) 0%, rgba(43, 33, 27, .9) 42%, rgba(43, 33, 27, .5) 100%),
+    image-set(url("../demo/hero-villa.webp?v=20261105-3") type("image/webp"), url("../demo/hero-villa.jpg?v=20261105-3") type("image/jpeg")) !important;
+  background-position: center, center 55% !important;
+  padding: clamp(32px, 5vw, 60px) !important;
+}
+body .directory-hero {
+  background-image:
+    linear-gradient(270deg, rgba(36, 27, 22, .97) 0%, rgba(43, 33, 27, .9) 48%, rgba(43, 33, 27, .62) 100%),
+    image-set(url("../demo/residential-building.webp") type("image/webp"), url("../demo/residential-building.jpg") type("image/jpeg")) !important;
+  background-position: center, center 45% !important;
+}
+body .favorites-hero {
+  background-image:
+    linear-gradient(270deg, rgba(43, 33, 27, .97) 0%, rgba(43, 33, 27, .88) 45%, rgba(43, 33, 27, .5) 100%),
+    image-set(url("../demo/interior-apartment.webp") type("image/webp"), url("../demo/interior-apartment.jpg") type("image/jpeg")) !important;
+  background-position: center, center 55% !important;
+  padding: clamp(32px, 5vw, 56px) !important;
+  margin-bottom: 20px;
+}
+body .companies-hero {
+  background-image:
+    linear-gradient(270deg, rgba(43, 33, 27, .97) 0%, rgba(43, 33, 27, .9) 48%, rgba(43, 33, 27, .6) 100%),
+    image-set(url("../demo/interior-apartment.webp") type("image/webp"), url("../demo/interior-apartment.jpg") type("image/jpeg")) !important;
+  background-position: center, center 50% !important;
+}
+body .marketplace-page > .hero h1,
+body .favorites-hero h1,
+body .companies-hero h1 { color: var(--aa-sand) !important; font-family: var(--aa-head); font-weight: 800; text-shadow: none !important; }
+body .marketplace-page > .hero p,
+body .favorites-hero p,
+body .companies-hero p { color: #E2D6C8 !important; text-shadow: none !important; }
+body .marketplace-page > .hero .eyebrow,
+body .companies-hero .eyebrow { color: var(--aa-peach) !important; }
+body .marketplace-page > .hero::before,
+body .marketplace-page > .hero::after,
+body .favorites-hero::before,
+body .favorites-hero::after { display: none !important; }
+body .directory-hero-panel { backdrop-filter: blur(6px); background: rgba(43, 33, 27, .55) !important; }
+@media (max-width: 760px) {
+  body .marketplace-page > .hero,
+  body .favorites-hero,
+  body .directory-hero,
+  body .companies-hero { background-position: center, 30% 50% !important; border-radius: 18px !important; }
+}
+
+/* ---- Home: sections hub ---- */
+body main > section.home-hub {
+  padding: var(--aa-section-y) var(--aa-gutter) !important;
+  margin: 0 !important;
+  background: #FFFCF8 !important;
+}
+body .home-hub-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+body .home-hub-card {
+  display: grid; align-content: start; gap: 8px;
+  padding: 22px 22px 24px;
+  border: 1px solid var(--aa-line); border-radius: 18px;
+  background: #fff; color: var(--aa-espresso); text-decoration: none;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+body .home-hub-card:hover { transform: translateY(-3px); border-color: var(--aa-terracotta); box-shadow: 0 16px 36px rgba(43, 33, 27, .10); }
+body .home-hub-icon {
+  width: 46px; height: 46px; display: grid; place-items: center;
+  border-radius: 14px; background: var(--aa-espresso); color: var(--aa-peach); font-size: 20px; margin-bottom: 4px;
+}
+body .home-hub-card b { font-family: var(--aa-head); font-weight: 700; font-size: 18px; }
+body .home-hub-card small { color: #6B5D52; line-height: 1.8; font-size: 14px; }
+@media (max-width: 1000px) { body .home-hub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { body .home-hub-grid { gap: 10px; } body .home-hub-card { padding: 16px; } body .home-hub-card small { font-size: 13px; } }
+
+/* Trust badges on cards and listing pages */
+body .trust-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #E7F2EA; color: #1F6B3A; border: 1px solid #BFDCC8; }
+body .trust-badge::before { content: "✓"; font-weight: 800; }
+body .trust-badge-company { background: #F6E8DE; color: var(--aa-terracotta); border-color: #E8C7B2; }
+
+/* ---- Home: browse by area ---- */
+body main > section.home-areas { padding: calc(var(--aa-section-y) * .75) var(--aa-gutter) !important; margin: 0 !important; background: var(--aa-sand) !important; }
+body .area-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+body .area-chip {
+  padding: 11px 20px; border-radius: 999px; border: 1px solid var(--aa-line); background: #fff;
+  color: var(--aa-espresso); font-family: var(--aa-head); font-weight: 600; font-size: 15px; text-decoration: none;
+  transition: background .2s, color .2s, border-color .2s;
+}
+body .area-chip:hover { background: var(--aa-espresso); color: var(--aa-sand); border-color: var(--aa-espresso); }
+body main > section.launch-campaign { margin-block: 72px !important; }
+
+/* Favorites empty state spans the grid */
+body .favorites-empty { grid-column: 1 / -1; text-align: center; padding: 48px 20px; border: 1px dashed var(--aa-line); border-radius: 18px; background: #FFFCF8; }
+body .favorites-empty h2 { font-size: 22px !important; margin: 0 0 8px; }
+body .favorites-empty p { color: #6B5D52; margin: 0 0 18px; }
+@media (max-width: 700px) {
+  body .topbar nav a { display: flex !important; justify-content: center; align-items: center; padding: 7px 4px !important; font-size: 13px !important; min-height: 36px; }
+  body .topbar nav { gap: 5px !important; }
+}

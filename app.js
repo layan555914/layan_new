@@ -47,6 +47,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (months <= 10) return "نُشر منذ " + months + " أشهر";
     return "نُشر منذ أكثر من " + months + " شهرًا";
   };
+  const trustBadge = row => row?.trust_badge === "owner"
+    ? '<span class="trust-badge" title="تحققت الإدارة من ملكية المعلن">مالك موثّق</span>'
+    : row?.trust_badge === "company" ? '<span class="trust-badge trust-badge-company" title="شركة تحققت منها الإدارة">شركة موثّقة</span>' : "";
   const applyUrlFilters = () => {
     const params = new URLSearchParams(window.location.search);
     FILTER_PARAMS.forEach(([key, id]) => {
@@ -703,6 +706,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="offer-card-topline">
               <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
               <span class="offer-published-badge">${postedAgo(o.created_at)}</span>
+              ${trustBadge(o)}
             </div>
             <h3>${esc(o.title)}</h3>
             <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join(" · ") || "أسيوط")}</p>
@@ -1070,6 +1074,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     openDialog();
   }
   $("addOfferTop")?.addEventListener("click", () => { selectedAccountType = "individual"; startAddOffer(); });
+  document.querySelectorAll("[data-open-add-offer]").forEach(button => button.addEventListener("click", () => { selectedAccountType = "individual"; startAddOffer(); }));
+  // Other pages link to "./?add=1" to open the add-listing flow directly.
+  if (new URLSearchParams(window.location.search).get("add") === "1") {
+    selectedAccountType = "individual";
+    window.setTimeout(startAddOffer, 0);
+  }
   $("addOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; startAddOffer(); });
   $("mobileAddOfferBtn")?.addEventListener("click", () => { selectedAccountType = "individual"; startAddOffer(); });
   document.querySelectorAll("[data-account-type]").forEach(button => {

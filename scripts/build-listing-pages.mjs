@@ -133,7 +133,7 @@ function listingPage(template, row) {
         ${row.description ? `<p>${esc(String(row.description).slice(0, 600))}</p>` : ""}
       </section>`;
   swap(/<section class="property-state"><h1>جارٍ فتح الإعلان<\/h1><p>[^<]*<\/p><\/section>/, preview);
-  swap(/<script src="\.\/config\.js"><\/script>/, `<script>window.ASYUT_PROPERTY_ID = "${id}";</script>\n  <script src="./config.js"></script>`);
+  swap(/<script src="\.\/config\.js(\?[^"]*)?"><\/script>/, match => `<script>window.ASYUT_PROPERTY_ID = "${id}";</script>\n  ${match}`);
   return html;
 }
 
