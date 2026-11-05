@@ -9,6 +9,7 @@ on:
       - fix/directory-admin-mobile-test-race-20261103
       - fix/directory-admin-visible-nav-buttons-20261103
       - restore/asyut-aqar-full-platform-20261101
+      - review/directory-atomic-audit-20261103
       - feature/asyut-real-estate-directory
       - fix/directory-cache-bust-v107
       - fix/directory-data-cache-v108
@@ -23,6 +24,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: asyut-aqar-validation-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
@@ -53,6 +58,9 @@ jobs:
       - name: Type-check Supabase Edge Functions
         run: |
           deno check --no-lock             supabase/functions/asyut-admin/index.ts             supabase/functions/asyut-push/index.ts
+
+      - name: Test synthetic-only data migration planner
+        run: node scripts/ci/validate-synthetic-data-migration.mjs --self-test
 
       - name: Validate pages, local assets, PWA shell and auth UI contracts
         run: |
@@ -337,10 +345,44 @@ jobs:
       - name: Install Chromium for browser journey tests
         run: npx playwright install --with-deps chromium
 
-      - name: Run customer and admin browser journey against mocked Supabase
+      - name: Run customer and admin browser journey against mocked Supabase and hosted staging
         env:
           CI: "true"
+          STAGING_SUPABASE_URL: https://wisnmlbefdrkcbbqvdlg.supabase.co
+          # Public publishable key only; no service-role key or user credential.
+          STAGING_SUPABASE_PUBLISHABLE_KEY: sb_publishable_Witds4WbdcsSIgfCx1NcOA__lasXKhk
         run: npx playwright test
 
       - name: Verify live Supabase reads and anonymous permission boundaries
         run: node tests/e2e/live-supabase-readonly.mjs
+
+      - name: Verify hosted staging HTTP reads and anonymous security boundaries
+        env:
+          STAGING_SUPABASE_URL: https://wisnmlbefdrkcbbqvdlg.supabase.co
+          # Public publishable key only; no service-role key or user credential.
+          STAGING_SUPABASE_PUBLISHABLE_KEY: sb_publishable_Witds4WbdcsSIgfCx1NcOA__lasXKhk
+        run: node tests/e2e/staging-readonly.mjs
+
+  rehearse-full-supabase-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out review branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js for Supabase CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pinned Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 2.84.2
+
+      - name: Confirm local Docker runtime
+        run: docker version
+
+      - name: Rebuild disposable local Supabase and verify baseline
+        shell: bash
+        run: bash scripts/ci/rehearse-production-schema-baseline.sh

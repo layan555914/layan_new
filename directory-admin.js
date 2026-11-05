@@ -61,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     logout.hidden = !ok;
   };
   const dateText = value => value ? new Date(value).toLocaleString("ar-EG") : "—";
-  const sessionUserId = () => session?.user?.id || auth?.getUser?.()?.id || null;
 
   async function fresh() {
     if (!session?.access_token) session = auth?.getSession?.() || null;
@@ -426,34 +425,22 @@ document.addEventListener("DOMContentLoaded", () => {
     return patch;
   }
 
-  function changedValues(oldRecord, patch) {
-    const before = {};
-    const after = {};
-    Object.keys(patch).forEach(key => {
-      before[key] = oldRecord?.[key] ?? null;
-      after[key] = patch[key];
-    });
-    return { before, after };
-  }
-
-  async function writeAudit(tableName, recordId, before, after, reason) {
-    const userId = sessionUserId();
-    const audit = {
-      table_name: tableName,
-      record_id: recordId,
-      changed_by: userId,
-      old_values: before || {},
-      new_values: after || {},
-      reason: String(reason || "تعديل من لوحة إدارة قاعدة بيانات السوق العقاري").slice(0, 240)
-    };
-    const result = await api("/rest/v1/directory_change_log", {
+  async function mutateWithAudit(tableName, operation, recordId, data, reason) {
+    const result = await api("/rest/v1/rpc/directory_admin_mutate_with_audit", {
       method: "POST",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(audit)
+      body: JSON.stringify({
+        p_table_name: tableName,
+        p_operation: operation,
+        p_record_id: recordId || null,
+        p_data: data,
+        p_reason: String(reason || "تعديل من لوحة إدارة قاعدة بيانات السوق العقاري").slice(0, 240)
+      })
     });
-    if (!Array.isArray(result) || result.length !== 1) {
-      throw new Error("تم تعديل السجل، لكن لم يؤكد النظام حفظ أثر التعديل في سجل المراجعة.");
+    if (!result || typeof result !== "object" || Array.isArray(result) ||
+        !result.record || !result.audit_id) {
+      throw new Error("لم يؤكد الخادم حفظ السجل وأثر العملية معًا.");
     }
+    return result;
   }
 
   function prepareMapLocationPatch(type, patch) {
@@ -491,17 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function updateRecord(type, recordId, patch, reason) {
     prepareMapLocationPatch(type, patch);
     const table = tables[type];
-    const oldRecord = (cache[type] || []).find(item => item.id === recordId) || {};
-    const beforeAfter = changedValues(oldRecord, patch);
-    const result = await api("/rest/v1/" + table + "?id=eq." + encodeURIComponent(recordId), {
-      method: "PATCH",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(patch)
-    });
-    if (!Array.isArray(result) || result.length !== 1) {
-      throw new Error("لم يؤكد الخادم تحديث سجل واحد؛ حدّث القائمة قبل المحاولة مجددًا.");
-    }
-    await writeAudit(table, recordId, beforeAfter.before, beforeAfter.after, reason);
+    await mutateWithAudit(table, "update", recordId, patch, reason || "حفظ تعديلات السجل");
   }
 
   async function addSourceLink(type, recordId, sourceId) {
@@ -512,13 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
     link[config.owner] = recordId;
     link.source_id = sourceId;
     link.claim_key = "general";
-    const result = await api("/rest/v1/" + config.link, {
-      method: "POST",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(link)
-    });
-    if (!Array.isArray(result) || result.length !== 1) throw new Error("لم يؤكد الخادم ربط المصدر بالسجل.");
-    await writeAudit(config.link, recordId, {}, link, "ربط مصدر بالسجل");
+    await mutateWithAudit(config.link, "insert", recordId, link, "ربط مصدر بالسجل");
   }
 
   function getCurrentType() {
@@ -550,12 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
             throw new Error("هذا المصدر مرتبط بسجل منشور. أخفِ السجل العام أو اربطه بمصدر عام بديل قبل إخفاء هذا المصدر.");
           }
         }
-        const beforeAfter = changedValues(cache.sources.find(item => item.id === recordId), patch);
-        const result = await api("/rest/v1/directory_sources?id=eq." + encodeURIComponent(recordId), {
-          method: "PATCH", headers: { Prefer: "return=representation" }, body: JSON.stringify(patch)
-        });
-        if (!Array.isArray(result) || result.length !== 1) throw new Error("لم يؤكد الخادم تحديث المصدر.");
-        await writeAudit("directory_sources", recordId, beforeAfter.before, beforeAfter.after, "تحديث بيانات مصدر");
+        await mutateWithAudit("directory_sources", "update", recordId, patch, "تحديث بيانات مصدر");
         say("تم تحديث المصدر وتسجيل التعديل.");
       } else if (button.hasAttribute("data-link-record")) {
         const sourceId = card.querySelector("[data-link-source]")?.value;
@@ -626,11 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
         is_public: form.get("is_public") === "on",
         notes: String(form.get("notes") || "").trim() || null
       };
-      const result = await api("/rest/v1/directory_sources", {
-        method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(source)
-      });
-      if (!Array.isArray(result) || result.length !== 1) throw new Error("لم يؤكد الخادم إضافة المصدر.");
-      await writeAudit("directory_sources", result[0].id, {}, source, "إضافة مصدر جديد");
+      await mutateWithAudit("directory_sources", "insert", null, source, "إضافة مصدر جديد");
       sourceForm.reset();
       say("تم حفظ المصدر الجديد. يمكنك ربطه بأي جهة أو مشروع أو طرح من بطاقة السجل.");
       await load();

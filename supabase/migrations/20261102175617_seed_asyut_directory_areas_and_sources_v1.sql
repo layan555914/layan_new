@@ -1,0 +1,9 @@
+-- HISTORICAL MIGRATION LEDGER MARKER ONLY — NOT ORIGINAL SQL.
+-- Production ledger version: 20261102175617
+-- Production ledger name: seed_asyut_directory_areas_and_sources_v1
+-- The original SQL body for this migration was not recovered from available Git history.
+-- This file is intentionally a no-op marker to preserve the production version/name key.
+-- A clean database is constructed by the current-state baseline migration
+-- 20261103140155_asyut_aqar_production_schema_baseline.sql, followed by the
+-- explicit reference-data seed and later incremental migrations.
+-- Do not treat this marker as a reconstruction of the historical change.
