@@ -88,14 +88,14 @@
     const style = document.createElement("style");
     style.id = "asyutShareStyles";
     style.textContent = `
-      .asyut-share-button,.asyut-item-share{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 15px;border:1px solid #c8963e;border-radius:10px;background:#102746;color:#fff;font:700 14px Tahoma,Arial,sans-serif;cursor:pointer;touch-action:manipulation}
-      .asyut-share-button{position:fixed;z-index:40;left:16px;bottom:16px;box-shadow:0 5px 18px #10274635}
+      .asyut-share-button,.asyut-item-share{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:9px 15px;border:1px solid #C98A64;border-radius:10px;background:#2B211B;color:#fff;font:700 14px Tahoma,Arial,sans-serif;cursor:pointer;touch-action:manipulation}
+      .asyut-share-button{position:fixed;z-index:40;left:16px;bottom:16px;box-shadow:0 5px 18px #2B211B35}
       .asyut-item-share{margin:10px 12px 12px}
       .asyut-category-share-wrap{display:grid;grid-template-rows:1fr auto;gap:6px;min-width:0}
       .asyut-category-share-wrap>.category-tile{width:100%;height:100%}
-      .asyut-category-share{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:7px 12px;border:1px solid #c8963e;border-radius:9px;background:#fff;color:#102746;font:700 13px Tahoma,Arial,sans-serif;cursor:pointer;touch-action:manipulation}
+      .asyut-category-share{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:7px 12px;border:1px solid #C98A64;border-radius:9px;background:#fff;color:#2B211B;font:700 13px Tahoma,Arial,sans-serif;cursor:pointer;touch-action:manipulation}
       .company-directory-card,.offer-card,.directory-card,.marketplace-listing-card,.listing-card{position:relative}
-      #asyutShareStatus{position:fixed;z-index:100;right:50%;bottom:72px;transform:translateX(50%);max-width:calc(100% - 24px);padding:10px 16px;border-radius:9px;background:#102746;color:#fff;font:14px Tahoma,Arial,sans-serif;box-shadow:0 5px 18px #10274635}
+      #asyutShareStatus{position:fixed;z-index:100;right:50%;bottom:72px;transform:translateX(50%);max-width:calc(100% - 24px);padding:10px 16px;border-radius:9px;background:#2B211B;color:#fff;font:14px Tahoma,Arial,sans-serif;box-shadow:0 5px 18px #2B211B35}
       #asyutShareStatus[hidden]{display:none}
       @media(max-width:600px){.asyut-share-button{left:12px;bottom:12px;min-height:46px}.asyut-item-share{width:calc(100% - 24px);margin:8px 12px 12px}}
     `;
