@@ -118,6 +118,35 @@ document.addEventListener("DOMContentLoaded", () => {
       target.innerHTML = rows.map(x => '<article class="admin-ad" data-property-offer-id="' + esc(x.id) + '"><div><span class="admin-chip">' + esc(x.property_type || "عقار") + ' · ' + esc(x.listing_purpose || "بيع") + '</span><h2>' + esc(x.title) + '</h2><p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + '</p><p><strong>المساحة:</strong> ' + (x.area_m2 == null ? "غير محددة" : esc(x.area_m2) + " م²") + '</p><p><strong>السعر:</strong> ' + Number(x.total_price || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه · <strong>المقدم:</strong> ' + Number(x.down_payment || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه · <strong>المدفوع:</strong> ' + Number(x.paid_amount || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه</p><p><strong>المتبقي:</strong> ' + Number(x.remaining_amount || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه · <strong>القسط:</strong> ' + Number(x.monthly_installment || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه</p><p><strong>رسوم التنازل:</strong> ' + Number(x.assignment_fee || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه · <strong>الخصم:</strong> ' + Number(x.discount_amount || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه</p><p><strong>المطور/المشروع:</strong> ' + esc(x.developer_name || "غير مسجل") + ' / ' + esc(x.project_name || "غير مسجل") + '</p><p><strong>صاحب الإعلان:</strong> ' + esc(x.contact_name || "غير مسجل") + ' · ' + esc(x.contact_phone || "لا يوجد هاتف") + '</p><p>' + esc(x.description || "") + '</p><p><strong>حالة التحقق:</strong> ' + esc(x.verification_status || "غير محددة") + ' · <strong>موافقة المطور:</strong> ' + esc(x.developer_approval_status || "غير محددة") + '</p>' + (x.verification_notes ? '<p class="admin-chip">' + esc(x.verification_notes) + '</p>' : '') + '<div class="admin-actions"><button type="button" class="btn btn-gold" data-property-action="approve">اعتماد ونشر</button><button type="button" class="btn btn-outline-dark" data-property-action="reject">رفض مع السبب</button></div></div></article>').join("");
     } catch (error) { target.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل الإعلانات العقارية.") + '</p>'; }
   }
+  async function loadTrustBadgeOffers() {
+    const target = document.getElementById("trustBadgeOffers");
+    if (!target) return;
+    target.innerHTML = '<p class="admin-empty">جارٍ تحميل الإعلانات المنشورة...</p>';
+    try {
+      const rows = await request("/rest/v1/property_offers?select=id,title,city,area,contact_name,contact_phone,developer_name,trust_badge,trust_badge_at&status=eq.available&order=created_at.desc&limit=300");
+      if (!Array.isArray(rows) || !rows.length) { target.innerHTML = '<p class="admin-empty">لا توجد إعلانات منشورة حاليًا.</p>'; return; }
+      const option = (value, label, current) => '<option value="' + value + '"' + ((current || "") === value ? " selected" : "") + '>' + label + '</option>';
+      target.innerHTML = rows.map(x => '<article class="admin-ad" data-trust-offer-id="' + esc(x.id) + '"><div><span class="admin-chip">ASY-' + esc(String(x.id).padStart(4, "0")) + '</span><h2>' + esc(x.title) + '</h2>' +
+        '<p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + ' · <strong>المعلن:</strong> ' + esc(x.contact_name || x.developer_name || "غير مسجل") + ' · ' + esc(x.contact_phone || "") + '</p>' +
+        '<div class="admin-actions"><label>الشارة <select data-trust-badge>' + option("", "بدون توثيق", x.trust_badge) + option("owner", "مالك موثّق", x.trust_badge) + option("company", "شركة موثّقة", x.trust_badge) + '</select></label>' +
+        '<button type="button" class="btn btn-gold" data-trust-save>حفظ الشارة</button></div></div></article>').join("");
+    } catch (error) {
+      target.innerHTML = '<p class="admin-empty">' + (/trust_badge/.test(String(error.message || "")) ? "يلزم تطبيق تحديث قاعدة البيانات الخاص بشارات التوثيق أولًا." : esc(error.message || "تعذر تحميل الإعلانات المنشورة.")) + '</p>';
+    }
+  }
+  document.getElementById("trustBadgeOffers")?.addEventListener("click", async event => {
+    const button = event.target.closest("[data-trust-save]");
+    const card = button?.closest("[data-trust-offer-id]");
+    if (!button || !card) return;
+    const badge = card.querySelector("[data-trust-badge]")?.value || "";
+    button.disabled = true;
+    try {
+      await request("/rest/v1/rpc/layan_admin_set_offer_trust_badge", { method: "POST", body: JSON.stringify({ p_id: Number(card.dataset.trustOfferId), p_badge: badge || null }) });
+      setStatus(badge ? "تم حفظ شارة التوثيق للإعلان." : "تمت إزالة شارة التوثيق من الإعلان.");
+    } catch (error) {
+      setStatus(error.message || "تعذر حفظ شارة التوثيق.");
+    } finally { button.disabled = false; }
+  });
   async function loadPendingPropertyDocuments() {
     if (!propertyDocsList) return;
     propertyDocsList.innerHTML = '<p class="admin-empty">جارٍ تحميل مستندات العقارات...</p>';
@@ -304,6 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadPendingMarketplaceListings();
       await loadPendingPropertyOffers();
       await loadPendingPropertyDocuments();
+      await loadTrustBadgeOffers();
       await loadPendingCompanyAds();
       await loadPendingAdSlots();
       await loadAdminUsers();
