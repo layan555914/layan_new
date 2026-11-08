@@ -15,7 +15,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://www.asyutq.com";
 const ADS_DIR = path.join(root, "ads");
 const MANIFEST = path.join(ADS_DIR, "manifest.json");
-const DEFAULT_IMAGE = SITE + "/assets/brand/og-image.jpg";
+const DEFAULT_IMAGE = SITE + "/assets/brand/og-image.jpg?v=20261108-asyutq";
 
 const STATIC_PAGES = [
   ["/", "daily", "1.0"],
