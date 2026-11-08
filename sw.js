@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v138-published-tracking-20261108";
+const CACHE_NAME = "asyut-aqar-shell-v139-owner-edits-20261108";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -48,6 +48,7 @@ const APP_SHELL = [
   "./listing-form.js",
   "./tracking.js",
   "./app-shell.js",
+  "./admin-edits.js",
   "./advertiser.html",
   "./advertiser.js",
   "./assets/brand/mascot.webp",

@@ -7,10 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta name="robots" content="noindex,nofollow">
 <title>إدارة أسيوط عقار | ASYUT AQAR</title>
-<link rel="stylesheet" href="./assets/build/base.min.css?v=5c9d42b98feee5b3">
+<link rel="stylesheet" href="./assets/build/base.min.css?v=89e6c8ee03672ccc">
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
-  <link rel="stylesheet" href="./admin.css?v=20261108-2">
+  <link rel="stylesheet" href="./admin.css?v=20261108-3">
 </head>
 <body class="adm-body">
 <header class="adm-top">
@@ -63,6 +63,7 @@
         <div class="adm-todo">
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secProperties"><strong id="statPendingProperties">—</strong><span>عقار قيد المراجعة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secMarketplace"><strong id="statPendingMarketplace">—</strong><span>خدمة قيد المراجعة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secEdits"><strong id="statPendingEdits">—</strong><span>تعديل على إعلان منشور</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanies"><strong id="statPendingCompanies">—</strong><span>ملف شركة قيد المراجعة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="requests"><strong data-requests-total>0</strong><span>طلب حذف/إيقاف ينتظر المالك</span></button>
           <button type="button" class="admin-stat adm-todo-item is-info" data-goto="published"><strong data-published-total>—</strong><span>منشور للزوار (عقارات + خدمات + شركات)</span><i hidden id="statApprovedMarketplace"></i></button>
@@ -76,12 +77,13 @@
 
     <section class="adm-view" data-view-panel="review" hidden>
       <header class="adm-view-head"><span class="adm-kicker">الخطوة 2</span><h1>المراجعة والاعتماد</h1><p>لا يظهر أي إعلان للزوار قبل اعتماده هنا. افتح كل طلب، راجع البيانات والصور والمستندات، ثم «اعتماد ونشر» أو «رفض مع السبب».</p>
-        <nav class="adm-jump" aria-label="أقسام المراجعة"><a href="#secProperties">العقارات</a><a href="#secDocuments">مستندات العقارات</a><a href="#secMarketplace">سوق الخدمات</a><a href="#secCompanies">ملفات الشركات</a><a href="#secCompanyAds">إعلانات الشركات</a><a href="#secSupplierAds">الإعلانات المميزة</a></nav>
+        <nav class="adm-jump" aria-label="أقسام المراجعة"><a href="#secProperties">العقارات</a><a href="#secDocuments">مستندات العقارات</a><a href="#secMarketplace">سوق الخدمات</a><a href="#secEdits">تعديلات الإعلانات</a><a href="#secCompanies">ملفات الشركات</a><a href="#secCompanyAds">إعلانات الشركات</a><a href="#secSupplierAds">الإعلانات المميزة</a></nav>
       </header>
       <div id="reviewPanel" hidden>
         <section class="adm-card" id="secProperties"><h2 class="adm-card-title"><i>أ</i>العقارات والتنازلات قيد المراجعة</h2><p class="adm-card-lead">كل أنواع العقارات (شقة، محل، أرض، مكتب…) للبيع أو الإيجار أو التنازل.</p><div id="pendingPropertyOffers"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secDocuments"><h2 class="adm-card-title"><i>ب</i>مستندات العقارات</h2><p class="adm-card-lead">المستندات خاصة بالإدارة ولا يراها الزوار.</p><div id="pendingPropertyDocuments"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secMarketplace"><h2 class="adm-card-title"><i>ج</i>سوق الخدمات</h2><p class="adm-card-lead">خدمات التشطيب ومواد البناء والأثاث والصيانة والاستشارات قبل النشر.</p><div id="pendingMarketplaceListings"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+        <section class="adm-card" id="secEdits"><h2 class="adm-card-title"><i>✎</i>تعديلات على إعلانات منشورة</h2><p class="adm-card-lead">صاحب الإعلان عدّل بياناته أو صوره. النسخة المنشورة تظل ظاهرة للزوار حتى تعتمد التعديل هنا.</p><div id="pendingListingEdits"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secCompanies"><h2 class="adm-card-title"><i>د</i>ملفات الشركات</h2><p class="adm-card-lead">اعتماد الملف يظهره في دليل الشركات العام.</p><div id="pendingCompanyProfiles"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secCompanyAds"><h2 class="adm-card-title"><i>هـ</i>إعلانات الشركات العقارية</h2><p class="adm-card-lead">تفعيل إعلانات الشركات بعد الاتفاق.</p><div id="pendingCompanyAds"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secSupplierAds"><h2 class="adm-card-title"><i>و</i>طلبات الإعلانات المميزة</h2><p class="adm-card-lead">طلبات «سوّق منتجاتك» والإعلانات التجارية.</p><div id="pendingAds"></div></section>
@@ -121,7 +123,7 @@
   </div>
 </div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261108-3"></script><script src="./admin.js?v=20261108-2"></script><script src="./admin-console.js?v=20261108-7"></script><script src="./admin-layout.js?v=20261108-4"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261108-3"></script><script src="./admin.js?v=20261108-2"></script><script src="./admin-console.js?v=20261108-7"></script><script src="./admin-layout.js?v=20261108-4"></script><script src="./admin-edits.js?v=20261108-1"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>

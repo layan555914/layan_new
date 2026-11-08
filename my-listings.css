@@ -108,3 +108,46 @@
     font-size: 12px;
   }
 }
+
+/* Owner editing (2026-11-08) */
+.my-listing-photos{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px}
+.my-listing-photos img{width:92px;height:70px;object-fit:cover;border-radius:9px;border:1px solid #E6DACB;flex:0 0 auto}
+.my-listing-photos img:first-child{outline:2px solid #C88762;outline-offset:1px}
+.my-listing-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #F1EAE2}
+.my-listing-actions .btn{min-height:42px;padding:8px 16px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}
+.btn-danger-soft{background:#FBF3F1;color:#9A4227;border:1px solid #EBC9BD}
+.btn-danger-soft[data-confirm="1"]{background:#9A4227;color:#fff}
+.my-listing-flag{padding:9px 11px;border-radius:9px;font-size:.92rem}
+.my-listing-flag.is-pending{background:#FFF7E6;border:1px solid #F0D9A8;color:#7A5410}
+.my-listing-hint{color:#6B5B4E;font-size:.9rem}
+.status-available{background:#e7f5ed;color:#17633a}.status-sold,.status-reserved{background:#EEE9E4;color:#5A4A3E}
+.my-edit-dialog{width:min(760px,calc(100% - 20px));max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:16px;box-shadow:0 20px 60px rgba(43,33,27,.35)}
+.my-edit-dialog::backdrop{background:rgba(43,33,27,.55)}
+.my-edit-form{display:grid;gap:14px;padding:18px}
+.my-edit-head{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:-18px;background:#fff;padding:6px 0;z-index:1}
+.my-edit-form h2{margin:0;font-size:1.15rem;color:#2B211B}
+.my-edit-close{width:40px;height:40px;border-radius:50%;border:1px solid #E6DACB;background:#fff;font-size:22px;cursor:pointer}
+.my-edit-intro{margin:0;background:#F9F2EC;border-right:3px solid #C88762;padding:10px;border-radius:8px;font-size:.92rem}
+.my-edit-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.my-edit-fields label{display:grid;gap:5px;font-size:.9rem;color:#45362C;min-width:0}
+.my-edit-fields label.is-wide{grid-column:1/-1}
+.my-edit-fields input,.my-edit-fields select,.my-edit-fields textarea{width:100%;min-height:44px;padding:10px;border:1px solid #DCD4CE;border-radius:9px;font:inherit;background:#fff}
+.my-edit-photos{border:1px solid #E6DACB;border-radius:12px;padding:12px;display:grid;gap:10px;min-width:0}
+.my-edit-photos legend{padding:0 6px;font-weight:700}
+.my-edit-photo-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.my-edit-photo-list figure{position:relative;margin:0;border-radius:10px;overflow:hidden;border:1px solid #E6DACB;background:#F7F2EC}
+.my-edit-photo-list figure.is-cover{border:2px solid #C88762}
+.my-edit-photo-list img{display:block;width:100%;height:96px;object-fit:cover}
+.my-edit-remove{position:absolute;top:5px;left:5px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(43,33,27,.8);color:#fff;font-size:18px;cursor:pointer}
+.my-edit-new{position:absolute;top:6px;right:6px;background:#17633a;color:#fff;font-size:11px;padding:2px 7px;border-radius:20px}
+.my-edit-cover,.my-edit-cover-tag{display:block;width:100%;margin:0;padding:7px 4px;border:0;font:inherit;font-size:.8rem;text-align:center}
+.my-edit-cover{background:#fff;color:#2B211B;cursor:pointer;border-top:1px solid #E6DACB}
+.my-edit-cover-tag{background:#C88762;color:#fff;font-weight:700}
+.my-edit-add{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 14px;border:1px dashed #C88762;border-radius:10px;cursor:pointer;color:#7A4A2E;font-weight:700}
+.my-edit-add input{display:none}
+.my-edit-status{margin:0;min-height:1.2em;color:#9A4227;font-weight:600}
+.my-edit-foot{display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:-18px;background:#fff;padding:10px 0}
+.my-edit-foot .btn{flex:1 1 160px;min-height:46px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer}
+@media (max-width:640px){.my-edit-form{padding:14px}.my-edit-photo-list{grid-template-columns:repeat(2,1fr)}.my-listing-actions .btn{flex:1 1 calc(50% - 8px)}}
+
+.my-listings-hero h1{color:#fff}

@@ -1290,3 +1290,11 @@ body:has(.aa-chat.is-open) .aa-mascot { visibility: hidden; }
 .aa-mascot-area-row .aa-mascot-area { border: 0; min-height: 30px; padding: 0; background: transparent; font-weight: 700; }
 .aa-mascot-locate { width: 100%; margin-top: 8px; min-height: 38px; border: 1px dashed var(--aa-terracotta); border-radius: 10px; background: #FFF8F2; color: var(--aa-terracotta); font: 700 13.5px var(--aa-body); cursor: pointer; }
 .aa-mascot-locate:disabled { opacity: .6; }
+
+/* «إعلاناتي» beside the top menu (signed-in users) */
+.aa-my-listings, header .aa-my-listings, .topbar .aa-my-listings { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 8px 16px; border-radius: 999px;
+  background: #C88762 !important; color: #fff !important; border: 0 !important; font-weight: 700; text-decoration: none; white-space: nowrap; order: 2; flex: 0 0 auto; }
+.aa-my-listings::before { content: "▤"; font-size: .9em; }
+header .aa-my-listings:hover, header .aa-my-listings[aria-current="page"] { background: #A9653F !important; }
+header .aa-my-listings[hidden], .aa-my-listings[hidden] { display: none !important; }
+@media (max-width: 640px) { .aa-my-listings { min-height: 36px; padding: 6px 12px; font-size: 13px; margin-inline-start: auto; } }
