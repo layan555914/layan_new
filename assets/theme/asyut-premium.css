@@ -1282,3 +1282,9 @@ body:has(.aa-chat.is-open) .aa-mascot { visibility: hidden; }
 }
 
 .site-credit { box-sizing: border-box; max-width: 100%; }
+
+/* Mascot: "إنت منين؟" (governorate / Assiut center) picker */
+.aa-mascot-area-label { display: grid; gap: 6px; margin-top: 10px; font-weight: 700; font-size: 13px; color: var(--aa-espresso); }
+.aa-mascot-area { width: 100%; min-height: 40px; padding: 6px 10px; border: 1px solid var(--aa-line); border-radius: 10px; background: #fff; color: var(--aa-espresso); font: inherit; font-size: 14px; }
+.aa-mascot-area-row { cursor: default; }
+.aa-mascot-area-row .aa-mascot-area { border: 0; min-height: 30px; padding: 0; background: transparent; font-weight: 700; }

@@ -32,6 +32,11 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => node.classList.remove("is-on"), 2200);
   };
 
+  const CENTERS = ["مدينة أسيوط", "أسيوط الجديدة", "مركز أسيوط", "ديروط", "القوصية", "منفلوط", "أبنوب", "الفتح", "أبو تيج", "ساحل سليم", "البداري", "صدفا", "الغنايم"];
+  const GOVS = ["القاهرة", "الجيزة", "الإسكندرية", "سوهاج", "المنيا", "قنا", "الأقصر", "أسوان", "بني سويف", "الفيوم", "الوادي الجديد", "البحر الأحمر", "القليوبية", "الشرقية", "الدقهلية", "الغربية", "المنوفية", "البحيرة", "كفر الشيخ", "دمياط", "بورسعيد", "الإسماعيلية", "السويس", "شمال سيناء", "جنوب سيناء", "مطروح", "خارج مصر"];
+  const areaSelect = current => `<select class="aa-mascot-area" aria-label="اختر مركزك أو محافظتك"><option value="">اختر مركزك أو محافظتك</option><optgroup label="محافظة أسيوط">${CENTERS.map(c => `<option value="أسيوط · ${c}" ${current === "أسيوط · " + c ? "selected" : ""}>${c}</option>`).join("")}</optgroup><optgroup label="محافظات أخرى">${GOVS.map(g => `<option value="${g}" ${current === g ? "selected" : ""}>${g}</option>`).join("")}</optgroup></select>`;
+  const saveArea = value => { if (!value) return; write("asyutHomeArea", value); window.dispatchEvent(new CustomEvent("asyut:home-area", { detail: value })); toast("شكرًا! هنعرض لك الأقرب ليك."); };
+
   function mount() {
     const root = document.createElement("div");
     root.className = "aa-mascot";
@@ -40,6 +45,7 @@
         <button type="button" class="aa-mascot-bubble-close" aria-label="إغلاق الترحيب">×</button>
         <b>أهلًا بيك في أسيوط عقار! 👋</b>
         <span>اضغط عليّ لو عندك أي سؤال: المساعد الذكي، واتساب، أو إضافة إعلانك مجانًا.</span>
+        <label class="aa-mascot-area-label">إنت منين؟ ${areaSelect(read("asyutHomeArea") || "")}</label>
       </div>
       <div class="aa-mascot-menu" id="aaMascotMenu" hidden>
         <b class="aa-mascot-menu-title">إزاي أقدر أساعدك؟</b>
@@ -48,6 +54,7 @@
         <button type="button" class="aa-mascot-action" data-mascot="signup"><span aria-hidden="true">＋</span>إنشاء حساب مجاني</button>
         <button type="button" class="aa-mascot-action" data-mascot="login"><span aria-hidden="true">⇥</span>تسجيل الدخول</button>
         <a class="aa-mascot-action" href="./?add=1"><span aria-hidden="true">⌂</span>أضف إعلانك مجانًا</a>
+        <label class="aa-mascot-action aa-mascot-area-row"><span aria-hidden="true">⌖</span>${areaSelect(read("asyutHomeArea") || "")}</label>
         <button type="button" class="aa-mascot-action" data-mascot="share"><span aria-hidden="true">⤴</span>مشاركة الصفحة</button>
       </div>
       <button type="button" class="aa-mascot-button" aria-expanded="false" aria-controls="aaMascotMenu" aria-label="المساعدة: المساعد الذكي وواتساب والحساب" title="محتاج مساعدة؟">
@@ -71,7 +78,17 @@
     };
     button.addEventListener("click", () => setOpen(menu.hidden));
     root.querySelector(".aa-mascot-bubble-close").addEventListener("click", () => { bubble.hidden = true; });
+    let keepBubble = false;
+    root.addEventListener("change", event => {
+      if (!event.target.matches(".aa-mascot-area")) return;
+      saveArea(event.target.value);
+      root.querySelectorAll(".aa-mascot-area").forEach(sel => { sel.value = event.target.value; });
+      if (!bubble.hidden) setTimeout(() => { bubble.hidden = true; }, 900);
+    });
+    bubble.addEventListener("focusin", () => { keepBubble = true; });
+    bubble.addEventListener("pointerdown", () => { keepBubble = true; });
     menu.addEventListener("click", event => {
+      if (event.target.closest(".aa-mascot-area-row")) return;
       const action = event.target.closest("[data-mascot]")?.dataset.mascot;
       if (!action) return;
       setOpen(false);
@@ -86,7 +103,7 @@
     if (!read(SEEN_KEY)) {
       root.classList.add("is-welcoming");
       setTimeout(() => { bubble.hidden = false; }, 900);
-      setTimeout(() => { bubble.hidden = true; root.classList.remove("is-welcoming"); }, 9000);
+      setTimeout(() => { if (!keepBubble) bubble.hidden = true; root.classList.remove("is-welcoming"); }, 12000);
       write(SEEN_KEY, new Date().toISOString());
     }
   }

@@ -16,7 +16,15 @@
 
   const zone = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch (_) { return ""; } })();
   const REGIONS = { "Africa/Cairo": "مصر", "Asia/Riyadh": "السعودية", "Asia/Dubai": "الإمارات", "Asia/Kuwait": "الكويت", "Asia/Qatar": "قطر", "Asia/Bahrain": "البحرين", "Asia/Muscat": "عُمان", "Asia/Amman": "الأردن", "Africa/Tripoli": "ليبيا", "Europe/London": "المملكة المتحدة" };
-  const region = REGIONS[zone] || (zone ? zone.split("/").pop().replace(/_/g, " ") : "");
+  const country = REGIONS[zone] || (zone ? zone.split("/").pop().replace(/_/g, " ") : "");
+  // Governorate / center: what the visitor chose (one tap in the mascot welcome), e.g.
+  // "أسيوط · أبنوب" or "القاهرة". Otherwise the country, with "غير محدد" for Egypt.
+  const regionNow = () => {
+    let home = "";
+    try { home = localStorage.getItem("asyutHomeArea") || ""; } catch (_) {}
+    if (home) return home.slice(0, 80);
+    return country === "مصر" ? "مصر · غير محدد" : country;
+  };
   const device = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? "موبايل" : /iPad|Tablet/i.test(navigator.userAgent) ? "تابلت" : "كمبيوتر";
   const page = (location.pathname.replace(/^\//, "") || "index.html").slice(0, 120);
   const listingId = () => {
@@ -28,7 +36,7 @@
   let disabled = false;
   function send(event, extra = {}) {
     if (disabled) return;
-    const body = JSON.stringify({ p_event: event, p_session: session, p_page: page, p_listing: extra.listing ?? null, p_target: extra.target ?? null, p_referrer: document.referrer ? new URL(document.referrer).hostname.slice(0, 120) : null, p_device: device, p_region: region || null });
+    const body = JSON.stringify({ p_event: event, p_session: session, p_page: page, p_listing: extra.listing ?? null, p_target: extra.target ?? null, p_referrer: document.referrer ? new URL(document.referrer).hostname.slice(0, 120) : null, p_device: device, p_region: regionNow() || null });
     fetch(base + "/rest/v1/rpc/layan_track_event", { method: "POST", keepalive: true, headers: { apikey: key, Authorization: "Bearer " + token(), "Content-Type": "application/json" }, body })
       .then(r => { if (r.status === 404 || r.status === 400) { disabled = true; try { store.setItem(OFF, "1"); } catch (_) {} } })
       .catch(() => {});
@@ -51,5 +59,13 @@
     if (event.target.closest("[data-favorite-id]")) send("favorite", { listing: Number(event.target.closest("[data-favorite-id]").dataset.favoriteId) || null });
     if (event.target.closest("#addOfferTop, [data-open-add-offer]")) send("add_listing_open");
   }, true);
+  // Which centers people look at: city filters on listing pages ("search" events).
+  document.addEventListener("change", event => {
+    const el = event.target;
+    if (!el.matches?.("select") || el.matches(".aa-mascot-area") || !(/city|heroArea/i.test(el.id + " " + el.name) || /المركز/.test(el.getAttribute("aria-label") || ""))) return;
+    const value = String(el.value || "").trim();
+    if (value && value.length < 40) send("search", { target: "مركز: " + value });
+  }, true);
+  window.addEventListener("asyut:home-area", () => send("search", { target: "منطقة الزائر: " + regionNow() }));
   window.addEventListener("layan-auth-state-changed", e => { if (e.detail?.authenticated) send("login"); });
 })();

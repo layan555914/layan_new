@@ -7,72 +7,121 @@
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta name="robots" content="noindex,nofollow">
 <title>إدارة أسيوط عقار | ASYUT AQAR</title>
-<link rel="stylesheet" href="./assets/build/base.min.css?v=97baff00cd855d1e">
-<style>
-.admin-wrap{width:min(980px,calc(100% - 28px));margin:28px auto 60px}
-.admin-head{background:#342922;color:#fff;border-radius:18px;padding:24px;margin-bottom:20px}
-.admin-head h1{margin:0 0 8px}.admin-head p{margin:0;color:#E7DBCF}
-.admin-panel{background:#fff;border:1px solid #F1EAE2;border-radius:16px;padding:22px;margin:16px 0}
-.admin-form{display:grid;gap:12px;max-width:480px}.admin-form label{display:grid;gap:6px}
-.admin-form input{padding:12px;border:1px solid #DCD4CE;border-radius:9px;font:inherit}
-.admin-ad{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;padding:18px 0;border-bottom:1px solid #F1EAE2}
-.admin-ad:last-child{border-bottom:0}.admin-ad h2{margin:8px 0;font-size:20px}.admin-ad p{margin:6px 0;overflow-wrap:anywhere}
-.admin-chip{background:#F6EBDF;color:#6A3E25;padding:4px 10px;border-radius:20px;font-size:12px}
-.admin-actions{display:flex;flex-direction:column;gap:8px;min-width:190px;justify-content:center}.admin-activation-fields{display:grid;gap:6px}.admin-activation-fields label{display:grid;gap:3px;font-size:12px;font-weight:700}.admin-activation-fields input{width:100%;padding:8px;border:1px solid #DCD4CE;border-radius:8px;font:inherit}
-.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.admin-stat{padding:16px;border:1px solid #ECE1D4;border-radius:12px;background:#FCFAF8}.admin-stat strong{display:block;font-size:26px;color:#342922}.admin-stat span{font-size:12px;color:#796759}@media(max-width:700px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr)}}.admin-empty{padding:22px;text-align:center;color:#796759}
-#adminStatus{padding:12px;border-radius:8px;background:#FAF7F3;min-height:24px}
-@media(max-width:640px){.admin-ad{grid-template-columns:1fr}.admin-actions{min-width:0}.admin-head{padding:18px}}
-</style>
+<link rel="stylesheet" href="./assets/build/base.min.css?v=bb9b3b8c66919236">
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
+  <link rel="stylesheet" href="./admin.css?v=20261108-1">
 </head>
-<body>
-<main class="admin-wrap">
-<header class="admin-head"><nav class="admin-topnav" aria-label="أدوات الإدارة"><a class="btn admin-back" href="./">← العودة للموقع الرئيسي</a><button class="btn admin-refresh" type="button" id="adminRefreshAll">تحديث البيانات</button></nav><h1>إدارة أسيوط عقار</h1><p>لوحة مراجعة الإعلانات والشركات والخدمات. لا تُنشر الطلبات إلا بعد مراجعة الإدارة، ولا توجد عمولة على البيع أو التنازل.</p></header>
-<section class="admin-panel admin-stats" id="adminStats" hidden aria-label="ملخص الإدارة">
-<div class="admin-stat"><strong id="statPendingProperties">—</strong><span>عقارات قيد المراجعة</span></div>
-<div class="admin-stat"><strong id="statPendingMarketplace">—</strong><span>إعلانات سوق معلقة</span></div>
-<div class="admin-stat"><strong id="statPendingCompanies">—</strong><span>طلبات شركات معلقة</span></div>
-<div class="admin-stat"><strong id="statApprovedMarketplace">—</strong><span>إعلانات سوق منشورة</span></div>
-</section>
-<section class="admin-panel admin-console" id="adminConsole" hidden aria-label="مركز التحكم">
-<nav class="admin-tabs" role="tablist">
-<button type="button" role="tab" data-admin-tab="overview" aria-selected="true">لوحة الأرقام</button>
-<button type="button" role="tab" data-admin-tab="users" aria-selected="false">المستخدمون</button>
-<button type="button" role="tab" data-admin-tab="activity" aria-selected="false">حركة العملاء والتواصل</button>
-<button type="button" role="tab" data-admin-tab="listings" aria-selected="false">الإعلانات المنشورة</button>
-<button type="button" role="tab" data-admin-tab="requests" aria-selected="false">طلبات الاعتماد <span class="admin-badge" data-requests-count hidden></span></button>
-<button type="button" role="tab" data-admin-tab="admins" aria-selected="false">صلاحيات الإدارة</button>
-<a class="admin-tab-link" href="#reviewPanel">طلبات المراجعة</a>
-</nav>
-<div class="admin-tabpanel" data-admin-panel="overview"></div>
-<div class="admin-tabpanel" data-admin-panel="users" hidden></div>
-<div class="admin-tabpanel" data-admin-panel="activity" hidden></div>
-<div class="admin-tabpanel" data-admin-panel="listings" hidden></div>
-<div class="admin-tabpanel" data-admin-panel="requests" hidden></div>
-<div class="admin-tabpanel" data-admin-panel="admins" hidden></div>
-</section>
-<section class="admin-panel" id="authPanel">
-<h2>دخول الإدارة</h2><p>استخدم حساب الإدارة المصرّح له. تسجيل الدخول وحده لا يمنح صلاحيات الإدارة.</p>
-<form id="adminLogin" class="admin-form">
+<body class="adm-body">
+<header class="adm-top">
+  <a class="adm-brand" href="./" aria-label="أسيوط عقار — الموقع الرئيسي"><img src="./assets/brand/logo-mark.svg" alt="" width="34" height="34" onerror="this.remove()"><span><b>أسيوط عقار</b><small>لوحة الإدارة</small></span></a>
+  <nav class="adm-top-actions" aria-label="أدوات الإدارة">
+    <a class="adm-btn adm-btn-ghost admin-back" href="./">← الموقع الرئيسي</a>
+    <button class="adm-btn adm-btn-ghost admin-refresh adm-when-in" type="button" id="adminRefreshAll">↻ تحديث البيانات</button>
+    <a class="adm-btn adm-btn-ghost adm-when-in" href="./directory-admin.html">الدليل العقاري</a>
+    <button class="adm-btn adm-btn-ghost adm-when-in" id="adminLogout" type="button">تسجيل الخروج</button>
+  </nav>
+</header>
+
+<main class="adm-wrap">
+<section class="adm-login" id="authPanel">
+  <div class="adm-login-card">
+    <span class="adm-kicker">ASYUT AQAR · ADMIN</span>
+    <h1>دخول الإدارة</h1>
+    <p>استخدم حساب الإدارة المصرّح له. تسجيل الدخول وحده لا يمنح صلاحيات الإدارة؛ الصلاحية يتحقق منها الخادم.</p>
+    <form id="adminLogin" class="admin-form adm-form">
 <label>البريد الإلكتروني<input id="adminEmail" type="email" required autocomplete="username"></label>
 <label>كلمة المرور<input id="adminPassword" type="password" required autocomplete="current-password"></label>
-<p style="margin:4px 0 8px;text-align:center"><a href="#" id="adminForgotPassword" style="display:inline-block;padding:12px 16px;border:2px solid #AE663D;border-radius:10px;color:#342922;font-weight:700;text-decoration:underline;background:#FCF8F3">نسيت كلمة المرور؟ اضغط هنا لاستعادة كلمة المرور</a></p>
+<p class="adm-forgot"><a href="#" id="adminForgotPassword">نسيت كلمة المرور؟</a></p>
 <button class="btn btn-gold" type="submit">تسجيل الدخول</button>
-</form></section>
-<section class="admin-panel" id="reviewPanel" hidden>
-<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center"><h2>طلبات الإعلانات المعلقة</h2><div><button class="btn btn-outline-dark" id="reloadPending" type="button">تحديث</button> <a class="btn btn-outline-dark" href="./directory-admin.html">إدارة الدليل العقاري</a> <button class="btn btn-outline-dark" id="adminLogout" type="button">تسجيل الخروج</button></div></div>
-<div id="pendingAds"></div>
-<hr><h2>طلبات ملفات الشركات</h2><p>اعتماد ملف الشركة يجعله ظاهرًا في دليل الشركات العام.</p><div id="pendingCompanyProfiles"><p class="admin-empty">جارٍ تحميل طلبات الشركات...</p></div>
-<hr><h2>طلبات سوق الخدمات والإعلانات الجديدة</h2><p>مراجعة الخدمات والمشروعات والإيجارات قبل النشر العام.</p><div id="pendingMarketplaceListings"><p class="admin-empty">جارٍ تحميل طلبات سوق الخدمات...</p></div>
-<hr><h2>العقارات والتنازلات قيد المراجعة</h2><p>بيانات تفصيلية للمراجعة الأولية؛ استخدم أزرار الاعتماد أو الرفض لتحديث حالة الإعلان.</p><div id="pendingPropertyOffers"><p class="admin-empty">جارٍ التحميل...</p></div><hr><h2>مستندات العقارات قيد المراجعة</h2><p>المستندات هنا خاصة ولا يمكن للزوار فتحها.</p><div id="pendingPropertyDocuments"><p class="admin-empty">جارٍ التحميل...</p></div>
-<hr><h2>توثيق الإعلانات المنشورة</h2><p>اختر «مالك موثّق» بعد التحقق من ملكية المعلن، أو «شركة موثّقة» بعد التحقق من الشركة. الشارة تظهر للزوار على البطاقة وصفحة الإعلان، ولا يستطيع المعلن تغييرها.</p><div id="trustBadgeOffers"><p class="admin-empty">جارٍ تحميل الإعلانات المنشورة...</p></div>
-<hr><h2>إعلانات الشركات العقارية</h2><p>مراجعة طلبات إعلانات الشركات وتفعيلها بعد الاتفاق.</p><div id="pendingCompanyAds"><p class="admin-empty">جارٍ تحميل إعلانات الشركات...</p></div>
-<hr><h2>المساحات الإعلانية</h2><p>تشغيل أو إيقاف مواضع الإعلانات التجارية على المنصة.</p><div id="pendingAdSlots"><p class="admin-empty">جارٍ تحميل المساحات الإعلانية...</p></div>
-<hr><h2>حسابات المستخدمين</h2><p>عرض الحسابات المسجلة وتاريخ التسجيل وآخر دخول. لا تتضمن هذه الصفحة تغيير كلمات المرور أو حذف الحسابات.</p><div id="adminUsers"><p class="admin-empty">جارٍ تحميل الحسابات...</p></div>
+</form>
+  </div>
 </section>
-<p id="adminStatus" role="status" aria-live="polite"></p>
+
+<div class="adm-shell admin-console" id="adminConsole" hidden>
+  <aside class="adm-side" aria-label="أقسام لوحة الإدارة">
+    <p class="adm-side-title">سير العمل اليومي</p>
+    <nav class="adm-steps">
+      <button type="button" data-view="today" aria-current="true"><i>1</i><span><b>لوحة اليوم</b><small>ما يحتاج إجراءك الآن</small></span><em data-count="today" hidden></em></button>
+      <button type="button" data-view="review"><i>2</i><span><b>المراجعة والاعتماد</b><small>عقارات · خدمات · شركات · إعلانات</small></span><em data-count="review" hidden></em></button>
+      <button type="button" data-view="requests" data-admin-tab="requests"><i>3</i><span><b>طلبات اعتماد المالك</b><small>حذف وإيقاف طلبه مدير</small></span><em data-requests-count class="admin-badge" hidden></em></button>
+      <button type="button" data-view="published" data-admin-tab="listings"><i>4</i><span><b>المنشور والتوثيق</b><small>الإعلانات الظاهرة للزوار</small></span></button>
+    </nav>
+    <p class="adm-side-title">المتابعة والتقارير</p>
+    <nav class="adm-steps">
+      <button type="button" data-view="customers" data-admin-tab="users"><i>5</i><span><b>العملاء والحسابات</b><small>ملف كل عميل وتحركاته</small></span></button>
+      <button type="button" data-view="activity" data-admin-tab="activity"><i>6</i><span><b>الزوار والتواصل</b><small>المحافظات والمراكز والاتصالات</small></span></button>
+      <button type="button" data-view="team" data-admin-tab="admins"><i>7</i><span><b>فريق الإدارة</b><small>من يدخل لوحة الإدارة</small></span></button>
+    </nav>
+  </aside>
+
+  <div class="adm-main">
+    <section class="adm-view" data-view-panel="today">
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 1</span><h1>لوحة اليوم</h1><p>ابدأ من هنا كل يوم: راجع ما ينتظر قرارك، ثم تابع أرقام الزوار والتواصل.</p></header>
+      <section class="adm-card admin-stats" id="adminStats" hidden aria-label="ما ينتظر قرارك">
+        <h2 class="adm-card-title">ما ينتظر قرارك الآن</h2>
+        <div class="adm-todo">
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secProperties"><strong id="statPendingProperties">—</strong><span>عقار قيد المراجعة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secMarketplace"><strong id="statPendingMarketplace">—</strong><span>خدمة قيد المراجعة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanies"><strong id="statPendingCompanies">—</strong><span>ملف شركة قيد المراجعة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="requests"><strong data-requests-total>0</strong><span>طلب حذف/إيقاف ينتظر المالك</span></button>
+          <div class="admin-stat adm-todo-item is-info"><strong id="statApprovedMarketplace">—</strong><span>خدمة منشورة</span></div>
+        </div>
+      </section>
+      <section class="adm-card">
+        <h2 class="adm-card-title">أرقام الزوار والتواصل</h2>
+        <div class="admin-tabpanel" data-admin-panel="overview"></div>
+      </section>
+    </section>
+
+    <section class="adm-view" data-view-panel="review" hidden>
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 2</span><h1>المراجعة والاعتماد</h1><p>لا يظهر أي إعلان للزوار قبل اعتماده هنا. افتح كل طلب، راجع البيانات والصور والمستندات، ثم «اعتماد ونشر» أو «رفض مع السبب».</p>
+        <nav class="adm-jump" aria-label="أقسام المراجعة"><a href="#secProperties">العقارات</a><a href="#secDocuments">مستندات العقارات</a><a href="#secMarketplace">سوق الخدمات</a><a href="#secCompanies">ملفات الشركات</a><a href="#secCompanyAds">إعلانات الشركات</a><a href="#secSupplierAds">الإعلانات المميزة</a></nav>
+      </header>
+      <div id="reviewPanel" hidden>
+        <section class="adm-card" id="secProperties"><h2 class="adm-card-title"><i>أ</i>العقارات والتنازلات قيد المراجعة</h2><p class="adm-card-lead">كل أنواع العقارات (شقة، محل، أرض، مكتب…) للبيع أو الإيجار أو التنازل.</p><div id="pendingPropertyOffers"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+        <section class="adm-card" id="secDocuments"><h2 class="adm-card-title"><i>ب</i>مستندات العقارات</h2><p class="adm-card-lead">المستندات خاصة بالإدارة ولا يراها الزوار.</p><div id="pendingPropertyDocuments"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+        <section class="adm-card" id="secMarketplace"><h2 class="adm-card-title"><i>ج</i>سوق الخدمات</h2><p class="adm-card-lead">خدمات التشطيب ومواد البناء والأثاث والصيانة والاستشارات قبل النشر.</p><div id="pendingMarketplaceListings"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+        <section class="adm-card" id="secCompanies"><h2 class="adm-card-title"><i>د</i>ملفات الشركات</h2><p class="adm-card-lead">اعتماد الملف يظهره في دليل الشركات العام.</p><div id="pendingCompanyProfiles"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+        <section class="adm-card" id="secCompanyAds"><h2 class="adm-card-title"><i>هـ</i>إعلانات الشركات العقارية</h2><p class="adm-card-lead">تفعيل إعلانات الشركات بعد الاتفاق.</p><div id="pendingCompanyAds"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+        <section class="adm-card" id="secSupplierAds"><h2 class="adm-card-title"><i>و</i>طلبات الإعلانات المميزة</h2><p class="adm-card-lead">طلبات «سوّق منتجاتك» والإعلانات التجارية.</p><div id="pendingAds"></div></section>
+        <div hidden><button id="reloadPending" type="button">تحديث</button></div>
+      </div>
+    </section>
+
+    <section class="adm-view" data-view-panel="requests" hidden>
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 3</span><h1>طلبات اعتماد المالك</h1><p>أي حذف أو إيقاف يطلبه مدير مضاف ينتظر هنا موافقة أحد المُلّاك قبل التنفيذ.</p></header>
+      <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="requests"></div></section>
+    </section>
+
+    <section class="adm-view" data-view-panel="published" hidden>
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 4</span><h1>المنشور والتوثيق</h1><p>كل ما يراه الزوار الآن: احذف المخالف، ووثّق المالك أو الشركة بعد التحقق، وتحكم في المساحات الإعلانية.</p></header>
+      <section class="adm-card"><h2 class="adm-card-title">الإعلانات المنشورة</h2><div class="admin-tabpanel" data-admin-panel="listings"></div></section>
+      <section class="adm-card"><h2 class="adm-card-title">توثيق المعلنين</h2><p class="adm-card-lead">«مالك موثّق» بعد التحقق من الملكية، أو «شركة موثّقة» بعد التحقق من الشركة. يظهر للزوار على البطاقة وصفحة الإعلان.</p><div id="trustBadgeOffers"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+      <section class="adm-card"><h2 class="adm-card-title">المساحات الإعلانية</h2><p class="adm-card-lead">تشغيل أو إيقاف مواضع الإعلانات التجارية على المنصة.</p><div id="pendingAdSlots"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+    </section>
+
+    <section class="adm-view" data-view-panel="customers" hidden>
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 5</span><h1>العملاء والحسابات</h1><p>كل الحسابات المسجلة ببيانات التسجيل. افتح «ملف العميل» لرؤية تحركاته واتصالاته، أو نزّلها Excel.</p></header>
+      <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="users"></div></section>
+      <details class="adm-card adm-collapse"><summary>سجل الحسابات الأساسي (أول 100 حساب)</summary><div id="adminUsers"><p class="admin-empty">جارٍ التحميل...</p></div></details>
+    </section>
+
+    <section class="adm-view" data-view-panel="activity" hidden>
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 6</span><h1>الزوار والتواصل</h1><p>من أي محافظة ومركز يأتي الزوار، وما الإعلانات التي تواصلوا بشأنها.</p></header>
+      <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="activity"></div></section>
+    </section>
+
+    <section class="adm-view" data-view-panel="team" hidden>
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 7</span><h1>فريق الإدارة</h1><p>المُلّاك يعتمدون كل شيء. المديرون المضافون يراجعون، وطلبات الحذف منهم تنتظر اعتماد المالك.</p></header>
+      <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="admins"></div></section>
+    </section>
+
+    <p id="adminStatus" class="adm-status" role="status" aria-live="polite"></p>
+  </div>
+</div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261108-2"></script><script src="./admin.js?v=20261108-2"></script><script src="./admin-console.js?v=20261108-4"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261108-2"></script><script src="./admin.js?v=20261108-2"></script><script src="./admin-console.js?v=20261108-5"></script><script src="./admin-layout.js?v=20261108-1"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT <span aria-hidden="true">|</span> All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G <span aria-hidden="true">|</span> <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
+
 </body></html>
