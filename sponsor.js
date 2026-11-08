@@ -146,7 +146,9 @@ document.addEventListener("DOMContentLoaded", () => {
     button.className = "sponsor-footer-link";
     button.textContent = "سوّق منتجاتك لعملاء أسيوط عقار";
     button.addEventListener("click", openForm);
-    footer.appendChild(button);
+    // Keep the developer credit as the very last line of the page.
+    const credit = footer.querySelector(".site-credit");
+    if (credit) footer.insertBefore(button, credit); else footer.appendChild(button);
   }
   document.querySelectorAll("[data-open-sponsor-form]").forEach(button => button.addEventListener("click", openForm));
 
