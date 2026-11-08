@@ -1,3 +1,5 @@
+// Anti-clickjacking: GitHub Pages cannot send X-Frame-Options, so the admin page refuses to run inside a frame.
+if (window.top !== window.self) { document.documentElement.style.display = "none"; try { window.top.location = window.self.location.href; } catch (_) {} }
 document.addEventListener("DOMContentLoaded", () => {
   "use strict";
   const config = window.LAYAN_CONFIG || {};
@@ -338,6 +340,9 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadPendingAdSlots();
       await loadAdminUsers();
       showState(true);
+      // admin-console.js (users, activity, admins, exports) starts once the admin check passed.
+      window.AsyutAdmin = { request, setStatus, esc, reload: () => document.getElementById("reloadPending")?.click() };
+      window.dispatchEvent(new CustomEvent("asyut:admin-ready"));
       setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
       return true;
     } catch (error) {

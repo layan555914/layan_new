@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p class="buyer-privacy-note">بيانات الميزانية والاحتياج خاصة بحسابك ولا تظهر لأصحاب الإعلانات. عند تفعيل إشعارات الهاتف، يمكن تنبيهك عند اعتماد عقار مطابق حتى إذا كانت المنصة مغلقة، بحسب دعم المتصفح ونظام الهاتف. وإن لم تفعّلها فستظل التنبيهات محفوظة داخل حسابك. المطابقة استرشادية؛ راجع تفاصيل العرض وتحقق من الالتزامات قبل الاتفاق.</p>
     </div>`;
   // The home page links to the full buyer-match tool on the offers page instead of embedding it.
-  if (document.body.classList.contains("page-home")) return;
+  if (document.body.classList.contains("page-home") || document.body.classList.contains("page-advertiser")) return;
   const offersSection = document.getElementById("offers");
   if (offersSection) offersSection.parentNode.insertBefore(root, document.getElementById("calculator") || offersSection.nextSibling);
   else document.querySelector("main")?.appendChild(root);

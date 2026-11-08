@@ -6,16 +6,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const send = document.getElementById("layanAiSend");
   const tabs = [...document.querySelectorAll("[data-ai-mode]")];
   let mode = "search";
+  document.querySelectorAll("[data-ai-suggest]").forEach(chip => chip.addEventListener("click", () => {
+    input.value = chip.textContent.trim();
+    form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event("submit", { cancelable: true }));
+  }));
   tabs.forEach(tab => tab.addEventListener("click", () => {
     mode = tab.dataset.aiMode === "admin" ? "admin" : "search";
     tabs.forEach(item => item.setAttribute("aria-pressed", String(item === tab)));
-    input.placeholder = mode === "admin" ? "اكتب سؤالًا عن تشغيل المنصة أو مراجعة الطلبات..." : "مثال: عايز شقة في أسيوط بمقدم أقل من 300 ألف...";
+    input.placeholder = mode === "admin" ? "اكتب سؤالًا عن تشغيل المنصة أو مراجعة الطلبات..." : "اسأل عن أي شيء في الموقع، أو اكتب طلبك: شقة إيجار في ديروط بمقدم 200 ألف...";
     answer.textContent = "";
   }));
   form.addEventListener("submit", async event => {
     event.preventDefault();
     const message = input.value.trim();
     if (!message) { input.focus(); return; }
+    // Customer questions are answered by the built-in site assistant (no login needed).
+    if (mode === "search" && window.AsyutAssistant) {
+      answer.className = "layan-ai-answer";
+      answer.innerHTML = window.AsyutAssistant.reply(message).html;
+      return;
+    }
     const api = window.LAYAN_SUPABASE;
     if (!api?.isAuthenticated?.()) {
       answer.className = "layan-ai-answer layan-ai-error";

@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <meta name="robots" content="noindex,nofollow">
 <title>إدارة أسيوط عقار | ASYUT AQAR</title>
-<link rel="stylesheet" href="./assets/build/base.min.css?v=c85c140869241d5d">
+<link rel="stylesheet" href="./assets/build/base.min.css?v=372755a1ceb47b7e">
 <style>
 .admin-wrap{width:min(980px,calc(100% - 28px));margin:28px auto 60px}
 .admin-head{background:#342922;color:#fff;border-radius:18px;padding:24px;margin-bottom:20px}
@@ -28,12 +28,29 @@
 </head>
 <body>
 <main class="admin-wrap">
-<header class="admin-head"><h1>إدارة أسيوط عقار</h1><p>لوحة مراجعة الإعلانات والشركات والخدمات. لا تُنشر الطلبات إلا بعد مراجعة الإدارة، ولا توجد عمولة على البيع أو التنازل.</p></header>
+<header class="admin-head"><nav class="admin-topnav" aria-label="أدوات الإدارة"><a class="btn admin-back" href="./">← العودة للموقع الرئيسي</a><button class="btn admin-refresh" type="button" id="adminRefreshAll">تحديث البيانات</button></nav><h1>إدارة أسيوط عقار</h1><p>لوحة مراجعة الإعلانات والشركات والخدمات. لا تُنشر الطلبات إلا بعد مراجعة الإدارة، ولا توجد عمولة على البيع أو التنازل.</p></header>
 <section class="admin-panel admin-stats" id="adminStats" hidden aria-label="ملخص الإدارة">
 <div class="admin-stat"><strong id="statPendingProperties">—</strong><span>عقارات قيد المراجعة</span></div>
 <div class="admin-stat"><strong id="statPendingMarketplace">—</strong><span>إعلانات سوق معلقة</span></div>
 <div class="admin-stat"><strong id="statPendingCompanies">—</strong><span>طلبات شركات معلقة</span></div>
 <div class="admin-stat"><strong id="statApprovedMarketplace">—</strong><span>إعلانات سوق منشورة</span></div>
+</section>
+<section class="admin-panel admin-console" id="adminConsole" hidden aria-label="مركز التحكم">
+<nav class="admin-tabs" role="tablist">
+<button type="button" role="tab" data-admin-tab="overview" aria-selected="true">لوحة الأرقام</button>
+<button type="button" role="tab" data-admin-tab="users" aria-selected="false">المستخدمون</button>
+<button type="button" role="tab" data-admin-tab="activity" aria-selected="false">حركة العملاء والتواصل</button>
+<button type="button" role="tab" data-admin-tab="listings" aria-selected="false">الإعلانات المنشورة</button>
+<button type="button" role="tab" data-admin-tab="requests" aria-selected="false">طلبات الاعتماد <span class="admin-badge" data-requests-count hidden></span></button>
+<button type="button" role="tab" data-admin-tab="admins" aria-selected="false">صلاحيات الإدارة</button>
+<a class="admin-tab-link" href="#reviewPanel">طلبات المراجعة</a>
+</nav>
+<div class="admin-tabpanel" data-admin-panel="overview"></div>
+<div class="admin-tabpanel" data-admin-panel="users" hidden></div>
+<div class="admin-tabpanel" data-admin-panel="activity" hidden></div>
+<div class="admin-tabpanel" data-admin-panel="listings" hidden></div>
+<div class="admin-tabpanel" data-admin-panel="requests" hidden></div>
+<div class="admin-tabpanel" data-admin-panel="admins" hidden></div>
 </section>
 <section class="admin-panel" id="authPanel">
 <h2>دخول الإدارة</h2><p>استخدم حساب الإدارة المصرّح له. تسجيل الدخول وحده لا يمنح صلاحيات الإدارة.</p>
@@ -56,5 +73,5 @@
 </section>
 <p id="adminStatus" role="status" aria-live="polite"></p>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261105-7"></script><script src="./admin.js?v=20261105-7"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261108-1"></script><script src="./admin.js?v=20261108-2"></script><script src="./admin-console.js?v=20261108-4"></script>
 </body></html>

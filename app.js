@@ -52,8 +52,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     : row?.trust_badge === "company" ? '<span class="trust-badge trust-badge-company" title="شركة تحققت منها الإدارة">شركة موثّقة</span>' : "";
   const applyUrlFilters = () => {
     const params = new URLSearchParams(window.location.search);
+    // Area landing pages (areas/<slug>.html) preset their city.
+    const preset = window.ASYUT_PRESET_FILTERS || {};
     FILTER_PARAMS.forEach(([key, id]) => {
-      const value = params.get(key);
+      const value = params.get(key) ?? preset[key] ?? null;
       const field = $(id);
       if (value != null && field) field.value = value;
     });
@@ -144,10 +146,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const selected = Array.from(photosInput.files || []);
     if (!selected.length) return;
     const invalid = selected.find(file =>
-      file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name) || file.size > 5 * 1024 * 1024
+      file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name) || file.size > 15 * 1024 * 1024
     );
     if (invalid) {
-      photosPreview.textContent = "الصورة غير صالحة: " + invalid.name + ". استخدم JPG أو JPEG وبحجم لا يتجاوز 5 ميجابايت للصورة.";
+      photosPreview.textContent = "الصورة غير صالحة: " + invalid.name + ". استخدم JPG أو JPEG وبحجم لا يتجاوز 15 ميجابايت للصورة.";
       photosInput.setCustomValidity("راجع صيغة الصور وحجمها قبل الإرسال.");
       return;
     }
@@ -252,11 +254,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     authDialog.id = "authDialog";
     authDialog.className = "details-dialog auth-dialog";
     authDialog.innerHTML = `
-      <div class="details-dialog-header"><h2 id="authTitle">تسجيل الدخول إلى أسيوط عقار</h2><button type="button" id="closeAuthDialog" aria-label="إغلاق">×</button></div>
-      <p class="auth-intro">أنشئ حسابًا مجانيًا أو سجّل الدخول لإضافة عروضك ومتابعتها.</p>
+      <div class="details-dialog-header auth-brand-head"><span class="auth-brand"><img src="./icon.svg" alt="" width="30" height="30">أسيوط عقار</span><button type="button" id="closeAuthDialog" aria-label="إغلاق">×</button></div>
+      <h2 id="authTitle" class="auth-title">تسجيل الدخول إلى أسيوط عقار</h2>
+      <p class="auth-intro" id="authIntro">سجّل الدخول لإضافة إعلاناتك ومتابعتها وحفظ العقارات.</p>
       <form id="authForm" class="auth-form">
+        <fieldset class="auth-signup-only auth-account-types" hidden>
+          <legend>نوع الحساب</legend>
+          <label class="auth-type"><input type="radio" name="authAccountType" value="seeker"><span><i aria-hidden="true">⌕</i>باحث عن عقار</span></label>
+          <label class="auth-type"><input type="radio" name="authAccountType" value="owner"><span><i aria-hidden="true">⌂</i>مالك عقار</span></label>
+          <label class="auth-type"><input type="radio" name="authAccountType" value="broker"><span><i aria-hidden="true">☺</i>وسيط عقاري</span></label>
+          <label class="auth-type"><input type="radio" name="authAccountType" value="company"><span><i aria-hidden="true">▦</i>شركة عقارية</span></label>
+        </fieldset>
+        <label class="auth-signup-only" hidden>الاسم الكامل<input id="authFullName" type="text" autocomplete="name" maxlength="80" placeholder="الاسم كما سيظهر للإدارة"></label>
+        <label class="auth-signup-only" hidden>رقم الموبايل<span class="auth-phone"><span dir="ltr">+20</span><input id="authPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" maxlength="13" placeholder="01xxxxxxxxx"></span></label>
         <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
-        <label>كلمة المرور<input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل"></label>
+        <label>كلمة المرور<span class="auth-password"><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل"><button type="button" id="authShowPassword" aria-label="إظهار كلمة المرور" aria-pressed="false">👁</button></span></label>
+        <label class="auth-signup-only auth-terms" hidden><input id="authTerms" type="checkbox"> أوافق على <a href="./terms.html" target="_blank" rel="noopener">الشروط</a> و<a href="./privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></label>
         <p id="authStatus" role="status" aria-live="polite"></p>
         <button class="btn btn-outline-dark" id="resendConfirmationBtn" type="button" hidden>إعادة إرسال رسالة التأكيد</button>
         <button class="btn btn-outline-dark auth-forgot-password" id="forgotPasswordBtn" type="button" aria-label="استعادة كلمة المرور عبر البريد الإلكتروني">نسيت كلمة المرور؟</button>
@@ -272,9 +285,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     const status = authDialog.querySelector("#authStatus");
     const resendButton = authDialog.querySelector("#resendConfirmationBtn");
     const forgotButton = authDialog.querySelector("#forgotPasswordBtn");
+    const signupOnly = [...authDialog.querySelectorAll(".auth-signup-only")];
+    const fullName = authDialog.querySelector("#authFullName");
+    const phone = authDialog.querySelector("#authPhone");
+    const terms = authDialog.querySelector("#authTerms");
+    const intro = authDialog.querySelector("#authIntro");
+    authDialog.querySelector("#authShowPassword").addEventListener("click", event => {
+      const show = password.type === "password";
+      password.type = show ? "text" : "password";
+      event.currentTarget.setAttribute("aria-pressed", String(show));
+      event.currentTarget.setAttribute("aria-label", show ? "إخفاء كلمة المرور" : "إظهار كلمة المرور");
+    });
     const paintMode = () => {
       resendButton.hidden = true;
       forgotButton.hidden = mode !== "login";
+      signupOnly.forEach(node => { node.hidden = mode !== "signup"; });
+      fullName.required = phone.required = terms.required = mode === "signup";
+      intro.textContent = mode === "login" ? "سجّل الدخول لإضافة إعلاناتك ومتابعتها وحفظ العقارات." : "ابدأ البحث عن عقار أو أضف إعلانك مجانًا. كل الحقول مطلوبة.";
       title.textContent = mode === "login" ? "تسجيل الدخول إلى أسيوط عقار" : "إنشاء حساب مجاني";
       submit.textContent = mode === "login" ? "تسجيل الدخول" : "إنشاء الحساب";
       toggle.textContent = mode === "login" ? "ليس لديك حساب؟ أنشئ حسابًا" : "لديك حساب بالفعل؟ سجّل الدخول";
@@ -332,7 +359,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           updateAuthButton();
           window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك، يمكنك الآن إضافة عرضك."); }, 450);
         } else {
-          const result = await api.signUp(email, pass);
+          const accountType = authDialog.querySelector('input[name="authAccountType"]:checked')?.value || "";
+          const name = fullName.value.trim().replace(/\s+/g, " ");
+          const mobile = phone.value.replace(/[^0-9]/g, "").replace(/^20/, "").replace(/^(?!0)/, "0");
+          if (!accountType) throw new Error("اختر نوع الحساب.");
+          if (name.length < 3) throw new Error("اكتب الاسم الكامل.");
+          if (!/^01[0125][0-9]{8}$/.test(mobile)) throw new Error("اكتب رقم موبايل مصري صحيح مثل 01012345678.");
+          if (!terms.checked) throw new Error("يلزم الموافقة على الشروط وسياسة الخصوصية.");
+          const result = await api.signUp(email, pass, { full_name: name, phone: mobile, account_type: accountType });
           if (result.needsEmailConfirmation) {
             status.textContent = "تم إنشاء الحساب بنجاح. افتح رسالة تأكيد البريد واضغط رابط التأكيد، ثم ارجع إلى منصة أسيوط عقار وسجّل الدخول. لو لم تصلك الرسالة، راجع مجلد الرسائل غير المرغوب فيها أو اضغط «إعادة إرسال رسالة التأكيد».";
             resendButton.hidden = false;
@@ -390,6 +424,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const d = ensureAuthDialog();
     d._setMode(mode);
     if (!d.open) d.showModal();
+  }
+  // Used by the mascot and by links like "./?auth=signup" from other pages.
+  window.AsyutOpenAuth = mode => openAuth(mode === "signup" ? "signup" : "login");
+  {
+    const authParam = new URLSearchParams(window.location.search).get("auth");
+    if (authParam === "login" || authParam === "signup") window.setTimeout(() => openAuth(authParam), 0);
   }
 
   function continueCompanyRegistration() {
@@ -610,8 +650,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const minBedrooms = minBedroomsRaw.trim() === "" ? null : num(minBedroomsRaw);
     const sort = $("sortFilter")?.value || "newest";
     const companyQuery = normalizeSearch($("companySearchInput")?.value || "");
+    // Advertiser page (advertiser.html?id=<owner>) shows one advertiser's listings only.
+    const ownerFilter = String(new URLSearchParams(window.location.search).get("id") || "").trim();
+    const onAdvertiserPage = document.body.classList.contains("page-advertiser");
 
     const filtered = offers.filter((o) => {
+      if (onAdvertiserPage && String(o.owner_id || "") !== ownerFilter) return false;
       const text = [
         o.title, o.city, o.area, o.property_type,
         o.description, o.developer_name
@@ -688,42 +732,58 @@ document.addEventListener("DOMContentLoaded", async () => {
       const photoCount = o.image_urls.length;
       const priceLabel = String(o.listing_purpose || "").includes("إيجار") ? "قيمة الإيجار المعلنة" : "السعر المعلن";
 
+      const purposeText = String(o.listing_purpose || "تنازل");
+      const typeText = String(o.property_type || "عقار");
+      const dealLabel = /تنازل/.test(typeText) ? typeText
+        : purposeText.includes("إيجار") ? typeText + " للإيجار"
+        : purposeText.includes("تنازل") ? typeText + " للتنازل"
+        : typeText + " للبيع";
+      const isRent = purposeText.includes("إيجار");
+      const advertiser = String(o.contact_name || o.developer_name || "").trim() || "معلن على أسيوط عقار";
+      const isCompany = Boolean(o.company_ad_id || o.trust_badge === "company" || /شركة|مكتب|للتطوير|العقارية/.test(advertiser));
+      const initial = advertiser.replace(/^(ال)/, "").trim().charAt(0) || "أ";
+      const specs = [o.area_m2 ? `${esc(o.area_m2)} م²` : "", o.bedrooms ? `${esc(o.bedrooms)} ${Number(o.bedrooms) === 2 ? "غرفتان" : "غرف"}` : "", o.bathrooms ? `${esc(o.bathrooms)} حمام` : ""].filter(Boolean);
+      const money2 = value => Math.round(num(value)).toLocaleString("en-US") + " ج.م";
+      const finance = [
+        num(o.down_payment) > 0 ? `<span>مقدم <b>${money2(o.down_payment)}</b></span>` : "",
+        num(o.remaining_amount) > 0 ? `<span>متبقي <b>${money2(o.remaining_amount)}</b></span>` : "",
+        num(o.monthly_installment) > 0 ? `<span>قسط <b>${money2(o.monthly_installment)}</b>/شهر</span>` : "",
+        isAssignment && num(o.assignment_fee) > 0 ? `<span>رسوم التنازل <b>${money2(o.assignment_fee)}</b></span>` : ""
+      ].filter(Boolean);
+      const detailsHref = "./property.html?id=" + encodeURIComponent(String(o.id));
+      const advertiserHref = o.owner_id ? "./advertiser.html?id=" + encodeURIComponent(String(o.owner_id)) : "";
+
       return `
-        <article class="offer-card">
+        <article class="offer-card listing-card${isFeatured ? " is-featured" : ""}">
           <div class="offer-card-media">
-            ${
+            <a href="${detailsHref}" class="offer-media-link" tabindex="-1" aria-hidden="true">${
               image
                 ? `<img class="offer-image" src="${esc(image)}" alt="${esc(o.title)}" loading="lazy" decoding="async">`
-                : `<div class="offer-image offer-image-placeholder"><span>ASYUT AQAR</span><small>أضف صورًا لهذا العقار</small></div>`
-            }
-            <div class="offer-card-badges">
-              <span class="offer-type">${esc(o.property_type)} · ${esc(o.listing_purpose || "تنازل")}</span>
-              ${isFeatured ? '<span class="featured-badge">★ عرض مميز</span>' : ""}
-            </div>
-            ${photoCount > 1 ? `<span class="offer-photo-count">▧ ${photoCount} صور</span>` : ""}
+                : `<div class="offer-image offer-image-placeholder"><span>ASYUT AQAR</span><small>لا توجد صور بعد</small></div>`
+            }</a>
+            <span class="listing-deal-label">${esc(dealLabel)}</span>
+            ${isFeatured ? '<span class="listing-featured">★ مميز</span>' : ""}
+            <button type="button" class="favorite-button listing-heart ${favorite ? "is-favorite" : ""}" data-favorite-id="${esc(o.id)}" aria-pressed="${favorite}" aria-label="${favorite ? "إزالة من المفضلة" : "حفظ في المفضلة"}">${favorite ? "♥" : "♡"}</button>
+            ${photoCount > 1 ? `<span class="offer-photo-count">▧ ${photoCount}</span>` : ""}
+            <button type="button" class="compare-card-button listing-compare" data-compare-id="${esc(o.id)}" aria-pressed="false" title="أضف للمقارنة">＋ قارن</button>
           </div>
           <div class="offer-card-content">
-            <div class="offer-card-topline">
-              <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
-              <span class="offer-published-badge">${postedAgo(o.created_at)}</span>
-              ${trustBadge(o)}
+            <div class="listing-head">
+              <h3><a href="${detailsHref}">${esc(o.title)}</a></h3>
+              <strong class="listing-price">${money2(o.total_price)}${isRent ? " / شهر" : ""}</strong>
             </div>
-            <h3>${esc(o.title)}</h3>
-            <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join(" · ") || "أسيوط")}</p>
-            ${o.latitude != null && o.longitude != null ? `<a class="offer-map-link" href="https://www.google.com/maps?q=${encodeURIComponent(Number(o.latitude)+","+Number(o.longitude))}" target="_blank" rel="noopener noreferrer">عرض موقع العقار على الخريطة</a>` : ""}
-            ${(o.area_m2 || o.bedrooms || o.bathrooms) ? `<p class="offer-specs">${o.area_m2 ? `<span>المساحة <b>${esc(o.area_m2)} م²</b></span>` : ""}${o.bedrooms ? `<span>غرف النوم <b>${esc(o.bedrooms)}</b></span>` : ""}${o.bathrooms ? `<span>الحمامات <b>${esc(o.bathrooms)}</b></span>` : ""}</p>` : ""}
-            <div class="offer-price-main"><span>${priceLabel}</span><strong>${money(o.total_price)}</strong></div>
-            <div class="offer-details">
-              ${num(o.down_payment)>0 ? `<div><span>المقدم عند التعاقد</span><strong>${money(o.down_payment)}</strong></div>` : ""}
-              ${num(o.paid_amount)>0 ? `<div><span>إجمالي المدفوع</span><strong>${money(o.paid_amount)}</strong></div>` : ""}
-              ${num(o.remaining_amount)>0 ? `<div><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></div>` : ""}
-              ${o.monthly_installment ? `<div><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></div>` : ""}
-              ${isAssignment ? `<div><span>رسوم التنازل</span><strong>${num(o.assignment_fee)>0 ? money(o.assignment_fee) : "تحدد من الجهة المختصة"}</strong></div>` : ""}
-            </div>
-            <div class="offer-card-actions">
-              <button type="button" class="favorite-button ${favorite ? "is-favorite" : ""}" data-favorite-id="${esc(o.id)}" aria-pressed="${favorite}" aria-label="${favorite ? "إزالة من المفضلة" : "حفظ في المفضلة"}">${favorite ? "★ محفوظ" : "☆ حفظ"}</button>
-              <button type="button" class="compare-card-button" data-compare-id="${esc(o.id)}" aria-pressed="false">＋ قارن</button>
-              <a class="details-button" href="./property.html?id=${encodeURIComponent(String(o.id))}">عرض التفاصيل</a>
+            <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join("، ") || "أسيوط")}</p>
+            ${specs.length ? `<p class="listing-specs">${specs.join(" <i>•</i> ")}</p>` : ""}
+            ${finance.length ? `<p class="listing-finance">${finance.join("")}</p>` : ""}
+            <p class="listing-meta"><span>${esc(offerCode(o))}</span><span>${postedAgo(o.created_at)}</span>${trustBadge(o)}</p>
+            <div class="listing-footer">
+              <div class="listing-advertiser">
+                <span class="listing-avatar${isCompany ? " is-company" : ""}" aria-hidden="true">${isCompany ? "▦" : esc(initial)}</span>
+                <div><b>${esc(advertiser)}</b>${advertiserHref ? `<a href="${advertiserHref}">كل إعلانات المعلن</a>` : ""}</div>
+              </div>
+              <div class="listing-actions">
+                <a class="details-button" href="${detailsHref}">عرض التفاصيل</a>
+              </div>
             </div>
           </div>
         </article>`;
@@ -1344,8 +1404,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       setStatus("لأمان المنصة، ارفع الصور بصيغة JPG أو JPEG فقط.");
       return;
     }
-    if (files.some((file) => file.size > 5 * 1024 * 1024)) {
-      setStatus("حجم الصورة الواحدة يجب ألا يتجاوز 5 ميجابايت.");
+    if (files.some((file) => file.size > 15 * 1024 * 1024)) {
+      setStatus("حجم الصورة الواحدة يجب ألا يتجاوز 15 ميجابايت.");
       return;
     }
 
@@ -1465,6 +1525,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       offers = rows.map(normalize);
+      window.ASYUT_OFFERS = offers.slice();
+      window.dispatchEvent(new CustomEvent("asyut:offers-loaded"));
       updateAreaFilter();
       applyUrlFilters();
       renderCompanies();
