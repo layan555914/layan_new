@@ -215,7 +215,7 @@
     if (lrow && t.closest("[data-listing-delete]")) {
       if (!confirm("حذف هذا الإعلان نهائيًا من المنصة؟ لا يمكن التراجع عن الحذف.")) return;
       try {
-        await rpc(lrow.dataset.kind === "offer" ? "layan_admin_delete_property_offer" : "layan_admin_delete_marketplace_listing", { p_id: Number(lrow.dataset.listing) });
+        await rpc(lrow.dataset.kind === "offer" ? "layan_admin_delete_property_offer" : "layan_admin_delete_marketplace_listing", { p_id: lrow.dataset.kind === "offer" ? Number(lrow.dataset.listing) : String(lrow.dataset.listing) });
         A.setStatus("تم حذف الإعلان."); loadListings();
       } catch (e) { A.setStatus(needsMigration(e) ? "حذف الإعلانات يحتاج تطبيق تحديث قاعدة البيانات أولًا." : e.message); }
       return;

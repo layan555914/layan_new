@@ -736,7 +736,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const typeText = String(o.property_type || "عقار");
       const dealLabel = /تنازل/.test(typeText) ? typeText
         : purposeText.includes("إيجار") ? typeText + " للإيجار"
-        : purposeText.includes("تنازل") ? typeText + " تنازل"
+        : purposeText.includes("تنازل") ? typeText + " للتنازل"
         : typeText + " للبيع";
       const isRent = purposeText.includes("إيجار");
       const advertiser = String(o.contact_name || o.developer_name || "").trim() || "معلن على أسيوط عقار";

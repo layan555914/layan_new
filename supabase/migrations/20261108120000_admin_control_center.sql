@@ -14,17 +14,24 @@ CREATE TABLE IF NOT EXISTS private.layan_admin_members (
 );
 REVOKE ALL ON private.layan_admin_members FROM PUBLIC, anon, authenticated;
 
--- Keep the existing admin rule under a new name and extend it with the members table.
+-- Keep the existing admin rule exactly as it is (copied to layan_is_admin_base), then extend
+-- private.layan_is_admin() IN PLACE. Replacing in place keeps the same function OID, so every
+-- existing RLS policy and RPC that calls it also accepts the admins added from the admin page.
 DO $do$
+DECLARE
+  v_def text;
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
     WHERE n.nspname = 'private' AND p.proname = 'layan_is_admin_base'
   ) THEN
-    ALTER FUNCTION private.layan_is_admin() RENAME TO layan_is_admin_base;
+    v_def := pg_get_functiondef('private.layan_is_admin()'::regprocedure);
+    v_def := regexp_replace(v_def, 'FUNCTION private\.layan_is_admin\(\)', 'FUNCTION private.layan_is_admin_base()');
+    EXECUTE v_def;
   END IF;
 END
 $do$;
+REVOKE ALL ON FUNCTION private.layan_is_admin_base() FROM PUBLIC, anon;
 
 CREATE OR REPLACE FUNCTION private.layan_is_admin()
 RETURNS boolean
@@ -175,11 +182,12 @@ SECURITY DEFINER
 SET search_path = ''
 AS $function$
 BEGIN
-  IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
-    RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING ERRCODE = '42501';
+  -- Owner-only: admins added from the admin page cannot suspend/delete accounts or change admins.
+  IF auth.uid() IS NULL OR NOT COALESCE(private.layan_is_admin_base(), false) THEN
+    RAISE EXCEPTION 'هذا الإجراء متاح لمالك المنصة فقط' USING ERRCODE = '42501';
   END IF;
   IF p_user = auth.uid() THEN RAISE EXCEPTION 'لا يمكنك إيقاف حسابك' USING ERRCODE = '22023'; END IF;
-  UPDATE auth.users SET banned_until = CASE WHEN p_suspended THEN 'infinity'::timestamptz ELSE NULL END WHERE id = p_user;
+  UPDATE auth.users SET banned_until = CASE WHEN p_suspended THEN now() + interval '100 years' ELSE NULL END WHERE id = p_user;
 END
 $function$;
 
@@ -190,8 +198,9 @@ SECURITY DEFINER
 SET search_path = ''
 AS $function$
 BEGIN
-  IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
-    RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING ERRCODE = '42501';
+  -- Owner-only: admins added from the admin page cannot suspend/delete accounts or change admins.
+  IF auth.uid() IS NULL OR NOT COALESCE(private.layan_is_admin_base(), false) THEN
+    RAISE EXCEPTION 'هذا الإجراء متاح لمالك المنصة فقط' USING ERRCODE = '42501';
   END IF;
   IF p_user = auth.uid() THEN RAISE EXCEPTION 'لا يمكنك حذف حسابك من هنا' USING ERRCODE = '22023'; END IF;
   DELETE FROM auth.users WHERE id = p_user;
@@ -213,7 +222,7 @@ BEGIN
 END
 $function$;
 
-CREATE OR REPLACE FUNCTION public.layan_admin_delete_marketplace_listing(p_id bigint)
+CREATE OR REPLACE FUNCTION public.layan_admin_delete_marketplace_listing(p_id uuid)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -252,8 +261,9 @@ AS $function$
 DECLARE
   v_user uuid;
 BEGIN
-  IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
-    RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING ERRCODE = '42501';
+  -- Owner-only: admins added from the admin page cannot suspend/delete accounts or change admins.
+  IF auth.uid() IS NULL OR NOT COALESCE(private.layan_is_admin_base(), false) THEN
+    RAISE EXCEPTION 'هذا الإجراء متاح لمالك المنصة فقط' USING ERRCODE = '42501';
   END IF;
   SELECT id INTO v_user FROM auth.users WHERE lower(email) = lower(btrim(p_email)) LIMIT 1;
   IF v_user IS NULL THEN RAISE EXCEPTION 'لا يوجد حساب بهذا البريد' USING ERRCODE = 'P0002'; END IF;
@@ -277,7 +287,7 @@ BEGIN
     'public.layan_admin_set_user_suspended(uuid, boolean)',
     'public.layan_admin_delete_user(uuid)',
     'public.layan_admin_delete_property_offer(bigint)',
-    'public.layan_admin_delete_marketplace_listing(bigint)',
+    'public.layan_admin_delete_marketplace_listing(uuid)',
     'public.layan_admin_list_admins()',
     'public.layan_admin_set_admin(text, boolean)'
   ] LOOP
