@@ -425,6 +425,33 @@
   }
   if (typeof window !== "undefined") window.LAYAN_WATERMARK = drawWatermark;
 
+  // Phones often give PNG screenshots, HEIC/HEIF or WebP photos. Convert any image the browser can
+  // read to a real JPEG before the JPEG-only checks and upload, instead of rejecting it.
+  async function toJpeg(file) {
+    if (!file || !/^image\//i.test(file.type || "") && !/\.(heic|heif|png|webp|jpe?g)$/i.test(file.name || "")) return file;
+    try {
+      const head = new Uint8Array(await file.slice(0, 3).arrayBuffer());
+      if (head[0] === 0xFF && head[1] === 0xD8 && head[2] === 0xFF) {
+        return /\.jpe?g$/i.test(file.name) && file.type === "image/jpeg" ? file : new File([file], String(file.name || "photo").replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+      }
+      if (typeof createImageBitmap !== "function" || typeof document === "undefined") return file;
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(bitmap.height * scale);
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      bitmap.close?.();
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.9));
+      return blob ? new File([blob], String(file.name || "photo").replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" }) : file;
+    } catch (_) {
+      return file;
+    }
+  }
+  if (typeof window !== "undefined") window.LAYAN_TO_JPEG = toJpeg;
+
   async function watermarkJpeg(file) {
     if (typeof createImageBitmap !== "function" || typeof document === "undefined") return file;
     const bitmap = await createImageBitmap(file);

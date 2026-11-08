@@ -146,10 +146,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const selected = Array.from(photosInput.files || []);
     if (!selected.length) return;
     const invalid = selected.find(file =>
-      file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name) || file.size > 15 * 1024 * 1024
+      !(/^image\//i.test(file.type || "") || /\.(jpe?g|png|heic|heif|webp)$/i.test(file.name || "")) || file.size > 15 * 1024 * 1024
     );
     if (invalid) {
-      photosPreview.textContent = "الصورة غير صالحة: " + invalid.name + ". استخدم JPG أو JPEG وبحجم لا يتجاوز 15 ميجابايت للصورة.";
+      photosPreview.textContent = "الصورة غير صالحة: " + invalid.name + ". اختر صورة (JPG أو PNG أو HEIC) بحجم لا يتجاوز 15 ميجابايت.";
       photosInput.setCustomValidity("راجع صيغة الصور وحجمها قبل الإرسال.");
       return;
     }
@@ -1398,10 +1398,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const files = Array.from(photosInput?.files || []);
+    // PNG / HEIC / WebP photos from phones are converted to JPEG here instead of being rejected.
+    const files = await Promise.all(Array.from(photosInput?.files || []).map(file => (window.LAYAN_TO_JPEG ? window.LAYAN_TO_JPEG(file) : file)));
     const documentFiles = Array.from(documentsInput?.files || []);
     if (files.some((file) => file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name))) {
-      setStatus("لأمان المنصة، ارفع الصور بصيغة JPG أو JPEG فقط.");
+      setStatus("تعذر قراءة إحدى الصور. جرّب صورة أخرى أو التقطها بالكاميرا.");
       return;
     }
     if (files.some((file) => file.size > 15 * 1024 * 1024)) {
