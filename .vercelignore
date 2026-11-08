@@ -1,0 +1,10 @@
+# Not part of the public website (kept in GitHub only)
+_review/
+supabase/
+tests/
+test-results/
+scripts/
+node_modules/
+playwright.config.mjs
+*.md
+DIRECTORY_SCHEMA_DRAFT.sql
