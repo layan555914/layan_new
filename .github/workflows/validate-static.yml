@@ -174,7 +174,9 @@ jobs:
             vm.runInNewContext(configSource, context, { timeout: 1000 });
             return context.window.LAYAN_CONFIG;
           }
-          const productionConfig = configForHost('layan-eg.com');
+          const productionConfig = configForHost('www.asyutq.com');
+          const apexConfig = configForHost('asyutq.com');
+          if (apexConfig.ENVIRONMENT !== 'production') errors.push('asyutq.com must use the production Supabase project');
           const previewConfig = configForHost('maps-preview.vercel.app');
           if (productionConfig.ENVIRONMENT !== 'production' ||
               productionConfig.SUPABASE_URL !== 'https://ebyhwqkmhxbgocngpqfe.supabase.co') {
@@ -345,7 +347,7 @@ jobs:
 
           if (fs.existsSync('CNAME')) {
             const cname = fs.readFileSync('CNAME', 'utf8').trim();
-            if (cname !== 'layan-eg.com') errors.push('Unexpected CNAME value: ' + cname);
+            if (cname !== 'www.asyutq.com') errors.push('Unexpected CNAME value: ' + cname);
           } else {
             errors.push('CNAME file is missing');
           }

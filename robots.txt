@@ -6,4 +6,4 @@ Disallow: /my-listings.html
 Disallow: /reset-password.html
 Disallow: /favorites.html
 
-Sitemap: https://layan-eg.com/sitemap.xml
+Sitemap: https://www.asyutq.com/sitemap.xml

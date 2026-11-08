@@ -16,7 +16,7 @@ custom SMTP sender (for example Resend or Brevo, both with free tiers) under Aut
 
 ## Reset password link works in any browser (important for phones)
 
-`reset-password.html` links straight to `https://layan-eg.com/reset-password.html?token_hash={{ .TokenHash }}&type=recovery`
+`reset-password.html` links straight to `https://www.asyutq.com/reset-password.html?token_hash={{ .TokenHash }}&type=recovery`
 instead of `{{ .ConfirmationURL }}`. The page verifies the one-time token itself, so the link works even when the
 email is opened in Gmail's in-app browser or on another device (the PKCE verifier lives only in the browser that
 requested the reset). A mail scanner that only loads the link no longer burns the token on Supabase's /verify GET.

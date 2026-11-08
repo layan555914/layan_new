@@ -2,7 +2,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 
 const source = fs.readFileSync(new URL("../../config.js", import.meta.url), "utf8");
-const context = { window: { location: { hostname: "layan-eg.com" } } };
+const context = { window: { location: { hostname: "www.asyutq.com" } } };
 vm.runInNewContext(source, context, { timeout: 1000 });
 
 const config = context.window.LAYAN_CONFIG || {};

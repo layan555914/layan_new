@@ -189,11 +189,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       await navigator.share({
         title: "ASYUT AQAR | أسيوط عقار",
         text: "اكتشف عروض التنازل العقاري على منصة أسيوط عقار",
-        url: "https://layan-eg.com/"
+        url: "https://www.asyutq.com/"
       });
     } catch (error) {
       if (error?.name !== "AbortError") {
-        const shareUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent("https://layan-eg.com/");
+        const shareUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent("https://www.asyutq.com/");
         window.open(shareUrl, "_blank", "noopener,noreferrer");
       }
     }
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const instagramShareLink = $("instagramShareLink");
   instagramShareLink?.addEventListener("click", async (event) => {
     event.preventDefault();
-    const siteUrl = "https://layan-eg.com/";
+    const siteUrl = "https://www.asyutq.com/";
     // Open on the direct tap to avoid mobile popup blockers.
     window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
     try {
