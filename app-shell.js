@@ -50,6 +50,30 @@
     }).catch(() => {});
   }
 
-  const start = () => { mountNav(); keepUpdated(); };
+  // «إعلاناتي» beside the top menu for signed-in users (index.html has its own button).
+  function signedIn() {
+    try {
+      const s = JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null");
+      return Boolean(s && s.access_token && (!s.expires_at || s.expires_at * 1000 > Date.now() - 7 * 24 * 3600 * 1000));
+    } catch (_) { return false; }
+  }
+  function mountMyListings() {
+    const nav = document.querySelector(".topbar nav, header nav");
+    if (!nav) return;
+    let link = document.querySelector(".aa-my-listings");
+    const show = signedIn() && !document.getElementById("myListingsLink");
+    if (!show) { if (link) link.hidden = true; return; }
+    if (!link) {
+      link = document.createElement("a");
+      link.className = "aa-my-listings";
+      link.href = "./my-listings.html";
+      link.textContent = "إعلاناتي";
+      if (/my-listings/.test(location.pathname)) link.setAttribute("aria-current", "page");
+      nav.insertAdjacentElement("afterend", link);
+    }
+    link.hidden = false;
+  }
+
+  const start = () => { mountNav(); keepUpdated(); mountMyListings(); window.addEventListener("layan:auth-ready", mountMyListings); window.addEventListener("layan-auth-state-changed", mountMyListings); window.addEventListener("focus", mountMyListings); };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();

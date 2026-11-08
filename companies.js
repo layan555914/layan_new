@@ -36,7 +36,7 @@ async function loadMyProfile(){
  }catch(e){status.textContent="تعذر التأكد من وجود ملف شركة سابق. لن نسمح بإنشاء طلب جديد قبل حل المشكلة. "+(e.message||"");console.warn("Company profile lookup:",e);return false}
 }
 async function open(){try{await verifiedSession();if(!profileLookupComplete){const ok=await loadMyProfile();if(!ok){dialog.showModal();return}}dialog.showModal()}catch(_){sessionStorage.setItem("layanCompanyRegistrationPending","1");window.location.href="./?company-register=1"}}
-$("companyRegisterOpen")?.addEventListener("click",open);$("companyRegisterOpenBottom")?.addEventListener("click",open);$("companyDialogClose")?.addEventListener("click",()=>dialog.close());dialog?.addEventListener("click",e=>{if(e.target===dialog)dialog.close()});$("companyDirectorySearch")?.addEventListener("input",render);$("companyCategoryFilter")?.addEventListener("change",render);
+$("companyRegisterOpen")?.addEventListener("click",open);if(new URLSearchParams(location.search).get("edit")==="1")setTimeout(open,300);$("companyRegisterOpenBottom")?.addEventListener("click",open);$("companyDialogClose")?.addEventListener("click",()=>dialog.close());dialog?.addEventListener("click",e=>{if(e.target===dialog)dialog.close()});$("companyDirectorySearch")?.addEventListener("input",render);$("companyCategoryFilter")?.addEventListener("change",render);
 form?.addEventListener("submit",async e=>{
 e.preventDefault();if(!form.reportValidity())return;
 try{await verifiedSession()}catch(err){status.textContent=err.message||"سجّل الدخول أولًا ثم أعد المحاولة.";return}
