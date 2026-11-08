@@ -105,7 +105,7 @@
   const listingCell = (id, map) => id ? `<a href="./property.html?id=${esc(id)}" target="_blank">ASY-${String(id).padStart(4, "0")}</a>${map?.get(Number(id)) ? " · " + esc(map.get(Number(id))) : ""}` : "";
   const detailText = e => {
     const t = String(e.target || "");
-    if (!t || t === location.hostname || /(^|\.)layan-eg\.com$/.test(t)) return "";
+    if (!t || t === location.hostname || /(^|\.)(layan-eg|asyutq)\.com$/.test(t)) return "";
     if (e.event_type === "contact_call") return "اتصال بشأن: " + t;
     if (e.event_type === "contact_whatsapp") return "واتساب بشأن: " + t;
     return t;
