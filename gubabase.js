@@ -568,12 +568,7 @@
       ["pending", "active"].includes(row.status)
     );
     if (matching) {
-      const linked = await request(
-        "property_offers?select=id&company_ad_id=eq." + encodeURIComponent(matching.id)
-      );
-      if ((Array.isArray(linked) ? linked.length : 0) >= 3) {
-        throw new Error("وصل إعلان الشركة إلى الحد الأقصى: 3 عقارات في الإعلان الواحد. لا يمكن إضافة عقار رابع إلى الإعلان نفسه.");
-      }
+      // A company ad can link any number of properties.
       return matching.id;
     }
     const created = await request("company_property_ads", {

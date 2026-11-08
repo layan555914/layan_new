@@ -46,6 +46,7 @@
         <b>أهلًا بيك في أسيوط عقار! 👋</b>
         <span>اضغط عليّ لو عندك أي سؤال: المساعد الذكي، واتساب، أو إضافة إعلانك مجانًا.</span>
         <label class="aa-mascot-area-label">إنت منين؟ ${areaSelect(read("asyutHomeArea") || "")}</label>
+        <button type="button" class="aa-mascot-locate" data-mascot-locate>📍 حدد مكاني تلقائيًا</button>
       </div>
       <div class="aa-mascot-menu" id="aaMascotMenu" hidden>
         <b class="aa-mascot-menu-title">إزاي أقدر أساعدك؟</b>
@@ -54,6 +55,7 @@
         <button type="button" class="aa-mascot-action" data-mascot="signup"><span aria-hidden="true">＋</span>إنشاء حساب مجاني</button>
         <button type="button" class="aa-mascot-action" data-mascot="login"><span aria-hidden="true">⇥</span>تسجيل الدخول</button>
         <a class="aa-mascot-action" href="./?add=1"><span aria-hidden="true">⌂</span>أضف إعلانك مجانًا</a>
+        <button type="button" class="aa-mascot-action" data-mascot-locate><span aria-hidden="true">📍</span>حدد مكاني تلقائيًا</button>
         <label class="aa-mascot-action aa-mascot-area-row"><span aria-hidden="true">⌖</span>${areaSelect(read("asyutHomeArea") || "")}</label>
         <button type="button" class="aa-mascot-action" data-mascot="share"><span aria-hidden="true">⤴</span>مشاركة الصفحة</button>
       </div>
@@ -85,6 +87,22 @@
       root.querySelectorAll(".aa-mascot-area").forEach(sel => { sel.value = event.target.value; });
       if (!bubble.hidden) setTimeout(() => { bubble.hidden = true; }, 900);
     });
+    root.addEventListener("click", async event => {
+      const btn = event.target.closest("[data-mascot-locate]");
+      if (!btn) return;
+      event.stopPropagation();
+      keepBubble = true;
+      if (!window.AsyutLocate) { toast("اختر مركزك من القائمة."); return; }
+      btn.disabled = true;
+      try {
+        const name = await window.AsyutLocate();
+        root.querySelectorAll(".aa-mascot-area").forEach(sel => { if ([...sel.options].some(o => o.value === name)) sel.value = name; });
+        toast("تم: " + name);
+        setTimeout(() => { bubble.hidden = true; }, 900);
+      } catch (_) {
+        toast("لم نتمكن من تحديد المكان. اختر مركزك من القائمة.");
+      } finally { btn.disabled = false; }
+    }, true);
     bubble.addEventListener("focusin", () => { keepBubble = true; });
     bubble.addEventListener("pointerdown", () => { keepBubble = true; });
     menu.addEventListener("click", event => {
