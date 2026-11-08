@@ -39,19 +39,19 @@
       <div class="aa-mascot-bubble" role="status" hidden>
         <button type="button" class="aa-mascot-bubble-close" aria-label="إغلاق الترحيب">×</button>
         <b>أهلًا بيك في أسيوط عقار! 👋</b>
-        <span>أنا هنا أساعدك تلاقي عقارك أو تعرض عقارك مجانًا.</span>
+        <span>اضغط عليّ لو عندك أي سؤال: المساعد الذكي، واتساب، أو إضافة إعلانك مجانًا.</span>
       </div>
       <div class="aa-mascot-menu" id="aaMascotMenu" hidden>
         <b class="aa-mascot-menu-title">إزاي أقدر أساعدك؟</b>
+        <button type="button" class="aa-mascot-action is-primary" data-mascot="assistant"><span aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.1 0-2.2-.2-3.1-.6L4 20l1.3-3.8C4.5 14.8 4 13.2 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/></svg></span><em>اسأل المساعد الذكي<small>إجابة فورية عن العقارات والخدمات والإعلان</small></em></button>
         <a class="aa-mascot-action is-wa" href="${WA}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">✆</span>تواصل معنا على واتساب</a>
         <button type="button" class="aa-mascot-action" data-mascot="signup"><span aria-hidden="true">＋</span>إنشاء حساب مجاني</button>
         <button type="button" class="aa-mascot-action" data-mascot="login"><span aria-hidden="true">⇥</span>تسجيل الدخول</button>
         <a class="aa-mascot-action" href="./?add=1"><span aria-hidden="true">⌂</span>أضف إعلانك مجانًا</a>
-        <button type="button" class="aa-mascot-action" data-mascot="assistant"><span aria-hidden="true">✦</span>اسأل مساعد أسيوط عقار</button>
         <button type="button" class="aa-mascot-action" data-mascot="share"><span aria-hidden="true">⤴</span>مشاركة الصفحة</button>
       </div>
-      <button type="button" class="aa-mascot-button" aria-expanded="false" aria-controls="aaMascotMenu" aria-label="تميمة أسيوط عقار: افتح قائمة المساعدة">
-        <picture><source srcset="./assets/brand/mascot.webp" type="image/webp"><img src="./assets/brand/mascot.png" alt="" width="313" height="360" decoding="async"></picture>
+      <button type="button" class="aa-mascot-button" aria-expanded="false" aria-controls="aaMascotMenu" aria-label="المساعدة: المساعد الذكي وواتساب والحساب" title="محتاج مساعدة؟">
+        <span class="aa-mascot-badge" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.1 0-2.2-.2-3.1-.6L4 20l1.3-3.8C4.5 14.8 4 13.2 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/></svg></span><picture><source srcset="./assets/brand/mascot.webp" type="image/webp"><img src="./assets/brand/mascot.png" alt="" width="313" height="360" decoding="async"></picture>
       </button>`;
     document.body.appendChild(root);
     const button = root.querySelector(".aa-mascot-button");

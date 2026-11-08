@@ -191,7 +191,7 @@
     root.id = "aaChat";
     root.className = "aa-chat";
     root.innerHTML = `
-      <button type="button" class="aa-chat-toggle" aria-expanded="false" aria-controls="aaChatPanel"><span aria-hidden="true">✦</span> مساعد أسيوط عقار</button>
+      <button type="button" class="aa-chat-toggle" aria-expanded="false" aria-controls="aaChatPanel" aria-label="اسأل مساعد أسيوط عقار" title="اسأل مساعد أسيوط عقار"><span class="aa-chat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.1 0-2.2-.2-3.1-.6L4 20l1.3-3.8C4.5 14.8 4 13.2 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/><path d="M12 8.2l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="currentColor" stroke="none"/></svg><i class="aa-chat-dot"></i></span><span class="aa-chat-label">اسأل المساعد</span></button>
       <section class="aa-chat-panel" id="aaChatPanel" hidden aria-label="مساعد أسيوط عقار">
         <header class="aa-chat-head"><div><b>مساعد أسيوط عقار</b><small>اسأل عن أي شيء في الموقع</small></div><button type="button" class="aa-chat-close" aria-label="إغلاق المساعد">×</button></header>
         <div class="aa-chat-log" role="log" aria-live="polite"></div>
@@ -200,6 +200,13 @@
       </section>`;
     document.body.appendChild(root);
     const toggle = root.querySelector(".aa-chat-toggle");
+    let lastY = window.scrollY;
+    window.addEventListener("scroll", () => {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) < 12) return;
+      root.classList.toggle("is-compact", y > 320 && y > lastY);
+      lastY = y;
+    }, { passive: true });
     const panel = root.querySelector(".aa-chat-panel");
     const log = root.querySelector(".aa-chat-log");
     const input = root.querySelector("input");

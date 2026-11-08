@@ -1223,3 +1223,44 @@ body .admin-note { color: #8A7B6F; font-size: 12.5px; }
 .site-credit a:hover { opacity: 1; color: #c76b4a; }
 .site-credit-footer { padding: 6px 16px 22px; background: transparent; color: #6f5b4b; }
 @media (max-width: 760px) { .site-credit { font-size: 11.5px; } .site-credit span { margin: 0 .3em; } }
+
+/* Assistant button v2: recognizable chat icon + clear label ("extended" button that
+   shrinks to a round chat icon while scrolling down and expands again on scroll up). */
+.aa-chat-toggle { width: auto; height: 54px; min-height: 54px; padding: 0 20px 0 8px; gap: 10px; font-size: 15px; border-radius: 999px;
+  justify-content: flex-start; overflow: hidden; transition: padding .25s ease, gap .25s ease, box-shadow .2s ease, transform .2s ease; }
+.aa-chat-toggle::after { content: none; display: none; }
+.aa-chat-toggle:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(43, 33, 27, .36); }
+.aa-chat-toggle:focus-visible { outline: 3px solid var(--aa-peach); outline-offset: 3px; }
+.aa-chat-ico { position: relative; flex: 0 0 auto; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--aa-terracotta); color: #fff; font-size: 0; }
+.aa-chat-toggle .aa-chat-ico { color: #fff; }
+.aa-chat-ico svg { width: 22px; height: 22px; display: block; }
+.aa-chat-dot { position: absolute; top: 1px; right: 1px; width: 10px; height: 10px; border-radius: 50%; background: #3fb36b; border: 2px solid var(--aa-espresso); }
+.aa-chat-label { color: var(--aa-sand); font-family: var(--aa-head); font-weight: 700; font-size: 15px; white-space: nowrap; max-width: 160px; opacity: 1; transition: max-width .25s ease, opacity .2s ease; }
+.aa-chat.is-compact .aa-chat-toggle { padding: 0 7px; gap: 0; }
+.aa-chat.is-compact .aa-chat-label { max-width: 0; opacity: 0; }
+@media (max-width: 700px) {
+  .aa-chat-toggle { width: auto; height: 50px; min-height: 50px; padding: 0 16px 0 6px; gap: 8px; }
+  .aa-chat-ico { width: 38px; height: 38px; }
+  .aa-chat-label { font-size: 14px; }
+  .aa-chat.is-compact .aa-chat-toggle { padding: 0 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .aa-chat-toggle, .aa-chat-label { transition: none; } }
+
+/* One help entry point: the mascot. On pages with the mascot, the assistant has no separate
+   floating button; it opens from the mascot menu and its panel appears on the mascot's side. */
+body:has(.aa-mascot) .aa-chat-toggle { display: none !important; }
+body:has(.aa-mascot) .aa-chat { left: 14px; right: auto; }
+body:has(.aa-chat.is-open) .aa-mascot { visibility: hidden; }
+@media (max-width: 700px) { body:has(.aa-mascot) .aa-chat { left: 12px; right: 12px; } }
+.aa-mascot-badge { position: absolute; top: 2px; right: 0; z-index: 1; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--aa-terracotta); color: #fff; border: 2px solid #FFFCF8; box-shadow: 0 4px 10px rgba(43, 33, 27, .25); }
+.aa-mascot-button { position: relative; }
+.aa-mascot-action.is-primary { background: var(--aa-espresso); border-color: var(--aa-espresso); color: var(--aa-sand); padding-block: 10px; }
+.aa-mascot-action.is-primary span { background: var(--aa-terracotta); color: #fff; }
+.aa-mascot-action.is-primary em { display: grid; font-style: normal; font-weight: 800; text-align: start; line-height: 1.4; }
+.aa-mascot-action.is-primary small { font-weight: 500; font-size: 11.5px; color: #CDBBA9; }
+.aa-mascot-action.is-primary:hover { border-color: var(--aa-terracotta); }
+@media (max-width: 700px) { .aa-mascot-badge { width: 24px; height: 24px; } .aa-mascot-badge svg { width: 13px; height: 13px; } }
+/* Keep the mascot in its corner (left) when the menu opens above it */
+.aa-mascot-button { align-self: flex-end; }
