@@ -85,6 +85,32 @@
     }
   }
 
+  // ---- Readable names for pages and listings ----
+  const PAGES_AR = { "index.html": "الرئيسية", "": "الرئيسية", "offers.html": "صفحة العقارات", "property.html": "صفحة إعلان عقار", "advertiser.html": "صفحة معلن", "marketplace.html": "سوق الخدمات", "companies.html": "الشركات", "company.html": "ملف شركة", "directory.html": "الدليل العقاري", "favorites.html": "المفضلة", "my-listings.html": "إعلاناتي", "guide.html": "دليل الاستخدام", "about.html": "من نحن", "privacy.html": "سياسة الخصوصية", "terms.html": "الشروط", "advertise.html": "أعلن معنا", "payment.html": "الدفع", "reset-password.html": "استعادة كلمة المرور" };
+  const pageName = page => {
+    const p = String(page || "").replace(/^\//, "").split("?")[0];
+    const area = p.match(/^areas\/([\w-]+)\.html$/);
+    if (area) return "صفحة مركز " + (AREA_PAGES[area[1]] || area[1]);
+    const ad = p.match(/^ads\/(\d+)\.html$/);
+    if (ad) return "صفحة إعلان ASY-" + ad[1].padStart(4, "0");
+    return PAGES_AR[p] || p;
+  };
+  let listingTitles = null;
+  async function titles() {
+    if (listingTitles) return listingTitles;
+    listingTitles = new Map();
+    try { (await A.request("/rest/v1/property_offers?select=id,title,property_type,listing_purpose&limit=2000") || []).forEach(o => listingTitles.set(Number(o.id), [o.property_type, o.listing_purpose, o.title].filter(Boolean).join(" · "))); } catch (_) {}
+    return listingTitles;
+  }
+  const listingCell = (id, map) => id ? `<a href="./property.html?id=${esc(id)}" target="_blank">ASY-${String(id).padStart(4, "0")}</a>${map?.get(Number(id)) ? " · " + esc(map.get(Number(id))) : ""}` : "";
+  const detailText = e => {
+    const t = String(e.target || "");
+    if (!t || t === location.hostname || /(^|\.)layan-eg\.com$/.test(t)) return "";
+    if (e.event_type === "contact_call") return "اتصال بشأن: " + t;
+    if (e.event_type === "contact_whatsapp") return "واتساب بشأن: " + t;
+    return t;
+  };
+
   // ---- Governorate / center helpers ----
   const AREA_PAGES = { "abnub": "أبنوب", "abu-tig": "أبو تيج", "assiut-city": "مدينة أسيوط", "dairut": "ديروط", "el-badari": "البداري", "el-fath": "الفتح", "el-ghanayem": "الغنايم", "el-qusiya": "القوصية", "manfalut": "منفلوط", "new-assiut": "أسيوط الجديدة", "sahel-selim": "ساحل سليم", "sidfa": "صدفا" };
   const sumBy = (rows, keyFn, valueKey) => {
@@ -141,11 +167,22 @@
     box.scrollIntoView({ behavior: "smooth", block: "start" });
     try {
       const events = await rpc("layan_admin_activity", { p_days: 365, p_user: id, p_type: null, p_limit: 1000 }) || [];
+      const map = await titles();
       const contacts = events.filter(e => /^contact_/.test(e.event_type));
+      const views = events.filter(e => e.event_type === "listing_view" && e.listing_id);
+      const pagesSeen = new Map(); events.filter(e => e.event_type === "page_view").forEach(e => { const n = pageName(e.page); pagesSeen.set(n, (pagesSeen.get(n) || 0) + 1); });
+      const viewed = new Map(); views.forEach(e => viewed.set(e.listing_id, (viewed.get(e.listing_id) || 0) + 1));
+      const regions = [...new Set(events.map(e => e.region).filter(Boolean))];
       box.innerHTML = `<header><h3>ملف العميل: ${esc(user.full_name || user.email)}</h3><button type="button" class="btn btn-outline-dark" data-export="profile" data-user-id="${esc(id)}">تنزيل Excel</button></header>
-        <div class="admin-kpis"><div><strong>${events.length}</strong><span>حركة مسجلة</span></div><div><strong>${contacts.length}</strong><span>مرة تواصل</span></div><div><strong>${esc(user.listings_count)}</strong><span>إعلانات</span></div><div><strong>${esc(ACCOUNT[user.account_type] || "—")}</strong><span>نوع الحساب</span></div></div>
-        <p><b>البريد:</b> ${esc(user.email)} · <b>الموبايل:</b> <span dir="ltr">${esc(user.phone || "—")}</span> · <b>التسجيل:</b> ${date(user.created_at)} · <b>آخر نشاط:</b> ${date(user.last_seen)}</p>
-        <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>الوقت</th><th>الحركة</th><th>الصفحة</th><th>الإعلان</th><th>التفاصيل</th><th>المنطقة</th></tr></thead><tbody>${events.slice(0, 300).map(e => `<tr><td>${date(e.created_at)}</td><td>${esc(TYPES[e.event_type] || e.event_type)}</td><td>${esc(e.page || "")}</td><td>${e.listing_id ? "ASY-" + String(e.listing_id).padStart(4, "0") : ""}</td><td>${esc(e.target || "")}</td><td>${esc(e.region || "")}</td></tr>`).join("") || '<tr><td colspan="6">لا توجد حركة مسجلة لهذا العميل بعد.</td></tr>'}</tbody></table></div>`;
+        <div class="admin-kpis"><div><strong>${events.length}</strong><span>حركة مسجلة</span></div><div><strong>${viewed.size}</strong><span>إعلان شاهده</span></div><div><strong>${contacts.length}</strong><span>مرة تواصل</span></div><div><strong>${esc(user.listings_count)}</strong><span>إعلانات أضافها</span></div></div>
+        <p><b>البريد:</b> ${esc(user.email)} · <b>الموبايل:</b> <span dir="ltr">${esc(user.phone || "—")}</span> · <b>نوع الحساب:</b> ${esc(ACCOUNT[user.account_type] || "—")} · <b>التسجيل:</b> ${date(user.created_at)} · <b>آخر نشاط:</b> ${date(user.last_seen)} · <b>المنطقة:</b> ${esc(regions.join("، ") || "—")}</p>
+        <div class="admin-columns">
+          <section><h3>تواصل مع</h3><ul class="admin-list">${contacts.map(e => `<li>${date(e.created_at)} — ${esc(TYPES[e.event_type])}${e.listing_id ? " · " + listingCell(e.listing_id, map) : ""}${detailText(e) ? " · " + esc(detailText(e)) : ""}</li>`).join("") || "<li>لم يتواصل بعد.</li>"}</ul></section>
+          <section><h3>الإعلانات التي شاهدها</h3><ul class="admin-list">${[...viewed.entries()].map(([lid, n]) => `<li>${listingCell(lid, map)} — ${n} مرة</li>`).join("") || "<li>لم يفتح إعلانات بعد.</li>"}</ul></section>
+          <section class="adm-span"><h3>الصفحات التي زارها</h3><ul class="admin-list">${[...pagesSeen.entries()].sort((a, b) => b[1] - a[1]).map(([n, c]) => `<li>${esc(n)} — ${c} مرة</li>`).join("") || "<li>—</li>"}</ul></section>
+        </div>
+        <h3>كل التحركات بالترتيب</h3>
+        <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>الوقت</th><th>الحركة</th><th>الصفحة</th><th>الإعلان</th><th>التفاصيل</th><th>المنطقة</th></tr></thead><tbody>${events.slice(0, 300).map(e => `<tr><td>${date(e.created_at)}</td><td>${esc(TYPES[e.event_type] || e.event_type)}</td><td>${esc(pageName(e.page))}</td><td>${listingCell(e.listing_id, map)}</td><td>${esc(detailText(e))}</td><td>${esc(e.region || "")}</td></tr>`).join("") || '<tr><td colspan="6">لا توجد حركة مسجلة لهذا العميل بعد.</td></tr>'}</tbody></table></div>`;
       box.dataset.events = JSON.stringify(events);
     } catch (error) {
       box.innerHTML = needsMigration(error) ? pendingNote : `<p class="admin-empty">${esc(error.message)}</p>`;
@@ -163,9 +200,10 @@
       const rows = await rpc("layan_admin_activity", { p_days: days, p_user: null, p_type: type === "contact" || type === "all" ? null : type, p_limit: 5000 }) || [];
       activityCache = type === "contact" ? rows.filter(e => /^contact_/.test(e.event_type)) : rows;
       const users = new Map(usersCache.map(u => [u.id, u]));
+      const map = await titles();
       panel.innerHTML = toolbar(`<label>النوع <select data-activity-type><option value="contact" ${type === "contact" ? "selected" : ""}>التواصل فقط (اتصال / واتساب)</option><option value="all" ${type === "all" ? "selected" : ""}>كل الحركة</option>${Object.entries(TYPES).map(([k, v]) => `<option value="${k}" ${type === k ? "selected" : ""}>${v}</option>`).join("")}</select></label><label>الفترة <select data-activity-days>${[1, 7, 30, 90, 365].map(d => `<option value="${d}" ${d === days ? "selected" : ""}>آخر ${d} يوم</option>`).join("")}</select></label><button class="btn btn-gold" type="button" data-export="activity">تنزيل Excel</button><span class="admin-pill">${activityCache.length} حركة</span>`) +
         `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>الوقت</th><th>الحركة</th><th>العميل</th><th>الإعلان</th><th>الصفحة</th><th>التفاصيل</th><th>الجهاز</th><th>المنطقة</th></tr></thead><tbody>` +
-        activityCache.slice(0, 1000).map(e => { const u = users.get(e.user_id); return `<tr><td>${date(e.created_at)}</td><td>${esc(TYPES[e.event_type] || e.event_type)}</td><td>${u ? esc(u.full_name || u.email) : e.user_id ? "حساب مسجل" : "زائر"}</td><td>${e.listing_id ? `<a href="./property.html?id=${esc(e.listing_id)}" target="_blank">ASY-${String(e.listing_id).padStart(4, "0")}</a>` : ""}</td><td>${esc(e.page || "")}</td><td>${esc(e.target || "")}</td><td>${esc(e.device || "")}</td><td>${esc(e.region || "")}</td></tr>`; }).join("") +
+        activityCache.slice(0, 1000).map(e => { const u = users.get(e.user_id); return `<tr><td>${date(e.created_at)}</td><td>${esc(TYPES[e.event_type] || e.event_type)}</td><td>${u ? esc(u.full_name || u.email) : e.user_id ? "حساب مسجل" : "زائر"}</td><td>${listingCell(e.listing_id, map)}</td><td>${esc(pageName(e.page))}</td><td>${esc(detailText(e))}</td><td>${esc(e.device || "")}</td><td>${esc(e.region || "")}</td></tr>`; }).join("") +
         `</tbody></table></div>`;
     } catch (error) {
       panel.innerHTML = needsMigration(error) ? pendingNote : `<p class="admin-empty">${esc(error.message)}</p>`;
@@ -178,13 +216,23 @@
     const panel = panels.listings;
     panel.innerHTML = '<p class="admin-empty">جارٍ تحميل الإعلانات المنشورة...</p>';
     try {
-      const offers = await A.request("/rest/v1/property_offers?select=id,title,listing_purpose,property_type,city,area,total_price,contact_name,contact_phone,owner_id,status,created_at&order=created_at.desc&limit=1000") || [];
-      const services = await A.request("/rest/v1/marketplace_listings?select=id,title,category,city,area,contact_phone,status,created_at&order=created_at.desc&limit=1000").catch(() => []) || [];
-      listingsCache = [...offers.map(o => ({ kind: "عقار", ...o })), ...services.map(s => ({ kind: "خدمة", ...s }))];
-      panel.innerHTML = toolbar(`<button class="btn btn-gold" type="button" data-export="listings">تنزيل Excel</button><span class="admin-pill">${offers.length} عقار · ${services.length} خدمة</span>`) +
-        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>النوع</th><th>الكود</th><th>العنوان</th><th>القسم</th><th>المكان</th><th>المعلن</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody>` +
-        listingsCache.map(x => `<tr data-listing="${esc(x.id)}" data-kind="${x.kind === "عقار" ? "offer" : "service"}"><td>${x.kind}</td><td>${x.kind === "عقار" ? "ASY-" + String(x.id).padStart(4, "0") : "#" + esc(x.id)}</td><td>${esc(x.title)}</td><td>${esc(x.property_type ? x.property_type + " · " + (x.listing_purpose || "") : x.category || "")}</td><td>${esc([x.city, x.area].filter(Boolean).join("، "))}</td><td>${esc(x.contact_name || "")} <span dir="ltr">${esc(x.contact_phone || "")}</span></td><td>${esc(x.status)}</td><td>${date(x.created_at)}</td>
-          <td class="admin-actions-cell">${x.kind === "عقار" ? `<a href="./property.html?id=${esc(x.id)}" target="_blank">فتح</a>` : ""}<button type="button" class="is-danger" data-listing-delete>حذف</button></td></tr>`).join("") +
+      const offers = await A.request("/rest/v1/property_offers?select=id,title,listing_purpose,property_type,city,area,total_price,contact_name,contact_phone,owner_id,status,created_at&status=in.(available,reserved,sold)&order=created_at.desc&limit=1000") || [];
+      const services = await A.request("/rest/v1/marketplace_listings?select=id,title,category,city,area,contact_phone,status,created_at&status=eq.approved&order=created_at.desc&limit=1000").catch(() => []) || [];
+      let companies = [];
+      try { companies = await rpc("layan_admin_list_published_companies") || []; }
+      catch (_) { companies = await A.request("/rest/v1/company_profiles?select=id,company_name,category,city,phone,status,created_at&status=eq.active&order=created_at.desc").catch(() => []) || []; }
+      const STATUS = { available: "منشور", reserved: "محجوز", sold: "تم البيع", approved: "منشور", active: "منشور" };
+      listingsCache = [
+        ...offers.map(o => ({ kind: "عقار", k: "offer", ...o })),
+        ...services.map(x => ({ kind: "خدمة", k: "service", ...x })),
+        ...companies.map(c => ({ kind: "شركة", k: "company", title: c.company_name, category: c.category, city: c.city, contact_phone: c.phone, ...c }))
+      ];
+      const published = listingsCache.length;
+      document.querySelectorAll("[data-published-total]").forEach(el => { el.textContent = published; });
+      panel.innerHTML = toolbar(`<button class="btn btn-gold" type="button" data-export="listings">تنزيل Excel</button><span class="admin-pill">${published} منشور: ${offers.length} عقار · ${services.length} خدمة · ${companies.length} شركة</span>`) +
+        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>النوع</th><th>الكود</th><th>العنوان</th><th>القسم</th><th>المكان</th><th>التواصل</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody>` +
+        listingsCache.map(x => `<tr data-listing="${esc(x.id)}" data-kind="${x.k}"><td>${x.kind}</td><td>${x.k === "offer" ? "ASY-" + String(x.id).padStart(4, "0") : "#" + esc(String(x.id).slice(0, 8))}</td><td>${esc(x.title)}</td><td>${esc(x.property_type ? x.property_type + " · " + (x.listing_purpose || "") : x.category || "")}</td><td>${esc([x.city, x.area].filter(Boolean).join(" · "))}</td><td dir="ltr">${esc(x.contact_phone || "")}</td><td>${esc(STATUS[x.status] || x.status || "")}</td><td>${date(x.created_at)}</td>
+          <td class="admin-actions-cell">${x.k === "offer" ? `<a href="./property.html?id=${esc(x.id)}" target="_blank">فتح</a>` : x.k === "company" ? `<a href="./company.html?id=${esc(x.id)}" target="_blank">فتح</a>` : `<a href="./marketplace.html" target="_blank">فتح</a>`}<button type="button" class="is-danger" data-listing-delete>حذف</button></td></tr>`).join("") +
         `</tbody></table></div>`;
     } catch (error) {
       panel.innerHTML = `<p class="admin-empty">${esc(error.message)}</p>`;
@@ -206,7 +254,7 @@
   }
 
   // ---- Owner approval requests ----
-  const ACTIONS = { delete_user: "حذف حساب", suspend_user: "إيقاف حساب", unsuspend_user: "إعادة تفعيل حساب", delete_offer: "حذف إعلان عقار", delete_service: "حذف خدمة" };
+  const ACTIONS = { delete_user: "حذف حساب", suspend_user: "إيقاف حساب", unsuspend_user: "إعادة تفعيل حساب", delete_offer: "حذف إعلان عقار", delete_service: "حذف خدمة", delete_company: "حذف ملف شركة" };
   const STATES = { pending: "بانتظار المالك", approved: "تم الاعتماد والتنفيذ", rejected: "مرفوض", failed: "تعذر التنفيذ" };
   const done = (result, doneText) => result === "pending"
     ? "تم إرسال الطلب إلى المالك للاعتماد. سيُنفَّذ بعد موافقته."
@@ -274,7 +322,8 @@
     if (lrow && t.closest("[data-listing-delete]")) {
       if (!confirm("حذف هذا الإعلان نهائيًا من المنصة؟ لا يمكن التراجع عن الحذف.")) return;
       try {
-        const r = await rpc(lrow.dataset.kind === "offer" ? "layan_admin_delete_property_offer" : "layan_admin_delete_marketplace_listing", { p_id: lrow.dataset.kind === "offer" ? Number(lrow.dataset.listing) : String(lrow.dataset.listing) });
+        const fn = { offer: "layan_admin_delete_property_offer", service: "layan_admin_delete_marketplace_listing", company: "layan_admin_delete_company_profile" }[lrow.dataset.kind];
+        const r = await rpc(fn, { p_id: lrow.dataset.kind === "offer" ? Number(lrow.dataset.listing) : String(lrow.dataset.listing) });
         A.setStatus(done(r, "تم حذف الإعلان.")); loadListings(); refreshRequestsBadge();
       } catch (e) { A.setStatus(needsMigration(e) ? "حذف الإعلانات يحتاج تطبيق تحديث قاعدة البيانات أولًا." : e.message); }
       return;

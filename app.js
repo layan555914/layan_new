@@ -754,7 +754,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const advertiserHref = o.owner_id ? "./advertiser.html?id=" + encodeURIComponent(String(o.owner_id)) : "";
 
       return `
-        <article class="offer-card listing-card${isFeatured ? " is-featured" : ""}">
+        <article class="offer-card listing-card${isFeatured ? " is-featured" : ""}" data-listing-id="${esc(o.id)}">
           <div class="offer-card-media">
             <a href="${detailsHref}" class="offer-media-link" tabindex="-1" aria-hidden="true">${
               image
@@ -828,7 +828,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const found = [...groups.values()].filter(c => !query || c.name.toLowerCase().includes(query));
     companyGrid.innerHTML = found.length ? found.map(c => {
-      const propertyRows = c.properties.slice(0, 3).map(o => `
+      const propertyRows = c.properties.slice(0, 6).map(o => `
         <li class="company-property">
           <span class="company-property-type">${esc(o.property_type || "عقار")}</span>
           <strong>${esc(o.title || "عرض عقاري")}</strong>
@@ -836,11 +836,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           <b>${money(o.total_price)}</b>
         </li>`).join("");
       const countLabel = c.id
-        ? `${c.properties.length} من 3 عقارات منشورة ضمن إعلان الشركة`
+        ? `${c.properties.length} عقار منشور ضمن إعلان الشركة`
         : `${c.properties.length} عقار مرتبط باسم الشركة`;
       return `
         <article class="company-card">
-          <div class="company-card-heading"><h3>${esc(c.name)}</h3><span class="company-count">${c.properties.length}/3</span></div>
+          <div class="company-card-heading"><h3>${esc(c.name)}</h3><span class="company-count">${c.properties.length}</span></div>
           <p>${countLabel}</p>
           <ul class="company-property-list">${propertyRows}</ul>
           <button class="btn btn-outline-dark" type="button" data-company-name="${esc(c.name)}">عرض التفاصيل في قائمة العروض</button>
@@ -1430,7 +1430,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         offer.image_urls = uploadedImageUrls;
       }
 
-      setStatus(selectedAccountType === "company" ? "جارٍ ربط العقار بإعلان الشركة والتحقق من حد 3 عقارات..." : "جارٍ حفظ العرض...");
+      setStatus(selectedAccountType === "company" ? "جارٍ ربط العقار بإعلان الشركة..." : "جارٍ حفظ العرض...");
       if (documentFiles.length) {
         if (!api.uploadPropertyDocuments) throw new Error("رفع مستندات العقار غير جاهز. حدّث الصفحة وحاول مرة أخرى.");
         setStatus("جارٍ رفع المستندات إلى مساحة خاصة...");

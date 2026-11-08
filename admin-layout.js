@@ -60,6 +60,19 @@
   window.addEventListener("asyut:admin-ready", () => {
     document.body.classList.add("adm-signed-in");
     paintCounts();
+    // Count published items for «لوحة اليوم» without opening the published view.
+    window.AsyutConsole?.open && setTimeout(async () => {
+      const el = document.querySelector("[data-published-total]");
+      if (!el || el.textContent !== "—") return;
+      try {
+        const head = async path => { const r = await window.AsyutAdmin.request(path); return Array.isArray(r) ? r.length : 0; };
+        const [o, m, c] = await Promise.all([
+          head("/rest/v1/property_offers?select=id&status=in.(available,reserved,sold)").catch(() => 0),
+          head("/rest/v1/marketplace_listings?select=id&status=eq.approved").catch(() => 0),
+          head("/rest/v1/company_profiles?select=id&status=eq.active").catch(() => 0)]);
+        if (el.textContent === "—") el.textContent = o + m + c;
+      } catch (_) {}
+    }, 800);
     const start = (location.hash || "").slice(1);
     setTimeout(() => show(views[start] ? start : "today"), 0);
   });

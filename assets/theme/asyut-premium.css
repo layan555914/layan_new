@@ -1288,3 +1288,5 @@ body:has(.aa-chat.is-open) .aa-mascot { visibility: hidden; }
 .aa-mascot-area { width: 100%; min-height: 40px; padding: 6px 10px; border: 1px solid var(--aa-line); border-radius: 10px; background: #fff; color: var(--aa-espresso); font: inherit; font-size: 14px; }
 .aa-mascot-area-row { cursor: default; }
 .aa-mascot-area-row .aa-mascot-area { border: 0; min-height: 30px; padding: 0; background: transparent; font-weight: 700; }
+.aa-mascot-locate { width: 100%; margin-top: 8px; min-height: 38px; border: 1px dashed var(--aa-terracotta); border-radius: 10px; background: #FFF8F2; color: var(--aa-terracotta); font: 700 13.5px var(--aa-body); cursor: pointer; }
+.aa-mascot-locate:disabled { opacity: .6; }
