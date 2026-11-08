@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v133-mascot-help-20261108";
+const CACHE_NAME = "asyut-aqar-shell-v134-app-shell-20261108";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -47,6 +47,7 @@ const APP_SHELL = [
   "./camera.js",
   "./listing-form.js",
   "./tracking.js",
+  "./app-shell.js",
   "./advertiser.html",
   "./advertiser.js",
   "./assets/brand/mascot.webp",
@@ -128,6 +129,22 @@ self.addEventListener("fetch", event => {
     return;
   }
 
+  // Code and styles: network first so the installed app always gets the latest version;
+  // the cached copy is only used offline.
+  if (/\.(css|js|json|webmanifest)$/i.test(url.pathname)) {
+    event.respondWith(
+      fetch(request, { cache: "no-cache" }).then(response => {
+        if (response && response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+        }
+        return response;
+      }).catch(() => caches.match(request, { ignoreSearch: true }))
+    );
+    return;
+  }
+
+  // Images and fonts: cache first.
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached;
