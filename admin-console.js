@@ -72,15 +72,43 @@
           <div><strong>${esc(s.new_users)}</strong><span>حساب جديد</span></div>
         </div>
         <div class="admin-columns">
-          <section><h3>الزوار حسب المنطقة</h3><ul class="admin-bars">${bar(s.by_region || [], "region", "visitors")}</ul></section>
+          <section><h3>الزوار حسب المحافظة</h3><ul class="admin-bars">${bar(byGovernorate(s.by_region || []), "label", "visitors")}</ul></section>
+          <section><h3>زوار محافظة أسيوط حسب المركز</h3><ul class="admin-bars">${bar(byCenter(s.by_region || []), "label", "visitors")}</ul></section>
+          <section class="adm-span"><h3>المراكز الأكثر طلبًا (صفحات المراكز والبحث بالمدينة)</h3><ul class="admin-bars">${bar(await centerInterest(s, days), "label", "visits")}</ul></section>
           <section><h3>أكثر الصفحات زيارة</h3><ul class="admin-bars">${bar(s.by_page || [], "page", "views")}</ul></section>
           <section><h3>أكثر الإعلانات تواصلًا</h3><ul class="admin-bars">${bar((s.top_listings || []).map(x => ({ ...x, label: "ASY-" + String(x.listing_id).padStart(4, "0") + " · " + x.views + " مشاهدة" })), "label", "contacts")}</ul></section>
           <section><h3>الزوار يوميًا</h3><ul class="admin-bars">${bar((s.by_day || []).slice(-14), "day", "visitors")}</ul></section>
         </div>
-        <p class="admin-note">المنطقة تقريبية من إعدادات المتصفح (المنطقة الزمنية واللغة)، ولا تُجمع عناوين IP أو مواقع دقيقة.</p>`;
+        <p class="admin-note">المحافظة والمركز يختارهما الزائر بنفسه بضغطة من التميمة («إنت منين؟»)؛ «غير محدد» = زائر من مصر لم يختر بعد. لا تُجمع عناوين IP أو مواقع GPS. «المراكز الأكثر طلبًا» من زيارات صفحات المراكز والبحث بالمدينة.</p>`;
     } catch (error) {
       panel.innerHTML = needsMigration(error) ? pendingNote : `<p class="admin-empty">${esc(error.message)}</p>`;
     }
+  }
+
+  // ---- Governorate / center helpers ----
+  const AREA_PAGES = { "abnub": "أبنوب", "abu-tig": "أبو تيج", "assiut-city": "مدينة أسيوط", "dairut": "ديروط", "el-badari": "البداري", "el-fath": "الفتح", "el-ghanayem": "الغنايم", "el-qusiya": "القوصية", "manfalut": "منفلوط", "new-assiut": "أسيوط الجديدة", "sahel-selim": "ساحل سليم", "sidfa": "صدفا" };
+  const sumBy = (rows, keyFn, valueKey) => {
+    const map = new Map();
+    rows.forEach(r => { const k = keyFn(r); if (!k) return; map.set(k, (map.get(k) || 0) + (Number(r[valueKey]) || 0)); });
+    return [...map.entries()].map(([label, v]) => ({ label, [valueKey]: v })).sort((a, b) => b[valueKey] - a[valueKey]);
+  };
+  const regionGov = region => {
+    const r = String(region || "").trim();
+    if (!r || r === "غير معروف") return "غير محدد";
+    if (r.startsWith("أسيوط ·")) return "أسيوط";
+    if (r === "مصر" || r === "مصر · غير محدد") return "مصر — لم يحدد المحافظة";
+    return r;
+  };
+  const byGovernorate = rows => sumBy(rows, r => regionGov(r.region), "visitors");
+  const byCenter = rows => sumBy(rows.filter(r => String(r.region || "").startsWith("أسيوط ·")), r => String(r.region).split("·")[1].trim(), "visitors");
+  async function centerInterest(summary, days) {
+    const fromPages = (summary.by_page || []).map(p => { const m = String(p.page || "").match(/areas\/([\w-]+)\.html/); return m && AREA_PAGES[m[1]] ? { label: AREA_PAGES[m[1]], visits: Number(p.views) || 0 } : null; }).filter(Boolean);
+    let fromSearch = [];
+    try {
+      const rows = await rpc("layan_admin_activity", { p_days: days, p_user: null, p_type: "search", p_limit: 5000 }) || [];
+      fromSearch = rows.map(e => { const m = String(e.target || "").match(/^مركز:\s*(.+)$/); return m ? { label: m[1].trim(), visits: 1 } : null; }).filter(Boolean);
+    } catch (_) {}
+    return sumBy([...fromPages, ...fromSearch], r => r.label, "visits").slice(0, 13);
   }
 
   // ---- Users ----
@@ -188,6 +216,7 @@
       const rows = await rpc("layan_admin_list_requests", { p_status: "pending" }) || [];
       const badge = root.querySelector("[data-requests-count]");
       if (badge) { badge.textContent = rows.length; badge.hidden = !rows.length; }
+      root.querySelectorAll("[data-requests-total]").forEach(el => { el.textContent = rows.length; });
     } catch (_) {}
   }
   async function loadRequests() {
@@ -288,6 +317,7 @@
     if (A?.reload) A.reload(); else window.location.reload();
   });
 
+  window.AsyutConsole = { open: name => { if (panels[name]) openTab(name); } };
   window.addEventListener("asyut:admin-ready", () => {
     A = window.AsyutAdmin;
     root.hidden = false;

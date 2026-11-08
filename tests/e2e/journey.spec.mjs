@@ -237,6 +237,8 @@ test("customer can search, open, save, submit, track and admin-review a property
 
   // 6. The admin panel checks the server-side allowlist and publishes the pending offer.
   await page.goto("/admin.html");
+  // Step 2 of the admin workflow: «المراجعة والاعتماد».
+  await page.locator("[data-view='review']").click();
   await expect(page.locator("#reviewPanel")).toBeVisible();
   const pendingCard = page.locator("[data-property-offer-id='202']");
   await expect(pendingCard).toContainText("إعلان اختبار رحلة المستخدم");
