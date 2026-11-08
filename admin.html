@@ -10,16 +10,16 @@
 <link rel="stylesheet" href="./assets/build/base.min.css?v=bb9b3b8c66919236">
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
-  <link rel="stylesheet" href="./admin.css?v=20261108-1">
+  <link rel="stylesheet" href="./admin.css?v=20261108-2">
 </head>
 <body class="adm-body">
 <header class="adm-top">
   <a class="adm-brand" href="./" aria-label="أسيوط عقار — الموقع الرئيسي"><img src="./assets/brand/logo-mark.svg" alt="" width="34" height="34" onerror="this.remove()"><span><b>أسيوط عقار</b><small>لوحة الإدارة</small></span></a>
   <nav class="adm-top-actions" aria-label="أدوات الإدارة">
-    <a class="adm-btn adm-btn-ghost admin-back" href="./">← الموقع الرئيسي</a>
-    <button class="adm-btn adm-btn-ghost admin-refresh adm-when-in" type="button" id="adminRefreshAll">↻ تحديث البيانات</button>
-    <a class="adm-btn adm-btn-ghost adm-when-in" href="./directory-admin.html">الدليل العقاري</a>
-    <button class="adm-btn adm-btn-ghost adm-when-in" id="adminLogout" type="button">تسجيل الخروج</button>
+    <a class="adm-btn adm-btn-ghost admin-back" href="./"><span class="adm-long">← الموقع الرئيسي</span><span class="adm-short">⌂ الموقع</span></a>
+    <button class="adm-btn adm-btn-ghost admin-refresh adm-when-in" type="button" id="adminRefreshAll"><span class="adm-long">↻ تحديث البيانات</span><span class="adm-short">↻ تحديث</span></button>
+    <a class="adm-btn adm-btn-ghost adm-when-in" href="./directory-admin.html"><span class="adm-long">الدليل العقاري</span><span class="adm-short">الدليل</span></a>
+    <button class="adm-btn adm-btn-ghost adm-when-in" id="adminLogout" type="button"><span class="adm-long">تسجيل الخروج</span><span class="adm-short">خروج</span></button>
   </nav>
 </header>
 
@@ -42,16 +42,16 @@
   <aside class="adm-side" aria-label="أقسام لوحة الإدارة">
     <p class="adm-side-title">سير العمل اليومي</p>
     <nav class="adm-steps">
-      <button type="button" data-view="today" aria-current="true"><i>1</i><span><b>لوحة اليوم</b><small>ما يحتاج إجراءك الآن</small></span><em data-count="today" hidden></em></button>
-      <button type="button" data-view="review"><i>2</i><span><b>المراجعة والاعتماد</b><small>عقارات · خدمات · شركات · إعلانات</small></span><em data-count="review" hidden></em></button>
-      <button type="button" data-view="requests" data-admin-tab="requests"><i>3</i><span><b>طلبات اعتماد المالك</b><small>حذف وإيقاف طلبه مدير</small></span><em data-requests-count class="admin-badge" hidden></em></button>
-      <button type="button" data-view="published" data-admin-tab="listings"><i>4</i><span><b>المنشور والتوثيق</b><small>الإعلانات الظاهرة للزوار</small></span></button>
+      <button type="button" data-view="today" aria-current="true"><i>1</i><span class="adm-short">اليوم</span><span><b>لوحة اليوم</b><small>ما يحتاج إجراءك الآن</small></span><em data-count="today" hidden></em></button>
+      <button type="button" data-view="review"><i>2</i><span class="adm-short">المراجعة</span><span><b>المراجعة والاعتماد</b><small>عقارات · خدمات · شركات · إعلانات</small></span><em data-count="review" hidden></em></button>
+      <button type="button" data-view="requests" data-admin-tab="requests"><i>3</i><span class="adm-short">اعتماد المالك</span><span><b>طلبات اعتماد المالك</b><small>حذف وإيقاف طلبه مدير</small></span><em data-requests-count class="admin-badge" hidden></em></button>
+      <button type="button" data-view="published" data-admin-tab="listings"><i>4</i><span class="adm-short">المنشور</span><span><b>المنشور والتوثيق</b><small>الإعلانات الظاهرة للزوار</small></span></button>
     </nav>
     <p class="adm-side-title">المتابعة والتقارير</p>
     <nav class="adm-steps">
-      <button type="button" data-view="customers" data-admin-tab="users"><i>5</i><span><b>العملاء والحسابات</b><small>ملف كل عميل وتحركاته</small></span></button>
-      <button type="button" data-view="activity" data-admin-tab="activity"><i>6</i><span><b>الزوار والتواصل</b><small>المحافظات والمراكز والاتصالات</small></span></button>
-      <button type="button" data-view="team" data-admin-tab="admins"><i>7</i><span><b>فريق الإدارة</b><small>من يدخل لوحة الإدارة</small></span></button>
+      <button type="button" data-view="customers" data-admin-tab="users"><i>5</i><span class="adm-short">العملاء</span><span><b>العملاء والحسابات</b><small>ملف كل عميل وتحركاته</small></span></button>
+      <button type="button" data-view="activity" data-admin-tab="activity"><i>6</i><span class="adm-short">الزوار</span><span><b>الزوار والتواصل</b><small>المحافظات والمراكز والاتصالات</small></span></button>
+      <button type="button" data-view="team" data-admin-tab="admins"><i>7</i><span class="adm-short">الفريق</span><span><b>فريق الإدارة</b><small>من يدخل لوحة الإدارة</small></span></button>
     </nav>
   </aside>
 
@@ -121,7 +121,7 @@
   </div>
 </div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261108-2"></script><script src="./admin.js?v=20261108-2"></script><script src="./admin-console.js?v=20261108-5"></script><script src="./admin-layout.js?v=20261108-1"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261108-2"></script><script src="./admin.js?v=20261108-2"></script><script src="./admin-console.js?v=20261108-5"></script><script src="./admin-layout.js?v=20261108-2"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT <span aria-hidden="true">|</span> All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G <span aria-hidden="true">|</span> <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>

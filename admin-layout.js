@@ -38,6 +38,16 @@
   };
   new MutationObserver(paintCounts).observe(document.getElementById("adminStats") || shell, { subtree: true, characterData: true, childList: true });
 
+  // Phones: each table cell gets its column title so tables can show as stacked cards.
+  const labelTables = () => shell.querySelectorAll("table").forEach(table => {
+    const heads = [...table.querySelectorAll("thead th, tr:first-child th")].map(th => th.textContent.trim());
+    if (!heads.length) return;
+    table.querySelectorAll("tbody tr").forEach(tr => [...tr.children].forEach((td, i) => { if (td.tagName === "TD" && !td.hasAttribute("data-label")) td.setAttribute("data-label", heads[i] || ""); }));
+  });
+  let labelQueued = false;
+  new MutationObserver(() => { if (labelQueued) return; labelQueued = true; requestAnimationFrame(() => { labelQueued = false; labelTables(); }); })
+    .observe(shell, { childList: true, subtree: true });
+
   // Status messages show briefly as a toast, then clear themselves.
   const status = document.getElementById("adminStatus");
   let statusTimer;
