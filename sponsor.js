@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Native placement inside the listings grid (offers page): approved ads after every 6 listings,
   // or one "advertise here" card when no ad is approved yet. Re-applied after each filter render.
-  const offersGrid = document.body.classList.contains("page-offers") ? document.getElementById("offersGrid") : null;
+  const offersGrid = document.body.classList.contains("page-offers") && !document.body.classList.contains("page-advertiser") ? document.getElementById("offersGrid") : null;
   function inlineCard(ad) {
     return renderCard(ad).replace('class="offer-card sponsor-card"', 'class="offer-card sponsor-card sponsor-inline" data-sponsor-inline');
   }

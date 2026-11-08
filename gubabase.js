@@ -128,7 +128,8 @@
   // A single callback handler below processes signup, magic-link, and recovery returns.
   // Keeping one handler avoids racing two requests against the same one-time auth token.
   function normalizeEmail(email) { return String(email || "").trim().toLowerCase(); }
-  async function signUp(email, password) {
+  // profile: { full_name, phone, account_type } saved as the user's metadata at signup.
+  async function signUp(email, password, profile) {
     const cleanEmail = normalizeEmail(email);
     if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
     if (String(password || "").length < 6) throw new Error("Password should be at least 6 characters.");
@@ -138,6 +139,11 @@
       const data = await authRequest("signup?redirect_to=" + encodeURIComponent(redirectTo), {
         email: cleanEmail,
         password,
+        ...(profile && typeof profile === "object" ? { data: {
+          full_name: String(profile.full_name || "").slice(0, 80),
+          phone: String(profile.phone || "").slice(0, 20),
+          account_type: String(profile.account_type || "").slice(0, 20)
+        } } : {}),
         code_challenge: pkce.codeChallenge,
         code_challenge_method: "s256"
       });
@@ -340,7 +346,7 @@
       "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price",
       "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
-      "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","latitude","longitude","created_at"
+      "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","contact_name","owner_id","latitude","longitude","created_at","updated_at"
     ].join(",");
     let rows;
     try {
@@ -358,8 +364,67 @@
       encodeURIComponent(session.user.id) + "&order=created_at.desc");
     return Array.isArray(rows) ? rows : [];
   }
-  // Stamp the ASYUT AQAR mark on listing photos before upload so copies keep the source,
-  // and cap very large photos at 2000px to keep pages fast. Falls back to the original file.
+  // Stamp listing photos before upload so copies keep the source:
+  // a diagonal repeated "أسيوط عقار · ASYUT AQAR" across the photo plus the brand badge.
+  function drawWatermark(ctx, width, height) {
+    const unit = Math.max(12, Math.round(Math.min(width, height) * 0.026));
+    // 1) Diagonal repeated name, faint, covering the whole picture.
+    const tile = "أسيوط عقار  ·  ASYUT AQAR";
+    const size = Math.max(14, Math.round(Math.min(width, height) * 0.045));
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    ctx.rotate(-Math.PI / 6);
+    ctx.font = "800 " + size + "px Alexandria, Tahoma, Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const stepX = ctx.measureText(tile).width + size * 2.2;
+    const stepY = size * 4.2;
+    const reach = Math.hypot(width, height);
+    for (let y = -reach; y <= reach; y += stepY) {
+      for (let x = -reach; x <= reach; x += stepX) {
+        const offset = (Math.round(y / stepY) % 2) * stepX / 2;
+        ctx.globalAlpha = 0.16;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillText(tile, x + offset, y);
+        ctx.globalAlpha = 0.07;
+        ctx.fillStyle = "#2B211B";
+        ctx.fillText(tile, x + offset + 1.5, y + 1.5);
+      }
+    }
+    ctx.restore();
+    // 2) Brand badge in the corner.
+    const pad = Math.round(unit * 0.9);
+    const label = "أسيوط عقار · layan-eg.com";
+    ctx.font = "700 " + unit + "px Alexandria, Tahoma, Arial, sans-serif";
+    const textWidth = ctx.measureText(label).width;
+    const markSize = Math.round(unit * 1.5);
+    const boxWidth = textWidth + markSize + pad * 2.6;
+    const boxHeight = markSize + pad;
+    const x = pad;
+    const y = height - boxHeight - pad;
+    ctx.save();
+    ctx.globalAlpha = 0.45;
+    ctx.fillStyle = "#2B211B";
+    if (typeof ctx.roundRect === "function") { ctx.beginPath(); ctx.roundRect(x, y, boxWidth, boxHeight, unit * 0.4); ctx.fill(); }
+    else ctx.fillRect(x, y, boxWidth, boxHeight);
+    ctx.globalAlpha = 0.85;
+    ctx.save();
+    ctx.translate(x + pad * 0.7, y + (boxHeight - markSize) / 2);
+    ctx.scale(markSize / 64, markSize / 64);
+    ctx.fillStyle = "#F3ECE1";
+    ctx.fill(new Path2D("M32 4.5L61.5 58H2.5ZM32 23L47 39.5V58H17V39.5Z"), "evenodd");
+    ctx.fillStyle = "#C98A64";
+    ctx.fill(new Path2D("M26.8 58V49.6a5.2 5.2 0 0 1 10.4 0V58Z"));
+    ctx.restore();
+    ctx.fillStyle = "#F3ECE1";
+    ctx.textBaseline = "middle";
+    ctx.direction = "rtl";
+    ctx.textAlign = "right";
+    ctx.fillText(label, x + boxWidth - pad * 0.8, y + boxHeight / 2);
+    ctx.restore();
+  }
+  if (typeof window !== "undefined") window.LAYAN_WATERMARK = drawWatermark;
+
   async function watermarkJpeg(file) {
     if (typeof createImageBitmap !== "function" || typeof document === "undefined") return file;
     const bitmap = await createImageBitmap(file);
@@ -373,36 +438,7 @@
     if (!ctx) return file;
     ctx.drawImage(bitmap, 0, 0, width, height);
     bitmap.close?.();
-    const unit = Math.max(12, Math.round(Math.min(width, height) * 0.026));
-    const pad = Math.round(unit * 0.9);
-    const label = "أسيوط عقار · layan-eg.com";
-    ctx.font = "700 " + unit + "px Alexandria, Tahoma, Arial, sans-serif";
-    const textWidth = ctx.measureText(label).width;
-    const markSize = Math.round(unit * 1.5);
-    const boxWidth = textWidth + markSize + pad * 2.6;
-    const boxHeight = markSize + pad;
-    const x = pad;
-    const y = height - boxHeight - pad;
-    ctx.globalAlpha = 0.45;
-    ctx.fillStyle = "#2B211B";
-    if (typeof ctx.roundRect === "function") { ctx.beginPath(); ctx.roundRect(x, y, boxWidth, boxHeight, unit * 0.4); ctx.fill(); }
-    else ctx.fillRect(x, y, boxWidth, boxHeight);
-    ctx.globalAlpha = 0.85;
-    const mark = new Path2D("M32 4.5L61.5 58H2.5ZM32 23L47 39.5V58H17V39.5Z");
-    ctx.save();
-    ctx.translate(x + pad * 0.7, y + (boxHeight - markSize) / 2);
-    ctx.scale(markSize / 64, markSize / 64);
-    ctx.fillStyle = "#F3ECE1";
-    ctx.fill(mark, "evenodd");
-    ctx.fillStyle = "#C98A64";
-    ctx.fill(new Path2D("M26.8 58V49.6a5.2 5.2 0 0 1 10.4 0V58Z"));
-    ctx.restore();
-    ctx.fillStyle = "#F3ECE1";
-    ctx.textBaseline = "middle";
-    ctx.direction = "rtl";
-    ctx.textAlign = "right";
-    ctx.fillText(label, x + boxWidth - pad * 0.8, y + boxHeight / 2);
-    ctx.globalAlpha = 1;
+    drawWatermark(ctx, width, height);
     const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.86));
     return blob && blob.size > 4 ? blob : file;
   }
@@ -414,7 +450,7 @@
       if (file.type !== "image/jpeg" || !/\.jpe?g$/i.test(file.name)) {
         throw new Error("لأمان المنصة، ارفع الصور بصيغة JPG أو JPEG فقط.");
       }
-      if (file.size > 5 * 1024 * 1024) throw new Error("حجم الصورة يجب ألا يتجاوز 5 ميجابايت.");
+      if (file.size > 15 * 1024 * 1024) throw new Error("حجم الصورة يجب ألا يتجاوز 15 ميجابايت.");
       if (file.size < 4) throw new Error("ملف الصورة غير صالح.");
       const signature = new Uint8Array(await file.slice(0, 3).arrayBuffer());
       if (signature[0] !== 0xFF || signature[1] !== 0xD8 || signature[2] !== 0xFF) {

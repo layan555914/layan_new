@@ -338,6 +338,9 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadPendingAdSlots();
       await loadAdminUsers();
       showState(true);
+      // admin-console.js (users, activity, admins, exports) starts once the admin check passed.
+      window.AsyutAdmin = { request, setStatus, esc, reload: () => document.getElementById("reloadPending")?.click() };
+      window.dispatchEvent(new CustomEvent("asyut:admin-ready"));
       setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
       return true;
     } catch (error) {
