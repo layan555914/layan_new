@@ -69,7 +69,7 @@
         const [o, m, c] = await Promise.all([
           head("/rest/v1/property_offers?select=id&status=in.(available,reserved,sold)").catch(() => 0),
           head("/rest/v1/marketplace_listings?select=id&status=eq.approved").catch(() => 0),
-          head("/rest/v1/company_profiles?select=id&status=eq.active").catch(() => 0)]);
+          head("/rest/v1/company_profiles_public?select=id").catch(() => 0)]);
         if (el.textContent === "—") el.textContent = o + m + c;
       } catch (_) {}
     }, 800);

@@ -220,7 +220,10 @@
       const services = await A.request("/rest/v1/marketplace_listings?select=id,title,category,city,area,contact_phone,status,created_at&status=eq.approved&order=created_at.desc&limit=1000").catch(() => []) || [];
       let companies = [];
       try { companies = await rpc("layan_admin_list_published_companies") || []; }
-      catch (_) { companies = await A.request("/rest/v1/company_profiles?select=id,company_name,category,city,phone,status,created_at&status=eq.active&order=created_at.desc").catch(() => []) || []; }
+      catch (_) {
+        // Before the 2026-11-08 database update: read the same public list the companies page shows.
+        companies = (await A.request("/rest/v1/company_profiles_public?select=id,company_name,category,city&order=company_name.asc").catch(() => []) || []).map(c => ({ status: "active", ...c }));
+      }
       const STATUS = { available: "منشور", reserved: "محجوز", sold: "تم البيع", approved: "منشور", active: "منشور" };
       listingsCache = [
         ...offers.map(o => ({ kind: "عقار", k: "offer", ...o })),
@@ -325,7 +328,7 @@
         const fn = { offer: "layan_admin_delete_property_offer", service: "layan_admin_delete_marketplace_listing", company: "layan_admin_delete_company_profile" }[lrow.dataset.kind];
         const r = await rpc(fn, { p_id: lrow.dataset.kind === "offer" ? Number(lrow.dataset.listing) : String(lrow.dataset.listing) });
         A.setStatus(done(r, "تم حذف الإعلان.")); loadListings(); refreshRequestsBadge();
-      } catch (e) { A.setStatus(needsMigration(e) ? "حذف الإعلانات يحتاج تطبيق تحديث قاعدة البيانات أولًا." : e.message); }
+      } catch (e) { A.setStatus(needsMigration(e) ? (lrow.dataset.kind === "company" ? "حذف الشركات يعمل بعد تشغيل تحديث قاعدة البيانات الأخير (زر Run في Supabase)." : "حذف الإعلانات يحتاج تطبيق تحديث قاعدة البيانات أولًا.") : e.message); }
       return;
     }
     const dec = t.closest("[data-request-decide]");
