@@ -52,6 +52,29 @@ async function main() {
     fs.writeFileSync(path.join(root, OUT, name + ".min.css"), header + code.toString() + "\n");
     console.log(`${name}.min.css  ${(combined.length / 1024).toFixed(0)} KB -> ${(code.length / 1024).toFixed(0)} KB`);
   }
+  refreshPageVersions();
+}
+// Point every page at the current bundle/theme version (content hash) so browsers and the
+// installed app's service worker always fetch the new CSS after a change.
+export function refreshPageVersions() {
+  const pages = [];
+  const walk = dir => {
+    for (const entry of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
+      const rel = path.posix.join(dir, entry.name);
+      if (entry.isDirectory() && (rel === "areas" || rel === "ads")) walk(rel);
+      else if (entry.isFile() && entry.name.endsWith(".html") && (dir === "." || dir === "areas" || dir === "ads")) pages.push(rel);
+    }
+  };
+  walk(".");
+  const themeHash = sourcesHash([THEME]);
+  for (const page of pages) {
+    const file = path.join(root, page);
+    const before = fs.readFileSync(file, "utf8");
+    const after = before
+      .replace(/assets\/build\/(\w+)\.min\.css\?v=[\w-]+/g, (m, name) => BUNDLES[name] ? `assets/build/${name}.min.css?v=${sourcesHash(BUNDLES[name])}` : m)
+      .replace(/assets\/theme\/asyut-premium\.css\?v=[\w-]+/g, `assets/theme/asyut-premium.css?v=${themeHash}`);
+    if (after !== before) fs.writeFileSync(file, after);
+  }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) await main();

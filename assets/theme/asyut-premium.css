@@ -1264,3 +1264,21 @@ body:has(.aa-chat.is-open) .aa-mascot { visibility: hidden; }
 @media (max-width: 700px) { .aa-mascot-badge { width: 24px; height: 24px; } .aa-mascot-badge svg { width: 13px; height: 13px; } }
 /* Keep the mascot in its corner (left) when the menu opens above it */
 .aa-mascot-button { align-self: flex-end; }
+
+/* App bottom navigation injected by app-shell.js on pages that had none (self-contained:
+   some pages don't load styles.css). Phones only. */
+.aa-appnav { display: none; }
+@media (max-width: 700px) {
+  body.has-appnav { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .aa-appnav { position: fixed; bottom: 0; right: 0; left: 0; z-index: 60; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px;
+    padding: 8px 8px max(8px, env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid var(--aa-line); box-shadow: 0 -8px 24px rgba(43, 33, 27, .08); font-family: var(--aa-body); }
+  .aa-appnav a, .aa-appnav button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-height: 48px;
+    border: 0; border-radius: 10px; background: transparent; color: var(--aa-espresso); font: inherit; text-decoration: none; cursor: pointer; }
+  .aa-appnav span { font-size: 21px; line-height: 1.25; color: #D9B9A0; }
+  .aa-appnav small { font-size: 10.5px; }
+  .aa-appnav .is-current { color: var(--aa-terracotta); font-weight: 800; }
+  .aa-appnav .is-current span { color: var(--aa-terracotta); }
+  .aa-appnav button span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #E9B08F, #C98A64); color: var(--aa-espresso); font-weight: 800; }
+}
+
+.site-credit { box-sizing: border-box; max-width: 100%; }
