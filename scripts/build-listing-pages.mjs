@@ -12,7 +12,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SITE = "https://layan-eg.com";
+const SITE = "https://www.asyutq.com";
 const ADS_DIR = path.join(root, "ads");
 const MANIFEST = path.join(ADS_DIR, "manifest.json");
 const DEFAULT_IMAGE = SITE + "/assets/brand/og-image.jpg";

@@ -12,7 +12,7 @@
   const SESSION_KEY = "layanSupabaseSession";
   // Production callbacks stay on the production domain; preview/local callbacks stay in TEST.
   const AUTH_REDIRECT_URL = config.ENVIRONMENT === "production"
-    ? "https://layan-eg.com/"
+    ? "https://www.asyutq.com/"
     : (window.location.origin.replace(/\/$/, "") + "/");
   const PROJECT_KEY_SUFFIX = new URL(url).hostname.split(".")[0];
   const RECOVERY_PKCE_STORAGE_KEY = "layanRecoveryCodeVerifier:" + PROJECT_KEY_SUFFIX;
@@ -394,7 +394,7 @@
     ctx.restore();
     // 2) Brand badge in the corner.
     const pad = Math.round(unit * 0.9);
-    const label = "أسيوط عقار · layan-eg.com";
+    const label = "أسيوط عقار · asyutq.com";
     ctx.font = "700 " + unit + "px Alexandria, Tahoma, Arial, sans-serif";
     const textWidth = ctx.measureText(label).width;
     const markSize = Math.round(unit * 1.5);
