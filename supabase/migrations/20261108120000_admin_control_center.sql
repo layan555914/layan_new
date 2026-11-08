@@ -175,56 +175,121 @@ BEGIN
 END
 $function$;
 
-CREATE OR REPLACE FUNCTION public.layan_admin_set_user_suspended(p_user uuid, p_suspended boolean)
+-- ---------------------------------------------------------------------------
+-- 4) Owner approval for destructive actions
+--    The owners (the original admin rule, private.layan_is_admin_base) act immediately.
+--    An admin added from the admin page creates a request that waits for an owner.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS private.layan_admin_requests (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  action text NOT NULL CHECK (action IN ('delete_user','suspend_user','unsuspend_user','delete_offer','delete_service')),
+  target text NOT NULL CHECK (char_length(target) <= 80),
+  target_label text CHECK (char_length(target_label) <= 200),
+  requested_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected','failed')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  decided_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  decided_at timestamptz,
+  note text CHECK (char_length(note) <= 300)
+);
+REVOKE ALL ON private.layan_admin_requests FROM PUBLIC, anon, authenticated;
+CREATE UNIQUE INDEX IF NOT EXISTS layan_admin_requests_one_pending
+  ON private.layan_admin_requests (action, target) WHERE status = 'pending';
+
+-- Performs an action. Internal only: never granted to any API role.
+CREATE OR REPLACE FUNCTION private.layan_admin_perform(p_action text, p_target text)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
 AS $function$
 BEGIN
-  -- Owner-only: admins added from the admin page cannot suspend/delete accounts or change admins.
-  IF auth.uid() IS NULL OR NOT COALESCE(private.layan_is_admin_base(), false) THEN
-    RAISE EXCEPTION 'هذا الإجراء متاح لمالك المنصة فقط' USING ERRCODE = '42501';
+  IF p_action = 'delete_user' THEN
+    DELETE FROM auth.users WHERE id = p_target::uuid;
+  ELSIF p_action = 'suspend_user' THEN
+    UPDATE auth.users SET banned_until = now() + interval '100 years' WHERE id = p_target::uuid;
+  ELSIF p_action = 'unsuspend_user' THEN
+    UPDATE auth.users SET banned_until = NULL WHERE id = p_target::uuid;
+  ELSIF p_action = 'delete_offer' THEN
+    DELETE FROM public.property_offers WHERE id = p_target::bigint;
+  ELSIF p_action = 'delete_service' THEN
+    DELETE FROM public.marketplace_listings WHERE id = p_target::uuid;
+  ELSE
+    RAISE EXCEPTION 'إجراء غير معروف' USING ERRCODE = '22023';
   END IF;
-  IF p_user = auth.uid() THEN RAISE EXCEPTION 'لا يمكنك إيقاف حسابك' USING ERRCODE = '22023'; END IF;
-  UPDATE auth.users SET banned_until = CASE WHEN p_suspended THEN now() + interval '100 years' ELSE NULL END WHERE id = p_user;
+  IF NOT FOUND THEN RAISE EXCEPTION 'العنصر غير موجود أو حُذف بالفعل' USING ERRCODE = 'P0002'; END IF;
 END
+$function$;
+REVOKE ALL ON FUNCTION private.layan_admin_perform(text, text) FROM PUBLIC, anon, authenticated;
+
+-- Owner: do it now and return 'done'. Added admin: queue it and return 'pending'.
+CREATE OR REPLACE FUNCTION private.layan_admin_act(p_action text, p_target text, p_label text)
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $function$
+BEGIN
+  IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
+    RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING ERRCODE = '42501';
+  END IF;
+  IF p_action IN ('delete_user','suspend_user') AND p_target = auth.uid()::text THEN
+    RAISE EXCEPTION 'لا يمكنك تنفيذ هذا الإجراء على حسابك' USING ERRCODE = '22023';
+  END IF;
+  IF COALESCE(private.layan_is_admin_base(), false) THEN
+    PERFORM private.layan_admin_perform(p_action, p_target);
+    RETURN 'done';
+  END IF;
+  INSERT INTO private.layan_admin_requests (action, target, target_label, requested_by)
+  VALUES (p_action, p_target, left(p_label, 200), auth.uid())
+  ON CONFLICT (action, target) WHERE status = 'pending' DO NOTHING;
+  RETURN 'pending';
+END
+$function$;
+REVOKE ALL ON FUNCTION private.layan_admin_act(text, text, text) FROM PUBLIC, anon, authenticated;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_set_user_suspended(p_user uuid, p_suspended boolean)
+RETURNS text
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $function$
+  SELECT private.layan_admin_act(CASE WHEN p_suspended THEN 'suspend_user' ELSE 'unsuspend_user' END, p_user::text,
+         (SELECT u.email::text FROM auth.users u WHERE u.id = p_user));
 $function$;
 
 CREATE OR REPLACE FUNCTION public.layan_admin_delete_user(p_user uuid)
-RETURNS void
-LANGUAGE plpgsql
+RETURNS text
+LANGUAGE sql
 SECURITY DEFINER
 SET search_path = ''
 AS $function$
-BEGIN
-  -- Owner-only: admins added from the admin page cannot suspend/delete accounts or change admins.
-  IF auth.uid() IS NULL OR NOT COALESCE(private.layan_is_admin_base(), false) THEN
-    RAISE EXCEPTION 'هذا الإجراء متاح لمالك المنصة فقط' USING ERRCODE = '42501';
-  END IF;
-  IF p_user = auth.uid() THEN RAISE EXCEPTION 'لا يمكنك حذف حسابك من هنا' USING ERRCODE = '22023'; END IF;
-  DELETE FROM auth.users WHERE id = p_user;
-END
+  SELECT private.layan_admin_act('delete_user', p_user::text, (SELECT u.email::text FROM auth.users u WHERE u.id = p_user));
 $function$;
 
 CREATE OR REPLACE FUNCTION public.layan_admin_delete_property_offer(p_id bigint)
-RETURNS void
-LANGUAGE plpgsql
+RETURNS text
+LANGUAGE sql
 SECURITY DEFINER
 SET search_path = ''
 AS $function$
-BEGIN
-  IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
-    RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING ERRCODE = '42501';
-  END IF;
-  DELETE FROM public.property_offers WHERE id = p_id;
-  IF NOT FOUND THEN RAISE EXCEPTION 'الإعلان غير موجود' USING ERRCODE = 'P0002'; END IF;
-END
+  SELECT private.layan_admin_act('delete_offer', p_id::text, (SELECT o.title FROM public.property_offers o WHERE o.id = p_id));
 $function$;
 
 CREATE OR REPLACE FUNCTION public.layan_admin_delete_marketplace_listing(p_id uuid)
-RETURNS void
+RETURNS text
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+AS $function$
+  SELECT private.layan_admin_act('delete_service', p_id::text, (SELECT m.title FROM public.marketplace_listings m WHERE m.id = p_id));
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_list_requests(p_status text DEFAULT 'pending')
+RETURNS TABLE (id bigint, action text, target text, target_label text, requested_by_email text, status text,
+               created_at timestamptz, decided_by_email text, decided_at timestamptz, note text, can_decide boolean)
 LANGUAGE plpgsql
+STABLE
 SECURITY DEFINER
 SET search_path = ''
 AS $function$
@@ -232,8 +297,44 @@ BEGIN
   IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
     RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING ERRCODE = '42501';
   END IF;
-  DELETE FROM public.marketplace_listings WHERE id = p_id;
-  IF NOT FOUND THEN RAISE EXCEPTION 'الإعلان غير موجود' USING ERRCODE = 'P0002'; END IF;
+  RETURN QUERY
+  SELECT r.id, r.action, r.target, r.target_label, ru.email::text, r.status, r.created_at, du.email::text, r.decided_at, r.note,
+         COALESCE(private.layan_is_admin_base(), false) AND r.status = 'pending'
+  FROM private.layan_admin_requests r
+  LEFT JOIN auth.users ru ON ru.id = r.requested_by
+  LEFT JOIN auth.users du ON du.id = r.decided_by
+  WHERE p_status IS NULL OR p_status = '' OR r.status = p_status
+  ORDER BY r.created_at DESC
+  LIMIT 500;
+END
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_decide_request(p_id bigint, p_approve boolean, p_note text DEFAULT NULL)
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $function$
+DECLARE
+  r private.layan_admin_requests%ROWTYPE;
+BEGIN
+  IF auth.uid() IS NULL OR NOT COALESCE(private.layan_is_admin_base(), false) THEN
+    RAISE EXCEPTION 'اعتماد الطلبات متاح لمالك المنصة فقط' USING ERRCODE = '42501';
+  END IF;
+  SELECT * INTO r FROM private.layan_admin_requests WHERE id = p_id AND status = 'pending' FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'الطلب غير موجود أو تم البت فيه' USING ERRCODE = 'P0002'; END IF;
+  IF p_approve THEN
+    BEGIN
+      PERFORM private.layan_admin_perform(r.action, r.target);
+    EXCEPTION WHEN OTHERS THEN
+      UPDATE private.layan_admin_requests SET status = 'failed', decided_by = auth.uid(), decided_at = now(), note = left(SQLERRM, 300) WHERE id = p_id;
+      RETURN 'failed';
+    END;
+  END IF;
+  UPDATE private.layan_admin_requests
+     SET status = CASE WHEN p_approve THEN 'approved' ELSE 'rejected' END, decided_by = auth.uid(), decided_at = now(), note = left(p_note, 300)
+   WHERE id = p_id;
+  RETURN CASE WHEN p_approve THEN 'approved' ELSE 'rejected' END;
 END
 $function$;
 
@@ -289,6 +390,8 @@ BEGIN
     'public.layan_admin_delete_property_offer(bigint)',
     'public.layan_admin_delete_marketplace_listing(uuid)',
     'public.layan_admin_list_admins()',
+    'public.layan_admin_list_requests(text)',
+    'public.layan_admin_decide_request(bigint, boolean, text)',
     'public.layan_admin_set_admin(text, boolean)'
   ] LOOP
     EXECUTE 'REVOKE ALL ON FUNCTION ' || f || ' FROM PUBLIC, anon';

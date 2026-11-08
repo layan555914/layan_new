@@ -1211,3 +1211,7 @@ body .admin-profile header { display: flex; justify-content: space-between; alig
 body .admin-pending { padding: 14px; border: 1px dashed var(--aa-terracotta); border-radius: 12px; background: #FBEFE8; }
 body .admin-note { color: #8A7B6F; font-size: 12.5px; }
 @media (max-width: 760px) { body .admin-kpis, body .admin-columns { grid-template-columns: 1fr 1fr; } body .admin-columns { grid-template-columns: 1fr; } }
+
+/* Admin: pending approval counter on the "طلبات الاعتماد" tab */
+.admin-console .admin-badge { display: inline-grid; place-items: center; min-width: 1.5em; height: 1.5em; padding: 0 .35em; margin-inline-start: .35em; border-radius: 999px; background: #a9442a; color: #fff; font-size: .78em; font-weight: 800; line-height: 1; }
+.admin-console .admin-badge[hidden] { display: none; }

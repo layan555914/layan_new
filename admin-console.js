@@ -169,7 +169,7 @@
     panel.innerHTML = '<p class="admin-empty">جارٍ تحميل صلاحيات الإدارة...</p>';
     try {
       const rows = await rpc("layan_admin_list_admins") || [];
-      panel.innerHTML = `<p>الحساب العادي لا يدخل لوحة الإدارة أبدًا. أضف هنا حسابات مسجلة بالفعل لتصبح «إدارة»، أو أزل الصلاحية. حساب المالك الأساسي ثابت ولا يُزال من هنا.</p>` +
+      panel.innerHTML = `<p>الحساب العادي لا يدخل لوحة الإدارة أبدًا. أضف هنا حسابات مسجلة بالفعل لتصبح «إدارة»، أو أزل الصلاحية. حسابات المالك ثابتة ولا تُزال من هنا، ومنح الصلاحية أو إزالتها للمالك فقط. المدير المضاف يراجع ويطلب الحذف، والمالك يعتمد.</p>` +
         toolbar(`<input type="email" data-admin-email placeholder="بريد الحساب المسجل"><button class="btn btn-gold" type="button" data-admin-add>منح صلاحية الإدارة</button>`) +
         `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>البريد</th><th>تاريخ المنح</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.email)}</td><td>${date(r.added_at)}</td><td><button type="button" class="is-danger" data-admin-remove="${esc(r.email)}">إزالة الصلاحية</button></td></tr>`).join("") || '<tr><td colspan="3">لا توجد حسابات إدارة إضافية. المالك الأساسي فقط.</td></tr>'}</tbody></table></div>`;
     } catch (error) {
@@ -177,7 +177,37 @@
     }
   }
 
-  const loaders = { overview: loadOverview, users: loadUsers, activity: loadActivity, listings: loadListings, admins: loadAdmins };
+  // ---- Owner approval requests ----
+  const ACTIONS = { delete_user: "حذف حساب", suspend_user: "إيقاف حساب", unsuspend_user: "إعادة تفعيل حساب", delete_offer: "حذف إعلان عقار", delete_service: "حذف خدمة" };
+  const STATES = { pending: "بانتظار المالك", approved: "تم الاعتماد والتنفيذ", rejected: "مرفوض", failed: "تعذر التنفيذ" };
+  const done = (result, doneText) => result === "pending"
+    ? "تم إرسال الطلب إلى المالك للاعتماد. سيُنفَّذ بعد موافقته."
+    : doneText;
+  async function refreshRequestsBadge() {
+    try {
+      const rows = await rpc("layan_admin_list_requests", { p_status: "pending" }) || [];
+      const badge = root.querySelector("[data-requests-count]");
+      if (badge) { badge.textContent = rows.length; badge.hidden = !rows.length; }
+    } catch (_) {}
+  }
+  async function loadRequests() {
+    const panel = panels.requests;
+    panel.innerHTML = '<p class="admin-empty">جارٍ تحميل الطلبات...</p>';
+    try {
+      const status = panel.dataset.status ?? "pending";
+      const rows = await rpc("layan_admin_list_requests", { p_status: status || null }) || [];
+      const isOwner = rows.some(r => r.can_decide);
+      panel.innerHTML = `<p>حذف الحسابات والإعلانات وإيقاف الحسابات بواسطة أي مدير مضاف يصل هنا أولًا، ولا يُنفَّذ إلا بعد اعتماد المالك. ما ينفذه المالك بنفسه يُنفَّذ مباشرة.</p>` +
+        toolbar(`<label>العرض <select data-requests-status>${[["pending", "بانتظار الاعتماد"], ["", "كل الطلبات"], ["approved", "المعتمدة"], ["rejected", "المرفوضة"]].map(([v, l]) => `<option value="${v}" ${v === status ? "selected" : ""}>${l}</option>`).join("")}</select></label>`) +
+        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>الطلب</th><th>العنصر</th><th>مقدم الطلب</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr data-request="${esc(r.id)}"><td>${esc(ACTIONS[r.action] || r.action)}</td><td>${esc(r.target_label || r.target)}</td><td>${esc(r.requested_by_email || "")}</td><td>${date(r.created_at)}</td><td>${esc(STATES[r.status] || r.status)}${r.note ? `<br><small>${esc(r.note)}</small>` : ""}</td><td>${r.can_decide ? `<button type="button" class="btn btn-gold" data-request-decide="1">اعتماد وتنفيذ</button> <button type="button" class="is-danger" data-request-decide="0">رفض</button>` : (r.status === "pending" ? "بانتظار المالك" : (r.decided_by_email ? esc(r.decided_by_email) : ""))}</td></tr>`).join("") || '<tr><td colspan="6">لا توجد طلبات.</td></tr>'}</tbody></table></div>` +
+        (isOwner || !rows.length ? "" : '<p class="admin-empty">الاعتماد متاح لحسابات المالك فقط.</p>');
+      refreshRequestsBadge();
+    } catch (error) {
+      panel.innerHTML = needsMigration(error) ? pendingNote : `<p class="admin-empty">${esc(error.message)}</p>`;
+    }
+  }
+
+  const loaders = { overview: loadOverview, users: loadUsers, activity: loadActivity, listings: loadListings, requests: loadRequests, admins: loadAdmins };
   function openTab(name) {
     root.querySelectorAll("[data-admin-tab]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.adminTab === name)));
     Object.entries(panels).forEach(([k, p]) => { p.hidden = k !== name; });
@@ -203,21 +233,34 @@
     if (row && t.closest("[data-user-suspend]")) {
       const suspend = t.closest("[data-user-suspend]").dataset.userSuspend === "1";
       if (!confirm(suspend ? "إيقاف هذا الحساب؟ لن يستطيع تسجيل الدخول." : "إعادة تفعيل هذا الحساب؟")) return;
-      try { await rpc("layan_admin_set_user_suspended", { p_user: row.dataset.user, p_suspended: suspend }); A.setStatus(suspend ? "تم إيقاف الحساب." : "تم تفعيل الحساب."); loadUsers(); } catch (e) { A.setStatus(e.message); }
+      try { const r = await rpc("layan_admin_set_user_suspended", { p_user: row.dataset.user, p_suspended: suspend }); A.setStatus(done(r, suspend ? "تم إيقاف الحساب." : "تم تفعيل الحساب.")); loadUsers(); refreshRequestsBadge(); } catch (e) { A.setStatus(e.message); }
       return;
     }
     if (row && t.closest("[data-user-delete]")) {
       if (!confirm("حذف هذا الحساب نهائيًا؟ لا يمكن التراجع عن الحذف.")) return;
-      try { await rpc("layan_admin_delete_user", { p_user: row.dataset.user }); A.setStatus("تم حذف الحساب."); loadUsers(); } catch (e) { A.setStatus(e.message); }
+      try { const r = await rpc("layan_admin_delete_user", { p_user: row.dataset.user }); A.setStatus(done(r, "تم حذف الحساب.")); loadUsers(); refreshRequestsBadge(); } catch (e) { A.setStatus(e.message); }
       return;
     }
     const lrow = t.closest("[data-listing]");
     if (lrow && t.closest("[data-listing-delete]")) {
       if (!confirm("حذف هذا الإعلان نهائيًا من المنصة؟ لا يمكن التراجع عن الحذف.")) return;
       try {
-        await rpc(lrow.dataset.kind === "offer" ? "layan_admin_delete_property_offer" : "layan_admin_delete_marketplace_listing", { p_id: lrow.dataset.kind === "offer" ? Number(lrow.dataset.listing) : String(lrow.dataset.listing) });
-        A.setStatus("تم حذف الإعلان."); loadListings();
+        const r = await rpc(lrow.dataset.kind === "offer" ? "layan_admin_delete_property_offer" : "layan_admin_delete_marketplace_listing", { p_id: lrow.dataset.kind === "offer" ? Number(lrow.dataset.listing) : String(lrow.dataset.listing) });
+        A.setStatus(done(r, "تم حذف الإعلان.")); loadListings(); refreshRequestsBadge();
       } catch (e) { A.setStatus(needsMigration(e) ? "حذف الإعلانات يحتاج تطبيق تحديث قاعدة البيانات أولًا." : e.message); }
+      return;
+    }
+    const dec = t.closest("[data-request-decide]");
+    if (dec) {
+      const approve = dec.dataset.requestDecide === "1";
+      const id = Number(dec.closest("[data-request]").dataset.request);
+      if (!confirm(approve ? "اعتماد الطلب وتنفيذه الآن؟ الحذف لا يمكن التراجع عنه." : "رفض هذا الطلب؟")) return;
+      const note = approve ? null : (prompt("سبب الرفض (اختياري)") || null);
+      try {
+        const r = await rpc("layan_admin_decide_request", { p_id: id, p_approve: approve, p_note: note });
+        A.setStatus(r === "approved" ? "تم اعتماد الطلب وتنفيذه." : r === "failed" ? "تعذر التنفيذ: العنصر غير موجود أو حُذف بالفعل." : "تم رفض الطلب.");
+        loadRequests(); loaded.delete("users"); loaded.delete("listings");
+      } catch (e) { A.setStatus(e.message); }
       return;
     }
     if (t.closest("[data-admin-add]")) {
@@ -236,6 +279,7 @@
   root.addEventListener("change", event => {
     if (event.target.matches("[data-overview-days]")) { panels.overview.dataset.days = event.target.value; loadOverview(); }
     if (event.target.matches("[data-activity-type], [data-activity-days]")) loadActivity();
+    if (event.target.matches("[data-requests-status]")) { panels.requests.dataset.status = event.target.value; loadRequests(); }
   });
   root.addEventListener("keydown", event => { if (event.key === "Enter" && event.target.matches("[data-user-search]")) loadUsers(); });
 
@@ -250,5 +294,6 @@
     const current = root.querySelector('[data-admin-tab][aria-selected="true"]')?.dataset.adminTab || "overview";
     loaded.clear();
     openTab(current);
+    refreshRequestsBadge();
   });
 })();
