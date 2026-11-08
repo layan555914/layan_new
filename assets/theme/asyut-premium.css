@@ -1223,3 +1223,26 @@ body .admin-note { color: #8A7B6F; font-size: 12.5px; }
 .site-credit a:hover { opacity: 1; color: #c76b4a; }
 .site-credit-footer { padding: 6px 16px 22px; background: transparent; color: #6f5b4b; }
 @media (max-width: 760px) { .site-credit { font-size: 11.5px; } .site-credit span { margin: 0 .3em; } }
+
+/* Assistant button v2: recognizable chat icon + clear label ("extended" button that
+   shrinks to a round chat icon while scrolling down and expands again on scroll up). */
+.aa-chat-toggle { width: auto; height: 54px; min-height: 54px; padding: 0 20px 0 8px; gap: 10px; font-size: 15px; border-radius: 999px;
+  justify-content: flex-start; overflow: hidden; transition: padding .25s ease, gap .25s ease, box-shadow .2s ease, transform .2s ease; }
+.aa-chat-toggle::after { content: none; display: none; }
+.aa-chat-toggle:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(43, 33, 27, .36); }
+.aa-chat-toggle:focus-visible { outline: 3px solid var(--aa-peach); outline-offset: 3px; }
+.aa-chat-ico { position: relative; flex: 0 0 auto; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--aa-terracotta); color: #fff; font-size: 0; }
+.aa-chat-toggle .aa-chat-ico { color: #fff; }
+.aa-chat-ico svg { width: 22px; height: 22px; display: block; }
+.aa-chat-dot { position: absolute; top: 1px; right: 1px; width: 10px; height: 10px; border-radius: 50%; background: #3fb36b; border: 2px solid var(--aa-espresso); }
+.aa-chat-label { color: var(--aa-sand); font-family: var(--aa-head); font-weight: 700; font-size: 15px; white-space: nowrap; max-width: 160px; opacity: 1; transition: max-width .25s ease, opacity .2s ease; }
+.aa-chat.is-compact .aa-chat-toggle { padding: 0 7px; gap: 0; }
+.aa-chat.is-compact .aa-chat-label { max-width: 0; opacity: 0; }
+@media (max-width: 700px) {
+  .aa-chat-toggle { width: auto; height: 50px; min-height: 50px; padding: 0 16px 0 6px; gap: 8px; }
+  .aa-chat-ico { width: 38px; height: 38px; }
+  .aa-chat-label { font-size: 14px; }
+  .aa-chat.is-compact .aa-chat-toggle { padding: 0 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .aa-chat-toggle, .aa-chat-label { transition: none; } }
