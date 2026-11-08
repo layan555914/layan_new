@@ -141,3 +141,31 @@ test("PKCE recovery code without the same-browser verifier is rejected safely", 
   await expect(page.locator("#submitBtn")).toBeDisabled();
   await expect(page).toHaveURL(/\/reset-password\.html$/);
 });
+
+test("expired or already-used recovery links offer a fresh link that works in any browser", async ({ page }) => {
+  let payload = null;
+  let redirectTarget = null;
+  await page.route(SUPABASE + "/auth/v1/recover**", async route => {
+    payload = route.request().postDataJSON();
+    redirectTarget = new URL(route.request().url()).searchParams.get("redirect_to");
+    await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
+  });
+
+  await page.goto("/reset-password.html#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired");
+  await expect(page.locator("#status")).toContainText("استُخدم من قبل أو انتهت صلاحيته");
+  await expect(page.locator("#resetForm")).toBeHidden();
+  await expect(page.locator("#newLinkForm")).toBeVisible();
+  expect(new URL(page.url()).hash).toBe("");
+
+  await page.locator("#newLinkEmail").fill("  User@Example.invalid ");
+  await page.locator("#newLinkBtn").click();
+  await expect(page.locator("#status")).toContainText("ستصلك رسالة");
+  expect(payload).toEqual({ email: "user@example.invalid" });
+  expect(redirectTarget).toBe(new URL("/reset-password.html", page.url()).href);
+});
+
+test("a recovery link opened in another browser (no PKCE verifier) also offers a fresh link", async ({ page }) => {
+  await page.goto("/reset-password.html?code=code-from-another-browser");
+  await expect(page.locator("#newLinkForm")).toBeVisible();
+  await expect(page.locator("#submitBtn")).toBeHidden();
+});
