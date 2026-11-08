@@ -1,3 +1,5 @@
+// Anti-clickjacking: GitHub Pages cannot send X-Frame-Options, so the admin page refuses to run inside a frame.
+if (window.top !== window.self) { document.documentElement.style.display = "none"; try { window.top.location = window.self.location.href; } catch (_) {} }
 document.addEventListener("DOMContentLoaded", () => {
   "use strict";
   const config = window.LAYAN_CONFIG || {};

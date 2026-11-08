@@ -23,6 +23,9 @@
     if (window.XLSX) return resolve(window.XLSX);
     const s = document.createElement("script");
     s.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+    // Subresource integrity: the browser refuses the file if the CDN copy is ever altered.
+    s.integrity = "sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw";
+    s.crossOrigin = "anonymous";
     s.onload = () => window.XLSX ? resolve(window.XLSX) : reject(new Error("xlsx"));
     s.onerror = () => reject(new Error("xlsx"));
     document.head.appendChild(s);
