@@ -169,3 +169,23 @@ test("a recovery link opened in another browser (no PKCE verifier) also offers a
   await expect(page.locator("#newLinkForm")).toBeVisible();
   await expect(page.locator("#submitBtn")).toBeHidden();
 });
+
+test("on an http page (no crypto.subtle) recovery and signup emails are still sent without PKCE", async ({ page }) => {
+  const payloads = {};
+  for (const name of ["recover", "signup"]) {
+    await page.route(SUPABASE + "/auth/v1/" + name + "**", async route => {
+      payloads[name] = route.request().postDataJSON();
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(name === "signup" ? { user: { id: "u" } } : {}) });
+    });
+  }
+  await page.route(SUPABASE + "/rest/v1/**", route => route.fulfill({ status: 200, contentType: "application/json", body: "[]" }));
+  await page.addInitScript(() => { Object.defineProperty(window.crypto, "subtle", { get: () => undefined, configurable: true }); });
+  await page.goto("/");
+  await page.evaluate(async () => {
+    await window.LAYAN_SUPABASE.resetPasswordForEmail("http-user@example.invalid");
+    await window.LAYAN_SUPABASE.signUp("http-user@example.invalid", "Test-Only-123!", { full_name: "x" });
+  });
+  expect(payloads.recover).toEqual({ email: "http-user@example.invalid" });
+  expect(payloads.signup.email).toBe("http-user@example.invalid");
+  expect(payloads.signup.code_challenge).toBeUndefined();
+});

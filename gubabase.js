@@ -33,8 +33,11 @@
   }
 
   async function createPkceChallenge(storageKey, context, reuseExisting = false) {
+    // crypto.subtle exists only on https pages. On http (e.g. before the domain's certificate is
+    // issued) fall back to the plain email-link flow instead of blocking signup/reset emails;
+    // reset-password.html and the signup callback both accept the plain (#access_token) return.
     if (!window.crypto?.getRandomValues || !window.crypto?.subtle) {
-      throw new Error("المتصفح لا يدعم التحقق الآمن لـ" + context + ". حدّث Chrome وحاول مرة أخرى.");
+      return { codeChallenge: null, reusedExisting: false, insecure: true };
     }
     if (reuseExisting) {
       try {
@@ -144,8 +147,7 @@
           phone: String(profile.phone || "").slice(0, 20),
           account_type: String(profile.account_type || "").slice(0, 20)
         } } : {}),
-        code_challenge: pkce.codeChallenge,
-        code_challenge_method: "s256"
+        ...(pkce.codeChallenge ? { code_challenge: pkce.codeChallenge, code_challenge_method: "s256" } : {})
       });
       normalizeSession(data);
       const needsEmailConfirmation = !data?.access_token;
@@ -180,8 +182,7 @@
     try {
       return await authRequest(query, {
         email: cleanEmail,
-        code_challenge: codeChallenge,
-        code_challenge_method: "s256"
+        ...(codeChallenge ? { code_challenge: codeChallenge, code_challenge_method: "s256" } : {})
       });
     } catch (error) {
       try { localStorage.removeItem(RECOVERY_PKCE_STORAGE_KEY); } catch (_) {}
