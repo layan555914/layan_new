@@ -743,7 +743,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const isCompany = Boolean(o.company_ad_id || o.trust_badge === "company" || /شركة|مكتب|للتطوير|العقارية/.test(advertiser));
       const initial = advertiser.replace(/^(ال)/, "").trim().charAt(0) || "أ";
       const specs = [o.area_m2 ? `${esc(o.area_m2)} م²` : "", o.bedrooms ? `${esc(o.bedrooms)} ${Number(o.bedrooms) === 2 ? "غرفتان" : "غرف"}` : "", o.bathrooms ? `${esc(o.bathrooms)} حمام` : ""].filter(Boolean);
-      const money2 = value => Math.round(num(value)).toLocaleString("en-US") + " ج.م";
+      const money2 = value => num(value) > 1 ? Math.round(num(value)).toLocaleString("en-US") + " ج.م" : "السعر غير معلن";
       const finance = [
         num(o.down_payment) > 0 ? `<span>مقدم <b>${money2(o.down_payment)}</b></span>` : "",
         num(o.remaining_amount) > 0 ? `<span>متبقي <b>${money2(o.remaining_amount)}</b></span>` : "",
