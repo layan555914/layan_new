@@ -115,11 +115,19 @@ document.addEventListener("DOMContentLoaded", () => {
       state(grid, error.message || "تعذر تحميل العقارات المميزة.", true);
     }
   }
+  const SERVICE_CATEGORIES = [
+    "الشركات والمكاتب العقارية",
+    "مواد البناء والتشطيب",
+    "الأثاث والفرش وتجهيز الوحدات",
+    "المشروعات والمطورون العقاريون",
+    "الصيانة وإدارة العقارات",
+    "الاستشارات والخدمات العقارية"
+  ];
   async function loadServices() {
     const grid = $("featuredServicesGrid");
     try {
       const rows = await rest("marketplace_listings?select=id,category,title,description,city,area,price,contact_phone,whatsapp,image_urls,created_at,is_featured&status=eq.approved&order=is_featured.desc,created_at.desc&limit=100");
-      const featured = rows.filter(item => item.is_featured === true);
+      const featured = rows.filter(item => SERVICE_CATEGORIES.includes(item.category) && item.is_featured === true);
       grid.innerHTML = featured.length ? featured.map(serviceCard).join("") :
         '<p class="featured-state">لا توجد خدمات مميزة منشورة حاليًا. <a href="./marketplace.html">تصفح سوق الخدمات</a>.</p>';
     } catch (error) {
