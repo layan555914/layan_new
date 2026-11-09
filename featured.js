@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   const money = value => {
     const number = Number(value);
-    return Number.isFinite(number) && number > 0 ? number.toLocaleString("en-US") + " ج.م" : "السعر عند التواصل";
+    return Number.isFinite(number) && number > 1 ? number.toLocaleString("en-US") + " ج.م" : "السعر غير معلن";
   };
   function state(grid, message, error) {
     if (!grid) return;
