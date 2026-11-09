@@ -1,0 +1,128 @@
+/* Official sponsor section — scoped to the home page only */
+.official-sponsor-section {
+  width: min(1160px, calc(100% - 32px));
+  margin: clamp(26px, 4vw, 48px) auto;
+}
+.official-sponsor-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: clamp(22px, 4vw, 48px);
+  min-height: 254px;
+  padding: clamp(24px, 4vw, 42px);
+  color: var(--aa-sand, #F3ECE1);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(201,138,100,.18), transparent 34%),
+    linear-gradient(120deg, #2B211B 0%, #3A2D25 62%, #2B211B 100%);
+  border: 1px solid rgba(201,138,100,.58);
+  border-radius: 22px;
+  box-shadow: 0 16px 42px rgba(43,31,27,.16);
+}
+.official-sponsor-card::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  z-index: -1;
+  border: 1px solid rgba(233,176,143,.16);
+  border-radius: 15px;
+  pointer-events: none;
+}
+.official-sponsor-copy { min-width: 0; }
+.official-sponsor-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 6px 13px;
+  color: #F8E5D5;
+  background: rgba(201,138,100,.15);
+  border: 1px solid rgba(233,176,143,.55);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.official-sponsor-kicker::before {
+  content: "★";
+  color: #E9B08F;
+  font-size: 13px;
+}
+.official-sponsor-copy h2 {
+  margin: 0;
+  color: #FFF8F0;
+  font-family: var(--aa-head, Alexandria, Tahoma, sans-serif);
+  font-size: clamp(25px, 3vw, 34px);
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+.official-sponsor-copy p {
+  max-width: 650px;
+  margin: 10px 0 0;
+  color: #E8DDD1;
+  font-size: 14px;
+  line-height: 1.9;
+}
+.official-sponsor-subline {
+  display: block;
+  margin-top: 8px;
+  color: #E9B08F;
+  font-size: 12px;
+  font-weight: 700;
+}
+.official-sponsor-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  margin-top: 20px;
+  padding: 10px 19px;
+  color: #FFF8F0 !important;
+  background: #A4472A;
+  border: 1px solid #C98A64;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background .2s ease, transform .2s ease;
+}
+.official-sponsor-link:hover {
+  background: #8C3A21;
+  transform: translateY(-1px);
+}
+.official-sponsor-logo-wrap {
+  display: grid;
+  place-items: center;
+  width: min(190px, 100%);
+  aspect-ratio: 1;
+  justify-self: center;
+  padding: 7px;
+  background: #FFF;
+  border: 1px solid rgba(233,176,143,.8);
+  border-radius: 50%;
+  box-shadow: 0 12px 30px rgba(0,0,0,.22), 0 0 0 7px rgba(233,176,143,.08);
+}
+.official-sponsor-logo-wrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+}
+@media (max-width: 700px) {
+  .official-sponsor-section { width: calc(100% - 24px); margin: 24px auto; }
+  .official-sponsor-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 18px;
+    padding: 25px 19px;
+    text-align: center;
+  }
+  .official-sponsor-logo-wrap { width: 142px; grid-row: 1; }
+  .official-sponsor-copy { grid-row: 2; }
+  .official-sponsor-copy p { margin-inline: auto; font-size: 13px; }
+  .official-sponsor-link { width: 100%; max-width: 320px; }
+}
