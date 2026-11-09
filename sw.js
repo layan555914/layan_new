@@ -1,8 +1,11 @@
-const CACHE_NAME = "asyut-aqar-shell-v140-asyutq-20261108";
+const CACHE_NAME = "asyut-aqar-shell-v141-asyutq-20261109";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./offers.html",
+  "./featured.html",
+  "./featured.css",
+  "./featured.js",
   "./property.html",
   "./property.css",
   "./property.js",
@@ -52,6 +55,8 @@ const APP_SHELL = [
   "./advertiser.html",
   "./advertiser.js",
   "./assets/brand/mascot.webp",
+  "./assets/brand/golden-ratio-logo.svg",
+  "./assets/theme/official-sponsor.css",
   "./manifest.json",
   "./pwa.js",
   "./icon.svg",
