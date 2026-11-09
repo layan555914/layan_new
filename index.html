@@ -572,12 +572,12 @@
 
       <label>
         المدينة / المركز
-        <input name="city" type="text" list="asyut-centers" placeholder="اختر أو اكتب المدينة / المركز" autocomplete="address-level2">        <datalist id="asyut-centers"><option value="مدينة أسيوط"><option value="أسيوط الجديدة"><option value="ديروط"><option value="القوصية"><option value="منفلوط"><option value="أبنوب"><option value="الفتح"><option value="ساحل سليم"><option value="البداري"><option value="أبو تيج"><option value="صدفا"><option value="الغنايم"></datalist>      </label>
+        <input name="city" type="text" list="asyut-centers" placeholder="اختر أو اكتب المدينة / المركز" autocomplete="address-level2">        <datalist id="asyut-centers"><option value="مدينة أسيوط"><option value="أسيوط الجديدة"><option value="الهضبة"><option value="ديروط"><option value="القوصية"><option value="منفلوط"><option value="أبنوب"><option value="الفتح"><option value="ساحل سليم"><option value="البداري"><option value="أبو تيج"><option value="صدفا"><option value="الغنايم"></datalist>      </label>
 
       <label>
         المنطقة
-        <input name="area" type="text" list="asyut-neighborhoods" placeholder="اسم الحي أو المنطقة">
-        <datalist id="asyut-neighborhoods"></datalist>
+        <input name="area" type="text" maxlength="120" placeholder="اكتب اسم الحي أو المنطقة بنفسك" autocomplete="address-level3">
+        
       </label>
 
       <details class="location-coordinates">
