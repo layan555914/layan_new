@@ -344,7 +344,7 @@
   }
   async function getOffers() {
     const fields = [
-      "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price",
+      "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price","price_on_request",
       "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","contact_name","owner_id","latitude","longitude","created_at","updated_at"
@@ -609,7 +609,8 @@
       monthly_installment: Number(offer.monthly_installment || 0) || null,
       property_type: offer.property_type || "شقة",
       description: offer.description || null,
-      total_price: Number(offer.total_price || 0),
+      price_on_request: offer.price_on_request === true,
+      total_price: offer.price_on_request === true ? null : Number(offer.total_price || 0),
       down_payment: Number(offer.down_payment || 0),
       paid_amount: Number(offer.paid_amount || 0),
       remaining_amount: Number(offer.remaining_amount ?? offer.remaining_installments ?? 0),
