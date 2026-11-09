@@ -109,10 +109,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   financeNote.setAttribute("aria-live", "polite");
   const remainingField = form?.querySelector('[name="remaining_installments"]');
   remainingField?.closest("label")?.insertAdjacentElement("afterend", financeNote);
+  const priceOnRequestToggle = form?.querySelector('[name="price_on_request"]');
+  const totalPriceInput = form?.querySelector('[name="total_price"]');
   const financeFields = ["total_price", "paid_amount", "remaining_installments"].map(name => form?.querySelector('[name="' + name + '"]')).filter(Boolean);
   const formatFinance = value => new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 0 }).format(value) + " جنيه";
   function updateFinanceCheck() {
     if (!financeNote || !form) return;
+    if (priceOnRequestToggle?.checked) {
+      financeNote.textContent = "السعر عند التواصل؛ لن نعرض مبلغًا إجماليًا في الإعلان. يمكن توضيح تفاصيل الدفع في وصف الوحدة.";
+      financeNote.dataset.state = "neutral";
+      return;
+    }
     const read = name => Number(form.querySelector('[name="' + name + '"]')?.value || 0);
     const total = read("total_price"), paid = read("paid_amount"), remaining = read("remaining_installments");
     const entered = paid + remaining;
@@ -127,8 +134,17 @@ document.addEventListener("DOMContentLoaded", async () => {
        difference < 0 ? " · تنبيه: المدفوع والمتبقي يتجاوزان إجمالي السعر." : " · الأرقام متوافقة.");
     financeNote.dataset.state = difference < 0 ? "warning" : difference === 0 ? "ok" : "neutral";
   }
+  function updatePriceRequestState() {
+    const enabled = priceOnRequestToggle?.checked === true;
+    if (totalPriceInput) {
+      totalPriceInput.disabled = enabled;
+      totalPriceInput.required = !enabled;
+    }
+    updateFinanceCheck();
+  }
   financeFields.forEach(field => field.addEventListener("input", updateFinanceCheck));
-  updateFinanceCheck();
+  priceOnRequestToggle?.addEventListener("change", updatePriceRequestState);
+  updatePriceRequestState();
   const photosPreview = document.createElement("div");
   photosPreview.className = "layan-photo-preview";
   photosPreview.setAttribute("aria-live", "polite");
@@ -529,7 +545,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   function openPropertyComparison() {
     const selected=compareIds().map(id=>offers.find(o=>String(o.id)===id)).filter(Boolean); if(selected.length<2)return;
-    const rows=[["نوع المعاملة",o=>compareValue(o.listing_purpose||"تنازل")],["نوع العقار",o=>compareValue(o.property_type)],["المدينة / المركز",o=>compareValue(o.city)],["الحي / المنطقة",o=>compareValue(o.area)],["السعر المعلن",o=>compareValue(o.total_price,"money")],["المقدم",o=>compareValue(o.down_payment,"money")],["إجمالي المدفوع",o=>compareValue(o.paid_amount,"money")],["المبلغ المتبقي",o=>compareValue(o.remaining_amount,"money")],["القسط الشهري",o=>compareValue(o.monthly_installment,"money")],["رسوم التنازل",o=>compareValue(o.assignment_fee,"money")],["المساحة",o=>compareValue(o.area_m2,"area")],["غرف النوم",o=>compareValue(o.bedrooms,"count")],["الحمامات",o=>compareValue(o.bathrooms,"count")],["المطور / الشركة",o=>compareValue(o.developer_name)],["كود الإعلان",o=>compareValue(offerCode(o))]];
+    const rows=[["نوع المعاملة",o=>compareValue(o.listing_purpose||"تنازل")],["نوع العقار",o=>compareValue(o.property_type)],["المدينة / المركز",o=>compareValue(o.city)],["الحي / المنطقة",o=>compareValue(o.area)],["السعر المعلن",o=>o.price_on_request ? "السعر عند التواصل" : compareValue(o.total_price,"money")],["المقدم",o=>compareValue(o.down_payment,"money")],["إجمالي المدفوع",o=>compareValue(o.paid_amount,"money")],["المبلغ المتبقي",o=>compareValue(o.remaining_amount,"money")],["القسط الشهري",o=>compareValue(o.monthly_installment,"money")],["رسوم التنازل",o=>compareValue(o.assignment_fee,"money")],["المساحة",o=>compareValue(o.area_m2,"area")],["غرف النوم",o=>compareValue(o.bedrooms,"count")],["الحمامات",o=>compareValue(o.bathrooms,"count")],["المطور / الشركة",o=>compareValue(o.developer_name)],["كود الإعلان",o=>compareValue(offerCode(o))]];
     const wrap=$("compareTableWrap"); if(!wrap)return;
     const head="<table class=compare-table><thead><tr><th>بيانات المقارنة</th>"+selected.map(o=>"<th><div class=compare-property-head><strong>"+esc(o.title)+"</strong><small>"+esc(offerCode(o))+"</small><button type=button data-remove-compare="+esc(o.id)+">إزالة</button></div></th>").join("")+"</tr></thead><tbody>";
     const body=rows.map(r=>"<tr><th scope=row>"+r[0]+"</th>"+selected.map(o=>"<td>"+r[1](o)+"</td>").join("")+"</tr>").join("");
@@ -582,6 +598,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       bathrooms: num(row.bathrooms),
       monthly_installment: num(row.monthly_installment),
       property_type: row.property_type || "شقة",
+      price_on_request: row.price_on_request === true,
       total_price: num(row.total_price),
       down_payment: num(row.down_payment),
       paid_amount: paid,
@@ -668,7 +685,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!purpose || normalizeSearch(o.listing_purpose || "تنازل") === purpose) &&
         (!city || normalizeSearch(o.city) === city) &&
         (!area || normalizeSearch(o.area) === area) &&
-        (totalPriceMax === null || num(o.total_price) <= totalPriceMax) &&
+        (totalPriceMax === null || (!o.price_on_request && num(o.total_price) <= totalPriceMax)) &&
         (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) &&
         (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) &&
         (minBedrooms === null || num(o.bedrooms) >= minBedrooms) &&
@@ -683,8 +700,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       const bFeatured = b.is_featured && (!b.featured_until || new Date(b.featured_until) > new Date());
       const featuredOrder = Number(bFeatured) - Number(aFeatured);
       if (featuredOrder) return featuredOrder;
-      if (sort === "price-asc") return num(a.total_price) - num(b.total_price);
-      if (sort === "price-desc") return num(b.total_price) - num(a.total_price);
+      if (sort === "price-asc" || sort === "price-desc") {
+        const aUnknownPrice = a.price_on_request || num(a.total_price) <= 1;
+        const bUnknownPrice = b.price_on_request || num(b.total_price) <= 1;
+        if (aUnknownPrice !== bUnknownPrice) return aUnknownPrice ? 1 : -1;
+        const difference = num(a.total_price) - num(b.total_price);
+        return sort === "price-asc" ? difference : -difference;
+      }
       if (sort === "paid-asc") return num(a.paid_amount || a.down_payment) - num(b.paid_amount || b.down_payment);
       if (sort === "monthly-asc") {
         const av = num(a.monthly_installment), bv = num(b.monthly_installment);
@@ -770,7 +792,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="offer-card-content">
             <div class="listing-head">
               <h3><a href="${detailsHref}">${esc(o.title)}</a></h3>
-              <strong class="listing-price">${money2(o.total_price)}${isRent ? " / شهر" : ""}</strong>
+              <strong class="listing-price">${o.price_on_request ? "السعر عند التواصل" : money2(o.total_price)}${!o.price_on_request && isRent ? " / شهر" : ""}</strong>
             </div>
             <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join("، ") || "أسيوط")}</p>
             ${specs.length ? `<p class="listing-specs">${specs.join(" <i>•</i> ")}</p>` : ""}
@@ -833,7 +855,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="company-property-type">${esc(o.property_type || "عقار")}</span>
           <strong>${esc(o.title || "عرض عقاري")}</strong>
           <span>${esc([o.city, o.area].filter(Boolean).join("، ") || "أسيوط")}</span>
-          <b>${money(o.total_price)}</b>
+          <b>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price)}</b>
         </li>`).join("");
       const countLabel = c.id
         ? `${c.properties.length} عقار منشور ضمن إعلان الشركة`
@@ -935,7 +957,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${o.area_m2 ? `<p><span>المساحة</span><strong>${esc(o.area_m2)} م²</strong></p>` : ""}
         ${o.bedrooms ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
         ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
-        <p><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></p>
+        <p><span>السعر الإجمالي</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price)}</strong></p>
         <p><span>المقدم المدفوع عند التعاقد</span><strong>${money(o.down_payment)}</strong></p>
         <p><span>إجمالي المدفوع حتى الآن (شامل المقدم)</span><strong>${money(o.paid_amount)}</strong></p>
         <p><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></p>
@@ -1323,6 +1345,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       monthly_installment: amount("monthly_installment"),
       property_type: value("property_type") || "شقة",
       description: value("description"),
+      price_on_request: priceOnRequestToggle?.checked === true,
       total_price: amount("total_price"),
       down_payment: amount("down_payment"),
       paid_amount: amount("paid_amount"),
@@ -1369,23 +1392,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    if (offer.total_price <= 0) {
+    if (!offer.price_on_request && offer.total_price <= 0) {
       setStatus("اكتب إجمالي سعر صحيحًا أكبر من صفر.");
       return;
     }
-    if (offer.down_payment < 0 || offer.down_payment > offer.total_price) {
+    if (!offer.price_on_request && (offer.down_payment < 0 || offer.down_payment > offer.total_price)) {
       setStatus("المقدم يجب أن يكون بين صفر وإجمالي السعر.");
       return;
     }
-    if (offer.paid_amount < 0 || offer.paid_amount > offer.total_price) {
+    if (!offer.price_on_request && (offer.paid_amount < 0 || offer.paid_amount > offer.total_price)) {
       setStatus("المبلغ المدفوع يجب ألا يتجاوز إجمالي السعر.");
       return;
     }
-    if (offer.remaining_amount < 0 || offer.remaining_amount > offer.total_price) {
+    if (!offer.price_on_request && (offer.remaining_amount < 0 || offer.remaining_amount > offer.total_price)) {
       setStatus("المبلغ المتبقي يجب أن يكون بين صفر وإجمالي السعر.");
       return;
     }
-    if (offer.paid_amount + offer.remaining_amount > offer.total_price + 0.01) {
+    if (!offer.price_on_request && offer.paid_amount + offer.remaining_amount > offer.total_price + 0.01) {
       setStatus("مجموع المبلغ المدفوع والمتبقي أكبر من إجمالي السعر؛ راجع الأرقام قبل الإرسال.");
       return;
     }
