@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!typeMatches) return false;
     if (p.city && normalizeLocation(o.city)!==normalizeLocation(p.city)) return false;
     if (p.area && !normalizeLocation(o.area).includes(normalizeLocation(p.area))) return false;
-    if (p.max_total_price>0 && Number(o.total_price||0)>p.max_total_price) return false;
+    if (p.max_total_price>0 && (o.price_on_request || Number(o.total_price||0)>p.max_total_price)) return false;
     const upfront = Number(o.paid_amount||0)+Number(o.assignment_fee||0);
     if (p.max_upfront>0 && upfront>p.max_upfront) return false;
     const monthly = Number(o.monthly_installment||0);
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function render(rows,p) {
     count.textContent = rows.length + " عرض";
     if (!rows.length) { cards.innerHTML='<div class="buyer-empty">مفيش عرض مطابق لكل الشروط حاليًا. جرّب توسّع الميزانية أو تغيّر المنطقة.</div>'; return; }
-    cards.innerHTML=rows.map(o=>`<article class="buyer-match-card"><span class="buyer-match-type">${esc(o.property_type||"عقار")}</span><h4>${esc(o.title||"عرض عقاري")}</h4><p>📍 ${esc([o.city||o.governorate,o.area].filter(Boolean).join(" · ")||"أسيوط")}</p><div class="buyer-match-price"><span>السعر الإجمالي</span><strong>${money(o.total_price)}</strong></div><div class="buyer-match-price"><span>المدفوع + رسوم التنازل</span><strong>${money(Number(o.paid_amount||0)+Number(o.assignment_fee||0))}</strong></div>${Number(o.monthly_installment||0)>0?`<div class="buyer-match-price"><span>القسط الشهري المسجل</span><strong>${money(o.monthly_installment)}</strong></div>`:""}<a class="btn btn-gold" href="./?offer=${encodeURIComponent(o.id)}" data-buyer-title="${esc(o.title||"عرض عقاري")}">شوف العرض في القائمة</a></article>`).join("");
+    cards.innerHTML=rows.map(o=>`<article class="buyer-match-card"><span class="buyer-match-type">${esc(o.property_type||"عقار")}</span><h4>${esc(o.title||"عرض عقاري")}</h4><p>📍 ${esc([o.city||o.governorate,o.area].filter(Boolean).join(" · ")||"أسيوط")}</p><div class="buyer-match-price"><span>السعر الإجمالي</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price)}</strong></div><div class="buyer-match-price"><span>المدفوع + رسوم التنازل</span><strong>${money(Number(o.paid_amount||0)+Number(o.assignment_fee||0))}</strong></div>${Number(o.monthly_installment||0)>0?`<div class="buyer-match-price"><span>القسط الشهري المسجل</span><strong>${money(o.monthly_installment)}</strong></div>`:""}<a class="btn btn-gold" href="./?offer=${encodeURIComponent(o.id)}" data-buyer-title="${esc(o.title||"عرض عقاري")}">شوف العرض في القائمة</a></article>`).join("");
   }
   let saved = null;
   let knownMatches = new Set();
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     catch(error){alertCount.textContent="تعذر تحميل التنبيهات: "+(error.message||"");}
   }
   async function loadOffers() {
-    const rows = await request("/rest/v1/property_offers?select=id,title,governorate,city,area,latitude,longitude,property_type,total_price,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc", {
+    const rows = await request("/rest/v1/property_offers?select=id,title,governorate,city,area,latitude,longitude,property_type,total_price,price_on_request,paid_amount,assignment_fee,monthly_installment,bedrooms,status,created_at&status=eq.available&order=created_at.desc", {
       headers: { Authorization: "Bearer " + (config?.SUPABASE_PUBLISHABLE_KEY || "") }
     });
     const hints=document.getElementById("buyerAreaHints");
