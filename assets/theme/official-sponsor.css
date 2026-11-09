@@ -121,7 +121,8 @@
     padding: 25px 19px;
     text-align: center;
   }
-  .official-sponsor-logo-wrap { width: 142px; }
+  .official-sponsor-logo-wrap { width: 142px; grid-row: 1; }
+  .official-sponsor-copy { grid-row: 2; }
   .official-sponsor-copy p { margin-inline: auto; font-size: 13px; }
   .official-sponsor-link { width: 100%; max-width: 320px; }
 }
