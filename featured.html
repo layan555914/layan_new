@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/build/home.min.css?v=9677fa3cbb8b1d79">
-  <link rel="stylesheet" href="./featured.css?v=4">
+  <link rel="stylesheet" href="./assets/build/home.min.css?v=ff50e7711d0ca35f">
+  <link rel="stylesheet" href="./featured.css?v=5">
   <link rel="icon" href="./icon.svg?v=20261105-2" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="أسيوط عقار | ASYUT AQAR">
@@ -40,17 +40,20 @@
     </div>
   </header>
 
-  <main class="featured-page">
-    <section class="featured-hero">
-      <span class="featured-eyebrow">ASYUT AQAR · أسيوط</span>
-      <h1>الإعلانات المميزة</h1>
-      <p>مكان واحد لاكتشاف العقارات والخدمات والإعلانات التجارية النشطة التي اعتمدتها إدارة أسيوط عقار. تظهر الشارة حسب حالة التمييز المسجلة للإعلان.</p>
+  <main class="featured-main">
+    <section class="page-hero featured-hero" aria-labelledby="featuredPageTitle">
+      <div class="page-hero-copy">
+      <span class="eyebrow">الإعلانات المميزة · محافظة أسيوط</span>
+      <h1 id="featuredPageTitle">الإعلانات المميزة<span>أفضل العقارات والخدمات في أسيوط</span></h1>
+      <p>مختارات مميزة من العقارات والخدمات والعروض التجارية في مكان واحد — تصفّحها بسهولة وتواصل مباشرة مع أصحابها.</p>
       <div class="featured-shortcuts" aria-label="انتقل إلى نوع الإعلان">
         <a href="#featuredProperties">العقارات المميزة</a>
         <a href="#featuredServices">الخدمات المميزة</a>
         <a href="#featuredSponsors">الإعلانات التجارية</a>
       </div>
+      </div>
     </section>
+    <div class="featured-page">
 
     <section class="featured-section" id="featuredProperties" aria-labelledby="featuredPropertiesTitle">
       <div class="featured-heading">
@@ -80,6 +83,7 @@
       <div><span class="featured-kicker">دليل الشركات</span><h2>الشركات والأنشطة المعتمدة</h2><p>ملفات الشركات المعتمدة متاحة في الدليل. لا يتضمن العرض العام الحالي حقلًا مستقلًا يحدد «شركة مميزة»، لذلك لا نضع شارة تمييز على أي شركة دون اعتماد هذه الحالة في النظام.</p></div>
       <a class="btn btn-gold" href="./companies.html">تصفح دليل الشركات</a>
     </section>
+    </div>
   </main>
 
   <footer class="featured-footer">
@@ -88,7 +92,8 @@
 
   <script src="./config.js?v=20261105-7"></script>
   <script src="./gubabase.js?v=20261108-4"></script>
-  <script src="./sponsored-ads.js?v=20261110-2"></script>
+  <script src="./sponsored-ads.js?v=20261110-3"></script>
   <script src="./featured.js?v=3"></script>
+<script src="./site-nav.js?v=20261110-1" defer></script>
 </body>
 </html>

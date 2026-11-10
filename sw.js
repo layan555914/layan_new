@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v143-sponsor-kicker-20261110";
+const CACHE_NAME = "asyut-aqar-shell-v144-site-nav-20261110";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -48,6 +48,7 @@ const APP_SHELL = [
   "./listing-form.js",
   "./tracking.js",
   "./app-shell.js",
+  "./site-nav.js",
   "./admin-edits.js",
   "./advertiser.html",
   "./advertiser.js",
