@@ -16,15 +16,17 @@ function tinyPng() {
 }
 
 async function mockBackend(page) {
-  const state = { offers: [], services: [], uploads: [] };
+  const state = { offers: [], services: [], uploads: [], expireNextUpload: false, refreshes: 0 };
   const user = { id: USER_ID, email: "all-types@example.invalid", email_confirmed_at: "2026-11-01T00:00:00Z", app_metadata: {}, user_metadata: {} };
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
   await page.route(SUPABASE + "/**", async route => {
     const req = route.request(); const url = new URL(req.url()); const path = url.pathname; const method = req.method();
+    if (path === "/auth/v1/token" && url.searchParams.get("grant_type") === "refresh_token") state.refreshes++;
     if (path === "/auth/v1/token") return reply(route, { access_token: "t", refresh_token: "r", token_type: "bearer", expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user });
     if (path === "/auth/v1/user") return reply(route, user);
     if (path.startsWith("/auth/v1/")) return reply(route, {});
     if (path.startsWith("/storage/v1/object/")) {
+      if (state.expireNextUpload) { state.expireNextUpload = false; return reply(route, { statusCode: "403", error: "Unauthorized", message: '"exp" claim timestamp check failed', code: "AccessDenied" }, 400); }
       const body = req.postDataBuffer();
       state.uploads.push({ type: req.headers()["content-type"], jpeg: !!body && body[0] === 0xFF && body[1] === 0xD8 && body[2] === 0xFF });
       return reply(route, { Key: path });
@@ -154,4 +156,21 @@ test("rooms follow the property type, and a project ad can be sent without a pri
   expect(state.offers[0]).toMatchObject({ property_type: "مشروع عقاري", price_on_request: true });
   expect(state.offers[0].bedrooms || 0).toBe(0);
   expect(state.offers[0].bathrooms || 0).toBe(0);
+});
+
+
+test("image upload survives an expired login token (refreshes once and retries)", async ({ page }) => {
+  const state = await mockBackend(page);
+  await page.goto("/");
+  await login(page);
+  state.expireNextUpload = true;
+  const result = await page.evaluate(async () => {
+    const bytes = new Uint8Array([0xFF, 0xD8, 0xFF, 0xE0, 0, 16, 74, 70, 73, 70, 0, 1, 0xFF, 0xD9]);
+    const file = new File([bytes], "photo.jpg", { type: "image/jpeg" });
+    try { return { urls: await window.LAYAN_SUPABASE.uploadImages([file]) }; } catch (e) { return { error: e.message }; }
+  });
+  expect(result.error).toBeUndefined();
+  expect(result.urls).toHaveLength(1);
+  expect(state.refreshes).toBe(1);
+  expect(state.uploads).toHaveLength(1);
 });

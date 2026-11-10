@@ -28,11 +28,14 @@
     const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
     const id = (crypto.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2));
     const path = "offers/" + session.user.id + "/" + prefix + "-" + id + ".jpg";
-    const r = await fetch(base + "/storage/v1/object/layan_real_estat/" + path, {
-      method: "POST",
-      headers: { apikey: cfg.SUPABASE_PUBLISHABLE_KEY, Authorization: "Bearer " + session.access_token, "Content-Type": "image/jpeg", "x-upsert": "false" },
-      body: jpg
-    });
+    const target = base + "/storage/v1/object/layan_real_estat/" + path;
+    const r = typeof auth.authedFetch === "function"
+      ? await auth.authedFetch(target, { method: "POST", headers: { "Content-Type": "image/jpeg", "x-upsert": "false" }, body: jpg })
+      : await fetch(target, {
+          method: "POST",
+          headers: { apikey: cfg.SUPABASE_PUBLISHABLE_KEY, Authorization: "Bearer " + session.access_token, "Content-Type": "image/jpeg", "x-upsert": "false" },
+          body: jpg
+        });
     if (!r.ok) { const t = await r.text(); throw new Error("تعذر رفع الصورة: " + (t.match(/"message":"([^"]+)/)?.[1] || r.status)); }
     return base + "/storage/v1/object/public/layan_real_estat/" + path;
   }
