@@ -36,6 +36,7 @@ async function mock(page, state) {
     if (path.startsWith("/storage/v1/object/") && method === "POST") { state.uploads.push({ path, type: req.headers()["content-type"], body: req.postDataBuffer() }); return reply(route, { Key: path }); }
     if (path === "/rest/v1/rpc/layan_advertiser_logos") { const items = req.postDataJSON().p_items || []; state.asked.push(...items); return reply(route, items.map(i => ({ owner_id: i.o, brand_key: i.n.trim().toLowerCase(), logo_url: i.n.trim().toLowerCase() === "hayah city" ? LOGO : null }))); }
     if (path === "/rest/v1/rpc/layan_my_advertiser_logos") return reply(route, state.mine);
+    if (path === "/rest/v1/rpc/layan_admin_whoami") return reply(route, "none");
     if (path === "/rest/v1/rpc/layan_set_my_advertiser_logo") { const b = req.postDataJSON(); state.set.push(b); state.mine = [{ brand_key: b.p_brand.toLowerCase(), brand_name: b.p_brand, logo_url: null, pending_logo_url: b.p_url }]; return reply(route, "pending"); }
     if (path === "/rest/v1/property_offers" && url.searchParams.get("select") === "contact_name,developer_name") return reply(route, [{ contact_name: "Hayah City" }, { contact_name: "مباني أدريس" }, { contact_name: "Hayah  City" }]);
     const offer = (id, name) => ({ id, title: "إعلان " + name, governorate: "أسيوط", city: "مدينة أسيوط", area: "الحمراء", property_type: "شقة", listing_purpose: "بيع",
@@ -68,7 +69,7 @@ test("listing card shows the advertiser's approved logo in the circle", async ({
   await expect(page.locator(".listing-card", { hasText: "إعلان مباني أدريس" })).toHaveCount(0);
 });
 
-test("a large, wide image is cropped to a centred 320×320 JPEG and sent for approval", async ({ page }) => {
+test("a large, wide image is shrunk to fit a 512×512 JPEG (whole logo kept) and sent for approval", async ({ page }) => {
   const state = { uploads: [], set: [], mine: [], asked: [] };
   await mock(page, state);
   await page.addInitScript(o => sessionStorage.setItem("layanSupabaseSession", JSON.stringify({ access_token: "t", refresh_token: "r", expires_at: Math.floor(Date.now() / 1000) + 3600, user: { id: o, email: "logo-owner@example.invalid" } })), OWNER);
@@ -81,7 +82,7 @@ test("a large, wide image is cropped to a centred 320×320 JPEG and sent for app
   expect(state.uploads).toHaveLength(1);
   expect(state.uploads[0].type).toBe("image/jpeg");
   expect(state.uploads[0].path).toContain("/offers/" + OWNER + "/logo-");
-  expect(jpegSize(state.uploads[0].body)).toEqual({ w: 320, h: 320 });
+  expect(jpegSize(state.uploads[0].body)).toEqual({ w: 512, h: 512 });
   expect(state.set[0].p_brand).toBe("مباني أدريس");
   expect(state.set[0].p_url).toContain("/storage/v1/object/public/layan_real_estat/offers/" + OWNER + "/logo-");
   await expect(page.locator("[data-brand-row='مباني أدريس'] .my-logo-status")).toContainText("بانتظار مراجعة الإدارة");

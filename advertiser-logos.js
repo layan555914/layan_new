@@ -66,9 +66,15 @@
   }
 
   // Crop to a centred square and resize, so any photo or wide/tall logo fits the circle.
-  async function squareJpeg(file, size = 320) {
-    if (!file || !/^image\//.test(file.type || "")) throw new Error("اختر صورة (JPG أو PNG).");
-    if (file.size > 15 * 1024 * 1024) throw new Error("حجم الصورة كبير جدًا (الحد 15 ميجابايت).");
+  // Fit the WHOLE image inside a square (no cropping, so a wide logo keeps its text), centred on white,
+  // and shrink it to 512×512 — any big photo/logo becomes a small, sharp file that fits the circle.
+  async function squareJpeg(file, size = 512) {
+    if (!file) throw new Error("اختر صورة.");
+    const type = String(file.type || "").toLowerCase();
+    if (type && !/^image\/(jpeg|jpg|png|webp|gif|bmp)$/.test(type)) {
+      throw new Error(/heic|heif/.test(type) ? "صيغة صور الآيفون (HEIC) غير مدعومة في المتصفح. صوّرها لقطة شاشة أو حوّلها إلى JPG ثم ارفعها." : "اختر صورة بصيغة JPG أو PNG.");
+    }
+    if (file.size > 25 * 1024 * 1024) throw new Error("حجم الصورة كبير جدًا (الحد 25 ميجابايت).");
     let bitmap;
     try { bitmap = await createImageBitmap(file); }
     catch (_) {
@@ -79,14 +85,18 @@
     }
     const w = bitmap.width, h = bitmap.height;
     if (!w || !h) throw new Error("تعذر قراءة الصورة.");
-    const side = Math.min(w, h);
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = size;
     const ctx = canvas.getContext("2d");
     ctx.fillStyle = "#ffffff"; // transparent logos get a clean white background
     ctx.fillRect(0, 0, size, size);
+    ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(bitmap, (w - side) / 2, (h - side) / 2, side, side, 0, 0, size, size);
+    // 84% of the circle: the corners of a square logo stay inside the round frame.
+    const box = size * 0.84;
+    const scale = Math.min(box / w, box / h);
+    const dw = Math.round(w * scale), dh = Math.round(h * scale);
+    ctx.drawImage(bitmap, Math.round((size - dw) / 2), Math.round((size - dh) / 2), dw, dh);
     const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.9));
     if (!blob) throw new Error("تعذر تجهيز الصورة.");
     return blob;
@@ -100,12 +110,22 @@
     const id = (crypto.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2));
     const path = "offers/" + session.user.id + "/logo-" + id + ".jpg";
     const r = await api.authedFetch(base + "/storage/v1/object/layan_real_estat/" + path, { method: "POST", headers: { "Content-Type": "image/jpeg", "x-upsert": "false" }, body: jpg });
-    if (!r.ok) throw new Error("تعذر رفع الصورة. حاول مرة أخرى.");
+    if (!r.ok) { const t = await r.text().catch(() => ""); throw new Error("تعذر رفع الصورة. حاول مرة أخرى." + (t ? " (" + t.slice(0, 120) + ")" : "")); }
     const url = base + "/storage/v1/object/public/layan_real_estat/" + path;
     const s2 = await api.authedFetch(base + "/rest/v1/rpc/layan_set_my_advertiser_logo", {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ p_brand: brand, p_url: url })
     });
-    if (!s2.ok) throw new Error("تعذر حفظ الشعار. حاول مرة أخرى.");
+    if (!s2.ok) { const t = await s2.text().catch(() => ""); throw new Error("تعذر حفظ الشعار. اعمل تحديث للصفحة (Ctrl + Shift + R) ثم حاول مرة أخرى." + (t ? " (" + t.slice(0, 120) + ")" : "")); }
+    // The owners (المدير) approve logos anyway: their own upload is approved right away.
+    try {
+      const who = await api.authedFetch(base + "/rest/v1/rpc/layan_admin_whoami", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+      if (who.ok && (await who.json()) === "owner") {
+        await api.authedFetch(base + "/rest/v1/rpc/layan_admin_review_logo", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ p_user: session.user.id, p_brand_key: brandKey(brand), p_approve: true })
+        });
+      }
+    } catch (_) { /* stays pending for approval */ }
     return url;
   }
   async function removeMyLogo(brand) {
@@ -164,7 +184,7 @@
           '<div class="adv-logo-circle my-logo-preview' + ((waiting || live) ? " has-logo" : "") + '" aria-hidden="true">' + ((waiting || live) ? '<img src="' + escHtml(waiting || live) + '" alt="">' : "▦") + '</div>' +
           '<div class="my-logo-info"><strong>' + escHtml(name) + '</strong><small class="my-logo-status">' + status + '</small></div>' +
           '<div class="my-logo-actions"><label class="btn btn-gold my-logo-upload">' + (live || waiting ? "تغيير الشعار" : "رفع شعار / صورة") +
-          '<input type="file" accept="image/jpeg,image/png,image/webp" data-camera-ready="1" data-logo-input hidden></label>' +
+          '<input type="file" accept="image/*" data-camera-ready="1" data-logo-input hidden></label>' +
           ((live || waiting) ? '<button type="button" class="btn btn-outline" data-logo-remove>إزالة</button>' : "") + '</div></div>';
       }).join("");
     };
