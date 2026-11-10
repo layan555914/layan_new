@@ -142,7 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const footer = document.querySelector("footer");
-  if (footer) {
+  // The redesigned footer already has this button in its «للمعلنين» column.
+  if (footer && !footer.querySelector("[data-open-sponsor-form]")) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "sponsor-footer-link";
