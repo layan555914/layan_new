@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderCard(ad) {
+    if (window.AsyutSponsoredAd) return window.AsyutSponsoredAd.render(ad);
     // Show only the advertiser's own verified image; otherwise render the neutral business-name placeholder.
     const image = safeUrl(ad.image_url);
     const target = safeUrl(ad.target_url);
@@ -78,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // or one "advertise here" card when no ad is approved yet. Re-applied after each filter render.
   const offersGrid = document.body.classList.contains("page-offers") && !document.body.classList.contains("page-advertiser") ? document.getElementById("offersGrid") : null;
   function inlineCard(ad) {
+    if (window.AsyutSponsoredAd) return window.AsyutSponsoredAd.render(ad, { className: "sponsor-inline", attr: "data-sponsor-inline" });
     return renderCard(ad).replace('class="offer-card sponsor-card"', 'class="offer-card sponsor-card sponsor-inline" data-sponsor-inline');
   }
   function placeInlineAds() {

@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const OFFER_FIELDS = [
     ["title", "عنوان الإعلان", "text", { required: true, maxlength: 160, wide: true }],
     ["listing_purpose", "نوع الإعلان", "select", { options: [["تنازل", "تنازل عقاري"], ["بيع", "بيع مباشر"], ["إيجار", "إيجار"]] }],
-    ["property_type", "نوع العقار", "select", { options: ["شقة", "فيلا", "محل", "مكتب إداري", "عيادة طبية", "مخزن", "معرض", "أرض مطروحة للبناء", "أرض تنازل"].map(v => [v, v]) }],
+    ["property_type", "نوع العقار", "select", { options: ["شقة", "فيلا", "محل", "مكتب إداري", "عيادة طبية", "مخزن", "معرض", "مشروع عقاري", "أرض مطروحة للبناء", "أرض تنازل"].map(v => [v, v]) }],
     ["city", "المدينة / المركز", "text", { list: "asyut-centers" }],
     ["area", "الحي / المنطقة", "text"],
     ["area_m2", "المساحة (م²)", "number"],
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const step = type === "int" ? ' step="1" min="0"' : type === "number" ? ' step="any" min="0" inputmode="decimal"' : "";
       control = '<input name="' + name + '" type="' + inputType + '"' + step + req + max + (opt.list ? ' list="' + opt.list + '"' : "") + (type === "tel" ? ' dir="ltr" inputmode="tel"' : "") + ' value="' + esc(value) + '">';
     }
-    return '<label class="' + (opt.wide ? "is-wide" : "") + '">' + esc(label) + control + "</label>";
+    return '<label class="' + (opt.wide ? "is-wide" : "") + '" data-field="' + name + '">' + esc(label) + control + "</label>";
   }
 
   function renderPhotos() {
@@ -147,6 +147,22 @@ document.addEventListener("DOMContentLoaded", () => {
     $("myEditPhotoHint").textContent = all.length + " / " + max + " صور — «صورة الغلاف» هي اللي بتظهر في مربع الإعلان الخارجي. اضغط «اجعلها الغلاف» لتغييرها، و× للحذف.";
     filesInput.disabled = all.length >= max;
   }
+
+  // Bedrooms only for homes; bathrooms not for land/projects (same rule as the add form).
+  function syncTypeFields() {
+    const typeSel = fieldsBox.querySelector('[name="property_type"]');
+    if (!typeSel) return;
+    const t = String(typeSel.value || "");
+    const kind = window.LAYAN_PROPERTY_KIND ? window.LAYAN_PROPERTY_KIND(t)
+      : /مشروع|كمبوند|طرح/.test(t) ? "project" : /أرض|ارض/.test(t) ? "land"
+      : /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(t) ? "residential" : "commercial";
+    const bed = fieldsBox.querySelector('[data-field="bedrooms"]'), bath = fieldsBox.querySelector('[data-field="bathrooms"]');
+    if (bed) bed.hidden = kind !== "residential";
+    if (bath) bath.hidden = kind === "land" || kind === "project";
+    const land = fieldsBox.querySelectorAll('[data-field="land_area_m2"], [data-field="land_zoning"]');
+    land.forEach(n => { n.hidden = kind !== "land"; });
+  }
+  fieldsBox.addEventListener("change", e => { if (e.target.name === "property_type") syncTypeFields(); });
 
   function openEdit(kind, row) {
     const fields = kind === "offer" ? OFFER_FIELDS : SERVICE_FIELDS;
@@ -161,6 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     editStatus.textContent = "";
     filesInput.value = "";
     renderPhotos();
+    syncTypeFields();
     $("myEditSave").disabled = false;
     dialog.showModal();
   }

@@ -103,7 +103,7 @@ function listingPage(template, row) {
   const specs = [
     row.property_type, purpose, place,
     row.area_m2 ? row.area_m2 + " م²" : "",
-    row.bedrooms ? row.bedrooms + " غرف" : ""
+    row.bedrooms && /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(String(row.property_type || "")) ? row.bedrooms + " غرف" : ""
   ].filter(Boolean).join(" · ");
   const description = (specs + ". " + String(row.description || "")).replace(/\s+/g, " ").trim().slice(0, 155);
   const schema = {
