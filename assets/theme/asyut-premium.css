@@ -1371,3 +1371,11 @@ body .adv-logo-img, .adv-logo-circle img { display: block; width: 100%; height: 
 .my-logo-upload { cursor: pointer; }
 .my-logo-empty { margin: 0; color: #7A6556; }
 @media (max-width: 600px) { .my-logo-row { grid-template-columns: 56px minmax(0, 1fr); } .my-logo-preview { width: 56px; height: 56px; } .my-logo-actions { grid-column: 1 / -1; } .my-logo-actions .btn { flex: 1 1 auto; } }
+/* Bigger advertiser circle so logos read well (2026-11-10) */
+body .listing-advertiser { gap: 12px; }
+body .listing-avatar { width: 56px; height: 56px; font-size: 21px; }
+body .listing-avatar.has-logo { width: 60px; height: 60px; }
+body .advertiser-avatar.has-logo { width: 104px; height: 104px; }
+.my-logo-row { grid-template-columns: 80px minmax(0, 1fr) auto; }
+.my-logo-preview { width: 80px; height: 80px; }
+@media (max-width: 600px) { body .listing-avatar { width: 50px; height: 50px; } body .listing-avatar.has-logo { width: 54px; height: 54px; } .my-logo-row { grid-template-columns: 64px minmax(0, 1fr); } .my-logo-preview { width: 64px; height: 64px; } }
