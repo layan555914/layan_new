@@ -170,7 +170,13 @@ Deno.serve(async (req: Request) => {
     });
 
     if (!geminiResponse.ok) {
-      console.error("Gemini API request failed with status", geminiResponse.status);
+      const errorPayload = await geminiResponse.json().catch(() => null) as {
+        error?: { message?: unknown; status?: unknown; code?: unknown };
+      } | null;
+      const safeApiMessage = typeof errorPayload?.error?.message === "string"
+        ? errorPayload.error.message.slice(0, 300)
+        : "No error message returned";
+      console.error("Gemini API request rejected", geminiResponse.status, safeApiMessage);
       if (geminiResponse.status === 429) {
         return json({ error: "الخدمة مشغولة حاليًا. حاول مرة أخرى بعد قليل." }, 429, origin);
       }
