@@ -26,7 +26,8 @@
     layan_admin_review_property_offer: "مراجعة إعلان عقار", layan_activate_supplier_ad: "تفعيل إعلان ممول",
     layan_reject_supplier_ad: "رفض إعلان ممول", layan_admin_set_offer_trust_badge: "توثيق معلن",
     layan_review_company_profile: "مراجعة ملف شركة", layan_admin_review_edit: "مراجعة تعديل على إعلان",
-    directory_admin_mutate_with_audit: "تعديل في الدليل العقاري", layan_approve_free_trial_ad: "اعتماد إعلان تجريبي"
+    directory_admin_mutate_with_audit: "تعديل في الدليل العقاري", layan_approve_free_trial_ad: "اعتماد إعلان تجريبي",
+    layan_admin_review_logo: "مراجعة شعار معلن"
   };
   const VERB = { POST: "إضافة", PATCH: "تعديل", DELETE: "حذف", PUT: "تعديل" };
 

@@ -812,7 +812,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <p class="listing-meta"><span>${esc(offerCode(o))}</span><span>${postedAgo(o.created_at)}</span>${trustBadge(o)}</p>
             <div class="listing-footer">
               <div class="listing-advertiser">
-                <span class="listing-avatar${isCompany ? " is-company" : ""}" aria-hidden="true">${isCompany ? "▦" : esc(initial)}</span>
+                <span class="listing-avatar${isCompany ? " is-company" : ""}" aria-hidden="true"${o.owner_id ? ` data-owner-avatar="${esc(o.owner_id)}"` : ""}>${isCompany ? "▦" : esc(initial)}</span>
                 <div><b>${esc(advertiser)}</b>${advertiserHref ? `<a href="${advertiserHref}">كل إعلانات المعلن</a>` : ""}</div>
               </div>
               <div class="listing-actions">
