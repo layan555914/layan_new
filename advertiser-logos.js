@@ -1,6 +1,7 @@
 // ASYUT AQAR — advertiser logo / photo in the circle next to the advertiser name (2026-11-10).
-// * Display: every element with data-owner-avatar="<owner id>" gets the advertiser's approved logo
-//   (or the logo of their approved company profile). Without a logo the letter/icon stays as before.
+// * An advertiser = account + advertiser name, so one account posting for several companies has a logo per company.
+// * Display: every element with data-owner-avatar="<owner id>" data-brand="<name>" gets that advertiser's approved logo
+//   (or the logo of the account's approved company profile with the same name). Otherwise the letter/icon stays.
 // * Upload (إعلاناتي): any image size/shape is cropped to a centred square and resized to 320×320 JPEG,
 //   so it fills the circle neatly. The new logo appears after the admin approves it.
 (function () {
@@ -10,8 +11,11 @@
   const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
   const key = cfg.SUPABASE_PUBLISHABLE_KEY || "";
   const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const cache = new Map(); // owner id -> logo url | ""
+  const cache = new Map(); // "owner|brand key" -> logo url | ""
   const safe = u => { try { const x = new URL(String(u || "")); return x.protocol === "https:" ? x.href : ""; } catch (_) { return ""; } };
+  // An advertiser = account + the advertiser name on the listing (same rule as app.js / the database).
+  const brandKey = name => String(name || "").trim().replace(/\s+/g, " ").toLowerCase();
+  const cacheKey = (owner, brand) => String(owner).toLowerCase() + "|" + brandKey(brand);
 
   function paint(el, url) {
     if (!url || el.querySelector("img.adv-logo-img")) return;
@@ -24,35 +28,39 @@
     img.src = url;
   }
 
-  let pending = new Set(), timer = 0;
-  async function fetchLogos(ids) {
-    if (!base || !key || !ids.length) return;
+  const pending = new Map(); let timer = 0;
+  async function fetchLogos(items) {
+    if (!base || !key || !items.length) return;
+    const keys = items.map(i => cacheKey(i.o, i.n));
     try {
       const r = await fetch(base + "/rest/v1/rpc/layan_advertiser_logos", {
         method: "POST",
         headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
-        body: JSON.stringify({ p_ids: ids })
+        body: JSON.stringify({ p_items: items })
       });
-      if (!r.ok) { ids.forEach(id => cache.set(id, "")); return; } // not deployed yet: keep letters
-      const rows = await r.json();
-      ids.forEach(id => cache.set(id, ""));
-      (Array.isArray(rows) ? rows : []).forEach(row => cache.set(String(row.owner_id), safe(row.logo_url)));
-    } catch (_) { ids.forEach(id => cache.set(id, "")); }
+      keys.forEach(k => cache.set(k, ""));
+      if (r.ok) {
+        const rows = await r.json();
+        (Array.isArray(rows) ? rows : []).forEach(row => cache.set(String(row.owner_id).toLowerCase() + "|" + String(row.brand_key || ""), safe(row.logo_url)));
+      } // not deployed yet: keep letters
+    } catch (_) { keys.forEach(k => cache.set(k, "")); }
     apply(document);
   }
   function apply(root) {
     (root || document).querySelectorAll("[data-owner-avatar]").forEach(el => {
       const id = String(el.getAttribute("data-owner-avatar") || "").toLowerCase();
       if (!UUID.test(id)) return;
-      if (cache.has(id)) paint(el, cache.get(id));
-      else pending.add(id);
+      const brand = el.getAttribute("data-brand") || "";
+      const k = cacheKey(id, brand);
+      if (cache.has(k)) paint(el, cache.get(k));
+      else if (!pending.has(k)) pending.set(k, { o: id, n: brand });
     });
     if (pending.size && !timer) {
       timer = setTimeout(() => {
-        const ids = [...pending].slice(0, 200);
-        ids.forEach(id => pending.delete(id));
+        const items = [...pending.entries()].slice(0, 200);
+        items.forEach(([k]) => pending.delete(k));
         timer = 0;
-        fetchLogos(ids);
+        fetchLogos(items.map(([, v]) => v));
       }, 60);
     }
   }
@@ -84,78 +92,108 @@
     return blob;
   }
 
-  async function uploadMyLogo(file) {
+  async function uploadMyLogo(brand, file) {
     const api = window.LAYAN_SUPABASE;
     const session = api?.getSession?.();
     if (!session?.user?.id) throw new Error("سجّل الدخول أولًا.");
     const jpg = await squareJpeg(file);
     const id = (crypto.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2));
     const path = "offers/" + session.user.id + "/logo-" + id + ".jpg";
-    const target = base + "/storage/v1/object/layan_real_estat/" + path;
-    const r = await api.authedFetch(target, { method: "POST", headers: { "Content-Type": "image/jpeg", "x-upsert": "false" }, body: jpg });
+    const r = await api.authedFetch(base + "/storage/v1/object/layan_real_estat/" + path, { method: "POST", headers: { "Content-Type": "image/jpeg", "x-upsert": "false" }, body: jpg });
     if (!r.ok) throw new Error("تعذر رفع الصورة. حاول مرة أخرى.");
     const url = base + "/storage/v1/object/public/layan_real_estat/" + path;
-    const s = await api.authedFetch(base + "/rest/v1/rpc/layan_set_my_advertiser_logo", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ p_url: url })
+    const s2 = await api.authedFetch(base + "/rest/v1/rpc/layan_set_my_advertiser_logo", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ p_brand: brand, p_url: url })
     });
-    if (!s.ok) throw new Error("تعذر حفظ الشعار. حاول مرة أخرى.");
+    if (!s2.ok) throw new Error("تعذر حفظ الشعار. حاول مرة أخرى.");
     return url;
   }
-  async function removeMyLogo() {
+  async function removeMyLogo(brand) {
     const r = await window.LAYAN_SUPABASE.authedFetch(base + "/rest/v1/rpc/layan_set_my_advertiser_logo", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ p_url: null })
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ p_brand: brand, p_url: null })
     });
     if (!r.ok) throw new Error("تعذر حذف الشعار.");
   }
-  async function myLogo() {
-    const r = await window.LAYAN_SUPABASE.authedFetch(base + "/rest/v1/rpc/layan_my_advertiser_logo", {
+  async function myLogos() {
+    const r = await window.LAYAN_SUPABASE.authedFetch(base + "/rest/v1/rpc/layan_my_advertiser_logos", {
       method: "POST", headers: { "Content-Type": "application/json" }, body: "{}"
     });
-    if (!r.ok) return null;
-    return r.json();
+    if (!r.ok) return [];
+    const rows = await r.json();
+    return Array.isArray(rows) ? rows : [];
   }
 
-  // ---------- «إعلاناتي»: logo card ----------
+  // ---------- «إعلاناتي»: one logo card per advertiser name I post with ----------
+  const escHtml = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   function setCircle(el, url) {
     el.classList.toggle("has-logo", !!url);
-    el.innerHTML = url ? '<img src="' + url.replace(/"/g, "%22") + '" alt="">' : "▦";
+    el.innerHTML = url ? '<img src="' + escHtml(url) + '" alt="">' : "▦";
+  }
+  async function myAdvertiserNames() {
+    const names = new Map();
+    try {
+      const api = window.LAYAN_SUPABASE;
+      const uid = api.getSession()?.user?.id;
+      const r = await api.authedFetch(base + "/rest/v1/property_offers?select=contact_name,developer_name&owner_id=eq." + encodeURIComponent(uid) + "&order=created_at.desc&limit=500");
+      const offers = r.ok ? await r.json() : [];
+      (Array.isArray(offers) ? offers : []).forEach(o => {
+        const n = String(o.contact_name || o.developer_name || "").trim().replace(/\s+/g, " ");
+        if (n && !names.has(brandKey(n))) names.set(brandKey(n), n);
+      });
+    } catch (_) {}
+    return names;
   }
   async function initMyLogoCard() {
     const card = document.getElementById("myLogoCard");
     if (!card || !window.LAYAN_SUPABASE?.isAuthenticated?.()) return;
-    const preview = document.getElementById("myLogoPreview");
-    const status = document.getElementById("myLogoStatus");
-    const input = document.getElementById("myLogoInput");
-    const remove = document.getElementById("myLogoRemove");
+    const list = document.getElementById("myLogoList");
     card.hidden = false;
-    const refresh = async () => {
-      const mine = await myLogo().catch(() => null) || {};
-      const live = safe(mine.logo_url), waiting = safe(mine.pending_logo_url);
-      setCircle(preview, waiting || live);
-      remove.hidden = !(live || waiting);
-      status.textContent = waiting ? "⏳ الشعار الجديد بانتظار مراجعة الإدارة، وسيظهر على إعلاناتك بعد الاعتماد."
-        : live ? "✓ الشعار ظاهر على إعلاناتك." : "لم تضف شعارًا بعد. يظهر حرف اسمك مكانه.";
+    const render = async () => {
+      const [names, rows] = await Promise.all([myAdvertiserNames(), myLogos().catch(() => [])]);
+      const byKey = new Map(rows.map(r => [r.brand_key, r]));
+      rows.forEach(r => { if (!names.has(r.brand_key)) names.set(r.brand_key, r.brand_name); });
+      if (!names.size) {
+        list.innerHTML = '<p class="my-logo-empty">أضف أول إعلان باسمك أو باسم شركتك، ثم ارجع هنا لإضافة الشعار.</p>';
+        return;
+      }
+      list.innerHTML = [...names.entries()].map(([k, name]) => {
+        const r = byKey.get(k) || {};
+        const live = safe(r.logo_url), waiting = safe(r.pending_logo_url);
+        const status = waiting ? "⏳ بانتظار مراجعة الإدارة" : live ? "✓ ظاهر على إعلاناتك" : "لا يوجد شعار — يظهر أول حرف من الاسم";
+        return '<div class="my-logo-row" data-brand-row="' + escHtml(name) + '">' +
+          '<div class="adv-logo-circle my-logo-preview' + ((waiting || live) ? " has-logo" : "") + '" aria-hidden="true">' + ((waiting || live) ? '<img src="' + escHtml(waiting || live) + '" alt="">' : "▦") + '</div>' +
+          '<div class="my-logo-info"><strong>' + escHtml(name) + '</strong><small class="my-logo-status">' + status + '</small></div>' +
+          '<div class="my-logo-actions"><label class="btn btn-gold my-logo-upload">' + (live || waiting ? "تغيير الشعار" : "رفع شعار / صورة") +
+          '<input type="file" accept="image/jpeg,image/png,image/webp" data-camera-ready="1" data-logo-input hidden></label>' +
+          ((live || waiting) ? '<button type="button" class="btn btn-outline" data-logo-remove>إزالة</button>' : "") + '</div></div>';
+      }).join("");
     };
-    input.addEventListener("change", async () => {
+    list.addEventListener("change", async event => {
+      const input = event.target.closest("[data-logo-input]");
+      if (!input) return;
+      const row = input.closest("[data-brand-row]");
       const file = input.files?.[0];
       input.value = "";
       if (!file) return;
+      const status = row.querySelector(".my-logo-status");
       try {
         status.textContent = "جارٍ تجهيز الصورة ورفعها...";
-        const local = URL.createObjectURL(await squareJpeg(file));
-        setCircle(preview, local);
-        await uploadMyLogo(file);
-        await refresh();
+        setCircle(row.querySelector(".my-logo-preview"), URL.createObjectURL(await squareJpeg(file)));
+        await uploadMyLogo(row.dataset.brandRow, file);
+        await render();
       } catch (e) { status.textContent = e.message || "تعذر رفع الصورة."; }
     });
-    remove.addEventListener("click", async () => {
-      if (!confirm("إزالة الشعار من إعلاناتك؟")) return;
-      try { await removeMyLogo(); await refresh(); } catch (e) { status.textContent = e.message; }
+    list.addEventListener("click", async event => {
+      const btn = event.target.closest("[data-logo-remove]");
+      if (!btn) return;
+      const row = btn.closest("[data-brand-row]");
+      if (!confirm("إزالة شعار «" + row.dataset.brandRow + "» من إعلاناته؟")) return;
+      try { await removeMyLogo(row.dataset.brandRow); await render(); } catch (e) { row.querySelector(".my-logo-status").textContent = e.message; }
     });
-    refresh();
+    render();
   }
 
-  window.AsyutAdvertiserLogos = { apply, squareJpeg, uploadMyLogo, removeMyLogo, myLogo };
+  window.AsyutAdvertiserLogos = { apply, squareJpeg, uploadMyLogo, removeMyLogo, myLogos, brandKey };
   const start = () => {
     initMyLogoCard();
     apply(document);

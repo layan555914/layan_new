@@ -1,5 +1,8 @@
 
 // Which fields make sense for each property type (shared with property.js / my-listings.js).
+// Advertiser identity on the site = account + the advertiser name written on the listing.
+window.LAYAN_ADVERTISER_NAME = window.LAYAN_ADVERTISER_NAME || (o => String((o && (o.contact_name || o.developer_name)) || "").trim().replace(/\s+/g, " "));
+window.LAYAN_BRAND_KEY = window.LAYAN_BRAND_KEY || (name => String(name || "").trim().replace(/\s+/g, " ").toLowerCase());
 window.LAYAN_PROPERTY_KIND = window.LAYAN_PROPERTY_KIND || function (type) {
   const t = String(type || "");
   if (/مشروع|كمبوند|طرح/.test(t)) return "project";
@@ -679,12 +682,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const minBedrooms = minBedroomsRaw.trim() === "" ? null : num(minBedroomsRaw);
     const sort = $("sortFilter")?.value || "newest";
     const companyQuery = normalizeSearch($("companySearchInput")?.value || "");
-    // Advertiser page (advertiser.html?id=<owner>) shows one advertiser's listings only.
-    const ownerFilter = String(new URLSearchParams(window.location.search).get("id") || "").trim();
+    // Advertiser page (advertiser.html?id=<owner>&name=<advertiser name>) shows one advertiser's listings only:
+    // same account AND same advertiser name, so one account posting for several companies gets a page per company.
+    const pageParams = new URLSearchParams(window.location.search);
+    const ownerFilter = String(pageParams.get("id") || "").trim();
+    const brandFilter = window.LAYAN_BRAND_KEY(pageParams.get("name") || "");
     const onAdvertiserPage = document.body.classList.contains("page-advertiser");
 
     const filtered = offers.filter((o) => {
       if (onAdvertiserPage && String(o.owner_id || "") !== ownerFilter) return false;
+      if (onAdvertiserPage && brandFilter && window.LAYAN_BRAND_KEY(window.LAYAN_ADVERTISER_NAME(o)) !== brandFilter) return false;
       const text = [
         o.title, o.city, o.area, o.property_type,
         o.description, o.developer_name
@@ -785,7 +792,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         isAssignment && num(o.assignment_fee) > 0 ? `<span>رسوم التنازل <b>${money2(o.assignment_fee)}</b></span>` : ""
       ].filter(Boolean);
       const detailsHref = "./property.html?id=" + encodeURIComponent(String(o.id));
-      const advertiserHref = o.owner_id ? "./advertiser.html?id=" + encodeURIComponent(String(o.owner_id)) : "";
+      const advertiserHref = o.owner_id ? "./advertiser.html?id=" + encodeURIComponent(String(o.owner_id)) + (String(o.contact_name || o.developer_name || "").trim() ? "&name=" + encodeURIComponent(window.LAYAN_ADVERTISER_NAME(o)) : "") : "";
 
       return `
         <article class="offer-card listing-card${isFeatured ? " is-featured" : ""}" data-listing-id="${esc(o.id)}">
@@ -812,7 +819,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <p class="listing-meta"><span>${esc(offerCode(o))}</span><span>${postedAgo(o.created_at)}</span>${trustBadge(o)}</p>
             <div class="listing-footer">
               <div class="listing-advertiser">
-                <span class="listing-avatar${isCompany ? " is-company" : ""}" aria-hidden="true"${o.owner_id ? ` data-owner-avatar="${esc(o.owner_id)}"` : ""}>${isCompany ? "▦" : esc(initial)}</span>
+                <span class="listing-avatar${isCompany ? " is-company" : ""}" aria-hidden="true"${o.owner_id ? ` data-owner-avatar="${esc(o.owner_id)}" data-brand="${esc(window.LAYAN_ADVERTISER_NAME(o))}"` : ""}>${isCompany ? "▦" : esc(initial)}</span>
                 <div><b>${esc(advertiser)}</b>${advertiserHref ? `<a href="${advertiserHref}">كل إعلانات المعلن</a>` : ""}</div>
               </div>
               <div class="listing-actions">
