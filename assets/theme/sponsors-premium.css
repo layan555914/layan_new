@@ -1,0 +1,156 @@
+/* ASYUT AQAR — premium official sponsors + sponsored ads (2026-11-10)
+   Palette: espresso #2B211B, cocoa #3A2D25, copper #C98A64, champagne #E9B08F, ivory #FFF8F0 */
+
+/* ---------- Official sponsor: refined luxury card ---------- */
+.official-sponsor-section.is-live { display: grid; gap: 18px; }
+.official-sponsor-card.os-premium {
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(233,176,143,.20) 0%, transparent 46%),
+    radial-gradient(90% 120% at 0% 100%, rgba(164,71,42,.22) 0%, transparent 52%),
+    repeating-linear-gradient(135deg, rgba(255,248,240,.022) 0 2px, transparent 2px 14px),
+    linear-gradient(118deg, #241B16 0%, #33271F 48%, #2A201A 100%);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 0 24px 60px rgba(36,27,22,.28), inset 0 1px 0 rgba(255,248,240,.06);
+}
+.official-sponsor-card.os-premium::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(233,176,143,.95), rgba(201,138,100,.25) 30%, rgba(255,232,210,.85) 55%, rgba(201,138,100,.2) 80%, rgba(233,176,143,.9));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+.os-corner { position: absolute; width: 44px; height: 44px; border-color: rgba(233,176,143,.55); border-style: solid; pointer-events: none; }
+.os-corner-a { top: 20px; right: 20px; border-width: 1px 1px 0 0; border-top-right-radius: 10px; }
+.os-corner-b { bottom: 20px; left: 20px; border-width: 0 0 1px 1px; border-bottom-left-radius: 10px; }
+.os-seal {
+  position: absolute; top: 18px; left: 22px;
+  display: grid; place-items: center; width: 34px; height: 34px;
+  color: #2B211B; font-size: 15px;
+  background: radial-gradient(circle at 35% 30%, #FFE7CF, #E9B08F 55%, #B9744F);
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(0,0,0,.3), 0 0 0 4px rgba(233,176,143,.12);
+}
+.os-premium .official-sponsor-copy h2 {
+  background: linear-gradient(100deg, #FFF8F0 0%, #F6D9C0 45%, #FFF8F0 70%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  font-size: clamp(27px, 3.4vw, 40px);
+}
+.os-premium .official-sponsor-kicker { backdrop-filter: blur(2px); }
+.os-premium .official-sponsor-logo-wrap {
+  position: relative;
+  padding: 9px;
+  background: #FFF;
+  border: 0;
+  box-shadow: 0 18px 40px rgba(0,0,0,.35), 0 0 0 1px rgba(233,176,143,.9), 0 0 0 9px rgba(233,176,143,.10), 0 0 0 10px rgba(233,176,143,.35);
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.os-premium .official-sponsor-logo-wrap:hover { transform: translateY(-3px) rotate(-1deg); }
+.official-sponsor-monogram { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg,#2B211B,#5A473A); color: #F6D9C0; font: 800 54px/1 var(--aa-head, Alexandria, sans-serif); }
+.os-premium .official-sponsor-link {
+  background: linear-gradient(135deg, #B4552F, #8C3A21);
+  border-color: rgba(233,176,143,.7);
+  box-shadow: 0 10px 24px rgba(140,58,33,.35);
+}
+
+/* Partner strip under the official sponsor */
+.os-partners { display: grid; gap: 12px; }
+.os-partners-title { display: flex; align-items: center; gap: 14px; margin: 4px 0 0; color: #8C5A3C; font-size: 13px; font-weight: 800; }
+.os-partners-title::before, .os-partners-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,138,100,.6), transparent); }
+.os-partners-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.os-partner {
+  display: flex; align-items: center; gap: 12px; min-height: 78px; padding: 12px 14px;
+  color: #2B211B; text-decoration: none;
+  background: linear-gradient(180deg, #FFFFFF, #FBF5EE);
+  border: 1px solid #E6D3C2; border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(43,33,27,.06);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+a.os-partner:hover { transform: translateY(-2px); border-color: #C98A64; box-shadow: 0 14px 28px rgba(43,33,27,.12); }
+.os-partner-logo { flex: 0 0 52px; display: grid; place-items: center; width: 52px; height: 52px; overflow: hidden; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px #E9B08F, 0 0 0 4px #FBF1E7; color: #8C3A21; font-weight: 800; font-size: 20px; }
+.os-partner-logo img { width: 100%; height: 100%; object-fit: contain; }
+.os-partner-text { display: grid; gap: 2px; min-width: 0; }
+.os-partner-text strong { font-size: 14px; }
+.os-partner-text small { color: #7A6556; font-size: 12px; line-height: 1.6; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* ---------- Sponsored ad card (home, offers grid, featured page) ---------- */
+.sponsor-card.sp-ad {
+  position: relative;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  padding: 0 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E8D5C4 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 14px 34px rgba(43,33,27,.08);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.sponsor-card.sp-ad::before {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(233,176,143,.0);
+  transition: box-shadow .25s ease;
+}
+.sponsor-card.sp-ad:hover { transform: translateY(-4px); border-color: #C98A64 !important; box-shadow: 0 22px 46px rgba(43,33,27,.15); }
+.sponsor-card.sp-ad:hover::before { box-shadow: inset 0 0 0 1px rgba(233,176,143,.65); }
+.sp-ad-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #2B211B; }
+.sp-ad-media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+.sponsor-card.sp-ad:hover .sp-ad-media img { transform: scale(1.04); }
+.sp-ad-media::after { content: ""; position: absolute; inset: auto 0 0; height: 45%; background: linear-gradient(0deg, rgba(36,27,22,.55), transparent); pointer-events: none; }
+.sp-ad-monogram {
+  display: grid; place-content: center; justify-items: center; gap: 8px; width: 100%; height: 100%;
+  background:
+    radial-gradient(80% 90% at 85% 10%, rgba(233,176,143,.28), transparent 55%),
+    repeating-linear-gradient(135deg, rgba(255,248,240,.035) 0 2px, transparent 2px 16px),
+    linear-gradient(135deg, #241B16, #4A3A2F);
+}
+.sp-ad-monogram span {
+  display: grid; place-items: center; width: 74px; height: 74px; border-radius: 50%;
+  color: #2B211B; font: 800 32px/1 var(--aa-head, Alexandria, sans-serif);
+  background: radial-gradient(circle at 35% 30%, #FFE7CF, #E9B08F 60%, #B9744F);
+  box-shadow: 0 0 0 6px rgba(233,176,143,.14), 0 12px 26px rgba(0,0,0,.35);
+}
+.sp-ad-monogram small { max-width: 85%; color: #F6D9C0; font-size: 15px; font-weight: 800; letter-spacing: .3px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-ad-badge {
+  position: absolute; top: 12px; right: 12px; z-index: 1;
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+  color: #FFF8F0; font-size: 11.5px; font-weight: 800;
+  background: rgba(36,27,22,.72); backdrop-filter: blur(6px);
+  border: 1px solid rgba(233,176,143,.7); border-radius: 999px;
+}
+.sp-ad-badge i { color: #E9B08F; font-style: normal; }
+.sp-ad-body { display: flex; flex: 1; flex-direction: column; gap: 10px; padding: 16px 18px 18px; }
+.sp-ad-brand { display: flex; align-items: center; gap: 10px; }
+.sp-ad-avatar { flex: 0 0 40px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: #FFF8F0; font-weight: 800; background: linear-gradient(135deg, #A4472A, #6E2F1C); box-shadow: 0 0 0 2px #fff, 0 0 0 3px #E9B08F; }
+.sp-ad-brand strong { display: block; color: #2B211B; font-size: 14px; line-height: 1.4; }
+.sp-ad-brand small { display: block; color: #8A7465; font-size: 11.5px; }
+.sp-ad-brand small b { color: #2F7A4F; font-weight: 800; }
+.sp-ad-body h3 { margin: 2px 0 0; color: #2B211B; font-size: 17px; line-height: 1.55; }
+.sp-ad-desc { margin: 0; color: #5E4C40; font-size: 13px; line-height: 1.85; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.sp-ad-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 12px; border-top: 1px dashed #EADBCD; }
+.sp-ad-btn {
+  flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 8px 14px;
+  color: #2B211B !important; text-decoration: none; font-size: 13px; font-weight: 800;
+  background: #FFF; border: 1px solid #D9C2AF; border-radius: 11px;
+  transition: background .2s ease, border-color .2s ease;
+}
+.sp-ad-btn:hover { background: #FBF3EA; border-color: #C98A64; }
+.sp-ad-btn-primary { color: #FFF8F0 !important; background: linear-gradient(135deg, #B4552F, #8C3A21); border-color: #8C3A21; }
+.sp-ad-btn-primary:hover { background: linear-gradient(135deg, #A14A28, #7A311B); }
+.sp-ad-btn-wa { flex: 0 1 auto; color: #1F7A4A !important; border-color: #BFE3CD; background: #F1FAF4; }
+
+/* Home grid: let premium cards breathe */
+.home-partners-grid.sponsor-live-grid { gap: 20px; }
+@media (max-width: 700px) {
+  .os-seal { top: 14px; left: 14px; width: 30px; height: 30px; }
+  .os-corner { display: none; }
+  .sp-ad-body { padding: 14px 15px 16px; }
+}
+.sponsor-card.sp-ad .sp-ad-body > * { margin-block: 0; min-height: 0; }
+.sponsor-card.sp-ad .sp-ad-body h3 { -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.sponsor-card.sp-ad .sp-ad-actions { margin-top: auto; }

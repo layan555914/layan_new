@@ -123,3 +123,35 @@ test("a service listing reaches the admin review queue as pending", async ({ pag
   await page.goto("/admin.html");
   await expect(page.locator("[data-marketplace-id='svc-0']")).toContainText("مكتب تشطيبات اختبار");
 });
+
+test("rooms follow the property type, and a project ad can be sent without a price", async ({ page }) => {
+  const state = await mockBackend(page);
+  await page.goto("/");
+  await login(page);
+  await page.locator("#addOfferTop").click();
+  const form = page.locator("#offerForm");
+  const bedrooms = form.locator("[data-rooms-field='bedrooms']");
+  const bathrooms = form.locator("[data-rooms-field='bathrooms']");
+  await form.locator("[name='property_type']").selectOption("شقة");
+  await expect(bedrooms).toBeVisible();
+  await form.locator("[name='property_type']").selectOption("محل");
+  await expect(bedrooms).toBeHidden();
+  await expect(bathrooms).toBeVisible();
+  await form.locator("[name='property_type']").selectOption("أرض مطروحة للبناء");
+  await expect(bathrooms).toBeHidden();
+  await form.locator("[name='property_type']").selectOption("مشروع عقاري");
+  await expect(bedrooms).toBeHidden();
+  await expect(form.locator("[name='total_price']")).not.toHaveAttribute("required", "");
+  await expect(form.locator("[data-price-label]")).toContainText("اختياري");
+
+  await form.locator("[name='account_type']").selectOption("individual");
+  await form.locator("[name='listing_purpose']").selectOption("بيع");
+  await form.locator("[name='title']").fill("مشروع سكني جديد بأسيوط الجديدة");
+  await form.locator("[name='city']").fill("أسيوط الجديدة");
+  await form.locator("[name='photos']").setInputFiles({ name: "project.png", mimeType: "image/png", buffer: tinyPng() });
+  await form.locator("button[type='submit']").click();
+  await expect.poll(() => state.offers.length, { timeout: 15000 }).toBe(1);
+  expect(state.offers[0]).toMatchObject({ property_type: "مشروع عقاري", price_on_request: true });
+  expect(state.offers[0].bedrooms || 0).toBe(0);
+  expect(state.offers[0].bathrooms || 0).toBe(0);
+});

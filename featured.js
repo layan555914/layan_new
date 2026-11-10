@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       esc(money(item.price)) + '</strong><div class="featured-card-actions">' + actions + '</div></div></article>';
   }
   function sponsorCard(item) {
+    if (window.AsyutSponsoredAd) return window.AsyutSponsoredAd.render(item, { className: "featured-sp-ad" });
     const image = safeImage(item.image_url);
     const target = safeLink(item.target_url);
     const phone = String(item.contact_phone || "").replace(/[^+0-9]/g, "");

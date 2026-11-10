@@ -257,7 +257,7 @@
   }
 
   // ---- Owner approval requests ----
-  const ACTIONS = { delete_user: "حذف حساب", suspend_user: "إيقاف حساب", unsuspend_user: "إعادة تفعيل حساب", delete_offer: "حذف إعلان عقار", delete_service: "حذف خدمة", delete_company: "حذف ملف شركة" };
+  const ACTIONS = { delete_user: "حذف حساب", suspend_user: "إيقاف حساب", unsuspend_user: "إعادة تفعيل حساب", delete_offer: "حذف إعلان عقار", delete_service: "حذف خدمة", delete_company: "حذف ملف شركة", delete_supplier_ad: "حذف إعلان ممول", delete_sponsor: "حذف راعٍ رسمي" };
   const STATES = { pending: "بانتظار المالك", approved: "تم الاعتماد والتنفيذ", rejected: "مرفوض", failed: "تعذر التنفيذ" };
   const done = (result, doneText) => result === "pending"
     ? "تم إرسال الطلب إلى المالك للاعتماد. سيُنفَّذ بعد موافقته."

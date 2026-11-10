@@ -1,6 +1,16 @@
 
+// Which fields make sense for each property type (shared with property.js / my-listings.js).
+window.LAYAN_PROPERTY_KIND = window.LAYAN_PROPERTY_KIND || function (type) {
+  const t = String(type || "");
+  if (/مشروع|كمبوند|طرح/.test(t)) return "project";
+  if (/أرض|ارض/.test(t)) return "land";
+  if (/شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(t)) return "residential";
+  return t ? "commercial" : "residential";
+};
 document.addEventListener("DOMContentLoaded", async () => {
   "use strict";
+  const kindOf = type => window.LAYAN_PROPERTY_KIND(type);
+  const showsBedrooms = o => kindOf(o?.property_type) === "residential";
 
   // Strip campaign tags from outbound share links only; keep inbound analytics intact.
   const cleanShareUrl = value => {
@@ -138,7 +148,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const enabled = priceOnRequestToggle?.checked === true;
     if (totalPriceInput) {
       totalPriceInput.disabled = enabled;
-      totalPriceInput.required = !enabled;
+      totalPriceInput.required = !enabled && kindOf(form?.querySelector('[name="property_type"]')?.value) !== "project";
     }
     updateFinanceCheck();
   }
@@ -545,7 +555,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   function openPropertyComparison() {
     const selected=compareIds().map(id=>offers.find(o=>String(o.id)===id)).filter(Boolean); if(selected.length<2)return;
-    const rows=[["نوع المعاملة",o=>compareValue(o.listing_purpose||"تنازل")],["نوع العقار",o=>compareValue(o.property_type)],["المدينة / المركز",o=>compareValue(o.city)],["الحي / المنطقة",o=>compareValue(o.area)],["السعر المعلن",o=>o.price_on_request ? "السعر عند التواصل" : compareValue(o.total_price,"money")],["المقدم",o=>compareValue(o.down_payment,"money")],["إجمالي المدفوع",o=>compareValue(o.paid_amount,"money")],["المبلغ المتبقي",o=>compareValue(o.remaining_amount,"money")],["القسط الشهري",o=>compareValue(o.monthly_installment,"money")],["رسوم التنازل",o=>compareValue(o.assignment_fee,"money")],["المساحة",o=>compareValue(o.area_m2,"area")],["غرف النوم",o=>compareValue(o.bedrooms,"count")],["الحمامات",o=>compareValue(o.bathrooms,"count")],["المطور / الشركة",o=>compareValue(o.developer_name)],["كود الإعلان",o=>compareValue(offerCode(o))]];
+    const rows=[["نوع المعاملة",o=>compareValue(o.listing_purpose||"تنازل")],["نوع العقار",o=>compareValue(o.property_type)],["المدينة / المركز",o=>compareValue(o.city)],["الحي / المنطقة",o=>compareValue(o.area)],["السعر المعلن",o=>o.price_on_request ? "السعر عند التواصل" : compareValue(o.total_price,"money")],["المقدم",o=>compareValue(o.down_payment,"money")],["إجمالي المدفوع",o=>compareValue(o.paid_amount,"money")],["المبلغ المتبقي",o=>compareValue(o.remaining_amount,"money")],["القسط الشهري",o=>compareValue(o.monthly_installment,"money")],["رسوم التنازل",o=>compareValue(o.assignment_fee,"money")],["المساحة",o=>compareValue(o.area_m2,"area")],["غرف النوم",o=>showsBedrooms(o)?compareValue(o.bedrooms,"count"):"—"],["الحمامات",o=>compareValue(o.bathrooms,"count")],["المطور / الشركة",o=>compareValue(o.developer_name)],["كود الإعلان",o=>compareValue(offerCode(o))]];
     const wrap=$("compareTableWrap"); if(!wrap)return;
     const head="<table class=compare-table><thead><tr><th>بيانات المقارنة</th>"+selected.map(o=>"<th><div class=compare-property-head><strong>"+esc(o.title)+"</strong><small>"+esc(offerCode(o))+"</small><button type=button data-remove-compare="+esc(o.id)+">إزالة</button></div></th>").join("")+"</tr></thead><tbody>";
     const body=rows.map(r=>"<tr><th scope=row>"+r[0]+"</th>"+selected.map(o=>"<td>"+r[1](o)+"</td>").join("")+"</tr>").join("");
@@ -764,7 +774,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const advertiser = String(o.contact_name || o.developer_name || "").trim() || "معلن على أسيوط عقار";
       const isCompany = Boolean(o.company_ad_id || o.trust_badge === "company" || /شركة|مكتب|للتطوير|العقارية/.test(advertiser));
       const initial = advertiser.replace(/^(ال)/, "").trim().charAt(0) || "أ";
-      const specs = [o.area_m2 ? `${esc(o.area_m2)} م²` : "", o.bedrooms ? `${esc(o.bedrooms)} ${Number(o.bedrooms) === 2 ? "غرفتان" : "غرف"}` : "", o.bathrooms ? `${esc(o.bathrooms)} حمام` : ""].filter(Boolean);
+      const specs = [o.area_m2 ? `${esc(o.area_m2)} م²` : "", o.bedrooms && showsBedrooms(o) ? `${esc(o.bedrooms)} ${Number(o.bedrooms) === 2 ? "غرفتان" : "غرف"}` : "", o.bathrooms && !["land", "project"].includes(kindOf(o.property_type)) ? `${esc(o.bathrooms)} حمام` : ""].filter(Boolean);
       const money2 = value => num(value) > 1 ? Math.round(num(value)).toLocaleString("en-US") + " ج.م" : "السعر غير معلن";
       const finance = [
         num(o.down_payment) > 0 ? `<span>مقدم <b>${money2(o.down_payment)}</b></span>` : "",
@@ -955,7 +965,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${o.land_utilities ? `<p><span>المرافق</span><strong>${esc(o.land_utilities)}</strong></p>` : ""}
         ${o.land_zoning ? `<p><span>استخدام الأرض</span><strong>${esc(o.land_zoning)}</strong></p>` : ""}
         ${o.area_m2 ? `<p><span>المساحة</span><strong>${esc(o.area_m2)} م²</strong></p>` : ""}
-        ${o.bedrooms ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
+        ${o.bedrooms && showsBedrooms(o) ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
         ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
         <p><span>السعر الإجمالي</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price)}</strong></p>
         <p><span>المقدم المدفوع عند التعاقد</span><strong>${money(o.down_payment)}</strong></p>
@@ -1228,7 +1238,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { activeDealKind = button.dataset.dealKind || ""; activeKind = ""; showResults(); }));
   const listingPurpose = form?.querySelector('[name="listing_purpose"]');
   const landDetails = $("landDetailsFields");
-  const updateLandFields = () => { if (landDetails) landDetails.hidden = !String(form?.querySelector('[name="property_type"]')?.value || "").includes("أرض"); };
+  const updateLandFields = () => {
+    const type = String(form?.querySelector('[name="property_type"]')?.value || "");
+    const kind = kindOf(type);
+    if (landDetails) landDetails.hidden = kind !== "land";
+    // Bedrooms only for homes; bathrooms not for land or a whole project.
+    const bed = form?.querySelector('[data-rooms-field="bedrooms"]'), bath = form?.querySelector('[data-rooms-field="bathrooms"]');
+    if (bed) { bed.hidden = kind !== "residential"; if (bed.hidden) bed.querySelector("input").value = ""; }
+    if (bath) { bath.hidden = kind === "land" || kind === "project"; if (bath.hidden) bath.querySelector("input").value = ""; }
+    // A project ad may be published without a price ("السعر عند التواصل").
+    const priceLabel = form?.querySelector("[data-price-label]");
+    if (priceLabel) priceLabel.textContent = kind === "project" ? "سعر يبدأ من (اختياري للمشروعات)" : "إجمالي السعر";
+    if (totalPriceInput && !priceOnRequestToggle?.checked) totalPriceInput.required = kind !== "project";
+  };
   form?.querySelector('[name="property_type"]')?.addEventListener("change", updateLandFields);
   updateLandFields();
   $("resetFiltersBtn")?.addEventListener("click", () => {
@@ -1392,6 +1414,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    {
+      const kind = kindOf(offer.property_type);
+      if (kind !== "residential") offer.bedrooms = 0;
+      if (kind === "land" || kind === "project") offer.bathrooms = 0;
+      if (kind === "project" && !(offer.total_price > 0)) { offer.price_on_request = true; offer.total_price = 0; }
+    }
     if (!offer.price_on_request && offer.total_price <= 0) {
       setStatus("اكتب إجمالي سعر صحيحًا أكبر من صفر.");
       return;
