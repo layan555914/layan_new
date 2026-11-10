@@ -117,8 +117,10 @@
     document.addEventListener("click", event => { if (!menu.hidden && !root.contains(event.target)) setOpen(false); });
     document.addEventListener("keydown", event => { if (event.key === "Escape" && !menu.hidden) { setOpen(false); button.focus(); } });
 
-    // Welcome once per visitor, then stay quietly in the corner.
-    if (!read(SEEN_KEY)) {
+    // Welcome once per visitor, then stay quietly in the corner. On phones it stays an icon only,
+    // so the first screen is not covered (tap it for the same menu).
+    const phone = window.matchMedia && window.matchMedia("(max-width: 560px)").matches;
+    if (!read(SEEN_KEY) && !phone) {
       root.classList.add("is-welcoming");
       setTimeout(() => { bubble.hidden = false; }, 900);
       setTimeout(() => { if (!keepBubble) bubble.hidden = true; root.classList.remove("is-welcoming"); }, 12000);

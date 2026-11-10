@@ -1,0 +1,86 @@
+/* ASYUT AQAR — phone layout that behaves like an app (2026-11-10).
+   Phones only (≤560px); the desktop and tablet layouts are untouched. Display changes only — no content removed.
+   Rollback: remove the <link> to this file. */
+@media (max-width: 560px) {
+  /* 1) Header: kept as is (logo, buttons, 3-column menu) — the owner prefers it */
+  /* 2) Type scale like an app */
+  body.page-home main h1 { font-size: 27px !important; line-height: 1.35 !important; }
+  body.page-home main h2 { font-size: 21px !important; line-height: 1.45 !important; }
+  body.page-home .section-heading p, body.page-home .ab-head p, body.page-home .hw-head p { font-size: 13.5px !important; line-height: 1.8 !important; }
+  body.page-home .eyebrow { font-size: 12px !important; }
+  body.page-home { --aa-section-y: 28px; }
+  /* 3) Areas: one swipeable row */
+  body .area-chips { display: flex !important; flex-wrap: wrap !important; justify-content: flex-start !important; gap: 7px !important; overflow: visible !important; }
+  body .area-chip { flex: 0 0 auto; padding: 7px 12px !important; font-size: 12.5px !important; min-height: 0 !important; }
+  /* 4) Partners: compact rows, all visible */
+  body.page-home .home-partners-grid { display: grid !important; grid-template-columns: 1fr !important; gap: 10px !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
+  .ps-card { display: grid !important; grid-template-columns: 104px minmax(0, 1fr); }
+  .ps-media { height: auto; min-height: 100%; aspect-ratio: auto; }
+  .ps-tag { display: none !important; }
+  .ps-body { padding: 10px 12px; gap: 3px; }
+  .ps-body h3 { font-size: 15px !important; }
+  .ps-body p { font-size: 12.5px !important; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ps-body .ps-book { width: auto !important; align-self: flex-start; min-height: 0 !important; padding: 6px 14px !important; font-size: 12.5px !important; margin-top: 4px !important; }
+  body.page-home .home-partners-cta { min-height: 36px !important; padding: 7px 14px !important; font-size: 12.5px !important; }
+  /* 5) Sections hub: app icon grid */
+  body .home-hub-grid { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 14px 8px !important; }
+  body .home-hub-card { padding: 0 !important; background: none !important; border: 0 !important; box-shadow: none !important; text-align: center !important; align-items: center !important; display: flex !important; flex-direction: column; gap: 6px !important; min-height: 0 !important; }
+  body .home-hub-card small { display: none !important; }
+  body .home-hub-card b { font-size: 12px !important; line-height: 1.4 !important; }
+  body .home-hub-icon { width: 54px !important; height: 54px !important; border-radius: 18px !important; font-size: 22px !important; margin: 0 !important; }
+  /* 6) About: swipe the parties, compact values */
+  .ab-head h2 { font-size: 22px !important; }
+  .ab-mission { padding: 18px !important; border-radius: 20px !important; }
+  .ab-mission h3 { font-size: 18px !important; margin-top: 8px !important; }
+  .ab-mission p { font-size: 13.5px !important; }
+  .ab-parties { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
+  .ab-party { display: block !important; padding: 12px !important; border-radius: 16px !important; }
+  .ab-party .ab-icon { width: 36px; height: 36px; margin-bottom: 8px; }
+  .ab-party .cx-ico { width: 18px; height: 18px; }
+  .ab-values { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .ab-value { display: block !important; padding: 14px !important; }
+  .ab-value + .ab-value { border-top: 0 !important; }
+  .ab-value:nth-child(n+3) { border-top: 1px solid var(--ab-line) !important; }
+  .ab-value:nth-child(even) { border-inline-start: 1px solid var(--ab-line) !important; }
+  .ab-value .ab-icon { width: 38px; height: 38px; }
+  .ab-value strong { margin: 8px 0 2px !important; font-size: 15px !important; }
+  .ab-value p, .ab-party p { font-size: 12.5px !important; line-height: 1.7 !important; }
+  .ab-party strong { font-size: 15px !important; }
+  /* 7) Launch + how: tighter */
+  body .launch-campaign h2 { font-size: 21px !important; }
+  .hw-head h2 { font-size: 22px !important; }
+  .hw-panel { padding: 18px !important; border-radius: 20px !important; }
+  /* 8) Quiet first screen: the assistant waits as an icon, install offer sits above the tab bar */
+  .install-app-banner:not([hidden]) { position: fixed !important; top: auto !important; bottom: 76px !important; inset-inline: 12px !important; z-index: 60; border-radius: 16px !important; }
+
+  /* 9) Home hero: shorter photo so the search shows sooner */
+  body .hero.design-hero::before { height: 210px !important; }
+  body .hero.design-hero .design-hero-content { padding-top: 140px !important; }
+  body .hero.design-hero .design-hero-sub { font-size: 13.5px !important; line-height: 1.8 !important; }
+  body .hero.design-hero .design-hero-lead { font-size: 16px !important; }
+
+  /* 10) Every page: one type scale */
+  body main h1 { font-size: 26px !important; line-height: 1.4 !important; }
+  body main h1 > span { font-size: .85em !important; }
+  body .section-heading h2, body main > section > h2, body .page-hero h2, body .info-hero h2,
+  body .section-heading h1 { font-size: 21px !important; line-height: 1.45 !important; }
+  body .page-hero p, body .info-hero p, body .companies-hero p, body .directory-hero p { font-size: 14px !important; line-height: 1.85 !important; }
+  body .page-hero, body .info-hero { padding-block: 26px 22px !important; }
+
+  /* 13) Info pages (about, advertise, guide, terms, privacy): same compact bar */
+  body .info-topbar { display: flex !important; flex-direction: column; align-items: stretch !important; min-width: 0; max-width: 100%; overflow: hidden; box-sizing: border-box; gap: 8px !important; padding: 10px 14px 8px !important; }
+  body .info-topbar .info-brand img { height: 34px !important; width: auto !important; }
+  body .info-topbar nav { min-width: 0; width: 100%; box-sizing: border-box; display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px !important; margin: 0 !important; padding: 0 !important; }
+  body .info-topbar nav a { min-width: 0; padding: 8px 4px !important; font-size: 13px !important; border-radius: 12px; background: rgba(255,248,240,.08); white-space: nowrap; text-align: center; }
+  body .info-hero h1, body main .info-hero h1 { font-size: 25px !important; }
+
+  /* 14) Nothing may run past the screen edge: long titles and words wrap, media and tables shrink */
+  html, body { max-width: 100%; overflow-x: clip; }
+  body main h1, body main h2, body main h3, body .page-hero *, body .info-hero * { overflow-wrap: anywhere; word-break: normal; max-width: 100%; }
+  body main img, body main video, body main iframe, body main canvas { max-width: 100%; }
+  body main table { max-width: 100%; }
+
+  /* 15) Category chips wrap instead of sliding sideways */
+  body .mk-chips, body .chip-row, body .filter-chips, body .featured-hero-tabs { display: flex !important; flex-wrap: wrap !important; overflow: visible !important; white-space: normal !important; gap: 7px !important; }
+  body .mk-chip { flex: 0 0 auto !important; font-size: 12.5px !important; padding: 7px 12px !important; }
+}
