@@ -25,7 +25,7 @@ const SYSTEM_INSTRUCTION = [
 ].join(" ");
 
 function isAllowedOrigin(origin: string): boolean {
-  if (!origin) return true;
+  if (!origin) return false;
   try {
     const url = new URL(origin);
     const host = url.hostname.toLowerCase();
@@ -105,7 +105,7 @@ function extractAnswer(payload: unknown): string {
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin") || "";
-  if (!isAllowedOrigin(origin)) {
+  if (!origin || !isAllowedOrigin(origin)) {
     return json({ error: "هذا المصدر غير مسموح له باستخدام المساعد." }, 403);
   }
 
@@ -116,12 +116,13 @@ Deno.serve(async (req: Request) => {
     return json({ error: "طريقة الطلب غير مدعومة." }, 405, origin);
   }
 
-  const contentLength = Number(req.headers.get("content-length") || "0");
-  if (contentLength > 12_000) {
+  const rawBody = await req.text();
+  if (rawBody.length > 12_000) {
     return json({ error: "حجم الطلب أكبر من المسموح." }, 413, origin);
   }
-
-  const body = await req.json().catch(() => null);
+  const body = (() => {
+    try { return JSON.parse(rawBody); } catch { return null; }
+  })();
   if (!body || typeof body !== "object") {
     return json({ error: "تعذر قراءة السؤال." }, 400, origin);
   }
@@ -153,7 +154,8 @@ Deno.serve(async (req: Request) => {
       signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": apiKey
+        "x-goog-api-key": apiKey,
+        "Api-Revision": "2026-05-20"
       },
       body: JSON.stringify({
         model: GEMINI_MODEL,
@@ -162,8 +164,7 @@ Deno.serve(async (req: Request) => {
         store: false,
         generation_config: {
           max_output_tokens: 420,
-          thinking_level: "low",
-          temperature: 0.25
+          thinking_level: "low"
         }
       })
     });
