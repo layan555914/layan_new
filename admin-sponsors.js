@@ -10,7 +10,7 @@
   const req = (path, opt = {}) => A.request("/rest/v1/" + path, opt);
   const rpc = (name, body = {}) => req("rpc/" + name, { method: "POST", body: JSON.stringify(body) });
   const say = msg => A?.setStatus?.(msg);
-  const httpUrl = v => { try { const u = new URL(String(v || "")); return ["https:", "http:"].includes(u.protocol) ? u.href : ""; } catch (_) { return ""; } };
+  const httpUrl = v => { try { const u = new URL(String(v || "")); if (u.protocol === "http:") u.protocol = "https:"; return u.protocol === "https:" ? u.href : ""; } catch (_) { return ""; } };
   const logoSrc = v => (/^\.\/assets\/[\w./?=-]+$/.test(String(v || "")) ? v : httpUrl(v));
   const fmtDate = v => v ? new Date(v).toLocaleDateString("ar-EG", { year: "numeric", month: "short", day: "numeric" }) : "";
   const toLocalInput = v => { if (!v) return ""; const d = new Date(v); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
