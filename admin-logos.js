@@ -17,9 +17,9 @@
     try {
       const rows = await rpc("layan_admin_list_pending_logos") || [];
       if (!rows.length) { box.innerHTML = '<p class="admin-empty">لا توجد شعارات بانتظار المراجعة.</p>'; return; }
-      box.innerHTML = rows.map(r => `<div class="as-item" data-logo-user="${esc(r.user_id)}">
+      box.innerHTML = rows.map(r => `<div class="as-item" data-logo-user="${esc(r.user_id)}" data-logo-brand="${esc(r.brand_key)}">
           ${circle(https(r.pending_logo_url), "الشعار الجديد")}
-          <div class="as-info"><strong>${esc(r.email)}</strong><small>${r.logo_url ? "سيستبدل الشعار الحالي" : "أول شعار لهذا المعلن"} · ${r.pending_at ? new Date(r.pending_at).toLocaleString("ar-EG") : ""}</small>
+          <div class="as-info"><strong>${esc(r.brand_name || "")}</strong><small>${esc(r.email)}</small><small>${r.logo_url ? "سيستبدل الشعار الحالي" : "أول شعار لهذا المعلن"} · ${r.pending_at ? new Date(r.pending_at).toLocaleString("ar-EG") : ""}</small>
             ${r.logo_url ? `<small style="display:flex;align-items:center;gap:6px">الحالي: <img src="${esc(https(r.logo_url))}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover"></small>` : ""}</div>
           <div class="as-actions"><button type="button" class="btn btn-gold" data-logo-approve="1">اعتماد</button><button type="button" class="btn btn-outline" data-logo-approve="0">رفض</button></div>
         </div>`).join("");
@@ -37,7 +37,7 @@
     const approve = btn.dataset.logoApprove === "1";
     btn.disabled = true;
     try {
-      await rpc("layan_admin_review_logo", { p_user: row.dataset.logoUser, p_approve: approve });
+      await rpc("layan_admin_review_logo", { p_user: row.dataset.logoUser, p_brand_key: row.dataset.logoBrand, p_approve: approve });
       A.setStatus(approve ? "تم اعتماد الشعار وظهر على إعلانات المعلن." : "تم رفض الشعار.");
       load();
     } catch (e) { A.setStatus(e.message); btn.disabled = false; }

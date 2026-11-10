@@ -1355,13 +1355,19 @@ body .listing-avatar.has-logo, body .advertiser-avatar.has-logo, .adv-logo-circl
   box-shadow: 0 0 0 1px #E3C3A8, 0 0 0 3px #FBF1E7, 0 4px 10px rgba(43,33,27,.12);
 }
 body .adv-logo-img, .adv-logo-circle img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-/* «إعلاناتي»: logo card */
-.my-logo-card { display: flex; align-items: center; gap: 22px; margin: 18px 0 8px; padding: 20px 22px; background: linear-gradient(180deg,#FFFDFA,#FBF4EC); border: 1px solid #EAD6C4; border-radius: 20px; box-shadow: 0 10px 26px rgba(43,33,27,.07); }
+/* «إعلاناتي»: logo card (one row per advertiser name) */
+.my-logo-card { margin: 18px 0 8px; padding: 20px 22px; background: linear-gradient(180deg,#FFFDFA,#FBF4EC); border: 1px solid #EAD6C4; border-radius: 20px; box-shadow: 0 10px 26px rgba(43,33,27,.07); }
 .my-logo-card[hidden] { display: none; }
-.my-logo-preview { flex: 0 0 96px; width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; font-size: 34px; color: #A4472A; background: #F6E8DE; box-shadow: 0 0 0 1px #E3C3A8, 0 0 0 6px #FBF1E7; }
 .my-logo-copy h2 { margin: 0 0 4px; font-size: 18px; }
-.my-logo-copy p { margin: 0 0 6px; color: #5E4C40; font-size: 14px; line-height: 1.8; }
-.my-logo-status { font-weight: 700; color: #8C5A3C !important; }
-.my-logo-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.my-logo-copy p { margin: 0 0 12px; color: #5E4C40; font-size: 14px; line-height: 1.8; }
+.my-logo-list { display: grid; gap: 10px; }
+.my-logo-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 10px 12px; background: #fff; border: 1px solid #EFE2D5; border-radius: 16px; }
+.my-logo-preview { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-size: 24px; color: #A4472A; background: #F6E8DE; box-shadow: 0 0 0 1px #E3C3A8, 0 0 0 4px #FBF1E7; overflow: hidden; }
+.my-logo-info { display: grid; gap: 2px; min-width: 0; }
+.my-logo-info strong { font-size: 15.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.my-logo-status { color: #8C5A3C; font-weight: 700; font-size: 12.5px; }
+.my-logo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.my-logo-actions .btn { min-height: 40px; padding: 8px 14px; font-size: 13.5px; }
 .my-logo-upload { cursor: pointer; }
-@media (max-width: 600px) { .my-logo-card { flex-direction: column; text-align: center; } .my-logo-actions { justify-content: center; } }
+.my-logo-empty { margin: 0; color: #7A6556; }
+@media (max-width: 600px) { .my-logo-row { grid-template-columns: 56px minmax(0, 1fr); } .my-logo-preview { width: 56px; height: 56px; } .my-logo-actions { grid-column: 1 / -1; } .my-logo-actions .btn { flex: 1 1 auto; } }
