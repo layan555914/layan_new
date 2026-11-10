@@ -56,10 +56,23 @@
 .osx-logo img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
 a.osx-logo:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px #C98A64, 0 0 0 7px #FBF1E7, 0 0 0 8px #C98A64, 0 22px 40px rgba(43,33,27,.18); }
 .osx-copy { min-width: 0; padding-inline-start: clamp(20px, 3vw, 36px); border-inline-start: 1px solid #EAD6C4; }
-.osx-kicker { display: inline-flex; align-items: center; gap: 7px; color: #A4472A; font-size: 12.5px; font-weight: 800; }
-.osx-kicker i { color: #C98A64; font-style: normal; }
+.osx-kicker {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 5px 6px 5px 15px; padding-inline: 6px 15px;
+  color: #FFF3E6; font-size: 12.5px; font-weight: 800; line-height: 1.5;
+  background: linear-gradient(135deg, #3A2D25 0%, #2B211B 100%);
+  border: 1px solid rgba(233,176,143,.85); border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(43,33,27,.18), inset 0 1px 0 rgba(255,248,240,.10);
+}
+.osx-kicker i {
+  display: grid; place-items: center; width: 24px; height: 24px; flex: 0 0 24px;
+  color: #2B211B; font-style: normal; font-size: 13px; line-height: 1;
+  background: radial-gradient(circle at 35% 30%, #FFE9D4, #E9B08F 55%, #B9744F);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(233,176,143,.22), 0 3px 8px rgba(0,0,0,.25);
+}
 .osx-copy h2 {
-  margin: 6px 0 0; color: #2B211B;
+  margin: 12px 0 0; color: #2B211B;
   font-family: var(--aa-head, Alexandria, Tahoma, sans-serif);
   font-size: clamp(26px, 3vw, 36px); font-weight: 800; line-height: 1.25; letter-spacing: 0;
 }
