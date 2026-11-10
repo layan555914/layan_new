@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v146-token-refresh-20261110";
+const CACHE_NAME = "asyut-aqar-shell-v147-advertiser-logos-20261110";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -49,6 +49,7 @@ const APP_SHELL = [
   "./tracking.js",
   "./app-shell.js",
   "./site-nav.js",
+  "./advertiser-logos.js",
   "./admin-edits.js",
   "./advertiser.html",
   "./advertiser.js",

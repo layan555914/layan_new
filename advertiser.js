@@ -18,7 +18,9 @@
     const badge = rows.find(o => o.trust_badge)?.trust_badge;
     document.title = name + " | إعلانات المعلن | أسيوط عقار";
     $("advertiserName").textContent = name;
-    $("advertiserAvatar").textContent = name.replace(/^ال/, "").charAt(0) || "أ";
+    const avatar = $("advertiserAvatar");
+    if (!avatar.classList.contains("has-logo")) avatar.textContent = name.replace(/^ال/, "").charAt(0) || "أ";
+    avatar.setAttribute("data-owner-avatar", id);
     $("advertiserMeta").innerHTML = `<b>${rows.length}</b> ${rows.length === 1 ? "إعلان منشور" : "إعلانات منشورة"}` +
       (since ? ` · على أسيوط عقار منذ ${esc(since.toLocaleDateString("ar-EG-u-nu-latn", { month: "long", year: "numeric" }))}` : "") +
       (badge === "owner" ? ' · <span class="trust-badge">مالك موثّق</span>' : badge === "company" ? ' · <span class="trust-badge trust-badge-company">شركة موثّقة</span>' : "");

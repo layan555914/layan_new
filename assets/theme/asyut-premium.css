@@ -1348,3 +1348,20 @@ body:has(.aa-chat.is-open) .aa-mascot { visibility: hidden; }
 header .aa-my-listings:hover, header .aa-my-listings[aria-current="page"] { background: #A9653F !important; }
 header .aa-my-listings[hidden], .aa-my-listings[hidden] { display: none !important; }
 @media (max-width: 640px) { .aa-my-listings { min-height: 36px; padding: 6px 12px; font-size: 13px; margin-inline-start: auto; } }
+
+/* Advertiser logo / photo inside the avatar circle (advertiser-logos.js, 2026-11-10) */
+body .listing-avatar.has-logo, body .advertiser-avatar.has-logo, .adv-logo-circle.has-logo {
+  padding: 0; border: 0 !important; overflow: hidden; background: #fff;
+  box-shadow: 0 0 0 1px #E3C3A8, 0 0 0 3px #FBF1E7, 0 4px 10px rgba(43,33,27,.12);
+}
+body .adv-logo-img, .adv-logo-circle img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+/* «إعلاناتي»: logo card */
+.my-logo-card { display: flex; align-items: center; gap: 22px; margin: 18px 0 8px; padding: 20px 22px; background: linear-gradient(180deg,#FFFDFA,#FBF4EC); border: 1px solid #EAD6C4; border-radius: 20px; box-shadow: 0 10px 26px rgba(43,33,27,.07); }
+.my-logo-card[hidden] { display: none; }
+.my-logo-preview { flex: 0 0 96px; width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; font-size: 34px; color: #A4472A; background: #F6E8DE; box-shadow: 0 0 0 1px #E3C3A8, 0 0 0 6px #FBF1E7; }
+.my-logo-copy h2 { margin: 0 0 4px; font-size: 18px; }
+.my-logo-copy p { margin: 0 0 6px; color: #5E4C40; font-size: 14px; line-height: 1.8; }
+.my-logo-status { font-weight: 700; color: #8C5A3C !important; }
+.my-logo-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.my-logo-upload { cursor: pointer; }
+@media (max-width: 600px) { .my-logo-card { flex-direction: column; text-align: center; } .my-logo-actions { justify-content: center; } }
