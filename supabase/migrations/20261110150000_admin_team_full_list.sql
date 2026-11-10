@@ -1,18 +1,7 @@
--- ASYUT AQAR — 2026-11-10: admin team = exactly the two owner accounts requested by the owner.
--- 1) Remove yy326743@gmail.com from the owner list (the account itself is NOT deleted; it simply
---    becomes a normal user and can no longer open the admin page or admin RPCs).
--- 2) The admin page "فريق الإدارة" now lists EVERYONE who has admin access: owners + added admins,
---    so the team is always visible; anyone added later appears there automatically.
--- Rollback for (1): INSERT INTO private.layan_admins (user_id)
---   SELECT id FROM auth.users WHERE lower(email) = 'yy326743@gmail.com';
-
--- ---------- 1) owners: only mostafaokealy@gmail.com and egya56@gmail.com ----------
-DELETE FROM private.layan_admins a
- USING auth.users u
- WHERE u.id = a.user_id AND lower(u.email) = 'yy326743@gmail.com';
-DELETE FROM private.layan_admin_members m
- USING auth.users u
- WHERE u.id = m.user_id AND lower(u.email) = 'yy326743@gmail.com';
+-- ASYUT AQAR — 2026-11-10: the admin page "فريق الإدارة" lists EVERYONE who has admin access
+-- (owners + added admins, with their role), so the team is always visible and anyone added later
+-- appears there automatically. Owners are unchanged (the owner decided to keep all three owner accounts).
+-- Rollback: restore public.layan_admin_list_admins() from 20261108120000_admin_control_center.sql.
 
 -- ---------- 2) list every admin (owners first) ----------
 DROP FUNCTION IF EXISTS public.layan_admin_list_admins();
