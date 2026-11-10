@@ -36,8 +36,8 @@
   <meta property="og:image:alt" content="أسيوط عقار — كل فرص أسيوط العقارية في مكان واحد">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://www.asyutq.com/assets/brand/og-image.jpg?v=20261108-asyutq">
-  <script>window.ASYUT_PRESET_FILTERS = {"city":"الفتح"};</script>
   <link rel="stylesheet" href="./assets/theme/sponsors-premium.css?v=20261110-1">
+  <script>window.ASYUT_PRESET_FILTERS = {"city":"الفتح"};</script>
 </head>
 <body class="page-offers">
   <div class="install-app-banner" id="installAppBanner" hidden>
@@ -119,6 +119,7 @@
               <option value="عيادة طبية">عيادة طبية</option>
               <option value="مخزن">مخزن</option>
               <option value="معرض">معرض</option>
+              <option value="مشروع عقاري">مشروع عقاري (طرح مطوّر)</option>
               <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option>
               <option value="أرض تنازل">أرض تنازل</option>
             </select>
@@ -326,6 +327,7 @@
           <option value="عيادة طبية">عيادة طبية</option>
           <option value="مخزن">مخزن</option>
           <option value="معرض">معرض</option>
+          <option value="مشروع عقاري">مشروع عقاري (طرح مطوّر)</option>
           <option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option>
           <option value="أرض تنازل">أرض تنازل</option>
         </select>
@@ -366,17 +368,17 @@
         <label>المرافق المتاحة<input name="land_utilities" maxlength="180" placeholder="مياه، كهرباء، صرف، غاز..."></label>
         <label>تصنيف / استخدام الأرض<input name="land_zoning" maxlength="180" placeholder="سكني، تجاري، إداري..."></label>
       </fieldset>
-      <label>
+      <label data-rooms-field="bedrooms">
         عدد غرف النوم
         <input name="bedrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
       </label>
 
-      <label>        عدد الحمامات
+      <label data-rooms-field="bathrooms">        عدد الحمامات
         <input name="bathrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
       </label>
 
-      <label>
-        إجمالي السعر
+      <label data-price-field>
+        <span data-price-label>إجمالي السعر</span>
         <input name="total_price" type="number" min="0" required>
       </label>
 
