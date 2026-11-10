@@ -208,3 +208,8 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
 .as-status{margin:0;min-height:1.2em;color:#9A3A22;font-weight:700}
 .as-foot{display:flex;gap:10px;flex-wrap:wrap}.as-foot .btn{flex:1 1 160px;min-height:46px;border-radius:12px;font-weight:800}
 @media(max-width:700px){.as-item{grid-template-columns:52px minmax(0,1fr)}.as-logo,.as-thumb{width:52px;height:52px}.as-actions{grid-column:1/-1;justify-content:stretch}.as-actions .btn{flex:1 1 calc(50% - 6px)}.as-grid{grid-template-columns:1fr}.as-logo-field{flex-direction:column;align-items:stretch}.as-logo-preview{align-self:center}}
+
+/* Admin team roles (2026-11-10) */
+.adm-role{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#F4ECE4;color:#5E4C40;border:1px solid #E3D2C2}
+.adm-role-owner{background:linear-gradient(135deg,#F6D9C0,#E9B08F);color:#2B211B;border-color:#E9B08F}
+.adm-team-count{margin:6px 0 12px;color:#5E4C40}
