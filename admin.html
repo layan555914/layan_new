@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./assets/build/base.min.css?v=4675e85217994f9c">
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
-  <link rel="stylesheet" href="./admin.css?v=20261110-2">
+  <link rel="stylesheet" href="./admin.css?v=20261110-3">
 </head>
 <body class="adm-body">
 <header class="adm-top">
@@ -44,7 +44,7 @@
     <nav class="adm-steps">
       <button type="button" data-view="today" aria-current="true"><i>1</i><span class="adm-short">اليوم</span><span><b>لوحة اليوم</b><small>ما يحتاج إجراءك الآن</small></span><em data-count="today" hidden></em></button>
       <button type="button" data-view="review"><i>2</i><span class="adm-short">المراجعة</span><span><b>المراجعة والاعتماد</b><small>عقارات · خدمات · شركات · إعلانات</small></span><em data-count="review" hidden></em></button>
-      <button type="button" data-view="requests" data-admin-tab="requests"><i>3</i><span class="adm-short">اعتماد المالك</span><span><b>طلبات اعتماد المالك</b><small>حذف وإيقاف طلبه مدير</small></span><em data-requests-count class="admin-badge" hidden></em></button>
+      <button type="button" data-view="requests" data-admin-tab="requests"><i>3</i><span class="adm-short">اعتماد المدير</span><span><b>طلبات اعتماد المدير</b><small>حذف وإيقاف طلبه مدير</small></span><em data-requests-count class="admin-badge" hidden></em></button>
       <button type="button" data-view="published" data-admin-tab="listings"><i>4</i><span class="adm-short">المنشور</span><span><b>المنشور والتوثيق</b><small>الإعلانات الظاهرة للزوار</small></span></button>
       <button type="button" data-view="sponsors"><i>★</i><span class="adm-short">الرعاة</span><span><b>الرعاة والإعلانات الممولة</b><small>الراعي الرسمي · الشركاء · الإعلانات</small></span></button>
     </nav>
@@ -66,7 +66,7 @@
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secMarketplace"><strong id="statPendingMarketplace">—</strong><span>خدمة قيد المراجعة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secEdits"><strong id="statPendingEdits">—</strong><span>تعديل على إعلان منشور</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanies"><strong id="statPendingCompanies">—</strong><span>ملف شركة قيد المراجعة</span></button>
-          <button type="button" class="admin-stat adm-todo-item" data-goto="requests"><strong data-requests-total>0</strong><span>طلب حذف/إيقاف ينتظر المالك</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="requests"><strong data-requests-total>0</strong><span>طلب ينتظر المدير</span></button>
           <button type="button" class="admin-stat adm-todo-item is-info" data-goto="published"><strong data-published-total>—</strong><span>منشور للزوار (عقارات + خدمات + شركات)</span><i hidden id="statApprovedMarketplace"></i></button>
         </div>
       </section>
@@ -93,7 +93,7 @@
     </section>
 
     <section class="adm-view" data-view-panel="requests" hidden>
-      <header class="adm-view-head"><span class="adm-kicker">الخطوة 3</span><h1>طلبات اعتماد المالك</h1><p>أي حذف أو إيقاف يطلبه مدير مضاف ينتظر هنا موافقة أحد المُلّاك قبل التنفيذ.</p></header>
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 3</span><h1>طلبات اعتماد المدير</h1><p>أي إضافة أو تعديل أو حذف يطلبه مشرف ينتظر هنا موافقة المدير قبل التنفيذ.</p></header>
       <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="requests"></div></section>
     </section>
 
@@ -107,7 +107,7 @@
     <section class="adm-view" data-view-panel="sponsors" hidden>
       <header class="adm-view-head"><span class="adm-kicker">الرعاية والإعلان</span><h1>الرعاة والإعلانات الممولة</h1><p>تحكم كامل فيما يظهر للزوار: أضف الراعي الرسمي وشركاء النجاح، وانشر الإعلانات الممولة أو أوقفها أو جددها أو احذفها.</p></header>
       <section class="adm-card" id="secSponsors"><div class="as-card-head"><div><h2 class="adm-card-title"><i>★</i>الرعاة الرسميون وشركاء النجاح</h2><p class="adm-card-lead">«الراعي الرسمي» يظهر كبطاقة فاخرة في الصفحة الرئيسية، و«شريك النجاح» في شريط الشركاء تحتها. الترتيب بالأسهم.</p></div><button type="button" class="btn btn-gold" id="addSponsorBtn">＋ إضافة راعٍ</button></div><div id="adminSponsorsList" class="as-list"><p class="admin-empty">جارٍ التحميل...</p></div></section>
-      <section class="adm-card" id="secSponsoredAds"><div class="as-card-head"><div><h2 class="adm-card-title"><i>◆</i>الإعلانات الممولة</h2><p class="adm-card-lead">تظهر في «خدمات تحتاجها بعد شراء عقارك» بالصفحة الرئيسية، وبين العقارات، وفي صفحة الإعلانات المميزة. الحذف من مدير مضاف ينتظر اعتماد المالك.</p></div><button type="button" class="btn btn-gold" id="addSponsoredAdBtn">＋ إعلان ممول</button></div><div id="adminSponsoredAdsList" class="as-list"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+      <section class="adm-card" id="secSponsoredAds"><div class="as-card-head"><div><h2 class="adm-card-title"><i>◆</i>الإعلانات الممولة</h2><p class="adm-card-lead">تظهر في «خدمات تحتاجها بعد شراء عقارك» بالصفحة الرئيسية، وبين العقارات، وفي صفحة الإعلانات المميزة. الحذف من مشرف ينتظر اعتماد المدير.</p></div><button type="button" class="btn btn-gold" id="addSponsoredAdBtn">＋ إعلان ممول</button></div><div id="adminSponsoredAdsList" class="as-list"><p class="admin-empty">جارٍ التحميل...</p></div></section>
     </section>
 
     <section class="adm-view" data-view-panel="customers" hidden>
@@ -122,7 +122,7 @@
     </section>
 
     <section class="adm-view" data-view-panel="team" hidden>
-      <header class="adm-view-head"><span class="adm-kicker">الخطوة 7</span><h1>فريق الإدارة</h1><p>المُلّاك يعتمدون كل شيء. المديرون المضافون يراجعون، وطلبات الحذف منهم تنتظر اعتماد المالك.</p></header>
+      <header class="adm-view-head"><span class="adm-kicker">الخطوة 7</span><h1>فريق الإدارة</h1><p>المدير يعتمد كل شيء. المشرفون يراجعون، وطلبات الحذف منهم تنتظر اعتماد المدير.</p></header>
       <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="admins"></div></section>
     </section>
 
@@ -130,7 +130,7 @@
   </div>
 </div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./gubabase.js?v=20261110-1"></script><script src="./admin.js?v=20261110-1"></script><script src="./admin-console.js?v=20261110-2"></script><script src="./admin-layout.js?v=20261108-4"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-sponsors.js?v=20261110-1"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261110-1"></script><script src="./gubabase.js?v=20261110-1"></script><script src="./admin.js?v=20261110-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261108-4"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-sponsors.js?v=20261110-2"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>

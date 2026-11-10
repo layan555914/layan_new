@@ -164,7 +164,7 @@
       } else if (act === "delete") {
         if (!window.confirm("حذف الراعي «" + s.name + "» نهائيًا؟ (يمكنك بدلًا من ذلك «إخفاء»)")) return;
         const r = await rpc("layan_admin_delete_sponsor", { p_id: s.id });
-        say(r === "pending" ? "تم إرسال طلب الحذف لاعتماد المالك." : "تم حذف الراعي.");
+        say(r === "pending" ? "تم إرسال طلب الحذف لاعتماد المدير." : "تم حذف الراعي.");
       }
       await loadSponsors();
     } catch (err) { say(err.message || "تعذر تنفيذ الإجراء."); }
@@ -318,7 +318,7 @@
       } else if (act === "delete") {
         if (!window.confirm("حذف الإعلان الممول «" + a.title + "» نهائيًا؟")) return;
         const r = await rpc("layan_admin_delete_supplier_ad", { p_id: a.id });
-        say(r === "pending" ? "تم إرسال طلب الحذف لاعتماد المالك." : "تم حذف الإعلان.");
+        say(r === "pending" ? "تم إرسال طلب الحذف لاعتماد المدير." : "تم حذف الإعلان.");
       }
       await loadAds();
     } catch (err) {

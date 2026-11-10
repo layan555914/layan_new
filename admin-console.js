@@ -14,7 +14,7 @@
   const TYPES = { page_view: "زيارة صفحة", listing_view: "مشاهدة إعلان", contact_call: "اتصال", contact_whatsapp: "واتساب", search: "بحث", favorite: "حفظ في المفضلة", signup: "إنشاء حساب", login: "تسجيل دخول", add_listing_open: "فتح إضافة إعلان", share: "مشاركة" };
   const ACCOUNT = { seeker: "باحث عن عقار", owner: "مالك عقار", broker: "وسيط عقاري", company: "شركة عقارية" };
   const needsMigration = error => /layan_admin_|layan_activity|function .* does not exist|Could not find the function|PGRST202|404/i.test(String(error?.message || error));
-  const pendingNote = '<p class="admin-empty admin-pending">هذه الأداة تحتاج تطبيق تحديث قاعدة البيانات «مركز التحكم» (20261108120000) بعد موافقة المالك. باقي أقسام الإدارة تعمل كالمعتاد.</p>';
+  const pendingNote = '<p class="admin-empty admin-pending">هذه الأداة تحتاج تطبيق تحديث قاعدة البيانات «مركز التحكم» (20261108120000) بعد موافقة المدير. باقي أقسام الإدارة تعمل كالمعتاد.</p>';
   const rpc = (name, body = {}) => A.request("/rest/v1/rpc/" + name, { method: "POST", body: JSON.stringify(body) });
 
   // ---- Excel export (SheetJS loaded on demand; CSV fallback) ----
@@ -248,10 +248,10 @@
     panel.innerHTML = '<p class="admin-empty">جارٍ تحميل صلاحيات الإدارة...</p>';
     try {
       const rows = await rpc("layan_admin_list_admins") || [];
-      const roleLabel = r => r.role === "owner" ? '<span class="adm-role adm-role-owner">★ مالك</span>' : '<span class="adm-role">مدير مضاف</span>';
+      const roleLabel = r => r.role === "owner" ? '<span class="adm-role adm-role-owner">★ مدير</span>' : '<span class="adm-role">مشرف</span>';
       const owners = rows.filter(r => r.role === "owner").length;
-      panel.innerHTML = `<p>هؤلاء فقط من يدخلون لوحة الإدارة. أي حساب عادي لا يرى لوحة الإدارة ولا يستطيع فتحها. أي حساب تضيفه هنا يظهر فورًا في القائمة، وإزالة الصلاحية متاحة لحسابات المالك فقط. المدير المضاف يراجع ويطلب الحذف، والمالك يعتمد.</p>` +
-        `<p class="adm-team-count"><b>${rows.length}</b> حساب له صلاحية الإدارة${owners ? ` — منهم <b>${owners}</b> مالك` : ""}</p>` +
+      panel.innerHTML = `<p>هؤلاء فقط من يدخلون لوحة الإدارة، وأي حساب عادي لا يراها ولا يستطيع فتحها. <b>المدير</b> صلاحيته كاملة ويعتمد كل شيء. <b>المشرف</b> يرى كل شيء، لكن أي إضافة أو تعديل أو حذف يقوم به يُرسل أولًا للمدير ولا يُنفَّذ إلا بعد موافقته. أي حساب تضيفه هنا يظهر فورًا كمشرف.</p>` +
+        `<p class="adm-team-count"><b>${rows.length}</b> حساب له صلاحية الإدارة${owners ? ` — منهم <b>${owners}</b> مدير` : ""}</p>` +
         toolbar(`<input type="email" data-admin-email placeholder="بريد الحساب المسجل"><button class="btn btn-gold" type="button" data-admin-add>منح صلاحية الإدارة</button>`) +
         `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>البريد</th><th>الصفة</th><th>منذ</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.email)}</td><td>${roleLabel(r)}</td><td>${date(r.added_at)}</td><td>${r.role === "owner" ? '<small>ثابت</small>' : `<button type="button" class="is-danger" data-admin-remove="${esc(r.email)}">إزالة الصلاحية</button>`}</td></tr>`).join("") || '<tr><td colspan="4">لا توجد حسابات.</td></tr>'}</tbody></table></div>`;
     } catch (error) {
@@ -260,10 +260,10 @@
   }
 
   // ---- Owner approval requests ----
-  const ACTIONS = { delete_user: "حذف حساب", suspend_user: "إيقاف حساب", unsuspend_user: "إعادة تفعيل حساب", delete_offer: "حذف إعلان عقار", delete_service: "حذف خدمة", delete_company: "حذف ملف شركة", delete_supplier_ad: "حذف إعلان ممول", delete_sponsor: "حذف راعٍ رسمي" };
-  const STATES = { pending: "بانتظار المالك", approved: "تم الاعتماد والتنفيذ", rejected: "مرفوض", failed: "تعذر التنفيذ" };
+  const ACTIONS = { delete_user: "حذف حساب", suspend_user: "إيقاف حساب", unsuspend_user: "إعادة تفعيل حساب", delete_offer: "حذف إعلان عقار", delete_service: "حذف خدمة", delete_company: "حذف ملف شركة", delete_supplier_ad: "حذف إعلان ممول", delete_sponsor: "حذف راعٍ رسمي", change: "إضافة / تعديل" };
+  const STATES = { pending: "بانتظار المدير", approved: "تم الاعتماد والتنفيذ", rejected: "مرفوض", failed: "تعذر التنفيذ" };
   const done = (result, doneText) => result === "pending"
-    ? "تم إرسال الطلب إلى المالك للاعتماد. سيُنفَّذ بعد موافقته."
+    ? "تم إرسال الطلب إلى المدير للاعتماد. سيُنفَّذ بعد موافقته."
     : doneText;
   async function refreshRequestsBadge() {
     try {
@@ -280,10 +280,10 @@
       const status = panel.dataset.status ?? "pending";
       const rows = await rpc("layan_admin_list_requests", { p_status: status || null }) || [];
       const isOwner = rows.some(r => r.can_decide);
-      panel.innerHTML = `<p>حذف الحسابات والإعلانات وإيقاف الحسابات بواسطة أي مدير مضاف يصل هنا أولًا، ولا يُنفَّذ إلا بعد اعتماد المالك. ما ينفذه المالك بنفسه يُنفَّذ مباشرة.</p>` +
+      panel.innerHTML = `<p>أي إضافة أو تعديل أو حذف أو إيقاف يقوم به مشرف يصل هنا أولًا، ولا يُنفَّذ إلا بعد اعتماد المدير. اضغط «التفاصيل» لترى التعديل المطلوب بالضبط قبل الاعتماد. ما ينفذه المدير بنفسه يُنفَّذ مباشرة.</p>` +
         toolbar(`<label>العرض <select data-requests-status>${[["pending", "بانتظار الاعتماد"], ["", "كل الطلبات"], ["approved", "المعتمدة"], ["rejected", "المرفوضة"]].map(([v, l]) => `<option value="${v}" ${v === status ? "selected" : ""}>${l}</option>`).join("")}</select></label>`) +
-        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>الطلب</th><th>العنصر</th><th>مقدم الطلب</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr data-request="${esc(r.id)}"><td>${esc(ACTIONS[r.action] || r.action)}</td><td>${esc(r.target_label || r.target)}</td><td>${esc(r.requested_by_email || "")}</td><td>${date(r.created_at)}</td><td>${esc(STATES[r.status] || r.status)}${r.note ? `<br><small>${esc(r.note)}</small>` : ""}</td><td>${r.can_decide ? `<button type="button" class="btn btn-gold" data-request-decide="1">اعتماد وتنفيذ</button> <button type="button" class="is-danger" data-request-decide="0">رفض</button>` : (r.status === "pending" ? "بانتظار المالك" : (r.decided_by_email ? esc(r.decided_by_email) : ""))}</td></tr>`).join("") || '<tr><td colspan="6">لا توجد طلبات.</td></tr>'}</tbody></table></div>` +
-        (isOwner || !rows.length ? "" : '<p class="admin-empty">الاعتماد متاح لحسابات المالك فقط.</p>');
+        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>الطلب</th><th>العنصر</th><th>مقدم الطلب</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr data-request="${esc(r.id)}" data-request-action="${esc(r.action)}"><td>${esc(ACTIONS[r.action] || r.action)}</td><td>${esc(r.target_label || r.target)}${r.action === "change" && r.payload ? `<details class="adm-change"><summary>التفاصيل</summary><pre dir="ltr">${esc(r.payload.method + " " + r.payload.path + (r.payload.body != null ? "\n" + JSON.stringify(r.payload.body, null, 2) : ""))}</pre></details>` : ""}</td><td>${esc(r.requested_by_email || "")}</td><td>${date(r.created_at)}</td><td>${esc(STATES[r.status] || r.status)}${r.note ? `<br><small>${esc(r.note)}</small>` : ""}</td><td>${r.can_decide ? `<button type="button" class="btn btn-gold" data-request-decide="1">اعتماد وتنفيذ</button> <button type="button" class="is-danger" data-request-decide="0">رفض</button>` : (r.status === "pending" ? "بانتظار المدير" : (r.decided_by_email ? esc(r.decided_by_email) : ""))}</td></tr>`).join("") || '<tr><td colspan="6">لا توجد طلبات.</td></tr>'}</tbody></table></div>` +
+        (isOwner || !rows.length ? "" : '<p class="admin-empty">الاعتماد متاح لحسابات المدير فقط.</p>');
       refreshRequestsBadge();
     } catch (error) {
       panel.innerHTML = needsMigration(error) ? pendingNote : `<p class="admin-empty">${esc(error.message)}</p>`;
@@ -338,8 +338,23 @@
     if (dec) {
       const approve = dec.dataset.requestDecide === "1";
       const id = Number(dec.closest("[data-request]").dataset.request);
-      if (!confirm(approve ? "اعتماد الطلب وتنفيذه الآن؟ الحذف لا يمكن التراجع عنه." : "رفض هذا الطلب؟")) return;
+      if (!confirm(approve ? "اعتماد الطلب وتنفيذه الآن؟ بعض الإجراءات مثل الحذف لا يمكن التراجع عنها." : "رفض هذا الطلب؟")) return;
       const note = approve ? null : (prompt("سبب الرفض (اختياري)") || null);
+      const row = dec.closest("[data-request]");
+      if (approve && row.dataset.requestAction === "change") {
+        try {
+          const all = await rpc("layan_admin_list_requests", { p_status: "pending" }) || [];
+          const req = all.find(x => Number(x.id) === id);
+          if (!req || !req.payload) throw new Error("الطلب غير موجود أو تم البت فيه.");
+          let ok = true, err = null;
+          try { await window.AsyutApproval.perform(req.payload); } catch (e) { ok = false; err = e.message; }
+          await rpc("layan_admin_finish_change", { p_id: id, p_ok: ok, p_note: err });
+          A.setStatus(ok ? "تم اعتماد التعديل وتنفيذه." : "تعذر تنفيذ التعديل: " + err);
+          loadRequests(); loaded.delete("users"); loaded.delete("listings");
+          window.AsyutAdmin?.reload?.();
+        } catch (e) { A.setStatus(e.message); }
+        return;
+      }
       try {
         const r = await rpc("layan_admin_decide_request", { p_id: id, p_approve: approve, p_note: note });
         A.setStatus(r === "approved" ? "تم اعتماد الطلب وتنفيذه." : r === "failed" ? "تعذر التنفيذ: العنصر غير موجود أو حُذف بالفعل." : "تم رفض الطلب.");
