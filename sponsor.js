@@ -59,20 +59,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function placeAds() {
     if (!grid) return;
-    grid.querySelectorAll("[data-sponsor-card]").forEach(node => node.remove());
+    grid.querySelectorAll("[data-sponsor-card], [data-partner-slot], .sponsor-slot").forEach(node => node.remove());
     ads.forEach(ad => grid.insertAdjacentHTML("beforeend", renderCard(ad)));
-    if (!ads.length) {
-      // No approved ad yet: show the available slots so companies see where their ad would appear.
-      const slots = [
-        ["تشطيب وديكور", "اعرض أعمال التشطيب والتصميم الداخلي أمام أصحاب الوحدات الجديدة."],
-        ["أثاث وأجهزة", "منتجاتك أمام من اشترى أو استأجر عقارًا ويجهّز بيته الآن."],
-        ["مواد بناء", "سيراميك ودهانات وأدوات صحية لمن يبني أو يشطب في أسيوط."]
-      ];
-      grid.innerHTML = slots.map(([category, text]) =>
-        '<article class="offer-card sponsor-card sponsor-cta sponsor-slot"><span class="sponsor-label">مساحة إعلانية متاحة</span>' +
-        '<div class="offer-card-content"><h3>' + esc(category) + '</h3><p>' + esc(text) + '</p>' +
-        '<div class="sponsor-actions"><a class="btn btn-gold" href="./advertise.html">احجز المساحة</a></div></div></article>').join("");
-    }
+    // Until each place is booked, show the service it is meant for, with a photo of that service,
+    // so the section always looks complete: 3 on top, 3 below (approved ads come first).
+    const free = SLOTS.slice(0, Math.max(0, SLOTS.length - ads.length));
+    grid.insertAdjacentHTML("beforeend", free.map(slotCard).join(""));
+  }
+
+  const PHOTO = id => "https://images.unsplash.com/" + id + "?auto=format&fit=crop&w=720&h=450&q=70";
+  const SLOTS = [
+    ["الشركات والمكاتب العقارية", "قدّم مكتبك لكل من يبحث عن عقار في أسيوط.", "photo-1758448721149-aa0ce8e1b2c9"],
+    ["مواد البناء والتشطيب", "سيراميك ودهانات وأدوات صحية لمن يبني أو يشطب.", "photo-1720414574239-19b692165d47"],
+    ["الأثاث والفرش وتجهيز الوحدات", "منتجاتك أمام من اشترى أو استأجر ويجهّز بيته الآن.", "photo-1779078652921-44629ffbcd07"],
+    ["المشروعات والمطورون العقاريون", "اعرض مشروعك ووحداته أمام المهتمين بالشراء.", "photo-1621511075938-f03482369feb"],
+    ["الصيانة وإدارة العقارات", "كهرباء وسباكة وصيانة لأصحاب الوحدات والعمارات.", "photo-1621905251189-08b45d6a269e"],
+    ["الاستشارات والخدمات العقارية", "معاينات وتقييم وتصميم لمن يتخذ قراره العقاري.", "photo-1608303588026-884930af2559"]
+  ];
+  function slotCard([category, text, photo]) {
+    return '<article class="ps-card" data-partner-slot>' +
+      '<div class="ps-media"><img src="' + esc(PHOTO(photo)) + '" alt="' + esc(category) + '" loading="lazy" decoding="async" width="720" height="450" referrerpolicy="no-referrer" onerror="this.remove()">' +
+      '<span class="ps-tag ps-status">مساحة إعلانية متاحة</span></div>' +
+      '<div class="ps-body"><h3>' + esc(category) + '</h3><p>' + esc(text) + '</p>' +
+      '<a class="btn btn-gold ps-book" href="./advertise.html">احجز المساحة</a></div></article>';
   }
 
   // Native placement inside the listings grid (offers page): approved ads after every 6 listings,
@@ -255,6 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  placeAds(); // the six service places show right away, even before (or without) the ads request
   loadAds();
   window.addEventListener("focus", loadAds);
 });
