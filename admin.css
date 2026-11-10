@@ -215,3 +215,18 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
 .adm-team-count{margin:6px 0 12px;color:#5E4C40}
 .adm-change summary{cursor:pointer;color:#8C3A21;font-weight:800;font-size:12px;margin-top:4px}
 .adm-change pre{max-width:520px;max-height:220px;overflow:auto;margin:6px 0 0;padding:10px;background:#FBF6F0;border:1px solid #EAD6C4;border-radius:10px;font-size:11.5px;white-space:pre-wrap;word-break:break-all;text-align:left}
+
+/* Tables never push the page wider than the screen; customers table fits without sideways scrolling (2026-11-10) */
+.adm-main > *, .adm-body .adm-card, .adm-body .admin-tabpanel, .adm-body .admin-table-wrap { min-width: 0; max-width: 100%; }
+.adm-body .admin-table-wrap { overflow-x: auto; }
+@media (min-width: 1021px) {
+  .adm-body [data-admin-panel="users"] .admin-table { table-layout: auto; font-size: 12.5px; }
+  .adm-body [data-admin-panel="users"] .admin-table th,
+  .adm-body [data-admin-panel="users"] .admin-table td { padding: 8px 6px; line-height: 1.55; }
+  .adm-body [data-admin-panel="users"] .admin-table td:nth-child(2) { overflow-wrap: anywhere; min-width: 150px; max-width: 220px; }
+  .adm-body [data-admin-panel="users"] .admin-table td:nth-child(1) { min-width: 90px; max-width: 140px; }
+  .adm-body [data-admin-panel="users"] .admin-table td:nth-child(5),
+  .adm-body [data-admin-panel="users"] .admin-table td:nth-child(6) { min-width: 82px; font-size: 12px; }
+  .adm-body [data-admin-panel="users"] .admin-actions-cell { display: flex; flex-wrap: wrap; gap: 4px; min-width: 150px; max-width: 170px; }
+  .adm-body [data-admin-panel="users"] .admin-actions-cell button { padding: 4px 8px; font-size: 12px; min-height: 30px; border-radius: 8px; }
+}
