@@ -213,3 +213,5 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
 .adm-role{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#F4ECE4;color:#5E4C40;border:1px solid #E3D2C2}
 .adm-role-owner{background:linear-gradient(135deg,#F6D9C0,#E9B08F);color:#2B211B;border-color:#E9B08F}
 .adm-team-count{margin:6px 0 12px;color:#5E4C40}
+.adm-change summary{cursor:pointer;color:#8C3A21;font-weight:800;font-size:12px;margin-top:4px}
+.adm-change pre{max-width:520px;max-height:220px;overflow:auto;margin:6px 0 0;padding:10px;background:#FBF6F0;border:1px solid #EAD6C4;border-radius:10px;font-size:11.5px;white-space:pre-wrap;word-break:break-all;text-align:left}
