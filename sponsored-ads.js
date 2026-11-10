@@ -51,21 +51,23 @@
   function officialCard(s, index) {
     const link = httpUrl(s.link_url);
     const logo = logoSrc(s.logo_url);
-    const logoHtml = logo ? '<img src="' + esc(logo) + '" alt="شعار ' + esc(s.name) + '" width="180" height="180" loading="' + (index ? "lazy" : "eager") + '" referrerpolicy="no-referrer">' : '<span class="official-sponsor-monogram">' + esc(initial(s.name)) + '</span>';
-    return '<div class="official-sponsor-card os-premium" data-sponsor-id="' + esc(s.id) + '">' +
-      '<span class="os-corner os-corner-a" aria-hidden="true"></span><span class="os-corner os-corner-b" aria-hidden="true"></span>' +
-      '<div class="official-sponsor-copy">' +
-        '<span class="official-sponsor-kicker">' + esc(s.kicker || "الراعي الرسمي لمنصة أسيوط عقار") + '</span>' +
+    const label = s.link_label || "زيارة صفحة الراعي";
+    const logoHtml = logo ? '<img src="' + esc(logo) + '" alt="شعار ' + esc(s.name) + '" width="150" height="150" loading="' + (index ? "lazy" : "eager") + '" referrerpolicy="no-referrer">' : '<span class="official-sponsor-monogram">' + esc(initial(s.name)) + '</span>';
+    const logoBox = link
+      ? '<a class="osx-logo" href="' + esc(link) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(label) + '">' + logoHtml + '</a>'
+      : '<div class="osx-logo">' + logoHtml + '</div>';
+    return '<article class="osx-card os-premium" data-sponsor-id="' + esc(s.id) + '">' +
+      logoBox +
+      '<div class="osx-copy">' +
+        '<span class="osx-kicker"><i aria-hidden="true">★</i>' + esc(s.kicker || "الراعي الرسمي لمنصة أسيوط عقار") + '</span>' +
         '<h2' + (index ? "" : ' id="officialSponsorTitle"') + '>' + esc(s.name) + '</h2>' +
         (s.tagline ? '<p>' + esc(s.tagline) + '</p>' : "") +
-        (s.subline ? '<span class="official-sponsor-subline">' + esc(s.subline) + '</span>' : "") +
-        (link ? '<a class="official-sponsor-link" href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' + esc(s.link_label || "زيارة صفحة الراعي") + ' <span aria-hidden="true">↗</span></a>' : "") +
+        (s.subline ? '<span class="osx-sub">' + esc(s.subline) + '</span>' : "") +
       '</div>' +
-      (link ? '<a class="official-sponsor-logo-wrap" href="' + esc(link) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(s.link_label || ("زيارة " + s.name)) + '">' + logoHtml + '</a>'
-            : '<div class="official-sponsor-logo-wrap">' + logoHtml + '</div>') +
-      '<span class="os-seal" aria-hidden="true">✦</span>' +
-    '</div>';
+      (link ? '<div class="osx-cta"><a class="osx-link" href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + ' <span aria-hidden="true">↗</span></a><small>شكرًا لدعمكم مسيرة أسيوط عقار</small></div>' : "") +
+    '</article>';
   }
+  const sectionHead = '<header class="osx-head"><span class="osx-eyebrow">بدعم ورعاية</span></header>';
   function partnerChip(s) {
     const link = httpUrl(s.link_url);
     const logo = logoSrc(s.logo_url);
@@ -89,9 +91,9 @@
       const partners = rows.filter(s => s.tier === "partner");
       if (!officials.length && !partners.length) { section.hidden = true; return; }
       section.hidden = false;
-      section.innerHTML = officials.map(officialCard).join("") +
+      section.innerHTML = (officials.length ? sectionHead : "") + officials.map(officialCard).join("") +
         (partners.length ? '<div class="os-partners"><p class="os-partners-title"><span>شركاء النجاح</span></p><div class="os-partners-row">' + partners.map(partnerChip).join("") + '</div></div>' : "");
-      section.classList.add("is-live");
+      section.classList.add("is-live", "osx-section");
     } catch (_) { /* keep static fallback */ }
   }
 

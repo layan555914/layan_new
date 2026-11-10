@@ -347,6 +347,24 @@ body .footer-legal a { color: var(--aa-peach); }
   body .topbar .top-actions .btn { min-height: 44px; padding: 10px 20px; white-space: nowrap; }
 }
 body .brand-logo { width: 48px; height: 48px; }
+/* Header fit (2026-11-10): keep every link and button fully inside the bar on laptop widths */
+@media (min-width: 1181px) {
+  body .topbar nav { min-width: 0; }
+  body .topbar .top-actions { flex: 0 0 auto; min-width: 0; padding-inline-start: 14px; }
+  body .topbar .top-actions .btn { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+}
+@media (min-width: 1181px) and (max-width: 1599px) {
+  body .topbar nav { margin-inline-start: 22px; font-size: 14px !important; }
+  body .topbar nav a { padding: 8px 9px !important; }
+  body .topbar .top-actions { gap: 8px !important; }
+  body .topbar .top-actions .btn { padding: 9px 14px; font-size: 14px; }
+}
+@media (min-width: 1181px) and (max-width: 1360px) {
+  body .topbar nav { margin-inline-start: 14px; font-size: 13.5px !important; }
+  body .topbar nav a { padding: 7px 7px !important; }
+  body .topbar .top-actions .btn { padding: 8px 12px; font-size: 13.5px; }
+}
+
 
 /* Install prompt: a quiet toast instead of a bar that pushes the page down */
 @media (min-width: 701px) {

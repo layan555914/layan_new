@@ -437,8 +437,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const api = window.LAYAN_SUPABASE;
     if (!button || !api) return;
     const user = api.getUser();
-    button.textContent = user ? "خروج (" + (user.email || "حسابي") + ")" : "تسجيل الدخول";
-    button.title = user ? "اضغط لتسجيل الخروج" : "تسجيل الدخول أو إنشاء حساب";
+    // Short, fixed-width label so the header never overflows with long e-mails; the address stays in the tooltip.
+    button.textContent = user ? "تسجيل الخروج" : "تسجيل الدخول";
+    button.title = user ? "مسجّل الدخول باسم " + (user.email || "حسابك") + " — اضغط لتسجيل الخروج" : "تسجيل الدخول أو إنشاء حساب";
+    button.setAttribute("aria-label", user ? "تسجيل الخروج من حساب " + (user.email || "") : "تسجيل الدخول أو إنشاء حساب");
     if (listingsLink) listingsLink.hidden = !user;
   }
   window.addEventListener("layan:auth-ready", () => {
