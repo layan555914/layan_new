@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v151-footer-20261110";
+const CACHE_NAME = "asyut-aqar-shell-v152-home-how-20261110";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -41,6 +41,7 @@ const APP_SHELL = [
   "./map.js",
   "./buyer.js",
   "./sponsor.js",
+  "./home-how.js",
   "./ai.js",
   "./assistant.js",
   "./mascot.js",

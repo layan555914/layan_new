@@ -112,3 +112,71 @@ body.page-home .official-sponsor-section.osx-section { margin-block: var(--aa-se
 /* no extra space under the last block of a section */
 body.page-home main > section > :last-child { margin-bottom: 0 !important; }
 body.page-home main > section.home-partners .home-partners-grid { margin-bottom: 0 !important; }
+
+/* ===== «كيف تعمل المنصة؟» (2026-11-10): two journeys, three steps each, one trust strip ===== */
+.hw {
+  --hw-ink: #2B211B; --hw-ink-2: #75604F; --hw-line: #EFE4D9; --hw-accent: #9A5A3C; --hw-accent-bg: #F6ECE3;
+  width: min(1180px, calc(100% - 32px)); margin: clamp(40px, 6vw, 80px) auto;
+}
+body.page-home .hw { margin-block: var(--aa-section-y); }
+.hw-head { max-width: 720px; margin: 0 auto 22px; text-align: center; }
+.hw-head h2 { margin: 8px 0 10px; font-size: clamp(28px, 3.6vw, 42px); line-height: 1.3; color: var(--hw-ink); letter-spacing: 0; }
+.hw-head p { margin: 0; color: var(--hw-ink-2); font-size: 16px; line-height: 1.9; }
+
+.hw-tabs { display: flex; width: max-content; max-width: 100%; margin: 0 auto 26px; padding: 5px; gap: 4px; border-radius: 999px; background: #fff; border: 1px solid var(--hw-line); box-shadow: 0 6px 18px rgba(43,33,27,.04); }
+.hw-tabs [role="tab"] {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: 0; border-radius: 999px; cursor: pointer;
+  font: 700 15px/1.4 var(--aa-head, Alexandria, sans-serif); color: var(--hw-ink-2); background: transparent; transition: background .2s ease, color .2s ease;
+}
+.hw-tabs [role="tab"] .cx-ico { width: 18px; height: 18px; }
+.hw-tabs [role="tab"]:hover { color: var(--hw-ink); }
+.hw-tabs [role="tab"].is-active { color: #FFF8F0; background: #2B211B; box-shadow: 0 6px 16px rgba(43,33,27,.18); }
+
+.hw-panel { padding: clamp(22px, 3.4vw, 40px); border-radius: 28px; background: linear-gradient(135deg, #FFFCF8 0%, #F8EFE6 100%); border: 1px solid #EEDFD1; box-shadow: 0 1px 2px rgba(43,33,27,.03), 0 18px 48px rgba(43,33,27,.05); }
+.hw-steps { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin: 0; padding: 0; list-style: none; counter-reset: none; }
+/* the line that links the three steps */
+.hw-steps::before { content: ""; position: absolute; top: 32px; inset-inline: calc(100% / 6); height: 0; border-top: 2px dashed #E3CDBA; }
+.hw-step { position: relative; text-align: center; padding: 0 6px; }
+.hw-badge { position: relative; display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; color: var(--hw-accent); background: #fff; border: 1px solid #EEDFD1; box-shadow: 0 8px 22px rgba(154,90,60,.12); }
+.hw-badge .cx-ico { width: 26px; height: 26px; }
+.hw-badge b { position: absolute; top: -4px; inset-inline-end: -4px; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font: 800 12px/1 var(--aa-head, Alexandria, sans-serif); color: #FFF8F0; background: var(--hw-accent); border: 2px solid #FFFCF8; }
+.hw-step h3 { margin: 0 0 6px; font-size: 18px; color: var(--hw-ink); letter-spacing: 0; }
+.hw-step p { margin: 0 auto; max-width: 30ch; color: var(--hw-ink-2); font-size: 14.5px; line-height: 1.85; }
+.hw-cta { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 28px; }
+.hw-more { color: var(--hw-accent); font-weight: 700; text-decoration: none; border-bottom: 1px solid #E6D2C1; padding-bottom: 2px; }
+.hw-more:hover { border-color: var(--hw-accent); }
+
+.hw-trust { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px 20px; margin-top: 18px; padding: 18px 22px; border-radius: 20px; background: #fff; border: 1px solid var(--hw-line); }
+.hw-trust-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: var(--hw-accent); background: var(--hw-accent-bg); }
+.hw-trust-body strong { display: block; margin-bottom: 2px; color: var(--hw-ink); font-family: var(--aa-head, Alexandria, sans-serif); font-size: 15.5px; }
+.hw-trust-body p { margin: 0; color: var(--hw-ink-2); font-size: 13.5px; line-height: 1.85; }
+.hw-pills { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.hw-pills li { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #FBF7F2; border: 1px solid var(--hw-line); color: var(--hw-ink); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.hw-pills li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #3F8F5B; flex: 0 0 7px; }
+.hw button:focus-visible, .hw a:focus-visible { outline: 2px solid #D9B79D; outline-offset: 3px; }
+
+@media (max-width: 960px) {
+  .hw-trust { grid-template-columns: auto minmax(0, 1fr); }
+  .hw-pills { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
+}
+@media (max-width: 700px) {
+  .hw { width: calc(100% - 24px); }
+  .hw-head { text-align: start; }
+  .hw-tabs { width: 100%; }
+  .hw-tabs [role="tab"] { flex: 1; justify-content: center; padding: 10px 12px; font-size: 14px; }
+  /* vertical timeline on phones */
+  .hw-steps { grid-template-columns: 1fr; gap: 22px; }
+  .hw-steps::before { top: 28px; bottom: 28px; inset-inline: 27px auto; height: auto; border-top: 0; border-inline-start: 2px dashed #E3CDBA; }
+  .hw-step { display: grid; grid-template-columns: 56px minmax(0, 1fr); column-gap: 14px; text-align: start; padding: 0; }
+  .hw-badge { grid-row: 1 / 3; width: 56px; height: 56px; margin: 0; }
+  .hw-badge .cx-ico { width: 22px; height: 22px; }
+  .hw-step h3 { margin-top: 4px; font-size: 16.5px; }
+  .hw-step p { max-width: none; font-size: 14px; }
+  .hw-cta .btn { width: 100%; }
+  .hw-trust { grid-template-columns: 1fr; padding: 16px; }
+  .hw-trust-icon { width: 42px; height: 42px; }
+}
+@media (prefers-reduced-motion: reduce) { .hw * { transition: none !important; } }
+/* keep the inactive tab clean (global button styles add a grey fill on phones) */
+.hw .hw-tabs [role="tab"]:not(.is-active) { background: transparent !important; box-shadow: none !important; color: var(--hw-ink-2) !important; }
+.hw .hw-tabs [role="tab"].is-active { background: #2B211B !important; color: #FFF8F0 !important; }
