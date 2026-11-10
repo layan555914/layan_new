@@ -145,14 +145,18 @@ Deno.serve(async (req: Request) => {
   // Temporary test-project-only diagnostic; remove before production.
   if (body.diagnostic === true) {
     try {
-      const check = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash", {
+      const check = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
         headers: { "x-goog-api-key": apiKey }
       });
-      const detail = (await check.text()).replace(/[\\r\\n\\t]+/g, " ").slice(0, 300);
-      console.error("Gemini model access diagnostic", check.status, check.statusText, check.headers.get("content-type") || "no-content-type", detail || "empty-body");
-      return json({ diagnosticStatus: check.status, statusText: check.statusText }, 200, origin);
+      const rawDetail = await check.text();
+      const detail = rawDetail.replaceAll(apiKey, "[redacted]").replace(/[\\r\\n\\t]+/g, " ").slice(0, 500);
+      return json({
+        diagnosticStatus: check.status,
+        statusText: check.statusText,
+        contentType: check.headers.get("content-type") || "",
+        detail
+      }, 200, origin);
     } catch (error) {
-      console.error("Gemini model access diagnostic failed", error instanceof Error ? error.name : "unknown");
       return json({ error: "تعذر فحص اتصال Gemini." }, 502, origin);
     }
   }
