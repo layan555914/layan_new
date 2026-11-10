@@ -180,3 +180,51 @@ body.page-home .hw { margin-block: var(--aa-section-y); }
 /* keep the inactive tab clean (global button styles add a grey fill on phones) */
 .hw .hw-tabs [role="tab"]:not(.is-active) { background: transparent !important; box-shadow: none !important; color: var(--hw-ink-2) !important; }
 .hw .hw-tabs [role="tab"].is-active { background: #2B211B !important; color: #FFF8F0 !important; }
+
+/* ===== Partner places (2026-11-10): one photo card per service until the place is booked ===== */
+body.page-home .home-partners-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 20px !important; }
+.ps-card {
+  display: flex; flex-direction: column; overflow: hidden; border-radius: 22px; background: #fff;
+  border: 1px solid #EFE4D9; box-shadow: 0 1px 2px rgba(43,33,27,.03), 0 12px 32px rgba(43,33,27,.05);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.ps-card:hover { transform: translateY(-3px); border-color: #E3CDBA; box-shadow: 0 18px 40px rgba(43,33,27,.09); }
+.ps-media { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: linear-gradient(135deg, #F6ECE3, #E9D5C3); }
+.ps-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+.ps-card:hover .ps-media img { transform: scale(1.04); }
+.ps-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(36,27,22,0) 55%, rgba(36,27,22,.35) 100%); pointer-events: none; }
+.ps-tag {
+  position: absolute; z-index: 1; top: 12px; inset-inline-start: 12px; max-width: calc(100% - 24px);
+  padding: 6px 12px; border-radius: 999px; background: rgba(255, 252, 248, .94); color: #7A3F25;
+  font: 700 12.5px/1.4 var(--aa-head, Alexandria, sans-serif); box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ps-body { display: flex; flex-direction: column; flex: 1; gap: 8px; padding: 18px 20px 20px; }
+.ps-status { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; color: #3F7A52; font-size: 12.5px; font-weight: 700; }
+.ps-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #3F8F5B; box-shadow: 0 0 0 3px rgba(63,143,91,.15); }
+.ps-body h3 { margin: 0; font-size: 18px; line-height: 1.5; color: #2B211B; letter-spacing: 0; }
+.ps-body p { margin: 0; color: #75604F; font-size: 14px; line-height: 1.8; flex: 1; }
+.ps-body .ps-book { margin-top: 6px; width: 100%; justify-content: center; }
+
+@media (max-width: 900px) {
+  body.page-home .home-partners-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 14px !important; }
+}
+/* phones: compact row cards (photo beside the text) so six places stay short */
+@media (max-width: 560px) {
+  body.page-home .home-partners-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+  .ps-card { display: grid; grid-template-columns: 112px minmax(0, 1fr); border-radius: 18px; }
+  .ps-media { aspect-ratio: auto; min-height: 100%; }
+  .ps-tag, .ps-media::after { display: none; }
+  .ps-body { gap: 4px; padding: 12px 14px; }
+  .ps-status { font-size: 11.5px; }
+  .ps-body h3 { font-size: 15.5px; }
+  .ps-body p { font-size: 12.5px; line-height: 1.7; }
+  .ps-body .ps-book { width: auto; align-self: flex-start; min-height: 0; padding: 7px 16px; font-size: 13px; margin-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { .ps-card, .ps-media img { transition: none !important; } }
+.ps-tag.ps-status { color: #2F6B45; }
+.ps-tag.ps-status::before { flex: 0 0 7px; }
+@media (max-width: 560px) {
+  .ps-card { position: relative; }
+  .ps-body h3 { padding-top: 2px; }
+}
