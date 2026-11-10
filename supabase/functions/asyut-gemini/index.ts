@@ -142,25 +142,6 @@ Deno.serve(async (req: Request) => {
     return json({ error: "لم يتم إعداد مفتاح Gemini على خادم الاختبار بعد." }, 503, origin);
   }
 
-  // Temporary test-project-only diagnostic; remove before production.
-  if (body.diagnostic === true) {
-    try {
-      const check = await fetch("https://generativelanguage.googleapis.com/v1beta/models", {
-        headers: { "x-goog-api-key": apiKey }
-      });
-      const rawDetail = await check.text();
-      const detail = rawDetail.replaceAll(apiKey, "[redacted]").replace(/[\\r\\n\\t]+/g, " ").slice(0, 500);
-      return json({
-        diagnosticStatus: check.status,
-        statusText: check.statusText,
-        contentType: check.headers.get("content-type") || "",
-        detail
-      }, 200, origin);
-    } catch (error) {
-      return json({ error: "تعذر فحص اتصال Gemini." }, 502, origin);
-    }
-  }
-
   if (!consumeRateLimit(req)) {
     return json({ error: "وصلت للحد المؤقت من الأسئلة. حاول مرة أخرى بعد دقيقة." }, 429, origin);
   }
@@ -178,7 +159,11 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify({
         model: GEMINI_MODEL,
         input: message,
-        store: false
+        system_instruction: SYSTEM_INSTRUCTION,
+        store: false,
+        generation_config: {
+          thinking_level: "low"
+        }
       })
     });
 
