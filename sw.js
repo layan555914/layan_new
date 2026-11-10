@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v145-https-20261110";
+const CACHE_NAME = "asyut-aqar-shell-v146-token-refresh-20261110";
 const APP_SHELL = [
   "./",
   "./index.html",

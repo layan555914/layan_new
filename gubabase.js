@@ -308,6 +308,40 @@
     }
   }
 
+  // Server says the token expired (e.g. the page stayed open for hours, or this device's clock is off):
+  // refresh once with the refresh token and let the caller retry.
+  async function forceRefreshSession() {
+    if (!session?.refresh_token) {
+      saveSession(null);
+      throw new Error("انتهت جلسة الدخول. سجّل الدخول مرة أخرى.");
+    }
+    try {
+      const refreshed = await authRequest("token?grant_type=refresh_token", { refresh_token: session.refresh_token });
+      if (!refreshed?.access_token || !refreshed?.user) throw new Error("تعذر تجديد الجلسة.");
+      normalizeSession(refreshed);
+    } catch (error) {
+      saveSession(null);
+      throw new Error("انتهت جلسة الدخول. سجّل الدخول مرة أخرى ثم أعد المحاولة.");
+    }
+  }
+  function isExpiredTokenResponse(status, bodyText) {
+    return (status === 401 || status === 403 || status === 400) && /exp|expired|JWT|jwt/i.test(String(bodyText || ""));
+  }
+  // fetch with the user's token; refreshes and retries once when the server reports an expired token.
+  async function authedFetch(target, options = {}) {
+    await ensureFreshSession();
+    const send = () => fetch(target, { ...options, headers: { ...authHeaders(), ...(options.headers || {}) } });
+    let response = await send();
+    if (!response.ok && session?.access_token && [400, 401, 403].includes(response.status)) {
+      const text = await response.clone().text().catch(() => "");
+      if (isExpiredTokenResponse(response.status, text)) {
+        await forceRefreshSession();
+        response = await send();
+      }
+    }
+    return response;
+  }
+
   async function requireAuthenticated() {
     if (!session?.access_token) throw new Error("سجّل الدخول أولًا قبل تقديم طلب تسجيل شركة.");
     await ensureFreshSession();
@@ -331,14 +365,9 @@
   }
 
   async function request(path, options = {}) {
-    await ensureFreshSession();
-    const response = await fetch(url + "/rest/v1/" + path, {
+    const response = await authedFetch(url + "/rest/v1/" + path, {
       ...options,
-      headers: {
-        ...authHeaders(),
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-      }
+      headers: { "Content-Type": "application/json", ...(options.headers || {}) }
     });
     return readResponse(response);
   }
@@ -487,14 +516,17 @@
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/\.jpe?g$/i, "") + ".jpg";
       const uniqueId = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2);
       const path = "offers/" + session.user.id + "/" + Date.now() + "-" + uniqueId + "-" + safeName;
-      const response = await fetch(url + "/storage/v1/object/" + bucket + "/" + path, {
+      const body = await watermarkJpeg(file).catch(() => file);
+      const response = await authedFetch(url + "/storage/v1/object/" + bucket + "/" + path, {
         method: "POST",
-        headers: { ...authHeaders(), "Content-Type": "image/jpeg", "x-upsert": "false" },
-        body: await watermarkJpeg(file).catch(() => file)
+        headers: { "Content-Type": "image/jpeg", "x-upsert": "false" },
+        body
       });
       if (!response.ok) {
-        const body = await response.text();
-        throw new Error("فشل رفع الصورة: " + body);
+        const text = await response.text();
+        throw new Error(isExpiredTokenResponse(response.status, text)
+          ? "انتهت جلسة الدخول. سجّل الدخول مرة أخرى ثم أعد رفع الصورة."
+          : "فشل رفع الصورة. حاول مرة أخرى. (" + String(text).slice(0, 160) + ")");
       }
       uploaded.push(url + "/storage/v1/object/public/" + bucket + "/" + path.split("/").map(encodeURIComponent).join("/"));
     }
@@ -537,8 +569,8 @@
       const safeName = String(file.name || "document").replace(/[^a-zA-Z0-9._-]/g,"_").slice(0,70).replace(/\.[^.]+$/,"") + "." + ext;
       const uid = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2);
       const path = "documents/" + session.user.id + "/" + uid + "-" + safeName;
-      const response = await fetch(url + "/storage/v1/object/layan-property-documents/" + path.split("/").map(encodeURIComponent).join("/"), {
-        method:"POST", headers:{...authHeaders(),"Content-Type":file.type,"x-upsert":"false"}, body:file
+      const response = await authedFetch(url + "/storage/v1/object/layan-property-documents/" + path.split("/").map(encodeURIComponent).join("/"), {
+        method:"POST", headers:{"Content-Type":file.type,"x-upsert":"false"}, body:file
       });
       if (!response.ok) throw new Error("فشل رفع مستند العقار: " + await response.text());
       uploaded.push(path);
@@ -698,6 +730,6 @@
   }
 
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
+  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
