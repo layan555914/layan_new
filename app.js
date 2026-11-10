@@ -480,6 +480,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedPromotionDuration = 15;
   const LAYAN_PHONE = "201007044265";
 
+  window.LAYAN_CATEGORY_MATCHES = (offer, category) => categoryMatches(offer, category);
   function categoryMatches(offer, category) {
     const normalize = (value) => String(value || "")
       .trim().toLowerCase()
