@@ -248,9 +248,12 @@
     panel.innerHTML = '<p class="admin-empty">جارٍ تحميل صلاحيات الإدارة...</p>';
     try {
       const rows = await rpc("layan_admin_list_admins") || [];
-      panel.innerHTML = `<p>الحساب العادي لا يدخل لوحة الإدارة أبدًا. أضف هنا حسابات مسجلة بالفعل لتصبح «إدارة»، أو أزل الصلاحية. حسابات المالك ثابتة ولا تُزال من هنا، ومنح الصلاحية أو إزالتها للمالك فقط. المدير المضاف يراجع ويطلب الحذف، والمالك يعتمد.</p>` +
+      const roleLabel = r => r.role === "owner" ? '<span class="adm-role adm-role-owner">★ مالك</span>' : '<span class="adm-role">مدير مضاف</span>';
+      const owners = rows.filter(r => r.role === "owner").length;
+      panel.innerHTML = `<p>هؤلاء فقط من يدخلون لوحة الإدارة. أي حساب عادي لا يرى لوحة الإدارة ولا يستطيع فتحها. أي حساب تضيفه هنا يظهر فورًا في القائمة، وإزالة الصلاحية متاحة لحسابات المالك فقط. المدير المضاف يراجع ويطلب الحذف، والمالك يعتمد.</p>` +
+        `<p class="adm-team-count"><b>${rows.length}</b> حساب له صلاحية الإدارة${owners ? ` — منهم <b>${owners}</b> مالك` : ""}</p>` +
         toolbar(`<input type="email" data-admin-email placeholder="بريد الحساب المسجل"><button class="btn btn-gold" type="button" data-admin-add>منح صلاحية الإدارة</button>`) +
-        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>البريد</th><th>تاريخ المنح</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.email)}</td><td>${date(r.added_at)}</td><td><button type="button" class="is-danger" data-admin-remove="${esc(r.email)}">إزالة الصلاحية</button></td></tr>`).join("") || '<tr><td colspan="3">لا توجد حسابات إدارة إضافية. المالك الأساسي فقط.</td></tr>'}</tbody></table></div>`;
+        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>البريد</th><th>الصفة</th><th>منذ</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr><td>${esc(r.email)}</td><td>${roleLabel(r)}</td><td>${date(r.added_at)}</td><td>${r.role === "owner" ? '<small>ثابت</small>' : `<button type="button" class="is-danger" data-admin-remove="${esc(r.email)}">إزالة الصلاحية</button>`}</td></tr>`).join("") || '<tr><td colspan="4">لا توجد حسابات.</td></tr>'}</tbody></table></div>`;
     } catch (error) {
       panel.innerHTML = needsMigration(error) ? pendingNote : `<p class="admin-empty">${esc(error.message)}</p>`;
     }
