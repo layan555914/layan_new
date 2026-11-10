@@ -353,6 +353,38 @@ body .brand-logo { width: 48px; height: 48px; }
   body .topbar .top-actions { flex: 0 0 auto; min-width: 0; padding-inline-start: 14px; }
   body .topbar .top-actions .btn { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
 }
+/* Header container a little wider than the page content so the full menu fits on large screens */
+@media (min-width: 1181px) {
+  body .topbar { padding-inline: max(24px, calc((100% - 1560px) / 2)) !important; }
+}
+/* Admin entry — first item of the main menu, admins only (site-nav.js) */
+body .topbar nav a.nav-admin {
+  display: inline-flex; align-items: center; gap: 7px;
+  color: #2B211B !important; font-weight: 800;
+  background: linear-gradient(135deg, #F6D9C0, #E9B08F) !important;
+  border: 1px solid #E9B08F; border-radius: 999px !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+}
+body .topbar nav a.nav-admin[hidden] { display: none !important; }
+body .topbar nav a.nav-admin i { font-style: normal; color: #8C3A21; font-size: 12px; }
+body .topbar nav a.nav-admin:hover { background: linear-gradient(135deg, #FFE7CF, #F0BE9E) !important; color: #2B211B !important; }
+body .topbar nav a.nav-admin + a { margin-inline-start: 6px; }
+/* Automatic fit (site-nav.js): tighter spacing first, then the menu moves to its own row */
+@media (min-width: 1181px) {
+  body .topbar.is-compact nav { margin-inline-start: 12px !important; font-size: 13.5px !important; }
+  body .topbar.is-compact nav a { padding: 7px 7px !important; }
+  body .topbar.is-compact .top-actions { gap: 6px !important; padding-inline-start: 10px; }
+  body .topbar.is-compact .top-actions .btn { padding: 8px 12px; font-size: 13.5px; }
+  body .topbar.is-stacked { flex-wrap: wrap !important; row-gap: 0 !important; padding-block: 10px 0 !important; }
+  body .topbar.is-stacked .top-actions { margin-inline-start: auto; }
+  body .topbar.is-stacked nav {
+    order: 5; flex: 1 0 100%; justify-content: center !important; flex-wrap: wrap !important;
+    margin: 10px 0 0 !important; padding: 8px 0 10px; gap: 4px !important;
+    border-top: 1px solid rgba(233, 176, 143, .16);
+    font-size: 14px !important;
+  }
+  body .topbar.is-stacked nav a { padding: 7px 12px !important; }
+}
 @media (min-width: 1181px) and (max-width: 1599px) {
   body .topbar nav { margin-inline-start: 22px; font-size: 14px !important; }
   body .topbar nav a { padding: 8px 9px !important; }
