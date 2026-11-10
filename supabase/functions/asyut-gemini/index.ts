@@ -154,18 +154,12 @@ Deno.serve(async (req: Request) => {
       signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-        "Api-Revision": "2026-05-20"
+        "x-goog-api-key": apiKey
       },
       body: JSON.stringify({
         model: GEMINI_MODEL,
         input: message,
-        system_instruction: SYSTEM_INSTRUCTION,
-        store: false,
-        generation_config: {
-          max_output_tokens: 420,
-          thinking_level: "low"
-        }
+        store: false
       })
     });
 
