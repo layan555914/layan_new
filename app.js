@@ -438,7 +438,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const current = api?.getSession?.();
     const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
     if (!base || !cfg.SUPABASE_PUBLISHABLE_KEY || !current?.access_token) return null;
-    const optedIn = authDialog.querySelector("#authEmailAnnouncements")?.checked === true;
+    const optedIn = authDialog?.querySelector("#authEmailAnnouncements")?.checked === true;
     const response = await fetch(base + "/functions/v1/email-notifications", {
       method: "POST",
       headers: {
@@ -1695,6 +1695,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function handleAuthCallback(event) {
     if (event.detail?.success) {
+      syncEmailNotificationSubscription().catch(error => console.warn("Email notification callback sync failed:", error));
       updateAuthButton();
       if (continueCompanyRegistration()) return;
       setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في أسيوط عقار.");
