@@ -97,9 +97,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return data;
   }
   function emailDispatchMessage(result) {
-    if (!result || !result.sent) return " لا يوجد مشترك مفعّل بالبريد لهذا التنبيه.";
-    return " تم إرسال تنبيه البريد إلى " + result.sent + " مشترك" +
-      (result.failed ? "، وفشل إرسال " + result.failed : "") + ".";
+    if (!result) return "";
+    if (result.sent > 0) {
+      return " تم إرسال تنبيه البريد إلى " + result.sent + " مشترك" +
+        (result.failed ? "، وفشل إرسال " + result.failed : "") + ".";
+    }
+    if (result.failed > 0) return " تعذر إرسال البريد إلى " + result.failed + " مشترك؛ سُجلت المحاولات الفاشلة.";
+    return " لا يوجد مشترك مفعّل بالبريد لهذا التنبيه.";
   }
   function showState(isLoggedIn) {
     authPanel.hidden = isLoggedIn;
