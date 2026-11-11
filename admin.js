@@ -77,6 +77,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return rows[0];
   }
+  async function sendEmailAnnouncement(recordType, recordId) {
+    await ensureFreshSession();
+    const response = await fetch(base + "/functions/v1/email-notifications", {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: "Bearer " + session.access_token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "dispatch",
+        record_type: recordType,
+        record_id: String(recordId)
+      })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "تعذر إرسال تنبيه البريد.");
+    return data;
+  }
+  function emailDispatchMessage(result) {
+    if (!result || !result.sent) return " لا يوجد مشترك مفعّل بالبريد لهذا التنبيه.";
+    return " تم إرسال تنبيه البريد إلى " + result.sent + " مشترك" +
+      (result.failed ? "، وفشل إرسال " + result.failed : "") + ".";
+  }
   function showState(isLoggedIn) {
     authPanel.hidden = isLoggedIn;
     reviewPanel.hidden = !isLoggedIn;
@@ -425,7 +449,15 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes })
       });
-      setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
+      let emailMessage = "";
+      if (action === "approve") {
+        try { emailMessage = emailDispatchMessage(await sendEmailAnnouncement("company_profile", id)); }
+        catch (emailError) {
+          console.warn("Company profile email announcement failed:", emailError);
+          emailMessage = " تعذر إرسال البريد، لكن تم اعتماد ملف الشركة ونشره.";
+        }
+      }
+      setStatus((action === "approve" ? "تم اعتماد ملف الشركة ونشره." : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.") + emailMessage);
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
     finally { button.disabled = false; }
@@ -467,6 +499,13 @@ document.addEventListener("DOMContentLoaded", () => {
           console.warn("Push notification dispatch error:", pushError);
           pushStatus = " تعذر إرسال إشعارات الهاتف، لكن تم نشر الإعلان بنجاح.";
         }
+        try {
+          const emailResult = await sendEmailAnnouncement("property_offer", Number(card.dataset.propertyOfferId));
+          pushStatus += emailDispatchMessage(emailResult);
+        } catch (emailError) {
+          console.warn("Property email announcement failed:", emailError);
+          pushStatus += " تعذر إرسال البريد، لكن تم نشر الإعلان بنجاح.";
+        }
       }
       setStatus(action === "approve" ? "تم اعتماد الإعلان ونشره." + pushStatus : "تم رفض الإعلان وتسجيل السبب.");
       await loadPending();
@@ -485,7 +524,15 @@ document.addEventListener("DOMContentLoaded", () => {
     button.disabled = true;
     try {
       await requestOneRow("/rest/v1/marketplace_listings?id=eq." + encodeURIComponent(card.dataset.marketplaceId) + "&status=eq.pending", {method:"PATCH",body:JSON.stringify({status:action==="approve"?"approved":"rejected",admin_notes:action==="approve"?null:notes,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id})});
-      setStatus(action==="approve"?"تم اعتماد إعلان سوق الخدمات ونشره.":"تم رفض إعلان سوق الخدمات.");
+      let emailMessage = "";
+      if (action === "approve") {
+        try { emailMessage = emailDispatchMessage(await sendEmailAnnouncement("marketplace_listing", card.dataset.marketplaceId)); }
+        catch (emailError) {
+          console.warn("Marketplace email announcement failed:", emailError);
+          emailMessage = " تعذر إرسال البريد، لكن تم نشر الخدمة.";
+        }
+      }
+      setStatus((action==="approve"?"تم اعتماد إعلان سوق الخدمات ونشره.":"تم رفض إعلان سوق الخدمات.") + emailMessage);
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة الإعلان."); }
     finally { button.disabled = false; }
@@ -506,7 +553,15 @@ document.addEventListener("DOMContentLoaded", () => {
       await requestOneRow("/rest/v1/company_property_ads?id=eq." + encodeURIComponent(card.dataset.companyAdId) + "&status=eq.pending", {
         method: "PATCH", body: JSON.stringify(patch)
       });
-      setStatus(action === "activate" ? "تم تفعيل إعلان الشركة لمدة 30 يومًا." : "تم رفض طلب إعلان الشركة.");
+      let emailMessage = "";
+      if (action === "activate") {
+        try { emailMessage = emailDispatchMessage(await sendEmailAnnouncement("company_ad", card.dataset.companyAdId)); }
+        catch (emailError) {
+          console.warn("Company ad email announcement failed:", emailError);
+          emailMessage = " تعذر إرسال البريد، لكن تم تفعيل إعلان الشركة.";
+        }
+      }
+      setStatus((action === "activate" ? "تم تفعيل إعلان الشركة لمدة 30 يومًا." : "تم رفض طلب إعلان الشركة.") + emailMessage);
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث إعلان الشركة."); }
     finally { button.disabled = false; }
@@ -546,7 +601,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (!window.confirm("تأكيد تفعيل الإعلان لمدة " + days + " يومًا بالسعر المتفق عليه " + price + " جنيه؟")) return;
         await request("/rest/v1/rpc/layan_activate_supplier_ad", {method:"POST",body:JSON.stringify({p_ad_id:id,p_days:days,p_price:price})});
-        setStatus("تم تفعيل الإعلان بعد تسجيل السعر والمدة المتفق عليهما.");
+        let emailMessage = "";
+        try { emailMessage = emailDispatchMessage(await sendEmailAnnouncement("supplier_ad", id)); }
+        catch (emailError) {
+          console.warn("Supplier ad email announcement failed:", emailError);
+          emailMessage = " تعذر إرسال البريد، لكن تم تفعيل الإعلان.";
+        }
+        setStatus("تم تفعيل الإعلان بعد تسجيل السعر والمدة المتفق عليهما." + emailMessage);
       } else {
         const reason = window.prompt("اكتب سبب رفض الطلب (3 أحرف على الأقل):");
         if (reason === null) return;
