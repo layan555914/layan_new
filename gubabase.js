@@ -145,7 +145,8 @@
         ...(profile && typeof profile === "object" ? { data: {
           full_name: String(profile.full_name || "").slice(0, 80),
           phone: String(profile.phone || "").slice(0, 20),
-          account_type: String(profile.account_type || "").slice(0, 20)
+          account_type: String(profile.account_type || "").slice(0, 20),
+          email_notifications: profile.email_notifications === true
         } } : {}),
         ...(pkce.codeChallenge ? { code_challenge: pkce.codeChallenge, code_challenge_method: "s256" } : {})
       });
