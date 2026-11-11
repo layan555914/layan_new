@@ -359,7 +359,20 @@ Deno.serve(async (req: Request) => {
               updated_at: new Date().toISOString()
             }).eq("user_id", account.id);
         }
-        return json({ ok: true, enabled: existing.is_enabled, already_registered: true }, 200, origin);
+        let welcomeSent = false;
+        if (existing.is_enabled && !existing.welcome_sent_at) {
+          try {
+            welcomeSent = await sendWelcome(
+              admin,
+              account.id,
+              String(account.email).trim().toLowerCase(),
+              existing.unsubscribe_token
+            );
+          } catch (welcomeError) {
+            console.warn("Welcome email retry failed:", welcomeError);
+          }
+        }
+        return json({ ok: true, enabled: existing.is_enabled, already_registered: true, welcome_sent: welcomeSent }, 200, origin);
       }
 
       const enabled = action === "set_subscription"
