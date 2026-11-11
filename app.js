@@ -254,12 +254,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     navigator.serviceWorker.register("./sw.js").catch(error => console.warn("تعذر تسجيل وضع العمل دون اتصال:", error));
   }
+  // pwa.js owns the install bar where it is loaded (when to show it, the install window, the iPhone guide).
+  const pwaOwnsInstall = () => !!window.__asyutPwa || !!document.querySelector('script[src*="pwa.js"]');
   window.addEventListener("beforeinstallprompt", event => {
+    if (pwaOwnsInstall()) return;
     event.preventDefault();
     installPrompt = event;
     if (!standalone && installBanner && !sessionStorage.getItem("layanInstallDismissed")) installBanner.hidden = false;
   });
   installButton?.addEventListener("click", async () => {
+    if (pwaOwnsInstall()) return;
     if (!installPrompt) {
       setStatus("لو خيار التثبيت مش ظاهر، افتح قائمة المتصفح ثم اختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق».");
       return;
@@ -270,6 +274,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (installBanner) installBanner.hidden = true;
   });
   $("dismissInstallBtn")?.addEventListener("click", () => {
+    if (pwaOwnsInstall()) return;
     if (installBanner) installBanner.hidden = true;
     sessionStorage.setItem("layanInstallDismissed", "1");
   });
