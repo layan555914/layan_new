@@ -57,3 +57,10 @@ test("company directory continues to render approved profiles from the public vi
   await expect(seededCard).toContainText("ملف تعريفي");
   await expect(page.locator("#companyDirectoryCount")).toContainText("2 شركة / ملف تعريفي");
 });
+
+test("curated company profile offers a free claim request", async ({ page }) => {
+  await page.goto("/company-albenaa-arabi-star.html");
+  await expect(page.locator(".company-claim-cta")).toContainText("مجانا");
+  await expect(page.locator(".company-claim-cta a"))
+    .toHaveAttribute("href", "./companies.html?claim=albenaa-arabi-star");
+});
