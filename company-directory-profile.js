@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function profileCard() {
     const logo = safeUrl(entry.logo_url);
-    const phone = String(entry.public_phone || "").replace(/[^+0-9]/g, "");
+    const phones = String(entry.public_phone || "").split(/[\\s/،,]+/).map(value => value.replace(/[^+0-9]/g, "")).filter(value => value.length >= 7);
     const site = safeUrl(entry.website_url);
     const gallery = (entry.gallery_urls || []).filter(safeUrl);
     const services = Array.isArray(entry.services) ? entry.services : [];
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '</h1><p>' + esc(desc) + '</p><div class="company-card-meta"><span>' + esc(entry.city || "أسيوط") +
       '</span>' + (entry.public_address ? '<span>' + esc(entry.public_address) + '</span>' : '') +
       '</div><div class="company-contact-actions">' +
-      (phone ? '<a class="company-contact-primary" href="tel:' + esc(phone) + '">اتصال</a>' : '') +
+      (phones.length ? phones.map((phone,index) => '<a class="company-contact-primary" href="tel:' + esc(phone) + '">' + (phones.length > 1 ? 'اتصال ' + (index+1) : 'اتصال') + '</a>').join('') : '') +
       (site ? '<a class="company-contact-secondary" target="_blank" rel="noopener noreferrer" href="' + esc(site) + '">الموقع الإلكتروني</a>' : '') +
       '<a class="company-contact-secondary" href="./companies.html">كل الشركات</a></div></div></section>' +
       (claimed
@@ -99,8 +99,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       (gallery.length ? '<section class="company-profile-section"><h2>معرض الأعمال المنشور</h2><div class="company-gallery">' + gallery.map((url,i) => '<img src="' + esc(url) + '" alt="صورة منشورة للشركة ' + (i+1) + '" loading="lazy">').join("") + '</div></section>' : '') +
       '<p class="company-directory-source">مصدر البيانات: <a href="' + esc(safeUrl(entry.source_url)) + '" target="_blank" rel="noopener noreferrer">' + esc(entry.source_label) + '</a> · تاريخ الاطلاع: ' + esc(entry.source_checked_at || "غير مسجل") + '</p>' +
       '<div id="companyDirectoryClaimArea"></div>';
-    if (!claimed) renderClaimForm();
-    else renderOwnerState();
   }
 
   async function refreshOwnClaim(user) {
@@ -183,7 +181,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  function renderOwnerEditForm() {
+  function renderOwnerEditForm(message = "") {
     const area = document.getElementById("companyDirectoryClaimArea");
     if (!area) return;
     area.innerHTML = '<section class="company-directory-owner-edit"><h2>إدارة صفحتك على أسيوط عقار</h2>' +
@@ -199,7 +197,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '<label>رابط الشعار<input name="logo_url" type="url" maxlength="1000" value="' + esc(entry.logo_url || "") + '"></label>' +
       '<label>الخدمات (افصل بينها بفاصلة)<input name="services" maxlength="600" value="' + esc(servicesText(entry.services)) + '"></label>' +
       '<label>روابط صور الأعمال (رابط في كل سطر)<textarea name="gallery_urls" rows="3">' + esc((entry.gallery_urls || []).join("\n")) + '</textarea></label>' +
-      '<p class="company-directory-form-status" role="status"></p><button type="submit">حفظ تحديثات الصفحة</button></form></section>';
+      '<p class="company-directory-form-status" role="status">' + esc(message) + '</p><button type="submit">حفظ تحديثات الصفحة</button></form></section>';
     document.getElementById("companyDirectoryOwnerForm")?.addEventListener("submit", saveOwnerChanges);
   }
 
@@ -234,15 +232,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         gallery_urls:gallery,
         updated_at:new Date().toISOString()
       };
-      const saved = await api("company_directory_entries?slug=eq." + encodeURIComponent(entry.slug), {
+      const saved = await api("company_directory_entries?slug=eq." + encodeURIComponent(entry.slug) + "&select=id,slug,company_name,category,description,city,public_address,public_phone,website_url,logo_url,gallery_urls,services,source_label,source_url,source_checked_at,is_published,claim_status,created_at,updated_at", {
         method:"PATCH",
         headers:{"Prefer":"return=representation"},
         body:JSON.stringify(patch)
       });
       if (!Array.isArray(saved) || saved.length !== 1) throw new Error("لم يؤكد النظام حفظ التعديلات.");
       entry = {...entry, ...saved[0]};
-      status.textContent = "تم حفظ بيانات صفحتك.";
-      profileCard();
+      const hero = root.querySelector(".company-profile-hero");
+      if (hero) {
+        hero.querySelector("h1").textContent = entry.company_name;
+        hero.querySelector(".eyebrow").textContent = entry.category;
+        hero.querySelector("p").textContent = entry.description || "";
+      }
+      renderOwnerEditForm("تم حفظ بيانات صفحتك بنجاح.");
     } catch (error) {
       status.textContent = error.message || "تعذر حفظ التحديثات.";
     } finally {
@@ -259,7 +262,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       root.innerHTML = '<p class="company-directory-state">الصفحة غير متاحة أو تم إخفاؤها للمراجعة.</p>';
       return;
     }
-    profileCard();
+    if (entry.claim_status === "unclaimed") {
+      const current = auth?.getSession?.();
+      if (current?.user?.id) {
+        try { await refreshOwnClaim(current.user); } catch (_) {}
+      }
+      if (ownClaim?.status === "pending") {
+        const area = document.getElementById("companyDirectoryClaimArea");
+        if (area) area.innerHTML = '<section class="company-directory-claim"><h2>طلب استلام صفحتك قيد المراجعة</h2><p>استلمنا طلبك بتاريخ ' + esc(ownClaim.created_at ? new Date(ownClaim.created_at).toLocaleDateString("ar-EG") : "قريب") + '. ستتواصل الإدارة معك بعد مراجعة إثبات الصفة.</p></section>';
+      } else {
+        renderClaimForm(ownClaim?.status === "rejected" ? "تم رفض طلب سابق. يمكنك تقديم طلب جديد بعد استكمال الإثبات." : "");
+      }
+    } else {
+      renderOwnerState();
+    }
   } catch (error) {
     root.innerHTML = '<p class="company-directory-state">' + esc(error.message || "تعذر تحميل صفحة الشركة.") + '</p>';
     console.warn("Company directory profile:", error);
