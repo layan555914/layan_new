@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     let directoryCatalog = [];
     try {
-      const catalogResponse = await fetch("./companies-catalog.json?v=20261113-1", { cache: "no-store" });
+      const catalogResponse = await fetch("./companies-catalog.json?v=20261113-2", { cache: "no-store" });
       if (catalogResponse.ok) {
         const catalogData = await catalogResponse.json();
         directoryCatalog = Array.isArray(catalogData.companies) ? catalogData.companies : [];
