@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const logo = safeUrl(entry.logo_url);
     const phones = String(entry.public_phone || "").split(/[\s/،,]+/).map(value => value.replace(/[^+0-9]/g, "")).filter(value => value.length >= 7);
     const site = safeUrl(entry.website_url);
+    const mapUrl = entry.public_address ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([entry.company_name,entry.public_address,entry.city || "أسيوط"].filter(Boolean).join(" ")) : "";
     const gallery = (entry.gallery_urls || []).filter(safeUrl);
     const services = Array.isArray(entry.services) ? entry.services : [];
     const claimed = entry.claim_status === "claimed";
@@ -91,6 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       '</div><div class="company-contact-actions">' +
       (phones.length ? phones.map((phone,index) => '<a class="company-contact-primary" href="tel:' + esc(phone) + '">' + (phones.length > 1 ? 'اتصال ' + (index+1) : 'اتصال') + '</a>').join('') : '') +
       (site ? '<a class="company-contact-secondary" target="_blank" rel="noopener noreferrer" href="' + esc(site) + '">الموقع الإلكتروني</a>' : '') +
+      (mapUrl ? '<a class="company-contact-secondary" target="_blank" rel="noopener noreferrer" href="' + esc(mapUrl) + '">بحث عن العنوان على الخريطة</a>' : '') +
       '<a class="company-contact-secondary" href="./companies.html">كل الشركات</a></div></div></section>' +
       (claimed
         ? '<div class="company-directory-claimed">تم استلام الصفحة من ممثل الشركة بعد مراجعة الإدارة</div>'
