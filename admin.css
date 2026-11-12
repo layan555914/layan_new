@@ -230,3 +230,6 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
   .adm-body [data-admin-panel="users"] .admin-actions-cell { display: flex; flex-wrap: wrap; gap: 4px; min-width: 150px; max-width: 170px; }
   .adm-body [data-admin-panel="users"] .admin-actions-cell button { padding: 4px 8px; font-size: 12px; min-height: 30px; border-radius: 8px; }
 }
+
+.admin-claim-warning{margin:12px 0;padding:12px 14px;border:1px solid #c98a64;border-right:4px solid #c98a64;border-radius:10px;background:#fbf4ee;color:#3a2d25;font-size:13px;line-height:1.9}
+.admin-claim-warning p{margin:4px 0}
