@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function profileCard() {
     const logo = safeUrl(entry.logo_url);
-    const phones = String(entry.public_phone || "").split(/[\s/،,]+/).map(value => value.replace(/[^+0-9]/g, "")).filter(value => value.length >= 7);
+    const phones = String(entry.public_phone || "").split(/[\s/،,]+/).map(value => value.replace(/[^+0-9]/g, "")).filter(value => value.length >= 5);
     const site = safeUrl(entry.website_url);
     const mapUrl = entry.public_address ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent([entry.company_name,entry.public_address,entry.city || "أسيوط"].filter(Boolean).join(" ")) : "";
     const gallery = (entry.gallery_urls || []).filter(safeUrl);
