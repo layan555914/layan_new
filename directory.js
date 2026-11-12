@@ -195,7 +195,9 @@ function card(title,desc,tag,detail,url,refs,record,recordType){
  if(recordType)shareTarget.searchParams.set("view",recordType);
  shareTarget.hash=recordKey?"directory-record-"+encodeURIComponent(recordKey):"";
  const shareUrl=recordKey?shareTarget.href:"";
- return '<article class="directory-card"'+(recordKey?' id="directory-record-'+esc(encodeURIComponent(recordKey))+'" data-share-url="'+esc(shareUrl)+'"':"")+'><div class="directory-card-meta">'+(tag?'<span class="directory-tag">'+esc(tag)+'</span>':"")+'</div><h3>'+esc(title)+'</h3>'+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(recordObj?verifiedLocationHtml(recordObj):"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
+ const companyProfileLink=recordObj?.name_ar==="البناء العربي استار"
+  ?'<a href="./company-albenaa-arabi-star.html">عرض الملف التعريفي وأرقام الفروع ↗</a>':"";
+ return '<article class="directory-card"'+(recordKey?' id="directory-record-'+esc(encodeURIComponent(recordKey))+'" data-share-url="'+esc(shareUrl)+'"':"")+'><div class="directory-card-meta">'+(tag?'<span class="directory-tag">'+esc(tag)+'</span>':"")+'</div><h3>'+esc(title)+'</h3>'+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+companyProfileLink+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(recordObj?verifiedLocationHtml(recordObj):"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
 }
 function setFilterAvailability(){
  $("#directoryTypeFilter").disabled=state.view!=="entities";
