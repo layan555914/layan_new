@@ -275,7 +275,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderClaimForm(ownClaim?.status === "rejected" ? "تم رفض طلب سابق. يمكنك تقديم طلب جديد بعد استكمال الإثبات." : "");
       }
     } else {
-      renderOwnerState();
+      const current = auth?.getSession?.();
+      if (current?.user?.id) {
+        renderOwnerState();
+      } else {
+        const area = document.getElementById("companyDirectoryClaimArea");
+        if (area) area.innerHTML = '<section class="company-directory-claim"><h2>الصفحة مستلمة بالفعل</h2><p>تم ربط الصفحة بممثل معتمد من الإدارة. إدارة الصفحة متاحة فقط للحساب الذي وافقت الإدارة على طلب استلامه. <a href="./">سجّل الدخول بالحساب المعتمد</a>.</p></section>';
+      }
     }
   } catch (error) {
     root.innerHTML = '<p class="company-directory-state">' + esc(error.message || "تعذر تحميل صفحة الشركة.") + '</p>';
