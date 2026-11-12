@@ -10,10 +10,12 @@ let companies=[],existingProfileId=null,existingStatus=null,supportsDraft=false,
 let showcaseCompanies=[];
 function card(c){const logo=safeUrl(c.logo_url);const href="./company.html?id="+encodeURIComponent(c.id);const services=Array.isArray(c.services)?c.services.slice(0,3):[];return '<article class="company-directory-card"><a href="'+href+'"><div class="company-card-cover">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="lazy">':esc(c.company_name.slice(0,1)))+'</div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a></article>'}
 function showcaseCard(c){
- const href="./company.html?showcase="+encodeURIComponent(c.slug);
+ const customPath=typeof c.profile_path==="string"&&/^\\.\\/[a-z0-9-]+\\.html$/i.test(c.profile_path)?c.profile_path:"";
+ const href=customPath||"./company.html?showcase="+encodeURIComponent(c.slug);
  const monogram=String(c.monogram||c.name?.slice(0,2)||"ش").slice(0,5);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
- return '<article class="company-directory-card company-showcase-card"><a href="'+href+'"><div class="company-card-cover company-showcase-cover"><span class="company-showcase-monogram">'+esc(monogram)+'</span><span class="company-showcase-status">ملف تعريفي أولي</span></div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a></article>';
+ const phone=String(c.phone||"").replace(/[^+0-9]/g,"");
+ return '<article class="company-directory-card company-showcase-card"><a class="company-showcase-main-link" href="'+esc(href)+'"><div class="company-card-cover company-showcase-cover"><span class="company-showcase-monogram">'+esc(monogram)+'</span><span class="company-showcase-status">ملف تعريفي أولي</span></div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a><div class="company-showcase-card-actions"><a href="'+esc(href)+'">عرض الملف</a>'+(phone?'<a href="tel:'+esc(phone)+'">اتصال '+esc(c.phone)+'</a>':"")+'</div></article>';
 }
 function normalizeName(v){return String(v||"").trim().toLocaleLowerCase("ar").replace(/[\s\-–—_]+/g," ")}
 
