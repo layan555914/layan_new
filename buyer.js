@@ -42,7 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <label>تفاصيل إضافية عن احتياجك
             <textarea name="notes" rows="3" maxlength="500" placeholder="مثال: دور منخفض، قريب من المواصلات، مناسب للسكن..."></textarea>
           </label>
-          <div class="buyer-notify-choice"><label><input name="notifications_enabled" type="checkbox" checked> أرسل لي تنبيهًا عند ظهور عقار يطابق طلبي</label></div>
+          <div class="buyer-notify-choice">
+            <label><input name="all_notifications_enabled" type="checkbox"> أرسل لي تنبيهًا عند نشر أي إعلان عقاري جديد</label>
+            <label><input name="notifications_enabled" type="checkbox" checked> أرسل لي تنبيهًا عند ظهور عقار يطابق طلبي</label>
+            <small>تقدر تفعّل الاختيارين معًا أو تختار النوع المناسب لك.</small>
+          </div>
           <button class="btn btn-gold" type="submit">احفظ طلبي وابحث عن المناسب</button>
           <button class="btn btn-outline-dark" id="buyerPushSubscribe" type="button">تفعيل إشعارات الهاتف حتى عند إغلاق التطبيق</button><button class="btn btn-outline-dark" id="buyerPushUnsubscribe" type="button" hidden>إيقاف إشعارات هذا الجهاز</button><p class="buyer-push-help">يتطلب HTTPS وموافقة المتصفح. على بعض الهواتف يلزم تثبيت أسيوط عقار على الشاشة الرئيسية.</p>
           <p id="buyerMatchStatus" role="status" aria-live="polite"></p>
@@ -92,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   const values = () => {
     const d = new FormData(form);
-    return {property_type:String(d.get("property_type")||"أي نوع"), city:String(d.get("city")||"").trim(), area:String(d.get("area")||"").trim(), max_total_price:Number(d.get("max_total_price")||0), max_upfront:Number(d.get("max_upfront")||0), max_monthly_installment:Number(d.get("max_monthly_installment")||0), min_bedrooms:Number(d.get("min_bedrooms")||0), notes:String(d.get("notes")||"").trim(), notifications_enabled:d.get("notifications_enabled")==="on"};
+    return {property_type:String(d.get("property_type")||"أي نوع"), city:String(d.get("city")||"").trim(), area:String(d.get("area")||"").trim(), max_total_price:Number(d.get("max_total_price")||0), max_upfront:Number(d.get("max_upfront")||0), max_monthly_installment:Number(d.get("max_monthly_installment")||0), min_bedrooms:Number(d.get("min_bedrooms")||0), notes:String(d.get("notes")||"").trim(), notifications_enabled:d.get("notifications_enabled")==="on", all_notifications_enabled:d.get("all_notifications_enabled")==="on"};
   };
   const normalizeLocation = value => String(value||"").trim().toLocaleLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/^مدينه\s+/,"").replace(/[\u064B-\u065F\u0670]/g,"").replace(/[ـ]/g,"").replace(/\s+/g," ");
   function matches(o,p) {
@@ -172,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!current) return;
     try {
       const s=await requireSession();
-      const rows=await request("/rest/v1/buyer_preferences?select=property_type,city,area,max_total_price,max_upfront,max_monthly_installment,min_bedrooms,notes,notifications_enabled&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=1");
+      const rows=await request("/rest/v1/buyer_preferences?select=property_type,city,area,max_total_price,max_upfront,max_monthly_installment,min_bedrooms,notes,notifications_enabled,all_notifications_enabled&owner_id=eq."+encodeURIComponent(s.user.id)+"&limit=1");
       if (!Array.isArray(rows)||!rows.length) return;
       saved=rows[0];
       for (const [k,v] of Object.entries(saved)) { const el=form.elements.namedItem(k); if (el) { if (el.type==="checkbox") el.checked=Boolean(v); else el.value=v ?? ""; } }
@@ -190,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const s=await requireSession();
       await request("/rest/v1/buyer_preferences?on_conflict=owner_id",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=representation"},body:JSON.stringify({...saved,owner_id:s.user.id,updated_at:new Date().toISOString()})});
       await refreshMatches(false);
-      status.textContent="تم حفظ طلبك والبحث في العروض المنشورة. سنعرض المطابقات الجديدة أثناء فتح المنصة.";
+      status.textContent="تم حفظ اختيارات التنبيه. ستصلك الإعلانات العامة أو العروض المطابقة حسب الخيارات التي فعلتها.";
     } catch(e) { status.textContent="تعذر حفظ الطلب: "+e.message; }
   });
   const pushSubscribeButton=$("buyerPushSubscribe");
