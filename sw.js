@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v158-buyer-notifications-20261112";
+const CACHE_NAME = "asyut-aqar-shell-v159-companies-directory-20261113";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -31,6 +31,10 @@ const APP_SHELL = [
   "./companies.css",
   "./companies.js",
   "./company-profile.js",
+  "./company-albenaa-arabi-star.html",
+  "./companies-catalog.json",
+  "./assets/companies/albenaa-arabi-star.webp",
+  "./assets/build/companies.min.css",
   "./styles.css",
   "./buyer.css",
   "./sponsor.css",
