@@ -1,50 +1,554 @@
 {
-  "version": 1,
+  "version": 2,
   "lastUpdated": "2026-11-13",
-  "notice": "بطاقات تعريفية أولية مبنية على مصادر عامة أو معلومات قدمها ممثل الشركة. الإدراج لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا من أسيوط عقار. بعض بيانات الدليل المحلي تحتاج تأكيدًا مباشرًا من الشركة.",
+  "notice": "بطاقات تعريفية أولية للشركات والأنشطة المرتبطة بسوق أسيوط. المعلومات مأخوذة من مواقع رسمية أو أدلة أعمال عامة أو بيانات قدمها ممثل الشركة. بعض بيانات الأدلة المحلية قد تكون قديمة أو تحتاج تأكيدًا مباشرًا. الإدراج لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا أو إعلانًا مدفوعًا من أسيوط عقار.",
   "adminWhatsapp": "201007044265",
   "companies": [
+    {
+      "slug": "star-group",
+      "monogram": "SG",
+      "name": "ستار جروب للإسكان والتعمير",
+      "category": "شركات تطوير ومشروعات عقارية",
+      "kind": "تطوير وإسكان",
+      "city": "أسيوط",
+      "address": "شارع يسري راغب، برج التجاريين، الدور الثاني، شقة 218",
+      "phone": "0882352655",
+      "phones": [
+        "0882352655",
+        "0882372255"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%B3%D8%AA%D8%A7%D8%B1%20%D8%AC%D8%B1%D9%88%D8%A8%20%D9%84%D9%84%D8%A5%D8%B3%D9%83%D8%A7%D9%86%20%D9%88%D8%A7%D9%84%D8%AA%D8%B9%D9%85%D9%8A%D8%B1%20Assiut%20Egypt",
+      "description": "مجموعة تعمل في الإسكان والتعمير، ولها فرع مدرج في مدينة أسيوط.",
+      "services": [
+        "الإسكان والتعمير",
+        "المشروعات العقارية"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "baitk-biedak",
+      "monogram": "BB",
+      "name": "بيتك بأيدك – فرع أسيوط",
+      "category": "شركات عقارية",
+      "kind": "تسويق وخدمات عقارية",
+      "city": "أسيوط",
+      "address": "شارع الجيش، برج رميح، الدور الأول",
+      "phone": "01152333777",
+      "phones": [
+        "01152333777",
+        "01152333666"
+      ],
+      "website": "https://www.baitkbiedak.com/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A8%D9%8A%D8%AA%D9%83%20%D8%A8%D8%A3%D9%8A%D8%AF%D9%83%20%E2%80%93%20%D9%81%D8%B1%D8%B9%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20Assiut%20Egypt",
+      "description": "نشاط عقاري له فرع مدرج في مدينة أسيوط، وتظهر له بيانات موقع إلكتروني وخدمة عملاء.",
+      "services": [
+        "التسويق العقاري",
+        "الخدمات العقارية"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "el-safa-real-estate",
+      "monogram": "ES",
+      "name": "الصفا للتسويق العقاري",
+      "category": "شركات عقارية",
+      "kind": "تسويق عقاري",
+      "city": "أسيوط",
+      "address": "حي شرق، 9 شارع جمال عبد الناصر، منطقة فريال، بجوار مستشفى الزهراء",
+      "phone": "01092702727",
+      "phones": [
+        "01092702727",
+        "01003462216"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D8%B5%D9%81%D8%A7%20%D9%84%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "مكتب تسويق عقاري مدرج في حي شرق بمدينة أسيوط.",
+      "services": [
+        "التسويق العقاري",
+        "الوساطة العقارية"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "tharaa-real-estate",
+      "monogram": "TH",
+      "name": "ثراء العقارية – فرع أسيوط",
+      "category": "شركات عقارية",
+      "kind": "استثمار وتسويق عقاري",
+      "city": "أسيوط",
+      "address": "حي غرب، 42 شارع عثمان بن عفان، فريال، بجوار غبور أوتو",
+      "phone": "0882322705",
+      "phones": [
+        "0882322705",
+        "01223448728"
+      ],
+      "website": "https://www.tharaagroup.com/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%AB%D8%B1%D8%A7%D8%A1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9%20%E2%80%93%20%D9%81%D8%B1%D8%B9%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20Assiut%20Egypt",
+      "description": "شركة عقارية لها فرع مدرج في حي غرب بمدينة أسيوط، ولها موقع إلكتروني منشور.",
+      "services": [
+        "الاستثمار العقاري",
+        "التسويق العقاري"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "morshedy-assiut",
+      "monogram": "MA",
+      "name": "معمار المرشدي – فرع أسيوط",
+      "category": "شركات تطوير ومشروعات عقارية",
+      "kind": "تطوير عقاري – مكتب أسيوط",
+      "city": "أسيوط",
+      "address": "18 شارع الجمهورية، برج اللؤلؤة الإداري، الدور الثاني، أمام بنك الاتحاد الوطني",
+      "phone": "0882284156",
+      "phones": [
+        "0882284156",
+        "01119979937"
+      ],
+      "website": "https://www.morshedy.com/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D8%B9%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D9%85%D8%B1%D8%B4%D8%AF%D9%8A%20%E2%80%93%20%D9%81%D8%B1%D8%B9%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20Assiut%20Egypt",
+      "description": "شركة تطوير عقاري لها فرع مدرج في شارع الجمهورية بمدينة أسيوط.",
+      "services": [
+        "التطوير العقاري",
+        "استفسارات المشروعات"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "tiba-land-division",
+      "monogram": "TL",
+      "name": "طيبة لتقسيم الأراضي – أبنوب",
+      "category": "شركات عقارية",
+      "kind": "تقسيم أراضٍ وخدمات عقارية",
+      "city": "أبنوب",
+      "address": "2 شارع التحرير، الدور الثاني، شقة 2، بجوار مسجد الشيخ يونس",
+      "phone": "0882510205",
+      "phones": [
+        "0882510205",
+        "01004241926"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%B7%D9%8A%D8%A8%D8%A9%20%D9%84%D8%AA%D9%82%D8%B3%D9%8A%D9%85%20%D8%A7%D9%84%D8%A3%D8%B1%D8%A7%D8%B6%D9%8A%20%E2%80%93%20%D8%A3%D8%A8%D9%86%D9%88%D8%A8%20Assiut%20Egypt",
+      "description": "نشاط متخصص في تقسيم الأراضي، وله عنوان مدرج بمدينة أبنوب التابعة لمحافظة أسيوط.",
+      "services": [
+        "تقسيم الأراضي",
+        "الخدمات العقارية"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "themar-real-estate",
+      "monogram": "TR",
+      "name": "ثمار العقارية",
+      "category": "شركات عقارية",
+      "kind": "نشاط عقاري",
+      "city": "أسيوط",
+      "address": "شارع تقسيم البترول، أمام مركز المنال",
+      "phone": "01067820010",
+      "phones": [
+        "01067820010"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%AB%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9%20Assiut%20Egypt",
+      "description": "نشاط عقاري مدرج في شارع تقسيم البترول بمدينة أسيوط.",
+      "services": [
+        "خدمات عقارية",
+        "استفسارات عقارية"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "road-house",
+      "monogram": "RH",
+      "name": "رود هاوس – Road House",
+      "category": "شركات عقارية",
+      "kind": "نشاط عقاري",
+      "city": "أسيوط",
+      "address": "8 شارع المساحة، متفرع من شارع الجمهورية، الدور الأول، بجوار الكنيسة الإنجيلية",
+      "phone": "01127666366",
+      "phones": [
+        "01127666366",
+        "01142863138"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%B1%D9%88%D8%AF%20%D9%87%D8%A7%D9%88%D8%B3%20%E2%80%93%20Road%20House%20Assiut%20Egypt",
+      "description": "نشاط عقاري مدرج في شارع المساحة المتفرع من شارع الجمهورية بمدينة أسيوط.",
+      "services": [
+        "خدمات عقارية",
+        "استفسارات عقارية"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "mawazin-consulting",
+      "monogram": "MW",
+      "name": "موازين للاستشارات والعقارات",
+      "category": "استشارات وخدمات عقارية",
+      "kind": "استشارات وخدمات عقارية",
+      "city": "أسيوط",
+      "address": "34 شارع الهلالي، ميدان الحمامة، أمام مطعم هم هم",
+      "phone": "0882054054",
+      "phones": [
+        "0882054054",
+        "01111534886"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D9%88%D8%A7%D8%B2%D9%8A%D9%86%20%D9%84%D9%84%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA%20Assiut%20Egypt",
+      "description": "نشاط للاستشارات والعقارات مدرج في ميدان الحمامة بمدينة أسيوط.",
+      "services": [
+        "الاستشارات العقارية",
+        "الخدمات العقارية"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "mekka-construction",
+      "monogram": "MK",
+      "name": "مكة للتشييد وإدارة المشروعات",
+      "category": "مقاولات وتشطيبات",
+      "kind": "تشييد وإدارة مشروعات",
+      "city": "أسيوط",
+      "address": "شارع عدلي، بجوار مدرسة ناصر الثانوية بنين",
+      "phone": "0882053086",
+      "phones": [
+        "0882053086",
+        "01125444333"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D9%83%D8%A9%20%D9%84%D9%84%D8%AA%D8%B4%D9%8A%D9%8A%D8%AF%20%D9%88%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D9%85%D8%B4%D8%B1%D9%88%D8%B9%D8%A7%D8%AA%20Assiut%20Egypt",
+      "description": "شركة تشييد وإدارة مشروعات لها عنوان مدرج في شارع عدلي بمدينة أسيوط.",
+      "services": [
+        "التشييد",
+        "إدارة المشروعات"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "el-wasset-contracting",
+      "monogram": "EW",
+      "name": "الوسيط للمقاولات العامة والاستثمار العقاري",
+      "category": "مقاولات وتشطيبات",
+      "kind": "مقاولات واستثمار عقاري",
+      "city": "أسيوط",
+      "address": "9 شارع نزيه خليفة، متفرع من شارع الجمهورية، أمام كلية الخدمة الاجتماعية",
+      "phone": "01006604548",
+      "phones": [
+        "01006604548",
+        "01022515211"
+      ],
+      "website": "http://www.elwasset.site123.me/sitemap",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D9%88%D8%B3%D9%8A%D8%B7%20%D9%84%D9%84%D9%85%D9%82%D8%A7%D9%88%D9%84%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B9%D8%A7%D9%85%D8%A9%20%D9%88%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط للمقاولات العامة والاستثمار العقاري مدرج في مدينة أسيوط، وله موقع إلكتروني منشور.",
+      "services": [
+        "المقاولات العامة",
+        "الاستثمار العقاري"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "abdel-shafy",
+      "monogram": "AS",
+      "name": "عبد الشافي للتطوير والتسويق العقاري",
+      "category": "شركات عقارية",
+      "kind": "تطوير وتسويق عقاري",
+      "city": "أسيوط",
+      "address": "برج طيبة، بجوار مجمع المصالح",
+      "phone": "01000477444",
+      "phones": [
+        "01000477444",
+        "01144984444"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%B4%D8%A7%D9%81%D9%8A%20%D9%84%D9%84%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط للتطوير والتسويق العقاري مدرج في برج طيبة بمدينة أسيوط.",
+      "services": [
+        "التطوير العقاري",
+        "التسويق العقاري"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "united-real-estate",
+      "monogram": "UR",
+      "name": "المتحدة للاستثمار العقاري",
+      "category": "شركات عقارية",
+      "kind": "استثمار عقاري",
+      "city": "أسيوط",
+      "address": "امتداد شارع يسري راغب، برج الأزهر، الدور السابع، أمام قصر نابولي للحلويات",
+      "phone": "01019711931",
+      "phones": [
+        "01019711931",
+        "01111188196"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D9%85%D8%AA%D8%AD%D8%AF%D8%A9%20%D9%84%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط للاستثمار العقاري مدرج في برج الأزهر بامتداد شارع يسري راغب.",
+      "services": [
+        "الاستثمار العقاري",
+        "الخدمات العقارية"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "mostaqbal-marketing",
+      "monogram": "MM",
+      "name": "المستقبل للتسويق العقاري",
+      "category": "شركات عقارية",
+      "kind": "تسويق عقاري",
+      "city": "أسيوط",
+      "address": "برج عمر بن الخطاب، شارع الهلالي، شقة 6",
+      "phone": "01221578888",
+      "phones": [
+        "01221578888",
+        "01221574444"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D9%82%D8%A8%D9%84%20%D9%84%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط للتسويق العقاري مدرج في شارع الهلالي بمدينة أسيوط.",
+      "services": [
+        "التسويق العقاري",
+        "الوساطة العقارية"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "el-masreya-investment",
+      "monogram": "EM",
+      "name": "المصرية للاستثمار العقاري",
+      "category": "شركات تطوير ومشروعات عقارية",
+      "kind": "استثمار وتطوير عقاري",
+      "city": "أسيوط",
+      "address": "برج الهدى مول، شارع 26 يوليو، الدور الثالث، شقة 4",
+      "phone": "0889202002",
+      "phones": [
+        "0889202002",
+        "0882362003"
+      ],
+      "website": "http://www.elmasria.co/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D9%85%D8%B5%D8%B1%D9%8A%D8%A9%20%D9%84%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "شركة للاستثمار العقاري مدرجة في برج الهدى مول بمدينة أسيوط، ولها موقع إلكتروني منشور.",
+      "services": [
+        "الاستثمار العقاري",
+        "التطوير العقاري"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "el-azemy-contracting",
+      "monogram": "EA",
+      "name": "العازمي للمقاولات والاستثمار العقاري",
+      "category": "مقاولات وتشطيبات",
+      "kind": "مقاولات واستثمار عقاري",
+      "city": "أسيوط",
+      "address": "شارع محمود رشوان، الدور الثالث، أمام مسجد مكة",
+      "phone": "0882052145",
+      "phones": [
+        "0882052145",
+        "01227207595"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D8%B9%D8%A7%D8%B2%D9%85%D9%8A%20%D9%84%D9%84%D9%85%D9%82%D8%A7%D9%88%D9%84%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط للمقاولات والاستثمار العقاري مدرج في شارع محمود رشوان بمدينة أسيوط.",
+      "services": [
+        "المقاولات",
+        "الاستثمار العقاري"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "economic-development-group",
+      "monogram": "EG",
+      "name": "المجموعة الاقتصادية للتطوير العمراني",
+      "category": "شركات تطوير ومشروعات عقارية",
+      "kind": "تطوير عمراني",
+      "city": "أسيوط",
+      "address": "ميدان المنفذ، برج الغول، بجوار حلواني الخزان",
+      "phone": "0882299938",
+      "phones": [
+        "0882299938",
+        "01111191146"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D9%85%D8%AC%D9%85%D9%88%D8%B9%D8%A9%20%D8%A7%D9%84%D8%A7%D9%82%D8%AA%D8%B5%D8%A7%D8%AF%D9%8A%D8%A9%20%D9%84%D9%84%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%B9%D9%85%D8%B1%D8%A7%D9%86%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط للتطوير العمراني مدرج في ميدان المنفذ بمدينة أسيوط.",
+      "services": [
+        "التطوير العمراني",
+        "الاستثمار العقاري"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "bait-el-baraka",
+      "monogram": "BE",
+      "name": "بيت البركة للتسويق والاستثمار العقاري",
+      "category": "شركات عقارية",
+      "kind": "تسويق واستثمار عقاري",
+      "city": "أسيوط",
+      "address": "برج خالد بن الوليد، ميدان المحطة، الدور الثاني، شقة 207، أمام محطة القطار",
+      "phone": "01014429745",
+      "phones": [
+        "01014429745",
+        "01110543999"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A8%D9%8A%D8%AA%20%D8%A7%D9%84%D8%A8%D8%B1%D9%83%D8%A9%20%D9%84%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82%20%D9%88%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط للتسويق والاستثمار العقاري مدرج في ميدان المحطة بمدينة أسيوط.",
+      "services": [
+        "التسويق العقاري",
+        "الاستثمار العقاري"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "aqar-investment",
+      "monogram": "AQ",
+      "name": "عقار للاستثمار والتسويق العقاري",
+      "category": "شركات عقارية",
+      "kind": "استثمار وتسويق وإدارة مشروعات",
+      "city": "أسيوط",
+      "address": "أبراج الوطنية، شارع الجمهورية، الدور الثاني الإداري، شقة 1، أعلى بنك QNB الأهلي",
+      "phone": "0882293429",
+      "phones": [
+        "0882293429",
+        "01114471729"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%B9%D9%82%D8%A7%D8%B1%20%D9%84%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط للاستثمار والإنشاء والتسويق العقاري وإدارة المشروعات، وله عنوان مدرج في أبراج الوطنية.",
+      "services": [
+        "الاستثمار العقاري",
+        "التسويق العقاري",
+        "إدارة المشروعات"
+      ],
+      "source_type": "local_directory",
+      "source_label": "دليل 140 – دليل أنشطة أسيوط",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "arab-contractors-assiut",
+      "monogram": "AC",
+      "name": "المقاولون العرب – فرع أسيوط",
+      "category": "مقاولات وتشطيبات",
+      "kind": "مقاولات وإنشاءات كبرى",
+      "city": "أسيوط",
+      "address": "29 شارع كورنيش النيل، بجوار مبنى محافظة أسيوط، حي شرق",
+      "phone": "0882324871",
+      "phones": [
+        "0882324871"
+      ],
+      "website": "https://www.arabcont.com/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D9%85%D9%82%D8%A7%D9%88%D9%84%D9%88%D9%86%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%20%E2%80%93%20%D9%81%D8%B1%D8%B9%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20Assiut%20Egypt",
+      "description": "فرع أسيوط لشركة المقاولون العرب، ويظهر في دليل الأعمال المحلي بوصفه شركة مقاولات عامة.",
+      "services": [
+        "المقاولات العامة",
+        "الإنشاءات",
+        "المشروعات العامة"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "south-egypt-construction",
+      "monogram": "SEC",
+      "name": "جنوب مصر للإنشاءات",
+      "category": "مقاولات وتشطيبات",
+      "kind": "إنشاءات ومقاولات",
+      "city": "أسيوط",
+      "address": "أبراج الشركة السعودية، الدور الأرضي، البرج الثالث، أسيوط ثان",
+      "phone": "0882061055",
+      "phones": [
+        "0882061055"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%AC%D9%86%D9%88%D8%A8%20%D9%85%D8%B5%D8%B1%20%D9%84%D9%84%D8%A5%D9%86%D8%B4%D8%A7%D8%A1%D8%A7%D8%AA%20Assiut%20Egypt",
+      "description": "شركة إنشاءات مدرجة في أبراج الشركة السعودية بمدينة أسيوط.",
+      "services": [
+        "الإنشاءات",
+        "المقاولات العامة"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
     {
       "slug": "hometown-group",
       "monogram": "HTG",
       "name": "هوم تاون جروب",
       "category": "شركات تطوير ومشروعات عقارية",
-      "kind": "مطور ومجموعة عقارية",
-      "city": "أسيوط",
-      "address": "مشروع West Gardens – أسيوط",
-      "phone": "19992",
-      "website": "https://htg-eg.com/ar/",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=West+Gardens+Hometown+Assiut",
-      "description": "مجموعة تعمل في التطوير العقاري والإنشاءات وإدارة المرافق. يدرج موقع المجموعة مشروع West Gardens ضمن مشروعاتها في أسيوط.",
-      "services": [
-        "التطوير العقاري",
-        "الإنشاءات والتنفيذ",
-        "إدارة المرافق"
-      ],
-      "source_label": "الموقع الرسمي للمجموعة",
-      "source_url": "https://htg-eg.com/ar/",
-      "source_note": "المعلومات التعريفية مأخوذة من الموقع الرسمي للمجموعة، وتشير إلى مشروع West Gardens في أسيوط."
-    },
-    {
-      "slug": "tayel-group",
-      "monogram": "TG",
-      "name": "مجموعة طايل – Tayel Group",
-      "category": "شركات تطوير ومشروعات عقارية",
-      "kind": "تطوير عقاري ومقاولات",
+      "kind": "تطوير عقاري",
       "city": "أسيوط الجديدة",
-      "address": "نشاط ومشروعات معلنة في أسيوط الجديدة",
+      "address": "مشروع West Gardens – غرب أسيوط",
       "phone": "",
-      "website": "https://www.hayahcity.com/ar/about-us.php",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Tayel+Group+Assiut",
-      "description": "مجموعة تعمل في التطوير العقاري والمقاولات. يذكر الموقع الرسمي أن شركة الرحاب للمقاولات التابعة للمجموعة بدأت العمل في مدينة أسيوط الجديدة عام 2008.",
+      "phones": [],
+      "website": "https://htg-eg.com/ar/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=West%20Gardens%20Hometown%20Assiut%20Assiut%20Egypt",
+      "description": "مجموعة تطوير عقاري يرد اسمها ضمن مصادر المشروعات العقارية المرتبطة بأسيوط. هذه البطاقة للتعريف بالمطور ولا تؤكد توافر وحدات أو عروض بيع حالية.",
       "services": [
         "التطوير العقاري",
-        "المقاولات",
-        "تقسيم الأراضي وأعمال الطرق"
+        "المشروعات السكنية"
       ],
-      "source_label": "الموقع الرسمي للمجموعة",
-      "source_url": "https://www.hayahcity.com/ar/about-us.php",
-      "source_note": "النبذة مستندة إلى صفحة من نحن الرسمية لمجموعة طايل."
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://htg-eg.com/ar/",
+      "source_note": "النبذة مستندة إلى موقع المجموعة وتغطيات مشروع West Gardens. التواصل بشأن المشروعات عبر الموقع الرسمي."
     },
     {
       "slug": "rdf-developments",
@@ -53,58 +557,140 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "شركة تطوير عقاري",
       "city": "أسيوط الجديدة",
-      "address": "كومبوند Paradise بجوار مسجد طريق الصعيد البحر الأحمر، مدينة أسيوط الجديدة",
-      "phone": "01080080286",
-      "website": "https://rdfdevelopments.com/",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=RDF+Paradise+New+Assiut",
-      "description": "شركة تطوير عقاري تعرض مشروع Paradise بمدينة أسيوط الجديدة، وتنشر على موقعها الرسمي بيانات التواصل والعنوان.",
-      "services": [
-        "التطوير العقاري",
-        "المشروعات السكنية"
-      ],
-      "source_label": "الموقع الرسمي للشركة",
-      "source_url": "https://rdfdevelopments.com/",
-      "source_note": "العنوان ورقم التواصل مأخوذان من صفحة التواصل والمعلومات المنشورة على الموقع الرسمي."
-    },
-    {
-      "slug": "arab-developers-holding",
-      "monogram": "ADH",
-      "name": "عرب ديفيلوبرز القابضة",
-      "category": "شركات تطوير ومشروعات عقارية",
-      "kind": "شركة تطوير عقاري",
-      "city": "أسيوط",
-      "address": "مشروع/نقطة بيع مرتبطة باسم نيوم أسيوط – يلزم تأكيد مقر الفرع",
+      "address": "مشروع Paradise – مدينة أسيوط الجديدة",
       "phone": "",
-      "website": "https://ad-holding.com/project/",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Arab+Developers+Holding+Assiut",
-      "description": "شركة تطوير عقاري مدرجة في مصادر المشروعات العقارية المرتبطة بأسيوط. بطاقة الشركة لا تؤكد وجود فرع مبيعات حالي أو عنوان محلي مستقل.",
+      "phones": [],
+      "website": "https://rdfdevelopments.com/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=RDF%20Developments%20Paradise%20New%20Assiut%20Assiut%20Egypt",
+      "description": "شركة تطوير عقاري تعرض مشروع Paradise بمدينة أسيوط الجديدة على موقعها الرسمي. البطاقة لا تؤكد توافر الوحدات أو حالة البيع الحالية.",
       "services": [
         "التطوير العقاري",
         "المشروعات السكنية"
       ],
-      "source_label": "الموقع الرسمي للشركة",
-      "source_url": "https://ad-holding.com/project/",
-      "source_note": "الموقع الرسمي للشركة مرجع للتعريف بها؛ تفاصيل الارتباط بأسيوط تحتاج تأكيدًا مباشرًا من الشركة."
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://rdfdevelopments.com/",
+      "source_note": "الموقع الرسمي للشركة هو مصدر التعريف بالمشروع وبيانات التواصل المحدثة."
     },
     {
-      "slug": "mabany-edris-assiut",
-      "monogram": "ME",
-      "name": "مباني إدريس – مكتب أسيوط",
+      "slug": "tayel-group",
+      "monogram": "TG",
+      "name": "مجموعة طايل – Tayel Group",
       "category": "شركات تطوير ومشروعات عقارية",
-      "kind": "مكتب تواصل/مبيعات مدرج محليًا",
-      "city": "أسيوط",
-      "address": "150 شارع الثورة، قسم ثان أسيوط",
-      "phone": "0882141931",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Mabany+Edris+Assiut",
-      "description": "مكتب محلي مدرج باسم مباني إدريس في أسيوط. ترتبط الشركة بمشروعات تطوير عقاري، وتحتاج بيانات الفرع ومواعيد التواصل إلى تأكيد مباشر.",
+      "kind": "تطوير عقاري ومقاولات",
+      "city": "أسيوط الجديدة",
+      "address": "نشاط ومشروعات معلنة بمدينة أسيوط الجديدة",
+      "phone": "",
+      "phones": [],
+      "website": "https://www.hayahcity.com/ar/about-us.php",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=Tayel%20Group%20Assiut%20Assiut%20Egypt",
+      "description": "مجموعة تعمل في التطوير العقاري والمقاولات؛ يذكر موقع Hayah City الرسمي تاريخ بدء أعمال شركة الرحاب للمقاولات في أسيوط الجديدة.",
       "services": [
-        "استفسارات المشروعات",
+        "التطوير العقاري",
+        "المقاولات"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://www.hayahcity.com/ar/about-us.php",
+      "source_note": "النبذة مستندة إلى صفحة المجموعة الرسمية، وبيانات التواصل تؤخذ من الموقع."
+    },
+    {
+      "slug": "venecia-development",
+      "monogram": "VD",
+      "name": "فينيسيا للتنمية والتخطيط العمراني",
+      "category": "شركات تطوير ومشروعات عقارية",
+      "kind": "تنمية وتطوير عمراني",
+      "city": "أسيوط",
+      "address": "شارع الجمهورية، أعلى بنك أبو ظبي التجاري",
+      "phone": "01009000151",
+      "phones": [
+        "01009000151"
+      ],
+      "website": "https://venecia-dev.com/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%81%D9%8A%D9%86%D9%8A%D8%B3%D9%8A%D8%A7%20%D9%84%D9%84%D8%AA%D9%86%D9%85%D9%8A%D8%A9%20%D9%88%D8%A7%D9%84%D8%AA%D8%AE%D8%B7%D9%8A%D8%B7%20%D8%A7%D9%84%D8%B9%D9%85%D8%B1%D8%A7%D9%86%D9%8A%20Assiut%20Egypt",
+      "description": "شركة تنمية وتطوير عقاري يظهر لها نشاط محلي في شارع الجمهورية بمدينة أسيوط، ولها موقع رسمي.",
+      "services": [
+        "التنمية العمرانية",
         "التطوير العقاري"
       ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Mabany+Edris+Assiut",
-      "source_note": "العنوان ورقم الهاتف كما ظهرا في بطاقة النشاط العامة؛ يُرجى التأكد منهما قبل الزيارة."
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "porto-group-assiut",
+      "monogram": "PG",
+      "name": "بورتو جروب – فرع أسيوط",
+      "category": "شركات تطوير ومشروعات عقارية",
+      "kind": "تطوير عقاري",
+      "city": "أسيوط",
+      "address": "شارع الجمهورية، برج بانوراما",
+      "phone": "16663",
+      "phones": [
+        "16663"
+      ],
+      "website": "https://portodevelopments.com/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A8%D9%88%D8%B1%D8%AA%D9%88%20%D8%AC%D8%B1%D9%88%D8%A8%20%E2%80%93%20%D9%81%D8%B1%D8%B9%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20Assiut%20Egypt",
+      "description": "فرع محلي مدرج لمجموعة بورتو في مدينة أسيوط. للحصول على بيانات المشروعات والخدمة الحالية يُرجى الرجوع للموقع الرسمي.",
+      "services": [
+        "التطوير العقاري",
+        "المشروعات السكنية"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+    },
+    {
+      "slug": "global-house-konoz",
+      "monogram": "GH",
+      "name": "جلوبال هاوس للتطوير العقاري – KONOZ",
+      "category": "شركات تطوير ومشروعات عقارية",
+      "kind": "تطوير عقاري – مشروع KONOZ",
+      "city": "أسيوط",
+      "address": "نقطة مبيعات مشروع KONOZ – شارع الجمهورية؛ يلزم تأكيد تفاصيل المكتب قبل الزيارة",
+      "phone": "01503444457",
+      "phones": [
+        "01503444457"
+      ],
+      "website": "https://eg.linkedin.com/company/global-house-developments",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=KONOZ%20Residence%20Assiut%20Assiut%20Egypt",
+      "description": "مشروع KONOZ Residence مرتبط باسم Global House Developments ويظهر له حضور مبيعات في وسط أسيوط؛ هذه بطاقة تعريفية مرتبطة بالمشروع وليست إثباتًا لفرع قانوني مستقل.",
+      "services": [
+        "التطوير العقاري",
+        "استفسارات مشروع KONOZ"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات المشروع ونقطة التواصل كما وردت في دليل الأعمال المحلي ومصادر المطور؛ يُرجى التأكيد مباشرة."
+    },
+    {
+      "slug": "maamar-alabbasi",
+      "monogram": "MA",
+      "name": "معمار العباسي للمقاولات والتطوير العقاري",
+      "category": "مقاولات وتشطيبات",
+      "kind": "مقاولات وتشطيبات وتوريدات",
+      "city": "أسيوط",
+      "address": "منطقة الشيخية السابعة، قسم أول أسيوط",
+      "phone": "01100002384",
+      "phones": [
+        "01100002384"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D8%B9%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B9%D8%A8%D8%A7%D8%B3%D9%8A%20%D9%84%D9%84%D9%85%D9%82%D8%A7%D9%88%D9%84%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
+      "description": "نشاط محلي متعدد الخدمات مدرج في أسيوط ضمن المقاولات والتوريدات والتشطيبات والتصميم الداخلي.",
+      "services": [
+        "المقاولات",
+        "التشطيبات",
+        "التوريدات",
+        "التصميم الداخلي"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
     },
     {
       "slug": "bunian-makka",
@@ -113,222 +699,47 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "تطوير عقاري وتشطيبات",
       "city": "أسيوط",
-      "address": "الوليدية الغربية، أسيوط 2",
+      "address": "الوليدية الغربية، قسم ثان أسيوط",
       "phone": "01020267555",
+      "phones": [
+        "01020267555"
+      ],
       "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Bunian+Makka+Assiut",
-      "description": "نشاط محلي في أسيوط مدرج ضمن التطوير العقاري وخدمات التشطيبات. تفاصيل المشروعات والخدمات تُراجع مباشرة مع ممثل النشاط.",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A8%D9%86%D9%8A%D8%A7%D9%86%20%D9%85%D9%83%D8%A9%20%D9%84%D9%84%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20%D9%88%D8%A7%D9%84%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8%D8%A7%D8%AA%20Assiut%20Egypt",
+      "description": "نشاط محلي في أسيوط مدرج ضمن التطوير العقاري والتشطيبات.",
       "services": [
         "التطوير العقاري",
         "التشطيبات",
         "إدارة المشروعات"
       ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Bunian+Makka+Assiut",
-      "source_note": "الاسم والعنوان ورقم التواصل وفق بطاقة النشاط العامة، وليست مراجعة مستقلة من أسيوط عقار."
-    },
-    {
-      "slug": "al-tasahiel-real-estate",
-      "monogram": "TR",
-      "name": "مكتب التساهيل العقارية",
-      "category": "شركات عقارية",
-      "kind": "وساطة وتسويق عقاري",
-      "city": "أسيوط",
-      "address": "أمام مطعم كايرو، 26 شارع يوليو فاروق سبكن، الحمراء الثانية",
-      "phone": "01020659960",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Al+Tasahiel+Real+Estate+Assiut",
-      "description": "مكتب عقاري مدرج في نتائج الأنشطة المحلية بمدينة أسيوط. يُرجى التواصل المباشر للتأكد من الخدمات المتاحة ومواعيد العمل.",
-      "services": [
-        "الوساطة العقارية",
-        "تسويق العقارات"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Al+Tasahiel+Real+Estate+Assiut",
-      "source_note": "بيانات الاتصال والموقع كما ظهرت في بطاقة النشاط العامة."
-    },
-    {
-      "slug": "maamar-alabbasi",
-      "monogram": "MA",
-      "name": "معمار العباسي للمقاولات والتطوير العقاري",
-      "category": "مقاولات وتشطيبات",
-      "kind": "مقاولات وتوريدات وخدمات هندسية",
-      "city": "أسيوط",
-      "address": "الشيخية السابعة، قسم أول أسيوط",
-      "phone": "01100002384",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Maamar+Al+Abbasi+Assiut",
-      "description": "نشاط محلي مدرج في أسيوط ضمن المقاولات العامة وخدمات مرتبطة بالتشطيب والتوريدات والتصميم الداخلي.",
-      "services": [
-        "المقاولات العامة",
-        "التشطيبات",
-        "التوريدات",
-        "التصميم الداخلي"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Maamar+Al+Abbasi+Assiut",
-      "source_note": "الاسم والتصنيف ورقم الاتصال وفق بطاقة النشاط العامة؛ يلزم تأكيد نطاق الأعمال من الشركة."
-    },
-    {
-      "slug": "green-way-real-estate",
-      "monogram": "GW",
-      "name": "جرين واي للتسويق والخدمات العقارية",
-      "category": "شركات عقارية",
-      "kind": "تسويق واستثمار عقاري",
-      "city": "أسيوط",
-      "address": "49 شارع 6 أكتوبر، حس السادات",
-      "phone": "01020606960",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Green+Way+Real+Estate+Assiut",
-      "description": "نشاط محلي مدرج في أسيوط ضمن التسويق والخدمات العقارية والاستثمار العقاري.",
-      "services": [
-        "التسويق العقاري",
-        "الخدمات العقارية",
-        "التشطيبات"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Green+Way+Real+Estate+Assiut",
-      "source_note": "العنوان ورقم التواصل والتصنيف كما ظهرت في بطاقة النشاط العامة."
-    },
-    {
-      "slug": "barah",
-      "monogram": "BARAH",
-      "name": "BARAH",
-      "category": "شركات عقارية",
-      "kind": "استثمار واستشارات عقارية",
-      "city": "أسيوط",
-      "address": "أبراج الموالح، برج 5، الدور الإداري الأول",
-      "phone": "01500070900",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=BARAH+Real+Estate+Assiut",
-      "description": "نشاط استثمار واستشارات عقارية مدرج في أسيوط، مع عنوان منشور في أبراج الموالح.",
-      "services": [
-        "الاستثمار العقاري",
-        "الاستشارات العقارية"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=BARAH+Real+Estate+Assiut",
-      "source_note": "البيانات وفق بطاقة النشاط العامة، ويُرجى تأكيد الخدمات ووسائل التواصل مباشرة."
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
     },
     {
       "slug": "upper-capital",
       "monogram": "UC",
       "name": "Upper Capital",
       "category": "شركات تطوير ومشروعات عقارية",
-      "kind": "تطوير عقاري",
+      "kind": "تطوير واستثمار عقاري",
       "city": "أسيوط",
       "address": "شارع جامعة الأزهر، برج المصطفى، أعلى مطعم أرابيتا، الدور الرابع الإداري، الوليدية الغربية",
       "phone": "01095200002",
+      "phones": [
+        "01095200002"
+      ],
       "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Upper+Capital+Assiut",
-      "description": "شركة مدرجة محليًا ضمن أنشطة التطوير العقاري في أسيوط، وتعرض بيانات موقعها ووسائل الاتصال عبر بطاقة النشاط العامة.",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=Upper%20Capital%20Assiut%20Egypt",
+      "description": "شركة تطوير عقاري مدرجة في منطقة الوليدية الغربية بمدينة أسيوط.",
       "services": [
         "التطوير العقاري",
         "الاستثمار العقاري"
       ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Upper+Capital+Assiut",
-      "source_note": "الاسم والعنوان ورقم التواصل كما ظهرت في بطاقة النشاط العامة."
-    },
-    {
-      "slug": "the-brokers",
-      "monogram": "TB",
-      "name": "The Brokers",
-      "category": "شركات عقارية",
-      "kind": "وساطة وتسويق عقاري",
-      "city": "أسيوط",
-      "address": "أسيوط – يُرجى تأكيد عنوان المكتب",
-      "phone": "01070758975",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=The+Brokers+Real+Estate+Assiut",
-      "description": "مكتب وساطة وتسويق عقاري مدرج في أسيوط. يُرجى التأكد من عنوان المكتب ونطاق العمل قبل الزيارة.",
-      "services": [
-        "الوساطة العقارية",
-        "التسويق العقاري"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=The+Brokers+Real+Estate+Assiut",
-      "source_note": "رقم التواصل والتصنيف وفق بطاقة النشاط العامة."
-    },
-    {
-      "slug": "egyptian-real-estate-investment-asyut",
-      "monogram": "ERI",
-      "name": "المصرية للاستثمار والتطوير العقاري بأسيوط",
-      "category": "شركات عقارية",
-      "kind": "استثمار وتطوير عقاري",
-      "city": "أسيوط",
-      "address": "26 شارع يوليو فاروق سبكن، الحمراء الثانية، أسيوط",
-      "phone": "01060792006",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Egyptian+Real+Estate+Investment+Assiut",
-      "description": "نشاط محلي مدرج ضمن شركات التطوير العقاري في أسيوط. بيانات البطاقة العامة لا تغني عن مراجعة الاسم التجاري والخدمات الحالية مع الشركة.",
-      "services": [
-        "الاستثمار العقاري",
-        "التطوير العقاري"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Egyptian+Real+Estate+Investment+Assiut",
-      "source_note": "البيانات وفق بطاقة النشاط العامة؛ يلزم تأكيد الصفة القانونية والخدمات الحالية."
-    },
-    {
-      "slug": "capital-construction-company",
-      "monogram": "CC",
-      "name": "Capital Construction Company (CCER)",
-      "category": "مقاولات وتشطيبات",
-      "kind": "مقاولات وإنشاءات",
-      "city": "أسيوط",
-      "address": "قسم ثان أسيوط – موقع Plus Code 55PQ+5X5",
-      "phone": "01005007878",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Capital+Construction+Company+Assiut",
-      "description": "شركة مقاولات مدرجة في أسيوط. يُرجى التواصل للتأكد من نوع الأعمال المتاحة وموقع المكتب التفصيلي.",
-      "services": [
-        "المقاولات",
-        "الإنشاءات"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Capital+Construction+Company+Assiut",
-      "source_note": "التصنيف ورقم الاتصال وفق بطاقة النشاط العامة."
-    },
-    {
-      "slug": "al-rowad-al-arab-contracting",
-      "monogram": "RA",
-      "name": "الرواد العرب للمقاولات",
-      "category": "مقاولات وتشطيبات",
-      "kind": "مقاولات وإنشاءات",
-      "city": "أسيوط الجديدة",
-      "address": "مدينة أسيوط الجديدة – البحر الأحمر",
-      "phone": "0882211454",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Al+Rowad+Al+Arab+Contracting+New+Assiut",
-      "description": "شركة مقاولات مدرجة في مدينة أسيوط الجديدة ضمن أنشطة الإنشاءات.",
-      "services": [
-        "المقاولات",
-        "الإنشاءات"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Al+Rowad+Al+Arab+Contracting+New+Assiut",
-      "source_note": "الاسم ورقم الاتصال والموقع وفق بطاقة النشاط العامة."
-    },
-    {
-      "slug": "morshedy-assiut-contact",
-      "monogram": "M",
-      "name": "معمار المرشدي – نقطة تواصل أسيوط",
-      "category": "شركات تطوير ومشروعات عقارية",
-      "kind": "نقطة تواصل/مبيعات مدرجة محليًا",
-      "city": "أسيوط",
-      "address": "شارع جامعة الأزهر، أسيوط",
-      "phone": "01069050303",
-      "website": "",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Morshedy+Assiut",
-      "description": "اسم مدرج محليًا كنقطة تواصل عقارية في أسيوط. لم يتم تأكيد الصفة الحالية للفرع أو علاقته التنظيمية بالمجموعة من خلال مصدر رسمي.",
-      "services": [
-        "استفسارات عقارية",
-        "التطوير العقاري"
-      ],
-      "source_label": "بطاقة نشاط على خرائط Google",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=Morshedy+Assiut",
-      "source_note": "الإدراج استرشادي ويحتاج تأكيدًا مباشرًا من الشركة."
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
     },
     {
       "slug": "al-benaa-al-arabi-star",
@@ -339,18 +750,45 @@
       "city": "أسيوط",
       "address": "شارع يسري راغب، خلف بنك فيصل الإسلامي",
       "phone": "01012588382",
-      "website": "https://www.facebook.com/share/1CimVDX8Di/",
-      "map_url": "https://www.google.com/maps/search/?api=1&query=Al+Benaa+Al+Arabi+Star+Assiut",
-      "description": "شركة متخصصة في أعمال البناء والإنشاءات والتشطيبات، وتذكر الشركة إتاحة أنظمة تقسيط بدون فوائد وفق شروط الاتفاق.",
+      "phones": [
+        "01012588382",
+        "01090954342",
+        "01040749197"
+      ],
+      "website": "",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=Al%20Benaa%20Al%20Arabi%20Star%20Assiut%20Assiut%20Egypt",
+      "description": "شركة متخصصة في أعمال البناء والإنشاءات والتشطيبات. نطاق الخدمة المعلن يشمل أسيوط والمنيا وسوهاج والوادي الجديد، مع فروع تواصل في أسيوط وطما والخارجة.",
       "services": [
         "أعمال البناء والإنشاءات",
         "التشطيبات",
         "التنفيذ بالمراكز والقرى"
       ],
-      "source_label": "بيانات قدمها ممثل الشركة",
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
       "source_url": "https://www.facebook.com/share/1CimVDX8Di/",
-      "source_note": "البيانات المقدمة من ممثل الشركة؛ لا تمثل تزكية مستقلة أو ضمانًا من أسيوط عقار.",
-      "profile_path": "./company-albenaa-arabi-star.html"
+      "source_note": "المعلومات مقدمة من ممثل الشركة، ولا تمثل تزكية مستقلة أو ضمانًا من أسيوط عقار."
+    },
+    {
+      "slug": "arab-developers-holding",
+      "monogram": "ADH",
+      "name": "عرب ديفيلوبرز القابضة",
+      "category": "شركات تطوير ومشروعات عقارية",
+      "kind": "شركة تطوير عقاري",
+      "city": "أسيوط",
+      "address": "ارتباط معلن بمشروع نيوم أسيوط – تفاصيل الفرع المحلي تحتاج تأكيد",
+      "phone": "",
+      "phones": [],
+      "website": "https://ad-holding.com/project/",
+      "map_url": "https://www.google.com/maps/search/?api=1&query=Arab%20Developers%20Holding%20Neom%20Assiut%20Assiut%20Egypt",
+      "description": "شركة تطوير عقاري مدرجة ضمن المصادر المرتبطة بمشروعات أسيوط. لا تؤكد هذه البطاقة وجود مكتب أو نقطة مبيعات محلية حاليًا.",
+      "services": [
+        "التطوير العقاري",
+        "المشروعات العقارية"
+      ],
+      "source_type": "public_business_listing",
+      "source_label": "EgyFinder – دليل أنشطة أسيوط",
+      "source_url": "https://ad-holding.com/project/",
+      "source_note": "الموقع الرسمي للشركة مصدر للتعريف بالمجموعة؛ الارتباط بالمشروع لا يعني إثبات فرع محلي."
     }
   ]
 }
