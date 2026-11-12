@@ -5,3 +5,5 @@
 .company-directory-card.is-curated{border-color:#e8d6c6}
 .company-directory-open{display:inline-flex;align-items:center;gap:6px;margin-top:12px;color:#985a36;font-size:12px;font-weight:800}
 .company-directory-card>a:focus-visible{outline:3px solid #c98a64;outline-offset:3px;border-radius:16px}
+
+.company-directory-card.is-curated .company-card-cover{background:#fff;padding:18px}.company-directory-card.is-curated .company-card-cover img{object-fit:contain}
