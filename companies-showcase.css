@@ -1,0 +1,56 @@
+/* ASYUT AQAR — curated companies showcase */
+.company-showcase-card .company-showcase-cover{
+ position:relative;display:grid;place-items:center;min-height:148px;overflow:hidden;
+ background:radial-gradient(circle at 15% 15%,#c8963e38,transparent 38%),linear-gradient(135deg,#102746,#1b3d62 62%,#0c1c31);
+}
+.company-showcase-card .company-showcase-cover:after{
+ content:"";position:absolute;inset:auto 0 0;height:4px;
+ background:linear-gradient(90deg,#a93636,#c8963e 55%,#102746);
+}
+.company-showcase-monogram{
+ display:grid;place-items:center;width:82px;height:82px;padding:8px;border:1px solid #c8963e99;
+ border-radius:20px;background:#ffffff12;color:#fff;font:800 25px/1 Alexandria,Arial,sans-serif;
+ letter-spacing:.02em;box-shadow:0 12px 28px #07152955;backdrop-filter:blur(8px);
+}
+.company-showcase-status{
+ position:absolute;top:10px;inset-inline-start:10px;z-index:1;padding:5px 9px;
+ border:1px solid #ffffff55;border-radius:30px;background:#102746d9;color:#fff;
+ font-size:10px;font-weight:700;
+}
+.company-showcase-card .company-directory-card-body{min-height:190px}
+.company-showcase-card h3{line-height:1.55}
+.company-showcase-profile-hero{
+ background:radial-gradient(at 8% 12%,#c8963e2b,transparent 35%),
+ radial-gradient(at 90% 90%,#a9363620,transparent 28%),linear-gradient(120deg,#102746,#1b3d62 60%,#0c1c31)!important;
+ border-bottom:5px solid #c8963e!important;
+}
+.company-showcase-profile-logo{
+ background:#ffffff12!important;border:2px solid #c8963e!important;color:#fff;
+}
+.company-showcase-profile-logo span{
+ display:grid;place-items:center;width:100%;height:100%;border-radius:10px;
+ color:#102746;background:#fff;font:800 35px/1 Alexandria,Arial,sans-serif;
+}
+.company-showcase-flags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.company-showcase-flags span{
+ display:inline-flex;padding:6px 11px;border:1px solid #ffffff55;border-radius:30px;
+ color:#fff;background:#ffffff12;font-size:11px;font-weight:700;
+}
+.company-showcase-claim{border-inline-start:4px solid #c8963e}
+.company-showcase-claim p{margin:0 0 14px;color:var(--muted);font-size:14px}
+.company-showcase-claim .company-contact-primary{
+ display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;
+ border-radius:9px;background:#102746;color:#fff;text-decoration:none;font-weight:800;
+}
+.company-showcase-notice{
+ margin:18px auto;padding:16px 18px;border:1px solid #c8963e55;border-radius:14px;
+ background:#fffaf1;color:#5d5145;font-size:12px;line-height:1.9;
+}
+.company-showcase-notice p{margin:8px 0 0}
+.company-showcase-notice a{color:#102746;font-weight:800;text-decoration:underline}
+@media(max-width:620px){
+ .company-showcase-card .company-showcase-cover{min-height:124px}
+ .company-showcase-monogram{width:70px;height:70px;font-size:21px}
+ .company-showcase-profile-hero{padding:20px!important}
+ .company-showcase-flags{justify-content:center}
+}
