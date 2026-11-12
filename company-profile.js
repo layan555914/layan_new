@@ -8,7 +8,7 @@ if(showcaseSlug){
   const data=await response.json();
   const c=(Array.isArray(data.companies)?data.companies:[]).find(item=>item.slug===showcaseSlug);
   if(!c){root.innerHTML='<p class="company-directory-state">ملف الشركة غير متاح حاليًا.</p>';return}
-  const phone=String(c.phone||"").replace(/[^+0-9]/g,"");
+  const phoneList=(Array.isArray(c.phones)?c.phones:(c.phone?[c.phone]:[])).map(value=>String(value||"").replace(/[^+0-9]/g,"")).filter(Boolean);const phone=phoneList[0]||"";
   const website=safe(c.website),map=safe(c.map_url),source=safe(c.source_url);
   const services=Array.isArray(c.services)?c.services:[];
   const adminNumber=String(data.adminWhatsapp||"").replace(/\D/g,"");
@@ -30,7 +30,7 @@ if(showcaseSlug){
     '<h1>'+esc(c.name)+'</h1><p>'+esc(c.description||"")+'</p>'+
     '<div class="company-showcase-flags"><span>ملف تعريفي أولي</span><span>متاح مجانًا للتحديث من ممثل الشركة بعد التحقق</span></div>'+
     '<div class="company-contact-actions">'+
-     (phone?'<a class="company-contact-primary" href="tel:'+esc(phone)+'">اتصال</a>':"")+
+     phoneList.map((value,index)=>'<a class="company-contact-primary" href="tel:'+esc(value)+'">'+(index===0?"اتصال ":"رقم إضافي ")+esc(value)+'</a>').join("")+
      (website?'<a class="company-contact-secondary" href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">الموقع الرسمي</a>':"")+
      (map?'<a class="company-contact-secondary" href="'+esc(map)+'" target="_blank" rel="noopener noreferrer">عرض الموقع على الخريطة</a>':"")+
     '</div></div></section>'+
