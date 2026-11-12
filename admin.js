@@ -199,15 +199,28 @@ document.addEventListener("DOMContentLoaded", () => {
       companyProfilesList.innerHTML = '<p class="admin-empty">لا توجد طلبات ملفات شركات معلقة.</p>';
       return;
     }
+    let directoryCatalog = [];
+    try {
+      const catalogResponse = await fetch("./companies-catalog.json?v=20261113-2", { cache: "no-store" });
+      if (catalogResponse.ok) {
+        const catalogData = await catalogResponse.json();
+        directoryCatalog = Array.isArray(catalogData.companies) ? catalogData.companies : [];
+      }
+    } catch (error) { console.warn("Company claim catalog lookup:", error); }
+    const normalizeCompanyName = value => String(value || "").trim().replace(/\\s+/g, " ").toLocaleLowerCase("ar");
     companyProfilesList.innerHTML = rows.map(row => {
       const isUpdate = companyDraftSupported && row.status === "active" && row.update_status === "pending" && row.pending_update && typeof row.pending_update === "object";
       const c = isUpdate ? Object.assign({}, row, row.pending_update) : row;
+      const catalogEntry = !isUpdate ? directoryCatalog.find(item => normalizeCompanyName(item.company_name) === normalizeCompanyName(c.company_name)) : null;
+      const reviewKind = catalogEntry ? "claim" : (isUpdate ? "update" : "new");
+      const officialCatalogPhone = catalogEntry ? String(catalogEntry.phone || "") : "";
       const services = Array.isArray(c.services) ? c.services : [];
       const projects = Array.isArray(c.projects) ? c.projects : [];
       const gallery = Array.isArray(c.gallery_urls) ? c.gallery_urls : [];
-      return '<article class="admin-ad" data-company-profile-id="' + esc(row.id) + '" data-company-kind="' + (isUpdate ? "update" : "new") + '">' +
+      return '<article class="admin-ad" data-company-profile-id="' + esc(row.id) + '" data-company-kind="' + reviewKind + '" data-company-official-phone="' + esc(officialCatalogPhone) + '">' +
         '<div class="company-review-details" data-company-details hidden>' +
-        '<span class="admin-chip">' + esc(c.category) + '</span> <span class="admin-chip">' + (isUpdate ? "طلب تعديل على ملف منشور — النسخة المنشورة ما زالت ظاهرة" : "طلب جديد أو إعادة إرسال") + '</span>' +
+        '<span class="admin-chip">' + esc(c.category) + '</span> <span class="admin-chip">' + (catalogEntry ? "طلب إدارة ملف تعريفي موجود — يلزم التحقق من الصفة" : (isUpdate ? "طلب تعديل على ملف منشور — النسخة المنشورة ما زالت ظاهرة" : "طلب جديد أو إعادة إرسال")) + '</span>' +
+        (catalogEntry ? '<div class="admin-claim-warning"><p><strong>تنبيه مراجعة:</strong> اسم الشركة يطابق ملفًا تعريفيًا موجودًا في صفحة الشركات. لا تعتمد الطلب قبل التواصل مع الشركة على رقمها المنشور والتحقق من أن مقدم الطلب ممثل مفوض عنها.</p><p><strong>رقم الشركة المنشور للتحقق:</strong> ' + esc(officialCatalogPhone || "لا يوجد رقم مسجل") + '</p>' + (catalogEntry.profile_url ? '<p>' + linkHtml(new URL(catalogEntry.profile_url, location.href).href, "فتح الملف التعريفي الحالي") + '</p>' : '') + '</div>' : '') +
         '<h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p>' +
         '<p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + (c.address ? ' — <strong>العنوان:</strong> ' + esc(c.address) : '') + '</p>' +
         '<p><strong>الهاتف:</strong> ' + esc(c.phone) + (c.whatsapp ? ' — <strong>واتساب:</strong> ' + esc(c.whatsapp) : '') + '</p>' +
@@ -417,7 +430,9 @@ document.addEventListener("DOMContentLoaded", () => {
       notes = window.prompt("اكتب البيانات أو التعديلات المطلوبة من الشركة:");
       if (notes === null) return;
       if (notes.trim().length < 3) { setStatus("اكتب تفاصيل واضحة لاستكمال البيانات."); return; }
-    } else if (!window.confirm(card.dataset.companyKind === "update" ? "اعتماد التعديلات وتحديث النسخة العامة لملف الشركة؟" : "اعتماد ملف الشركة ونشره في دليل أسيوط عقار؟")) return;
+    } else if (!window.confirm(card.dataset.companyKind === "claim"
+      ? "هذا الطلب يطابق ملفًا تعريفيًا موجودًا. قبل الاعتماد، اتصل برقم الشركة المنشور (" + (card.dataset.companyOfficialPhone || "راجع بيانات الملف") + ") وتأكد من صفة مقدم الطلب. هل تم التحقق من التفويض؟"
+      : (card.dataset.companyKind === "update" ? "اعتماد التعديلات وتحديث النسخة العامة لملف الشركة؟" : "اعتماد ملف الشركة ونشره في دليل أسيوط عقار؟"))) return;
     button.disabled = true;
     try {
       // All new-company and published-profile decisions use the same admin-only database RPC.

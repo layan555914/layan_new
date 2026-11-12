@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "companies": [
+    {
+      "id": "albenaa-arabi-star",
+      "company_name": "البناء العربي استار",
+      "category": "مقاولات وتشطيبات",
+      "description": "أعمال البناء والإنشاءات والتشطيبات بمختلف المستويات، مع إتاحة التقسيط بدون فوائد وفق شروط الاتفاق مع الشركة.",
+      "services": [
+        "أعمال البناء والإنشاءات",
+        "التشطيبات بمختلف المستويات",
+        "تنفيذ الأعمال بالمراكز والقرى",
+        "أنظمة التقسيط وفق شروط الشركة"
+      ],
+      "city": "أسيوط",
+      "profile_url": "./company-albenaa-arabi-star.html",
+      "profile_kind": "introductory",
+      "source_note": "بيانات تعريفية قدمها ممثل الشركة إلى أسيوط عقار؛ وليست تزكية مستقلة من المنصة.",
+      "logo_url": "./assets/companies/albenaa-arabi-star.webp",
+      "address": "شارع يسري راغب، خلف بنك فيصل الإسلامي",
+      "phone": "01012588382",
+      "whatsapp": "01012588382",
+      "slug": "albenaa-arabi-star",
+      "verification_status": "بيانات مقدمة من ممثل الشركة"
+    }
+  ]
+}

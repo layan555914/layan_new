@@ -48,7 +48,19 @@ test("company directory continues to render approved profiles from the public vi
   await mockApprovedCompanyView(page);
   await page.goto("/companies.html");
 
-  await expect(page.locator("#companyDirectoryGrid .company-directory-card")).toHaveCount(1);
+  await expect(page.locator("#companyDirectoryGrid .company-directory-card")).toHaveCount(2);
   await expect(page.locator("#companyDirectoryGrid")).toContainText(approvedCompany.company_name);
-  await expect(page.locator("#companyDirectoryCount")).toContainText("1 شركة معتمدة");
+  await expect(page.locator("#companyDirectoryGrid")).toContainText("البناء العربي استار");
+  const seededCard = page.locator("#companyDirectoryGrid a[href='./company-albenaa-arabi-star.html']");
+  await expect(seededCard).toBeVisible();
+  await expect(seededCard.locator("img")).toHaveAttribute("src", "./assets/companies/albenaa-arabi-star.webp");
+  await expect(seededCard).toContainText("ملف تعريفي");
+  await expect(page.locator("#companyDirectoryCount")).toContainText("2 شركة / ملف تعريفي");
+});
+
+test("curated company profile offers a free claim request", async ({ page }) => {
+  await page.goto("/company-albenaa-arabi-star.html");
+  await expect(page.locator(".company-claim-cta")).toContainText("مجانا");
+  await expect(page.locator(".company-claim-cta a"))
+    .toHaveAttribute("href", "./companies.html?claim=albenaa-arabi-star");
 });
