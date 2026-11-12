@@ -262,6 +262,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       root.innerHTML = '<p class="company-directory-state">الصفحة غير متاحة أو تم إخفاؤها للمراجعة.</p>';
       return;
     }
+    profileCard();
     if (entry.claim_status === "unclaimed") {
       const current = auth?.getSession?.();
       if (current?.user?.id) {
