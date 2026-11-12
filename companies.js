@@ -7,9 +7,44 @@ function session(){return window.LAYAN_SUPABASE?.getSession?.()||null}
 async function verifiedSession(){const auth=window.LAYAN_SUPABASE;if(!auth?.requireAuthenticated)throw Error("تعذر تحميل نظام تسجيل الدخول. حدّث الصفحة وحاول مرة أخرى.");return await auth.requireAuthenticated()}
 async function api(path,options={}){if(!base||!key)throw Error("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");const s=session();const r=await fetch(base+"/rest/v1/"+path,{...options,headers:{apikey:key,Authorization:"Bearer "+(s?.access_token||key),"Content-Type":"application/json",...(options.headers||{})}});const raw=await r.text();let d=null;try{d=raw?JSON.parse(raw):null}catch(_){}if(!r.ok)throw Error(d?.message||d?.details||"تعذر تنفيذ الطلب.");return d}
 let companies=[],existingProfileId=null,existingStatus=null,supportsDraft=false,submissionSaved=false,profileLookupComplete=false;
+let showcaseCompanies=[];
 function card(c){const logo=safeUrl(c.logo_url);const href="./company.html?id="+encodeURIComponent(c.id);const services=Array.isArray(c.services)?c.services.slice(0,3):[];return '<article class="company-directory-card"><a href="'+href+'"><div class="company-card-cover">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="lazy">':esc(c.company_name.slice(0,1)))+'</div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a></article>'}
-function render(){const q=($("companyDirectorySearch")?.value||"").trim().toLocaleLowerCase("ar");const cat=$("companyCategoryFilter")?.value||"";const found=companies.filter(c=>(!cat||c.category===cat)&&(!q||[c.company_name,c.description,c.city,c.category,...(c.services||[])].join(" ").toLocaleLowerCase("ar").includes(q)));grid.innerHTML=found.length?found.map(card).join(""):'<p class="company-directory-state">لا توجد شركات معتمدة تطابق البحث حاليًا.</p>';count.textContent=found.length+" شركة معتمدة"}
-async function load(){try{companies=await api("company_profiles_public?select=id,company_name,category,description,services,city,logo_url&order=company_name.asc")||[];render()}catch(e){grid.innerHTML='<p class="company-directory-state">تعذر تحميل دليل الشركات الآن. حاول تحديث الصفحة لاحقًا.</p>';count.textContent="تعذر التحميل";console.warn(e)}}
+function showcaseCard(c){
+ const customPath=typeof c.profile_path==="string"&&/^\.\/[a-z0-9-]+\.html$/i.test(c.profile_path)?c.profile_path:"";
+ const href=customPath||"./company.html?showcase="+encodeURIComponent(c.slug);
+ const monogram=String(c.monogram||c.name?.slice(0,2)||"ش").slice(0,5);
+ const services=Array.isArray(c.services)?c.services.slice(0,3):[];
+ const phone=String(c.phone||"").replace(/[^+0-9]/g,"");
+ return '<article class="company-directory-card company-showcase-card"><a class="company-showcase-main-link" href="'+esc(href)+'"><div class="company-card-cover company-showcase-cover"><span class="company-showcase-monogram">'+esc(monogram)+'</span><span class="company-showcase-status">ملف تعريفي أولي</span></div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a><div class="company-showcase-card-actions"><a href="'+esc(href)+'">عرض الملف</a>'+(phone?'<a href="tel:'+esc(phone)+'">اتصال '+esc(c.phone)+'</a>':"")+'</div></article>';
+}
+function normalizeName(v){return String(v||"").trim().toLocaleLowerCase("ar").replace(/[\s\-–—_]+/g," ")}
+
+function render(){
+ const q=($("companyDirectorySearch")?.value||"").trim().toLocaleLowerCase("ar");
+ const cat=$("companyCategoryFilter")?.value||"";
+ const matches=(c,nameField)=>{const services=Array.isArray(c.services)?c.services:[];const text=[c[nameField],c.description,c.city,c.category,c.kind,...services].join(" ").toLocaleLowerCase("ar");return (!cat||c.category===cat)&&(!q||text.includes(q))};
+ const curated=showcaseCompanies.filter(c=>matches(c,"name"));
+ const curatedNames=new Set(showcaseCompanies.map(c=>normalizeName(c.name)));
+ const approved=companies.filter(c=>!curatedNames.has(normalizeName(c.company_name))&&matches(c,"company_name"));
+ const cards=[...curated.map(showcaseCard),...approved.map(card)];
+ grid.innerHTML=cards.length?cards.join(""):'<p class="company-directory-state">لا توجد شركات أو أنشطة تطابق البحث الحالي.</p>';
+ count.textContent=(curated.length+approved.length)+" شركة ونشاط";
+}
+async function load(){
+ const [showcaseResult,approvedResult]=await Promise.allSettled([
+  fetch("./companies-showcase.json?v=20261113-1",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("تعذر تحميل قائمة الشركات");return r.json()}),
+  api("company_profiles_public?select=id,company_name,category,description,services,city,logo_url&order=company_name.asc")
+ ]);
+ if(showcaseResult.status==="fulfilled"&&Array.isArray(showcaseResult.value?.companies))showcaseCompanies=showcaseResult.value.companies;
+ else console.warn("Company showcase data:",showcaseResult.reason);
+ if(approvedResult.status==="fulfilled")companies=approvedResult.value||[];
+ else console.warn("Approved company profiles:",approvedResult.reason);
+ render();
+ if(!showcaseCompanies.length&&approvedResult.status==="rejected"){
+  grid.innerHTML='<p class="company-directory-state">تعذر تحميل الشركات الآن. حاول تحديث الصفحة لاحقًا.</p>';
+  count.textContent="تعذر التحميل";
+ }
+}
 
 async function loadMyProfile(){
  profileLookupComplete=false;existingProfileId=null;existingStatus=null;supportsDraft=false;
