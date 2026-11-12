@@ -3,7 +3,7 @@
 
 create table if not exists public.company_directory_entries (
   id uuid primary key default gen_random_uuid(),
-  slug text not null unique check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'),
+  slug text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
   company_name text not null check (char_length(btrim(company_name)) between 2 and 160),
   category text not null check (char_length(btrim(category)) between 2 and 140),
   description text not null default '',
