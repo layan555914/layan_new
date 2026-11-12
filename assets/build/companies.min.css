@@ -4,3 +4,8 @@
 .company-profile-label{display:inline-flex;align-items:center;padding:3px 8px;border:1px solid #e7cebc;border-radius:999px;background:#fbf3ec;color:#8b5231;font-size:11px;font-weight:800}.company-directory-card.is-curated{border-color:#e8d6c6}.company-directory-open{display:inline-flex;align-items:center;gap:6px;margin-top:12px;color:#985a36;font-size:12px;font-weight:800}.company-directory-card>a:focus-visible{outline:3px solid #c98a64;outline-offset:3px;border-radius:16px}
 
 .company-directory-card.is-curated .company-card-cover{background:#fff;padding:18px}.company-directory-card.is-curated .company-card-cover img{object-fit:contain}
+
+.company-claim-cta{border-color:#e3c5a7;background:linear-gradient(135deg,#fffaf4,#f8eee4)}
+.company-claim-cta p{margin:0 0 14px;color:#5a4639;line-height:1.9}
+.company-claim-cta a{display:inline-flex;align-items:center;justify-content:center;padding:11px 18px;border:1px solid #b87951;border-radius:11px;background:#c98a64;color:#2b211b;font-weight:800;text-decoration:none;transition:filter .18s ease}
+.company-claim-cta a:hover{filter:brightness(.96)}
