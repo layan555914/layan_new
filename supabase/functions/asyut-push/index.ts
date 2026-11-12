@@ -1,7 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2.118.0";
 import webpush from "npm:web-push@3.6.7";
 
-const allowedOrigins = new Set(["https://layan-eg.com", "https://www.layan-eg.com"]);
+const allowedOrigins = new Set(["https://asyutq.com", "https://www.asyutq.com", "https://layan-eg.com", "https://www.layan-eg.com"]);
 const json = (body: unknown, status = 200, origin: string | null = null) => new Response(JSON.stringify(body), {
   status,
   headers: {
@@ -59,7 +59,7 @@ Deno.serve(async (req: Request) => {
         id: 1,
         public_key: keys.publicKey,
         private_key: keys.privateKey,
-        subject: "https://layan-eg.com/",
+        subject: "https://www.asyutq.com/",
         updated_at: new Date().toISOString(),
       };
       const { data: created, error: insertError } = await adminClient.from("buyer_push_vapid_config").insert(fresh).select("*").single();
@@ -90,23 +90,43 @@ Deno.serve(async (req: Request) => {
     if (offerError || !offer) return json({ error: "الإعلان غير منشور أو غير متاح." }, 404, origin);
 
     const { data: preferences, error: preferenceError } = await adminClient.from("buyer_preferences")
-      .select("owner_id,property_type,city,area,max_total_price,max_upfront,max_monthly_installment,min_bedrooms,notifications_enabled")
-      .eq("notifications_enabled", true);
+      .select("owner_id,property_type,city,area,max_total_price,max_upfront,max_monthly_installment,min_bedrooms,notifications_enabled,all_notifications_enabled")
+      .or("notifications_enabled.eq.true,all_notifications_enabled.eq.true");
     if (preferenceError) throw preferenceError;
-    const matchedUsers = (preferences || []).filter((p: any) => {
-      if (p.property_type !== "أي نوع" && p.property_type !== offer.property_type) return false;
-      if (p.city && normalize(p.city) !== normalize(offer.city)) return false;
-      if (p.area && !normalize(offer.area).includes(normalize(p.area))) return false;
-      if (Number(p.max_total_price || 0) > 0 && Number(offer.total_price || 0) > Number(p.max_total_price)) return false;
-      const upfront = Number(offer.paid_amount || 0) + Number(offer.assignment_fee || 0);
-      if (Number(p.max_upfront || 0) > 0 && upfront > Number(p.max_upfront)) return false;
-      const monthly = Number(offer.monthly_installment || 0);
-      if (Number(p.max_monthly_installment || 0) > 0 && monthly > 0 && monthly > Number(p.max_monthly_installment)) return false;
-      if (Number(p.min_bedrooms || 0) > 0 && Number(offer.bedrooms || 0) < Number(p.min_bedrooms)) return false;
-      return true;
-    });
-    const userIds = [...new Set(matchedUsers.map((p: any) => p.owner_id).filter(Boolean))];
-    if (!userIds.length) return json({ matchedUsers: 0, alertsCreated: 0, sent: 0, failed: 0 }, 200, origin);
+
+    const allUserIds = new Set<string>();
+    const matchedUserIds = new Set<string>();
+    const recipientModes = new Map<string, { all: boolean; matched: boolean }>();
+    const upfront = Number(offer.paid_amount || 0) + Number(offer.assignment_fee || 0);
+    const monthly = Number(offer.monthly_installment || 0);
+
+    for (const preference of preferences || []) {
+      const allEnabled = preference.all_notifications_enabled === true;
+      const typeMatches = preference.property_type === "أي نوع" || preference.property_type === offer.property_type;
+      const cityMatches = !preference.city || normalize(preference.city) === normalize(offer.city);
+      const areaMatches = !preference.area || normalize(offer.area).includes(normalize(preference.area));
+      const totalPriceMatches = Number(preference.max_total_price || 0) <= 0 || Number(offer.total_price || 0) <= Number(preference.max_total_price);
+      const upfrontMatches = Number(preference.max_upfront || 0) <= 0 || upfront <= Number(preference.max_upfront);
+      const monthlyMatches = Number(preference.max_monthly_installment || 0) <= 0 || monthly <= 0 || monthly <= Number(preference.max_monthly_installment);
+      const bedroomsMatch = Number(preference.min_bedrooms || 0) <= 0 || Number(offer.bedrooms || 0) >= Number(preference.min_bedrooms);
+      const matchedEnabled = preference.notifications_enabled === true &&
+        typeMatches && cityMatches && areaMatches && totalPriceMatches && upfrontMatches && monthlyMatches && bedroomsMatch;
+
+      if (allEnabled) allUserIds.add(preference.owner_id);
+      if (matchedEnabled) matchedUserIds.add(preference.owner_id);
+      if (!allEnabled && !matchedEnabled) continue;
+
+      const previous = recipientModes.get(preference.owner_id) || { all: false, matched: false };
+      recipientModes.set(preference.owner_id, {
+        all: previous.all || allEnabled,
+        matched: previous.matched || matchedEnabled,
+      });
+    }
+
+    const userIds = [...recipientModes.keys()];
+    if (!userIds.length) {
+      return json({ allUsers: 0, matchedUsers: 0, notifiedUsers: 0, alertsCreated: 0, sent: 0, failed: 0 }, 200, origin);
+    }
 
     const alertRows = userIds.map(userId => ({
       user_id: userId,
@@ -121,25 +141,26 @@ Deno.serve(async (req: Request) => {
       .select("user_id,offer_id");
     if (alertError) throw alertError;
     const newUserIds = [...new Set((newlyInserted || []).map((row: any) => row.user_id))];
-    if (!newUserIds.length) return json({ matchedUsers: userIds.length, alertsCreated: 0, sent: 0, failed: 0 }, 200, origin);
+    if (!newUserIds.length) return json({ allUsers: allUserIds.size, matchedUsers: matchedUserIds.size, notifiedUsers: userIds.length, alertsCreated: 0, sent: 0, failed: 0 }, 200, origin);
 
     const { data: subscriptions, error: subscriptionError } = await adminClient.from("buyer_push_subscriptions")
       .select("id,user_id,endpoint,p256dh,auth")
       .in("user_id", newUserIds);
     if (subscriptionError) throw subscriptionError;
     const config = await loadVapidConfig();
-    webpush.setVapidDetails(config.subject || "https://layan-eg.com/", config.public_key, config.private_key);
-    const payload = JSON.stringify({
-      title: "أسيوط عقار: عرض جديد يناسبك",
-      body: String(offer.title || "ظهر عقار جديد يناسب طلبك"),
-      url: "/?offer=" + encodeURIComponent(String(offer.id)),
-      tag: "asyut-aqar-offer-" + String(offer.id),
-      icon: "https://layan-eg.com/icon.svg",
-    });
+    webpush.setVapidDetails(config.subject || "https://www.asyutq.com/", config.public_key, config.private_key);
     let sent = 0, failed = 0;
     for (const subscription of subscriptions || []) {
       try {
         if (!allowedPushEndpoint(subscription.endpoint)) { await adminClient.from("buyer_push_subscriptions").delete().eq("id", subscription.id); failed++; continue; }
+        const mode = recipientModes.get(subscription.user_id);
+        const payload = JSON.stringify({
+          title: mode?.all ? "إعلان جديد على أسيوط عقار" : "عرض جديد يناسب طلبك",
+          body: String(offer.title || "تم نشر إعلان عقاري جديد."),
+          url: "/?offer=" + encodeURIComponent(String(offer.id)),
+          tag: "asyut-aqar-offer-" + String(offer.id),
+          icon: "https://www.asyutq.com/icon.svg",
+        });
         await webpush.sendNotification({
           endpoint: subscription.endpoint,
           keys: { p256dh: subscription.p256dh, auth: subscription.auth },
@@ -158,7 +179,7 @@ Deno.serve(async (req: Request) => {
         }
       }
     }
-    return json({ matchedUsers: userIds.length, alertsCreated: newlyInserted?.length || 0, subscriptions: subscriptions?.length || 0, sent, failed }, 200, origin);
+    return json({ allUsers: allUserIds.size, matchedUsers: matchedUserIds.size, notifiedUsers: userIds.length, alertsCreated: newlyInserted?.length || 0, subscriptions: subscriptions?.length || 0, sent, failed }, 200, origin);
   } catch (error) {
     console.error("asyut-push error:", error);
     return json({ error: "تعذر إكمال إعداد أو إرسال إشعارات العروض." }, 500, origin);

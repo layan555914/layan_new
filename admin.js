@@ -458,7 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           const pushData = await pushResponse.json().catch(() => ({}));
           if (pushResponse.ok) {
-            pushStatus = pushData.sent > 0 ? " تم إرسال تنبيه إلى " + pushData.sent + " جهاز." : " تم حفظ التنبيه للمشترين المطابقين؛ لا توجد أجهزة مفعّلة حاليًا.";
+            pushStatus = pushData.sent > 0 ? " تم إرسال تنبيه إلى " + pushData.sent + " جهاز." : " تم حفظ التنبيهات للمشتركين؛ لا توجد أجهزة هاتف مفعّلة حاليًا.";
           } else {
             console.warn("Push notification dispatch failed:", pushData.error || pushResponse.status);
             pushStatus = " تعذر إرسال إشعارات الهاتف، لكن تم نشر الإعلان بنجاح.";
