@@ -51,6 +51,9 @@ test("company directory continues to render approved profiles from the public vi
   await expect(page.locator("#companyDirectoryGrid .company-directory-card")).toHaveCount(2);
   await expect(page.locator("#companyDirectoryGrid")).toContainText(approvedCompany.company_name);
   await expect(page.locator("#companyDirectoryGrid")).toContainText("البناء العربي استار");
-  await expect(page.locator("#companyDirectoryGrid a[href='./company-albenaa-arabi-star.html']")).toBeVisible();
+  const seededCard = page.locator("#companyDirectoryGrid a[href='./company-albenaa-arabi-star.html']");
+  await expect(seededCard).toBeVisible();
+  await expect(seededCard.locator("img")).toHaveAttribute("src", "./assets/companies/albenaa-arabi-star.webp");
+  await expect(seededCard).toContainText("ملف تعريفي");
   await expect(page.locator("#companyDirectoryCount")).toContainText("2 شركة / ملف تعريفي");
 });
