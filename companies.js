@@ -10,7 +10,7 @@ let companies=[],existingProfileId=null,existingStatus=null,supportsDraft=false,
 let showcaseCompanies=[];
 function card(c){const logo=safeUrl(c.logo_url);const href="./company.html?id="+encodeURIComponent(c.id);const services=Array.isArray(c.services)?c.services.slice(0,3):[];return '<article class="company-directory-card"><a href="'+href+'"><div class="company-card-cover">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="lazy">':esc(c.company_name.slice(0,1)))+'</div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a></article>'}
 function showcaseCard(c){
- const customPath=typeof c.profile_path==="string"&&/^\.\//[a-z0-9-]+\.html$/i.test(c.profile_path)?c.profile_path:"";
+ const customPath=typeof c.profile_path==="string"&&/^\.\/[a-z0-9-]+\.html$/i.test(c.profile_path)?c.profile_path:"";
  const href=customPath||"./company.html?showcase="+encodeURIComponent(c.slug);
  const monogram=String(c.monogram||c.name?.slice(0,2)||"ش").slice(0,5);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
