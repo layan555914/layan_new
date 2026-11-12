@@ -68,3 +68,11 @@
  .company-showcase-profile-hero{padding:20px}
  .company-showcase-flags{justify-content:center}
 }
+.claim-owner-block{margin-top:22px;padding:20px;border:1px solid var(--aa-line,#E6DACB);border-inline-start:4px solid var(--aa-copper,#C98A64);border-radius:14px;background:var(--aa-cream,#FFF8F0)}
+.claim-owner-block h2{margin:0 0 8px;color:var(--aa-espresso,#2B211B)}
+.claim-owner-block p{margin:0 0 14px;color:var(--aa-muted,#6B5D52);font-size:13px}
+.claim-owner-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:10px;background:var(--aa-terracotta,#A4472A);color:var(--aa-cream,#FFF8F0);font-weight:800;text-decoration:none}
+.company-showcase-card-actions{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 16px}
+.company-showcase-card-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 12px;border:1px solid var(--aa-line,#E6DACB);border-radius:9px;color:var(--aa-espresso,#2B211B);font-size:12px;font-weight:700}
+.company-showcase-card-actions a:first-child{border-color:var(--aa-terracotta,#A4472A);background:var(--aa-terracotta,#A4472A);color:var(--aa-cream,#FFF8F0)}
+.company-showcase-card-actions a:hover{background:var(--aa-sand,#F3ECE1)}
