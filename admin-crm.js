@@ -368,7 +368,12 @@
       ["assigned_to_email","مسؤول المتابعة"],["next_follow_up_at","موعد المتابعة"],
       ["last_contact_at","آخر تواصل"],["notes","ملاحظات داخلية"]
     ];
-    const quote = value => '"' + String(value ?? "").replace(/"/g, '""') + '"';
+    const quote = value => {
+      let text = String(value ?? "");
+      // Third-party names/notes must stay data when opened in Excel or another spreadsheet.
+      if (/^[\\u0000-\\u0020]*[=+\\-@]/.test(text)) text = "'" + text;
+      return '"' + text.replace(/"/g, '""') + '"';
+    };
     const csv = "\uFEFF" + [
       columns.map(([, label]) => quote(label)).join(","),
       ...leads.map(row => columns.map(([key]) =>
