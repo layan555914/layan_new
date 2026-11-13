@@ -371,7 +371,7 @@
     const quote = value => {
       let text = String(value ?? "");
       // Third-party names/notes must stay data when opened in Excel or another spreadsheet.
-      if (/^[\\u0000-\\u0020]*[=+\\-@]/.test(text)) text = "'" + text;
+      if (/^[\x00-\x20]*[=+\-@]/.test(text)) text = "'" + text;
       return '"' + text.replace(/"/g, '""') + '"';
     };
     const csv = "\uFEFF" + [
