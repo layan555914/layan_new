@@ -14,8 +14,12 @@ function showcaseCard(c){
  const href=customPath||"./company.html?showcase="+encodeURIComponent(c.slug);
  const monogram=String(c.monogram||c.name?.slice(0,2)||"ش").slice(0,5);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
- const phone=String(c.phone||"").replace(/[^+0-9]/g,"");
- return '<article class="company-directory-card company-showcase-card"><a class="company-showcase-main-link" href="'+esc(href)+'"><div class="company-card-cover company-showcase-cover"><span class="company-showcase-monogram">'+esc(monogram)+'</span><span class="company-showcase-status">ملف تعريفي أولي</span></div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a><div class="company-showcase-card-actions"><a href="'+esc(href)+'">عرض الملف</a>'+(phone?'<a href="tel:'+esc(phone)+'">اتصال '+esc(c.phone)+'</a>':"")+'</div></article>';
+ const pending=c.verification_status==="needs_confirmation";
+ const phone=!pending?String(c.phone||"").replace(/[^+0-9]/g,""):"";
+ const state=String(c.verification_status||"directory_match");
+ const label=String(c.verification_label||"ملف تعريفي أولي");
+ const contact=phone?'<a href="tel:'+esc(phone)+'">'+esc(c.contact_label||"اتصال")+' '+esc(c.phone)+'</a>':'<span class="company-showcase-contact-pending">'+(pending?"بيانات الاتصال قيد التحقق":"لا يوجد رقم اتصال منشور")+'</span>';
+ return '<article class="company-directory-card company-showcase-card"><a class="company-showcase-main-link" href="'+esc(href)+'"><div class="company-card-cover company-showcase-cover"><span class="company-showcase-monogram">'+esc(monogram)+'</span><span class="company-showcase-status" data-state="'+esc(state)+'">'+esc(label)+'</span></div><div class="company-directory-card-body"><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div></div></a><div class="company-showcase-card-actions"><a href="'+esc(href)+'">عرض الملف</a>'+contact+'</div></article>';
 }
 function normalizeName(v){return String(v||"").trim().toLocaleLowerCase("ar").replace(/[\s\-–—_]+/g," ")}
 
@@ -32,7 +36,7 @@ function render(){
 }
 async function load(){
  const [showcaseResult,approvedResult]=await Promise.allSettled([
-  fetch("./companies-showcase.json?v=20261113-1",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("تعذر تحميل قائمة الشركات");return r.json()}),
+  fetch("./companies-showcase.json?v=20261113-2",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("تعذر تحميل قائمة الشركات");return r.json()}),
   api("company_profiles_public?select=id,company_name,category,description,services,city,logo_url&order=company_name.asc")
  ]);
  if(showcaseResult.status==="fulfilled"&&Array.isArray(showcaseResult.value?.companies))showcaseCompanies=showcaseResult.value.companies;
