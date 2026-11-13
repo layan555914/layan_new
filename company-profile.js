@@ -3,13 +3,16 @@ const params=new URLSearchParams(location.search),showcaseSlug=params.get("showc
 if(showcaseSlug){
  try{
   if(!/^[a-z0-9-]{2,100}$/i.test(showcaseSlug))throw Error("رابط ملف الشركة غير صحيح.");
-  const response=await fetch("./companies-showcase.json?v=20261113-1",{cache:"no-cache"});
+  const response=await fetch("./companies-showcase.json?v=20261113-2",{cache:"no-cache"});
   if(!response.ok)throw Error("تعذر تحميل ملفات الشركات.");
   const data=await response.json();
   const c=(Array.isArray(data.companies)?data.companies:[]).find(item=>item.slug===showcaseSlug);
   if(!c){root.innerHTML='<p class="company-directory-state">ملف الشركة غير متاح حاليًا.</p>';return}
-  const phoneList=(Array.isArray(c.phones)?c.phones:(c.phone?[c.phone]:[])).map(value=>String(value||"").replace(/[^+0-9]/g,"")).filter(Boolean);const phone=phoneList[0]||"";
-  const website=safe(c.website),map=safe(c.map_url),source=safe(c.source_url);
+  const contactNeedsConfirmation=c.verification_status==="needs_confirmation";
+  const phoneList=(contactNeedsConfirmation?[]:(Array.isArray(c.phones)?c.phones:(c.phone?[c.phone]:[]))).map(value=>String(value||"").replace(/[^+0-9]/g,"")).filter(Boolean);const phone=phoneList[0]||"";
+  const website=safe(c.website),map=contactNeedsConfirmation?"":safe(c.map_url),source=safe(c.source_url);
+  const verificationLabel=String(c.verification_label||"ملف تعريفي أولي");
+  const verificationState=String(c.verification_status||"directory_match");
   const services=Array.isArray(c.services)?c.services:[];
   const adminNumber=String(data.adminWhatsapp||"").replace(/\D/g,"");
   const claimText="مرحبًا، أنا أمثل شركة "+c.name+" وأرغب في طلب إدارة الصفحة التعريفية للشركة على منصة أسيوط عقار. أرجو توضيح خطوات التحقق وتفعيل إدارة الملف.";
@@ -22,15 +25,15 @@ if(showcaseSlug){
   const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=profileUrl.href;
   let schema=document.getElementById("companyStructuredData");
   if(!schema){schema=document.createElement("script");schema.id="companyStructuredData";schema.type="application/ld+json";document.head.appendChild(schema);}
-  schema.textContent=JSON.stringify({"@context":"https://schema.org","@type":"Organization","name":c.name,"description":c.description||undefined,"url":profileUrl.href,"telephone":c.phone||undefined,"address":c.address?{"@type":"PostalAddress","streetAddress":c.address,"addressLocality":c.city||"أسيوط","addressCountry":"EG"}:{"@type":"PostalAddress","addressLocality":c.city||"أسيوط","addressCountry":"EG"}});
+  schema.textContent=JSON.stringify({"@context":"https://schema.org","@type":"Organization","name":c.name,"description":c.description||undefined,"url":profileUrl.href,"telephone":(!contactNeedsConfirmation&&c.phone)?c.phone:undefined,"address":(!contactNeedsConfirmation&&c.address)?{"@type":"PostalAddress","streetAddress":c.address,"addressLocality":c.city||"أسيوط","addressCountry":"EG"}:{"@type":"PostalAddress","addressLocality":c.city||"أسيوط","addressCountry":"EG"}});
   root.innerHTML=
    '<section class="company-profile-hero company-showcase-profile-hero">'+
     '<div class="company-profile-logo company-showcase-profile-logo"><span>'+esc(c.monogram||String(c.name||"ش").slice(0,2))+'</span></div>'+
     '<div><span class="eyebrow">'+esc(c.kind||c.category||"شركة")+'</span>'+
     '<h1>'+esc(c.name)+'</h1><p>'+esc(c.description||"")+'</p>'+
-    '<div class="company-showcase-flags"><span>ملف تعريفي أولي</span><span>متاح مجانًا للتحديث من ممثل الشركة بعد التحقق</span></div>'+
+    '<div class="company-showcase-flags"><span data-state="'+esc(verificationState)+'">'+esc(verificationLabel)+'</span><span>'+(contactNeedsConfirmation?"بيانات الاتصال مخفية مؤقتًا لحين التأكيد":"يمكن لممثل الشركة طلب إدارة الملف مجانًا بعد التحقق")+'</span></div>'+
     '<div class="company-contact-actions">'+
-     phoneList.map((value,index)=>'<a class="company-contact-primary" href="tel:'+esc(value)+'">'+(index===0?"اتصال ":"رقم إضافي ")+esc(value)+'</a>').join("")+
+     (phoneList.length?phoneList.map((value,index)=>'<a class="company-contact-primary" href="tel:'+esc(value)+'">'+(index===0?esc(c.contact_label||"اتصال")+" ":"رقم إضافي ")+esc(value)+'</a>').join(""):(contactNeedsConfirmation?'<span class="company-data-pending">بيانات الاتصال قيد التحقق، لذلك لا نعرض رقمًا غير محسوم.</span>':""))+
      (website?'<a class="company-contact-secondary" href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">الموقع الرسمي</a>':"")+
      (map?'<a class="company-contact-secondary" href="'+esc(map)+'" target="_blank" rel="noopener noreferrer">عرض الموقع على الخريطة</a>':"")+
     '</div></div></section>'+
