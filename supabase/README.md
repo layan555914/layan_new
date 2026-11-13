@@ -6,13 +6,14 @@ This branch tests whether a new empty local Supabase database can build the curr
 
 ## Migration chain
 
-The clean-install chain contains 23 active SQL migrations:
+The clean-install chain contains 24 active SQL migrations:
 
 1. 20261103140155_asyut_aqar_production_schema_baseline.sql — catalog-derived application schema snapshot captured on 2026-11-03.
 2. 20261103140655_seed_asyut_aqar_marketplace_categories.sql — 11 stable marketplace categories.
 3. 20261103141537_directory_admin_mutate_with_audit.sql — directory administration RPC.
 4. The 18 SQL files currently present on main, dated 2026-11-04 through 2026-11-12.
 5. 20261113165309_serialize_company_claim_approvals_by_entity.sql and 20261113172533_company_claim_feature_schema_reconciliation.sql — company representative claim locking and clean-install schema reconciliation.
+6. 20261113231500_admin_crm_internal_leads.sql — private prospective advertiser/sponsor CRM tables, role-checked RPCs, follow-up fields and activity history.
 
 The baseline is a squashed schema snapshot, not a recreation of the original 59 pre-November-3 migration bodies. Those old DDL changes are represented by the baseline snapshot. No empty no-op migration markers are added to this build chain.
 
@@ -21,7 +22,7 @@ The baseline is a squashed schema snapshot, not a recreation of the original 59 
 - Application-owned tables, columns, constraints, indexes, views, functions, triggers, RLS and grants from the November 3 catalog snapshot.
 - Incremental admin, directory, owner approval, advertiser logo, sponsor, buyer notification and company-claim schema changes after November 3.
 - A separate local-only Storage bootstrap for two ASYUT AQAR buckets and six object policies.
-- Local API tests for Auth, owner isolation, directory admin RPC atomicity and Storage RLS.
+- Local API tests for Auth, owner isolation, directory admin RPC atomicity, Storage RLS, and the internal CRM's anonymous/user/supervisor/owner boundaries.
 
 ## What is deliberately not included
 
@@ -52,5 +53,6 @@ The script creates an isolated temporary project, clears hosted Supabase access 
 - No hosted Supabase project ref, production password, API key or secret is configured in this branch.
 - The script uses explicit --local CLI operations and refuses non-loopback endpoints in its API test program.
 - It does not run supabase db push, migration repair, linked reset, or any production command.
-- The 23-migration chain is for clean-install reproducibility only. It does not rewrite or reconcile the production migration ledger.
+- The 24-migration chain is for clean-install reproducibility only. It does not rewrite or reconcile the production migration ledger.
+- The CRM migration and API checks are part of the local rehearsal only; production adoption requires a separate migration-ledger reconciliation and explicit owner approval.
 - No merge, production deployment, or live database change is part of this rehearsal.
