@@ -54,5 +54,8 @@ The script creates an isolated temporary project, clears hosted Supabase access 
 - The script uses explicit --local CLI operations and refuses non-loopback endpoints in its API test program.
 - It does not run supabase db push, migration repair, linked reset, or any production command.
 - The 24-migration chain is for clean-install reproducibility only. It does not rewrite or reconcile the production migration ledger.
+- CRM phase 1 is limited to real-estate developers, brokerages, real-estate offices, property finance, and related sponsors. Service providers, suppliers, finishing, furniture and other non-real-estate categories are intentionally deferred to phase 2.
+- The CRM API test also verifies that a phase-2 category is rejected by the phase-1 save RPC.
+- CRM CSV export prefixes spreadsheet-formula-looking values as text before quoting cells.
 - The CRM migration and API checks are part of the local rehearsal only; production adoption requires a separate migration-ledger reconciliation and explicit owner approval.
 - No merge, production deployment, or live database change is part of this rehearsal.
