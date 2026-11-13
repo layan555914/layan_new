@@ -76,3 +76,12 @@
 .company-showcase-card-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 12px;border:1px solid var(--aa-line,#E6DACB);border-radius:9px;color:var(--aa-espresso,#2B211B);font-size:12px;font-weight:700}
 .company-showcase-card-actions a:first-child{border-color:var(--aa-terracotta,#A4472A);background:var(--aa-terracotta,#A4472A);color:var(--aa-cream,#FFF8F0)}
 .company-showcase-card-actions a:hover{background:var(--aa-sand,#F3ECE1)}
+
+/* Verification states: distinguish official, directory-listed, project-only and pending records. */
+.company-showcase-status[data-state="needs_confirmation"]{border-color:#d9a5a0;background:#fff4f2;color:#8d302a}
+.company-showcase-status[data-state="directory_match"]{border-color:rgba(201,138,100,.55);background:rgba(43,33,27,.9);color:#fff8f0}
+.company-showcase-status[data-state="official_company"],.company-showcase-status[data-state="official_company_profile"]{border-color:#b6d5c1;background:#eff8f1;color:#245d38}
+.company-showcase-status[data-state="project_only"]{border-color:#d6c5a7;background:#fbf4e6;color:#75552b}
+.company-showcase-status[data-state="company_supplied"]{border-color:#c8b9d9;background:#f6f1fb;color:#60447f}
+.company-showcase-card-actions .company-showcase-contact-pending{display:inline-flex;align-items:center;min-height:36px;padding:7px 10px;border:1px dashed var(--aa-line,#E6DACB);border-radius:9px;color:var(--aa-muted,#6B5D52);font-size:11px;font-weight:700}
+.company-data-pending{display:inline-flex;align-items:center;padding:9px 12px;border:1px dashed #d9a5a0;border-radius:9px;background:#fff4f2;color:#8d302a;font-size:12px;font-weight:700}
