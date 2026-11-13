@@ -6,6 +6,7 @@ CONFIG_FILE="$ROOT_DIR/supabase/config.toml"
 STORAGE_BASELINE_FILE="$ROOT_DIR/supabase/bootstrap/storage-baseline.sql"
 ASSERTIONS_FILE="$ROOT_DIR/tests/db/current-state-schema.assertions.sql"
 STORAGE_API_TEST="$ROOT_DIR/tests/db/storage-api-baseline.mjs"
+CRM_API_TEST="$ROOT_DIR/tests/db/admin-crm-api.mjs"
 TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/asyut-aqar-current-state.XXXXXX")"
 STACK_STARTED=0
 
@@ -17,7 +18,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST"; do
+for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST" "$CRM_API_TEST"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required current-state rehearsal file is missing or empty: $required_file" >&2
     exit 1
@@ -121,6 +122,7 @@ export API_URL ANON_KEY SERVICE_ROLE_KEY
 export DATABASE_URL="$DB_URL"
 export MAILPIT_URL="http://127.0.0.1:54324"
 node "$STORAGE_API_TEST"
+node "$CRM_API_TEST"
 unset MAILPIT_URL DATABASE_URL SERVICE_ROLE_KEY ANON_KEY
 
-echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local Storage/Auth API checks."
+echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local Storage/Auth/CRM API checks."
