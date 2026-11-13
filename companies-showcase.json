@@ -27,7 +27,10 @@
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
       "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "baitk-biedak",
@@ -51,8 +54,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
-      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://egyfinder.net/branches/ar/226118-baitk-biedak",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "el-safa-real-estate",
@@ -77,7 +83,10 @@
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
       "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "tharaa-real-estate",
@@ -101,8 +110,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
-      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://dalil140.com/branches/ar/346981-tharaa-real-estate",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "morshedy-assiut",
@@ -112,11 +124,8 @@
       "kind": "تطوير عقاري – مكتب أسيوط",
       "city": "أسيوط",
       "address": "18 شارع الجمهورية، برج اللؤلؤة الإداري، الدور الثاني، أمام بنك الاتحاد الوطني",
-      "phone": "0882284156",
-      "phones": [
-        "0882284156",
-        "01119979937"
-      ],
+      "phone": "",
+      "phones": [],
       "website": "https://www.morshedy.com/",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D8%B9%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D9%85%D8%B1%D8%B4%D8%AF%D9%8A%20%E2%80%93%20%D9%81%D8%B1%D8%B9%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20Assiut%20Egypt",
       "description": "شركة تطوير عقاري لها فرع مدرج في شارع الجمهورية بمدينة أسيوط.",
@@ -124,10 +133,13 @@
         "التطوير العقاري",
         "استفسارات المشروعات"
       ],
-      "source_type": "local_directory",
-      "source_label": "دليل 140 – دليل أعمال محلي",
-      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_type": "official_branch_list_review",
+      "source_label": "صفحة الفروع الحالية للشركة",
+      "source_url": "https://morshedy-eg.com/pages/الفروع",
+      "source_note": "توجد بيانات قديمة لفرع أسيوط في أدلة أعمال محلية، لكن صفحة الفروع الحالية للشركة لم تؤكد استمرار الفرع. لا تعتمد على العنوان القديم أو تتصل بأرقام قديمة قبل تأكيد الشركة.",
+      "verification_status": "needs_confirmation",
+      "verification_label": "فرع أسيوط قيد التحقق",
+      "verification_note": "العنوان القديم ورقم الفرع واردان في أدلة أعمال محلية، لكن صفحة الفروع الحالية للشركة لا تؤكد وجود فرع أسيوط. أُخفيت بيانات اتصال الفرع مؤقتًا لحين التأكيد."
     },
     {
       "slug": "tiba-land-division",
@@ -152,7 +164,10 @@
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
       "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "themar-real-estate",
@@ -175,8 +190,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
-      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://dalil140.com/company/ar/347012-themar-real-estate",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "road-house",
@@ -200,8 +218,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://dalil140.com/company/ar/346517-road-house",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "mawazin-consulting",
@@ -225,8 +246,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://eg.shewaya.com/listing/موازين-للاستشارات-والعقارات",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "mekka-construction",
@@ -239,7 +263,8 @@
       "phone": "0882053086",
       "phones": [
         "0882053086",
-        "01125444333"
+        "01125444333",
+        "01116262162"
       ],
       "website": "",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D9%83%D8%A9%20%D9%84%D9%84%D8%AA%D8%B4%D9%8A%D9%8A%D8%AF%20%D9%88%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9%20%D8%A7%D9%84%D9%85%D8%B4%D8%B1%D9%88%D8%B9%D8%A7%D8%AA%20Assiut%20Egypt",
@@ -250,8 +275,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://dalil140.com/company/ar/345815-mekka-construction-projects-management",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "el-wasset-contracting",
@@ -275,8 +303,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "abdel-shafy",
@@ -301,7 +332,10 @@
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
       "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "united-real-estate",
@@ -326,7 +360,10 @@
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
       "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "mostaqbal-marketing",
@@ -351,7 +388,10 @@
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
       "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "el-masreya-investment",
@@ -374,9 +414,12 @@
         "التطوير العقاري"
       ],
       "source_type": "local_directory",
-      "source_label": "دليل 140 – دليل أعمال محلي",
-      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_label": "إعلان منشور باسم الشركة + دليل أعمال",
+      "source_url": "https://www.beldo.com/properties/شقتك-عندنا-استلام-فورى-و-تقسيط-على-7-سنوات-465612.html",
+      "source_note": "العنوان والأرضي 0889202002 مدرجان في دليل أعمال؛ ظهر أيضًا إعلان منشور باسم الشركة يتضمن أرقام موبايل إضافية. أبقينا الأرقام المدرجة في الدليل كما هي لحين تأكيد مباشر.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "el-azemy-contracting",
@@ -400,8 +443,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "economic-development-group",
@@ -425,8 +471,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "bait-el-baraka",
@@ -451,7 +500,10 @@
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
       "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "العنوان أو رقم التواصل مدرج في دليل أعمال محلي؛ لم يصدر تأكيد مباشر من الشركة حتى الآن. يُرجى التأكد قبل الزيارة أو الاعتماد على الرقم."
     },
     {
       "slug": "aqar-investment",
@@ -463,8 +515,7 @@
       "address": "أبراج الوطنية، شارع الجمهورية، الدور الثاني الإداري، شقة 1، أعلى بنك QNB الأهلي",
       "phone": "0882293429",
       "phones": [
-        "0882293429",
-        "01114471729"
+        "0882293429"
       ],
       "website": "",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%B9%D9%82%D8%A7%D8%B1%20%D9%84%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1%20%D9%88%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
@@ -477,7 +528,10 @@
       "source_type": "local_directory",
       "source_label": "دليل 140 – دليل أعمال محلي",
       "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "الهاتف الأرضي 0882293429 مدرج في أكثر من مصدر. اختلفت أرقام المحمول المنشورة؛ لذلك أزلنا رقم المحمول من البطاقة العامة لحين تأكيد الشركة."
     },
     {
       "slug": "arab-contractors-assiut",
@@ -486,10 +540,10 @@
       "category": "مقاولات وتشطيبات",
       "kind": "مقاولات وإنشاءات كبرى",
       "city": "أسيوط",
-      "address": "29 شارع كورنيش النيل، بجوار مبنى محافظة أسيوط، حي شرق",
-      "phone": "0882324871",
+      "address": "29 شارع النيل، بجوار مبنى محافظة أسيوط، حي شرق",
+      "phone": "0882135625",
       "phones": [
-        "0882324871"
+        "0882135625"
       ],
       "website": "https://www.arabcont.com/",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A7%D9%84%D9%85%D9%82%D8%A7%D9%88%D9%84%D9%88%D9%86%20%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%20%E2%80%93%20%D9%81%D8%B1%D8%B9%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20Assiut%20Egypt",
@@ -499,10 +553,13 @@
         "الإنشاءات",
         "المشروعات العامة"
       ],
-      "source_type": "local_directory",
-      "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_type": "official_company_website",
+      "source_label": "الموقع الرسمي – فرع أسيوط",
+      "source_url": "https://arabcont.com/EgyptOffices.aspx",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "official_company",
+      "verification_label": "بيانات الفرع من الموقع الرسمي",
+      "verification_note": "رقم فرع أسيوط والعنوان من صفحة الفروع الرسمية للشركة."
     },
     {
       "slug": "south-egypt-construction",
@@ -511,22 +568,26 @@
       "category": "مقاولات وتشطيبات",
       "kind": "إنشاءات ومقاولات",
       "city": "أسيوط",
-      "address": "أبراج الشركة السعودية، الدور الأرضي، البرج الثالث، أسيوط ثان",
+      "address": "أسيوط – كورنيش النيل – أبراج الشركة السعودية – البرج الثالث – الدور الأرضي",
       "phone": "0882061055",
       "phones": [
-        "0882061055"
+        "0882061055",
+        "01152350404"
       ],
-      "website": "",
+      "website": "https://www.se-constructions.com/",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%AC%D9%86%D9%88%D8%A8%20%D9%85%D8%B5%D8%B1%20%D9%84%D9%84%D8%A5%D9%86%D8%B4%D8%A7%D8%A1%D8%A7%D8%AA%20Assiut%20Egypt",
       "description": "شركة إنشاءات مدرجة في أبراج الشركة السعودية بمدينة أسيوط.",
       "services": [
         "الإنشاءات",
         "المقاولات العامة"
       ],
-      "source_type": "local_directory",
-      "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_type": "official_company_website",
+      "source_label": "الموقع الرسمي – اتصل بنا",
+      "source_url": "https://www.se-constructions.com/contact_us/",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "official_company",
+      "verification_label": "بيانات الاتصال من الموقع الرسمي",
+      "verification_note": "العنوان وأرقام الاتصال منشورة في صفحة اتصل بنا الرسمية."
     },
     {
       "slug": "hometown-group",
@@ -535,9 +596,11 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "تطوير عقاري",
       "city": "أسيوط الجديدة",
-      "address": "مشروع West Gardens – غرب أسيوط",
-      "phone": "",
-      "phones": [],
+      "address": "مشروع West Gardens في أسيوط – المشروع ليس عنوان فرع إداري للشركة",
+      "phone": "19992",
+      "phones": [
+        "19992"
+      ],
       "website": "https://htg-eg.com/ar/",
       "map_url": "https://www.google.com/maps/search/?api=1&query=West%20Gardens%20Hometown%20Assiut%20Assiut%20Egypt",
       "description": "مجموعة تطوير عقاري يرد اسمها ضمن مصادر المشروعات العقارية المرتبطة بأسيوط. هذه البطاقة للتعريف بالمطور ولا تؤكد توافر وحدات أو عروض بيع حالية.",
@@ -545,10 +608,14 @@
         "التطوير العقاري",
         "المشروعات السكنية"
       ],
-      "source_type": "official_or_company_page",
-      "source_label": "الموقع الرسمي أو صفحة الشركة",
-      "source_url": "https://htg-eg.com/ar/",
-      "source_note": "النبذة مستندة إلى موقع المجموعة وتغطيات مشروع West Gardens. التواصل بشأن المشروعات عبر الموقع الرسمي."
+      "source_type": "official_company_website",
+      "source_label": "الموقع الرسمي – المشروعات والتواصل",
+      "source_url": "https://htg-eg.com/ar/تواصل-معنا/",
+      "source_note": "النبذة مستندة إلى موقع المجموعة وتغطيات مشروع West Gardens. التواصل بشأن المشروعات عبر الموقع الرسمي.",
+      "contact_label": "الخط الساخن",
+      "verification_status": "project_only",
+      "verification_label": "لها مشروع في أسيوط – المقر الرئيسي بالقاهرة",
+      "verification_note": "الموقع الرسمي يذكر مشروع West Gardens في أسيوط، ويحدد المقر الإداري في القاهرة الجديدة. رقم 19992 هو الخط الساخن العام، وليس رقم فرع أسيوط."
     },
     {
       "slug": "rdf-developments",
@@ -557,9 +624,11 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "شركة تطوير عقاري",
       "city": "أسيوط الجديدة",
-      "address": "مشروع Paradise – مدينة أسيوط الجديدة",
-      "phone": "",
-      "phones": [],
+      "address": "كومبوند Paradise بجوار مسجد طريق الصعيد البحر الأحمر، مدينة أسيوط الجديدة",
+      "phone": "01080080286",
+      "phones": [
+        "01080080286"
+      ],
       "website": "https://rdfdevelopments.com/",
       "map_url": "https://www.google.com/maps/search/?api=1&query=RDF%20Developments%20Paradise%20New%20Assiut%20Assiut%20Egypt",
       "description": "شركة تطوير عقاري تعرض مشروع Paradise بمدينة أسيوط الجديدة على موقعها الرسمي. البطاقة لا تؤكد توافر الوحدات أو حالة البيع الحالية.",
@@ -567,10 +636,14 @@
         "التطوير العقاري",
         "المشروعات السكنية"
       ],
-      "source_type": "official_or_company_page",
-      "source_label": "الموقع الرسمي أو صفحة الشركة",
+      "source_type": "official_company_website",
+      "source_label": "الموقع الرسمي – اتصل بنا",
       "source_url": "https://rdfdevelopments.com/",
-      "source_note": "الموقع الرسمي للشركة هو مصدر التعريف بالمشروع وبيانات التواصل المحدثة."
+      "source_note": "الموقع الرسمي للشركة هو مصدر التعريف بالمشروع وبيانات التواصل المحدثة.",
+      "contact_label": "اتصال / واتساب",
+      "verification_status": "official_company",
+      "verification_label": "بيانات المشروع والاتصال من الموقع الرسمي",
+      "verification_note": "الموقع الرسمي يعرض رقم الهاتف والواتساب وعنوان كومبوند Paradise بمدينة أسيوط الجديدة."
     },
     {
       "slug": "tayel-group",
@@ -579,20 +652,23 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "تطوير عقاري ومقاولات",
       "city": "أسيوط الجديدة",
-      "address": "نشاط ومشروعات معلنة بمدينة أسيوط الجديدة",
+      "address": "مشروع حياة سيتي في أسيوط الجديدة – موقع مشروع وليس مقرًا إداريًا",
       "phone": "",
       "phones": [],
-      "website": "https://www.hayahcity.com/ar/about-us.php",
+      "website": "https://www.hayahcity.com/ar/hayah-city.php",
       "map_url": "https://www.google.com/maps/search/?api=1&query=Tayel%20Group%20Assiut%20Assiut%20Egypt",
       "description": "مجموعة تعمل في التطوير العقاري والمقاولات؛ يذكر موقع Hayah City الرسمي تاريخ بدء أعمال شركة الرحاب للمقاولات في أسيوط الجديدة.",
       "services": [
         "التطوير العقاري",
         "المقاولات"
       ],
-      "source_type": "official_or_company_page",
-      "source_label": "الموقع الرسمي أو صفحة الشركة",
-      "source_url": "https://www.hayahcity.com/ar/about-us.php",
-      "source_note": "النبذة مستندة إلى صفحة المجموعة الرسمية، وبيانات التواصل تؤخذ من الموقع."
+      "source_type": "official_project_page",
+      "source_label": "صفحة مشروع حياة سيتي",
+      "source_url": "https://www.hayahcity.com/ar/hayah-city.php",
+      "source_note": "النبذة مستندة إلى صفحة المجموعة الرسمية، وبيانات التواصل تؤخذ من الموقع.",
+      "verification_status": "project_only",
+      "verification_label": "مشروع في أسيوط الجديدة – لا يوجد فرع مثبت",
+      "verification_note": "صفحة المشروع تذكر أن حياة سيتي أُنشئت على يد مجموعة طايل جروب للتطوير العقاري. لم يظهر في المصدر عنوان فرع أو رقم تواصل محلي للمجموعة."
     },
     {
       "slug": "venecia-development",
@@ -601,11 +677,9 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "تنمية وتطوير عمراني",
       "city": "أسيوط",
-      "address": "شارع الجمهورية، أعلى بنك أبو ظبي التجاري",
-      "phone": "01009000151",
-      "phones": [
-        "01009000151"
-      ],
+      "address": "أعلى بنك أبوظبي التجاري، شارع الجمهورية، أسيوط",
+      "phone": "",
+      "phones": [],
       "website": "https://venecia-dev.com/",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%81%D9%8A%D9%86%D9%8A%D8%B3%D9%8A%D8%A7%20%D9%84%D9%84%D8%AA%D9%86%D9%85%D9%8A%D8%A9%20%D9%88%D8%A7%D9%84%D8%AA%D8%AE%D8%B7%D9%8A%D8%B7%20%D8%A7%D9%84%D8%B9%D9%85%D8%B1%D8%A7%D9%86%D9%8A%20Assiut%20Egypt",
       "description": "شركة تنمية وتطوير عقاري يظهر لها نشاط محلي في شارع الجمهورية بمدينة أسيوط، ولها موقع رسمي.",
@@ -613,10 +687,13 @@
         "التنمية العمرانية",
         "التطوير العقاري"
       ],
-      "source_type": "local_directory",
-      "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_type": "official_company_website",
+      "source_label": "الموقع الرسمي للشركة",
+      "source_url": "https://venecia-dev.com/",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "official_company",
+      "verification_label": "العنوان منشور على موقع الشركة – الهاتف غير منشور",
+      "verification_note": "الموقع الرسمي يعرض عنوان الشركة في شارع الجمهورية بأسيوط، ولم نعثر في صفحة الموقع على رقم هاتف يمكن تأكيده؛ لذلك أزلنا الرقم القديم من البطاقة العامة."
     },
     {
       "slug": "porto-group-assiut",
@@ -639,8 +716,11 @@
       ],
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "اسم فرع أسيوط والعنوان والخط الساخن 16663 مدرجة بدليل أعمال. الخط الساخن عام للمجموعة وليس رقمًا محليًا للفرع."
     },
     {
       "slug": "global-house-konoz",
@@ -649,20 +729,25 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "تطوير عقاري – مشروع KONOZ",
       "city": "أسيوط",
-      "address": "نقطة مبيعات مشروع KONOZ – شارع الجمهورية؛ يلزم تأكيد تفاصيل المكتب قبل الزيارة",
-      "phone": "",
-      "phones": [],
-      "website": "https://eg.linkedin.com/company/global-house-developments",
+      "address": "مشروعات KONOZ في أسيوط وأسيوط الجديدة – لا يمثل عنوان مكتب محدد",
+      "phone": "01503444457",
+      "phones": [
+        "01503444457"
+      ],
+      "website": "https://www.linkedin.com/company/global-house-developments",
       "map_url": "https://www.google.com/maps/search/?api=1&query=KONOZ%20Residence%20Assiut%20Assiut%20Egypt",
       "description": "مشروع KONOZ Residence مرتبط باسم Global House Developments ويظهر له حضور مبيعات في وسط أسيوط؛ هذه بطاقة تعريفية مرتبطة بالمشروع وليست إثباتًا لفرع قانوني مستقل.",
       "services": [
         "التطوير العقاري",
         "استفسارات مشروع KONOZ"
       ],
-      "source_type": "local_directory",
-      "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "المعلومات التعريفية عن المشروع ونقطة المبيعات تحتاج تأكيدًا مباشرًا من الشركة قبل نشر تفاصيل التواصل."
+      "source_type": "official_company_profile",
+      "source_label": "صفحة الشركة على LinkedIn",
+      "source_url": "https://www.linkedin.com/company/global-house-developments",
+      "source_note": "المعلومات التعريفية عن المشروع ونقطة المبيعات تحتاج تأكيدًا مباشرًا من الشركة قبل نشر تفاصيل التواصل.",
+      "verification_status": "official_company_profile",
+      "verification_label": "بيانات صفحة الشركة – عنوان فرع محدد غير منشور",
+      "verification_note": "صفحة الشركة تعرض وجودها في أسيوط ورقم التواصل 01503444457 ومشروعات KONOZ. لم يُثبت عنوان مكتب محلي محدد."
     },
     {
       "slug": "maamar-alabbasi",
@@ -672,10 +757,8 @@
       "kind": "مقاولات وتشطيبات وتوريدات",
       "city": "أسيوط",
       "address": "منطقة الشيخية السابعة، قسم أول أسيوط",
-      "phone": "01100002384",
-      "phones": [
-        "01100002384"
-      ],
+      "phone": "",
+      "phones": [],
       "website": "",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D8%B9%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D8%B9%D8%A8%D8%A7%D8%B3%D9%8A%20%D9%84%D9%84%D9%85%D9%82%D8%A7%D9%88%D9%84%D8%A7%D8%AA%20%D9%88%D8%A7%D9%84%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20Assiut%20Egypt",
       "description": "نشاط محلي متعدد الخدمات مدرج في أسيوط ضمن المقاولات والتوريدات والتشطيبات والتصميم الداخلي.",
@@ -688,7 +771,10 @@
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
       "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "needs_confirmation",
+      "verification_label": "قيد التحقق – لا توجد بيانات اتصال معتمدة",
+      "verification_note": "لم نعثر على مصدر مستقل كافٍ يثبت بيانات العنوان أو رقم الهاتف المسجلين. أُخفيت بيانات الاتصال مؤقتًا لحين تقديم مستند أو مصدر مباشر."
     },
     {
       "slug": "bunian-makka",
@@ -697,12 +783,15 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "تطوير عقاري وتشطيبات",
       "city": "أسيوط",
-      "address": "الوليدية الغربية، قسم ثان أسيوط",
-      "phone": "01020267555",
+      "address": "ميدان الأزهر، أبراج القضاة، برج (ب)، الدور الأول، أسيوط",
+      "phone": "01020276888",
       "phones": [
-        "01020267555"
+        "01020276888",
+        "01092373777",
+        "01020276555",
+        "01020384888"
       ],
-      "website": "",
+      "website": "https://bunyan-makkah.com/assiut/",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D8%A8%D9%86%D9%8A%D8%A7%D9%86%20%D9%85%D9%83%D8%A9%20%D9%84%D9%84%D8%AA%D8%B7%D9%88%D9%8A%D8%B1%20%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%20%D9%88%D8%A7%D9%84%D8%AA%D8%B4%D8%B7%D9%8A%D8%A8%D8%A7%D8%AA%20Assiut%20Egypt",
       "description": "نشاط محلي في أسيوط مدرج ضمن التطوير العقاري والتشطيبات.",
       "services": [
@@ -710,10 +799,13 @@
         "التشطيبات",
         "إدارة المشروعات"
       ],
-      "source_type": "local_directory",
-      "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_type": "official_company_website",
+      "source_label": "الموقع الرسمي – فرع أسيوط",
+      "source_url": "https://bunyan-makkah.com/assiut/",
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "official_company",
+      "verification_label": "بيانات فرع أسيوط من الموقع الرسمي",
+      "verification_note": "الموقع الرسمي يحدد عنوان مكتب أسيوط ويعرض أرقام الفرع: الرئيسي 01020276888، واتساب 01092373777، و01020276555 و01020384888."
     },
     {
       "slug": "upper-capital",
@@ -737,7 +829,10 @@
       "source_type": "local_directory",
       "source_label": "EgyFinder – دليل أعمال محلي",
       "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها."
+      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "verification_status": "directory_match",
+      "verification_label": "بيانات من دليل أعمال – بانتظار تأكيد الشركة",
+      "verification_note": "بيانات العنوان والهاتف مدرجة في دليل أعمال محلي، ولم يظهر مصدر رسمي مباشر للشركة يؤكدها."
     },
     {
       "slug": "al-benaa-al-arabi-star",
@@ -765,7 +860,10 @@
       "source_label": "بيانات مقدمة من ممثل الشركة",
       "source_url": "https://www.facebook.com/share/1CimVDX8Di/",
       "source_note": "المعلومات مقدمة من ممثل الشركة، ولا تمثل تزكية مستقلة أو ضمانًا من أسيوط عقار.",
-      "profile_path": "./company-albenaa-arabi-star.html"
+      "profile_path": "./company-albenaa-arabi-star.html",
+      "verification_status": "company_supplied",
+      "verification_label": "بيانات مقدمة من ممثل الشركة",
+      "verification_note": "البيانات مقدمة من ممثل الشركة. الإدراج التعريفي مجاني ولا يعني تزكية أو اعتمادًا من أسيوط عقار؛ طلب إدارة الملف يتطلب التحقق من صفة الممثل."
     },
     {
       "slug": "arab-developers-holding",
@@ -774,20 +872,32 @@
       "category": "شركات تطوير ومشروعات عقارية",
       "kind": "شركة تطوير عقاري",
       "city": "أسيوط",
-      "address": "ارتباط معلن بمشروع نيوم أسيوط – تفاصيل الفرع المحلي تحتاج تأكيد",
+      "address": "مشروع نيوم أسيوط في مدينة ناصر الجديدة – المشروع ليس عنوان فرع إداري",
       "phone": "",
       "phones": [],
-      "website": "https://ad-holding.com/project/",
+      "website": "https://ad-holding.com/ar/",
       "map_url": "https://www.google.com/maps/search/?api=1&query=Arab%20Developers%20Holding%20Neom%20Assiut%20Assiut%20Egypt",
       "description": "شركة تطوير عقاري مدرجة ضمن المصادر المرتبطة بمشروعات أسيوط. لا تؤكد هذه البطاقة وجود مكتب أو نقطة مبيعات محلية حاليًا.",
       "services": [
         "التطوير العقاري",
         "المشروعات العقارية"
       ],
-      "source_type": "official_or_company_page",
-      "source_label": "الموقع الرسمي أو صفحة الشركة",
-      "source_url": "https://ad-holding.com/project/",
-      "source_note": "الموقع الرسمي للشركة مصدر للتعريف بالمجموعة؛ الارتباط بالمشروع لا يعني إثبات فرع محلي."
+      "source_type": "official_project_page",
+      "source_label": "الموقع الرسمي – مشروع نيوم أسيوط",
+      "source_url": "https://ad-holding.com/ar/project/nyoum-assiut/",
+      "source_note": "الموقع الرسمي للشركة مصدر للتعريف بالمجموعة؛ الارتباط بالمشروع لا يعني إثبات فرع محلي.",
+      "verification_status": "project_only",
+      "verification_label": "مشروع رسمي في أسيوط – لا يوجد فرع مثبت",
+      "verification_note": "الموقع الرسمي يثبت أن نيوم أسيوط أحد مشروعات المطورون العرب القابضة، لكنه لا يثبت وجود فرع إداري أو رقم محلي للشركة في أسيوط."
     }
-  ]
+  ],
+  "reviewedAt": "2026-11-13",
+  "verificationPolicy": {
+    "official_company": "بيانات الاتصال أو العنوان مأخوذة من موقع رسمي للشركة.",
+    "official_company_profile": "بيانات منشورة في صفحة الشركة الرسمية؛ العنوان المحلي قد لا يكون محددًا.",
+    "project_only": "وجود مشروع في أسيوط لا يعني وجود فرع أو مكتب للشركة داخل المحافظة.",
+    "directory_match": "بيانات منشورة في دليل أعمال مستقل؛ لم تؤكدها الشركة مباشرة.",
+    "company_supplied": "بيانات قدمها ممثل الشركة؛ لا تمثل تزكية أو اعتمادًا قانونيًا.",
+    "needs_confirmation": "تم إخفاء بيانات الاتصال غير المحسومة لحين تأكيدها."
+  }
 }
