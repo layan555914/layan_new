@@ -28,6 +28,8 @@ const users = [];
 let ownerId = null;
 let adminId = null;
 let leadId = null;
+let approvalLeadId = null;
+const approvalRequestIds = [];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -196,6 +198,86 @@ try {
   });
   assert(!directTable.response.ok, "The private CRM table is unexpectedly exposed through the public REST schema.");
 
+  // Exercise the complete added-admin -> owner approval -> execution path using only local Supabase.
+  const approvalLabel = "CRM Approval " + runId;
+  const approvalPayload = {
+    method: "POST",
+    path: "/rest/v1/rpc/layan_admin_crm_save_lead",
+    body: leadPayload(),
+    prefer: "return=minimal",
+  };
+  const queued = await rpc("layan_admin_request_change", {
+    p_label: approvalLabel,
+    p_payload: approvalPayload,
+  }, adminToken);
+  assert(queued.response.ok && queued.body === "pending",
+    "An added administrator could not submit a CRM change for owner approval: " + JSON.stringify(queued.body));
+
+  const pendingRequests = await rpc("layan_admin_list_requests", { p_status: "pending" }, ownerToken);
+  assert(pendingRequests.response.ok && Array.isArray(pendingRequests.body),
+    "The owner could not load pending approval requests.");
+  const pendingApproval = pendingRequests.body.find(item =>
+    item.action === "change" && item.target_label === approvalLabel && item.requested_by_email === admin.email
+  );
+  assert(pendingApproval?.id && pendingApproval.payload?.path === approvalPayload.path,
+    "The CRM approval request or its operation payload was not available to the owner.");
+  approvalRequestIds.push(Number(pendingApproval.id));
+
+  const ownerExecution = await request(pendingApproval.payload.path, {
+    method: pendingApproval.payload.method,
+    headers: authHeaders(anonKey, ownerToken, {
+      "content-type": "application/json",
+      Prefer: pendingApproval.payload.prefer || "return=minimal",
+    }),
+    body: JSON.stringify(pendingApproval.payload.body),
+  });
+  assert(ownerExecution.response.ok && typeof ownerExecution.body === "string",
+    "The owner could not execute the approved CRM change: " + JSON.stringify(ownerExecution.body));
+  approvalLeadId = ownerExecution.body;
+
+  const finished = await rpc("layan_admin_finish_change", {
+    p_id: pendingApproval.id, p_ok: true, p_note: null,
+  }, ownerToken);
+  assert(finished.response.ok && finished.body === "approved",
+    "The owner could not mark the executed CRM request as approved.");
+
+  const approvedLeadVisible = await rpc("layan_admin_list_crm_leads", {
+    ...listBody, p_search: "CRM Test " + runId.slice(0, 8),
+  }, adminToken);
+  assert(approvedLeadVisible.response.ok && approvedLeadVisible.body.some(row => row.id === approvalLeadId),
+    "The approved CRM change was not visible to the administration team.");
+
+  // A second request is explicitly rejected; its payload must never be executed.
+  const rejectedLabel = "CRM Rejected " + runId;
+  const rejectedPayload = {
+    method: "POST",
+    path: "/rest/v1/rpc/layan_admin_crm_save_lead",
+    body: { ...leadPayload(), p_name: "Rejected CRM " + runId.slice(0, 8) },
+    prefer: "return=minimal",
+  };
+  const rejectQueued = await rpc("layan_admin_request_change", {
+    p_label: rejectedLabel, p_payload: rejectedPayload,
+  }, adminToken);
+  assert(rejectQueued.response.ok && rejectQueued.body === "pending",
+    "The added administrator could not submit the request used for rejection testing.");
+  const pendingAfterSecond = await rpc("layan_admin_list_requests", { p_status: "pending" }, ownerToken);
+  const rejectionRequest = pendingAfterSecond.body?.find(item =>
+    item.action === "change" && item.target_label === rejectedLabel && item.requested_by_email === admin.email
+  );
+  assert(rejectionRequest?.id, "The owner could not find the CRM request to reject.");
+  approvalRequestIds.push(Number(rejectionRequest.id));
+
+  const rejected = await rpc("layan_admin_decide_request", {
+    p_id: rejectionRequest.id, p_approve: false, p_note: "رفض اختبار محلي",
+  }, ownerToken);
+  assert(rejected.response.ok && rejected.body === "rejected",
+    "The owner could not reject the pending CRM request.");
+  const rejectedLead = await rpc("layan_admin_list_crm_leads", {
+    ...listBody, p_search: "Rejected CRM " + runId.slice(0, 8),
+  }, adminToken);
+  assert(rejectedLead.response.ok && !rejectedLead.body.some(row => row.name === rejectedPayload.body.p_name),
+    "A rejected CRM request was unexpectedly executed.");
+
   const archived = await rpc("layan_admin_crm_archive_lead", { p_id: leadId }, ownerToken);
   assert(archived.response.ok && archived.body === true, "The owner could not archive the temporary CRM lead.");
 
@@ -203,10 +285,17 @@ try {
   assert(afterArchive.response.ok && !afterArchive.body.some(row => row.id === leadId),
     "An archived CRM lead remained in the active list.");
 
-  console.log("PASS: CRM is hidden from anonymous and regular users; added administrators can read but cannot write directly; owner CRUD, stage history, activity timeline, dashboard summary and archive all work locally.");
+  console.log("PASS: CRM isolation, owner-only writes, full supervisor request -> owner execution -> approval flow, owner rejection, stage history, activity timeline, dashboard summary and archive all work locally.");
 } finally {
-  if (leadId) {
-    try { runLocalSql("DELETE FROM private.admin_crm_leads WHERE id = " + safeUuid(leadId) + ";"); } catch (_) {}
+  if (leadId || approvalLeadId) {
+    const ids = [leadId, approvalLeadId].filter(Boolean).map(safeUuid).join(",");
+    try { runLocalSql("DELETE FROM private.admin_crm_leads WHERE id IN (" + ids + ");"); } catch (_) {}
+  }
+  if (approvalRequestIds.length) {
+    const ids = approvalRequestIds.map(Number).filter(n => Number.isSafeInteger(n) && n > 0);
+    if (ids.length) {
+      try { runLocalSql("DELETE FROM private.layan_admin_requests WHERE id IN (" + ids.join(",") + ");"); } catch (_) {}
+    }
   }
   if (adminId) {
     try { runLocalSql("DELETE FROM private.layan_admin_members WHERE user_id = " + safeUuid(adminId) + ";"); } catch (_) {}
