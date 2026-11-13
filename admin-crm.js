@@ -446,6 +446,9 @@
   });
 
   $("#crmExport")?.addEventListener("click", exportCsv);
+  document.getElementById("adminRefreshAll")?.addEventListener("click", () => {
+    if (document.querySelector('[data-view="crm"][aria-current]')) loadLeads();
+  });
 
   async function activate() {
     api = window.AsyutAdmin || api;
