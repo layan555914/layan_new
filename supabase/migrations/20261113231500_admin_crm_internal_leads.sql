@@ -241,7 +241,6 @@ BEGIN
 
   IF p_category NOT IN (
     'developer','brokerage','real_estate_office','bank_finance',
-    'supplier_factory','finishing_furniture','service_provider',
     'potential_sponsor','other'
   ) THEN
     RAISE EXCEPTION 'نوع الجهة غير صحيح' USING ERRCODE = '22023';
