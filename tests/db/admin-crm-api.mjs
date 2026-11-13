@@ -156,6 +156,13 @@ try {
   const regularWrite = await rpc("layan_admin_crm_save_lead", leadPayload(), regularToken);
   assert(!regularWrite.response.ok, "A regular platform user unexpectedly wrote an internal CRM lead.");
 
+  const phaseTwoCategoryWrite = await rpc("layan_admin_crm_save_lead", {
+    ...leadPayload(),
+    p_category: "service_provider",
+  }, ownerToken);
+  assert(!phaseTwoCategoryWrite.response.ok,
+    "The phase-one CRM unexpectedly accepted a deferred service-provider category.");
+
   const created = await rpc("layan_admin_crm_save_lead", leadPayload(), ownerToken);
   assert(created.response.ok && typeof created.body === "string", "The owner could not create a CRM lead: " + JSON.stringify(created.body));
   leadId = created.body;
