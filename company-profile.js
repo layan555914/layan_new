@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded",async()=>{
  const params=new URLSearchParams(location.search);
  const profileId=params.get("id");
  const entityId=params.get("entity_id");
+ const ENTITY_LOGO_ASSETS=Object.freeze({
+  "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
+ });
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const safeUrl=v=>{try{const u=new URL(String(v||""));return["https:","http:"].includes(u.protocol)?u.href:"";}catch(_){return"";}};
  const digits=v=>String(v||"").replace(/[^0-9]/g,"");
@@ -64,6 +67,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const entity=Array.isArray(rows)?rows[0]:null;
   if(!entity){renderError("هذا السجل غير متاح للعامة أو لم يعد منشورًا في الدليل.");return;}
   const name=entity.name_ar||entity.name_en||"جهة عقارية";
+  const logo=ENTITY_LOGO_ASSETS[entity.id]||"";
   const type=categoryLabel(entity.entity_type);
   const website=safeUrl(entity.website_url);
   const phone=digits(entity.public_phone);
