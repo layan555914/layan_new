@@ -374,11 +374,11 @@ BEGIN
     RAISE EXCEPTION 'نتيجة التواصل طويلة أكثر من اللازم' USING ERRCODE = '22023';
   END IF;
 
-  IF NOT EXISTS (
-    SELECT 1 FROM private.admin_crm_leads l
-    WHERE l.id = p_lead_id AND l.archived_at IS NULL
-    FOR UPDATE
-  ) THEN
+  PERFORM 1
+  FROM private.admin_crm_leads l
+  WHERE l.id = p_lead_id AND l.archived_at IS NULL
+  FOR UPDATE;
+  IF NOT FOUND THEN
     RAISE EXCEPTION 'الجهة غير موجودة أو مؤرشفة' USING ERRCODE = 'P0002';
   END IF;
 
