@@ -242,8 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const createdAt = row.created_at ? new Date(row.created_at).toLocaleString("ar-EG-u-nu-latn") : "—";
         const profileUrl = "./company.html?entity_id=" + encodeURIComponent(row.directory_entity_id);
         const waText = "مرحبًا " + String(row.representative_name || "") + "، بخصوص طلب استلام ملف " + String(row.company_name || "") + " على أسيوط عقار: " + String(row.admin_notes || "نحتاج استكمال التحقق من الصفة والتفويض.");
-        const whatsapp = phoneDigits.length >= 7
-          ? '<a class="btn btn-outline-dark" href="https://wa.me/' + esc(phoneDigits) + '?text=' + encodeURIComponent(waText) + '" target="_blank" rel="noopener noreferrer">مراسلة واتساب</a>'
+        const whatsappNumber = phoneDigits.startsWith("0") ? "20" + phoneDigits.slice(1) : phoneDigits;
+        const whatsapp = whatsappNumber.length >= 10
+          ? '<a class="btn btn-outline-dark" href="https://wa.me/' + esc(whatsappNumber) + '?text=' + encodeURIComponent(waText) + '" target="_blank" rel="noopener noreferrer">مراسلة واتساب</a>'
           : "";
         return '<article class="admin-ad" data-company-claim-id="' + esc(row.id) + '">' +
           '<div><span class="admin-chip">طلب استلام ملف · قيد المراجعة</span>' +
@@ -396,6 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showState(false);
       list.innerHTML = "";
       if (companyProfilesList) companyProfilesList.innerHTML = "";
+      if (companyClaimsList) companyClaimsList.innerHTML = "";
       if (propertyDocsList) propertyDocsList.innerHTML = "";
       setStatus(/غير مصرح|permission|row-level|policy|401|403|غير مخوّل/i.test(error.message)
         ? "هذا الحساب غير مخوّل للإدارة. يمكنك متابعة ملف شركتك من صفحة دليل الشركات."
