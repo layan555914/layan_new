@@ -59,3 +59,11 @@
 .company-claim-form input:focus,.company-claim-form select:focus,.company-claim-form textarea:focus{outline:2px solid #c98a64;outline-offset:1px}
 .company-claim-form .btn{width:100%;min-height:46px}
 @media(max-width:700px){.company-claim-dialog{padding:17px}.company-claim-dialog .btn{width:100%}}
+
+
+/* Claim submission feedback */
+.company-claim-status{margin:10px 0;padding:12px 14px;border:1px solid #d9c7b7;border-radius:12px;background:#f8f1e9;color:#4d3a2d;font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.company-claim-status[data-state="error"]{border-color:#dfb9b2;background:#fff3f1;color:#8a342c}
+.company-claim-status[data-state="success"]{border-color:#c8d9c5;background:#f2f8f0;color:#345c31}
+.company-claim-login-link{display:inline-flex;margin:4px 0 12px;color:#8a4d2e;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.company-claim-form button:disabled{opacity:.65;cursor:wait}
