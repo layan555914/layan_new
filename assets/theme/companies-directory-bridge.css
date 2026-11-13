@@ -40,3 +40,6 @@
  .company-claim-panel .btn{width:100%}
 }
 @media(prefers-reduced-motion:reduce){.company-directory-card,.company-directory-card a{transition:none}}
+
+.company-card-cover--directory img{width:100%;height:100%;padding:17px;object-fit:contain;background:#fff8f0}
+.company-directory-entity-monogram img{width:100%;height:100%;padding:12px;object-fit:contain;background:#fff8f0;border-radius:14px}
