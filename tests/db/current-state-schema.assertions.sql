@@ -13,8 +13,8 @@ DECLARE
   v_has_lock boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 23 THEN
-    RAISE EXCEPTION 'Expected 23 clean-install migrations (Nov 3 baseline + 18 main migrations + 2 company claim migrations); found %', v_count;
+  IF v_count <> 24 THEN
+    RAISE EXCEPTION 'Expected 24 clean-install migrations (Nov 3 baseline + 18 main migrations + 2 company-claim migrations + 1 internal CRM migration) (Nov 3 baseline + 18 main migrations + 2 company claim migrations); found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
@@ -82,6 +82,63 @@ BEGIN
      OR NOT has_function_privilege('authenticated','public.company_claim_admin_list()','EXECUTE')
      OR NOT has_function_privilege('authenticated','public.company_claim_admin_review(uuid,text,text)','EXECUTE') THEN
     RAISE EXCEPTION 'Company claim admin RPC EXECUTE grants are incorrect';
+  END IF;
+
+  IF to_regclass('private.admin_crm_leads') IS NULL
+     OR to_regclass('private.admin_crm_activities') IS NULL THEN
+    RAISE EXCEPTION 'Private internal CRM relations are missing';
+  END IF;
+
+  IF NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.admin_crm_leads'::regclass)
+     OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.admin_crm_activities'::regclass) THEN
+    RAISE EXCEPTION 'Internal CRM tables must have RLS enabled';
+  END IF;
+
+  IF has_table_privilege('anon','private.admin_crm_leads','SELECT')
+     OR has_table_privilege('anon','private.admin_crm_leads','INSERT')
+     OR has_table_privilege('authenticated','private.admin_crm_leads','SELECT')
+     OR has_table_privilege('authenticated','private.admin_crm_leads','INSERT')
+     OR has_table_privilege('authenticated','private.admin_crm_leads','UPDATE')
+     OR has_table_privilege('authenticated','private.admin_crm_leads','DELETE')
+     OR has_table_privilege('service_role','private.admin_crm_leads','SELECT')
+     OR has_table_privilege('authenticated','private.admin_crm_activities','SELECT')
+     OR has_table_privilege('authenticated','private.admin_crm_activities','INSERT')
+     OR has_table_privilege('authenticated','private.admin_crm_activities','UPDATE')
+     OR has_table_privilege('authenticated','private.admin_crm_activities','DELETE') THEN
+    RAISE EXCEPTION 'Internal CRM tables must not grant direct API table access';
+  END IF;
+
+  SELECT count(*) INTO v_count
+  FROM pg_proc p
+  JOIN pg_namespace n ON n.oid=p.pronamespace
+  WHERE n.nspname='public'
+    AND p.proname IN (
+      'layan_admin_list_crm_leads',
+      'layan_admin_list_crm_summary',
+      'layan_admin_list_crm_activities',
+      'layan_admin_crm_save_lead',
+      'layan_admin_crm_log_activity',
+      'layan_admin_crm_archive_lead'
+    )
+    AND p.prosecdef
+    AND p.proconfig @> ARRAY['search_path=""'];
+  IF v_count <> 6 THEN
+    RAISE EXCEPTION 'Every CRM RPC must be SECURITY DEFINER with an empty search_path; found %', v_count;
+  END IF;
+
+  IF has_function_privilege('anon','public.layan_admin_list_crm_leads(text,text,text,text,integer)','EXECUTE')
+     OR has_function_privilege('anon','public.layan_admin_list_crm_summary()','EXECUTE')
+     OR has_function_privilege('anon','public.layan_admin_list_crm_activities(uuid,integer)','EXECUTE')
+     OR has_function_privilege('anon','public.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text)','EXECUTE')
+     OR has_function_privilege('anon','public.layan_admin_crm_log_activity(uuid,text,text,text,timestamptz)','EXECUTE')
+     OR has_function_privilege('anon','public.layan_admin_crm_archive_lead(uuid)','EXECUTE')
+     OR NOT has_function_privilege('authenticated','public.layan_admin_list_crm_leads(text,text,text,text,integer)','EXECUTE')
+     OR NOT has_function_privilege('authenticated','public.layan_admin_list_crm_summary()','EXECUTE')
+     OR NOT has_function_privilege('authenticated','public.layan_admin_list_crm_activities(uuid,integer)','EXECUTE')
+     OR NOT has_function_privilege('authenticated','public.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text)','EXECUTE')
+     OR NOT has_function_privilege('authenticated','public.layan_admin_crm_log_activity(uuid,text,text,text,timestamptz)','EXECUTE')
+     OR NOT has_function_privilege('authenticated','public.layan_admin_crm_archive_lead(uuid)','EXECUTE') THEN
+    RAISE EXCEPTION 'CRM RPC execute grants must exclude anon and allow authenticated sessions to reach server-side role checks';
   END IF;
 
   IF NOT (SELECT relrowsecurity FROM pg_class WHERE oid='public.advertiser_brand_logos'::regclass)
