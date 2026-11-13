@@ -23,7 +23,7 @@ CREATE TABLE public.advertiser_leads (
   last_contact_at timestamptz,
   notes text,
   archived_at timestamptz,
-  created_by uuid NOT NULL DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE RESTRICT,
+  created_by uuid DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE SET NULL,
   updated_by uuid DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
@@ -67,7 +67,7 @@ CREATE TABLE public.advertiser_lead_activities (
   notes text,
   next_follow_up_at timestamptz,
   stage_after text,
-  actor_user_id uuid NOT NULL DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE RESTRICT,
+  actor_user_id uuid DEFAULT auth.uid() REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT advertiser_lead_activities_type_check
     CHECK (activity_type IN ('call','whatsapp','meeting','email','visit','note')),
