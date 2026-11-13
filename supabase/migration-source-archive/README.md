@@ -9,7 +9,7 @@
 - Production currently records 77 migration versions.
 - At the time of the audit, 65 production versions did not have a matching version-prefixed SQL file in the active migration folder of the company-claim review branch.
 - The production migration ledger retained ordered `statements[]` bodies for those 65 versions.
-- 63 bodies were copied into the JSON archive without the two owner-specific records described below.
+- 63 source records were copied into the JSON archive without the two owner-specific records described below. One of the 63 records (`20261102175735`) is intentionally partial: its public `directory_entities` seed remains, while the separate `directory_entity_private` seed containing internal addresses and phone numbers was removed. The record carries an explicit `redactions` note.
 - The remaining two migrations are documented by version and name, but their SQL bodies are intentionally not included in this public repository:
   - `20261027143024 add_confirmed_layan_admin_account`
   - `20261027144249 add_confirmed_layan_admin_user`
@@ -30,7 +30,7 @@ The script writes one SQL file per archive record to:
 
 `supabase/migration-source-archive/exported-sql/`
 
-It preserves the array order and SQL content from each stored statement, adding a statement terminator on a new line only when the stored item does not already end with one. The recorded statements do not preserve the original file's byte-for-byte formatting or comments; this is a reconstructed source archive from the production ledger, not a copy of the developer's original file bytes.
+It preserves the array order for each stored statement and adds a statement terminator on a new line only when the stored item does not already end with one. The recorded statements do not preserve the original file's byte-for-byte formatting or comments; this is a reconstructed source archive from the production ledger, not a copy of the developer's original file bytes. The `20261102175735` record is deliberately redacted and incomplete: the internal address/phone insert is omitted. Do not use that exported file to seed the private directory table.
 
 ## Safety boundary
 
@@ -45,7 +45,8 @@ It preserves the array order and SQL content from each stored statement, adding 
 |---|---:|
 | Production migration ledger rows | 77 |
 | Missing version-matched files found during the review-branch audit | 65 |
-| SQL statement records safely archived here | 63 |
+| SQL source records archived here | 63 |
+| Directory seed record with private address/phone block redacted | 1 |
 | Owner-specific migration bodies withheld from the public archive | 2 |
 | Empty statement arrays whose SQL files already exist in main | 5 |
 
