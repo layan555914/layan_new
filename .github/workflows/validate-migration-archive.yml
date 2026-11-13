@@ -1,0 +1,70 @@
+name: Validate recovered migration source archive
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "supabase/migration-source-archive/**"
+      - "scripts/recovery/export-production-migration-archive.mjs"
+      - ".github/workflows/validate-migration-archive.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out archive branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check exporter syntax
+        run: node --check scripts/recovery/export-production-migration-archive.mjs
+
+      - name: Validate archive metadata and privacy exclusions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const path = 'supabase/migration-source-archive/production-ledger-statements-2026-11-13.json';
+          const archive = JSON.parse(fs.readFileSync(path, 'utf8'));
+          if (archive.format !== 'asyut-aqar-production-migration-source-archive-v1') throw new Error('Unexpected archive format');
+          if (archive.record_count !== 63 || archive.records?.length !== 63) throw new Error('Expected exactly 63 recovered source records');
+          const seen = new Set();
+          for (const record of archive.records) {
+            if (!/^\\d{14}$/.test(String(record.version))) throw new Error('Invalid migration version: ' + record.version);
+            if (!/^[a-zA-Z0-9_]+$/.test(String(record.name))) throw new Error('Invalid migration name: ' + record.name);
+            if (seen.has(record.version)) throw new Error('Duplicate migration version: ' + record.version);
+            seen.add(record.version);
+            if (!Array.isArray(record.statements) || !record.statements.length) throw new Error('Missing SQL statements: ' + record.version);
+            if (record.statements.some(statement => typeof statement !== 'string' || !statement.trim())) throw new Error('Invalid statement: ' + record.version);
+          }
+          if (archive.withheld?.length !== 2) throw new Error('Expected the two owner-specific migrations to remain withheld');
+          const raw = JSON.stringify(archive);
+          if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(raw)) throw new Error('Archive unexpectedly contains an email literal');
+          if (raw.includes('c859cbba-2952-421d-a0fd-71e276d0d59d')) throw new Error('Archive unexpectedly contains a withheld Auth UUID');
+          console.log('PASS: 63 ordered source records, metadata, statement payloads and privacy exclusions.');
+          NODE
+
+      - name: Export SQL into archival folder only
+        run: node scripts/recovery/export-production-migration-archive.mjs
+
+      - name: Verify export count and active migration directory isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          count="$(find supabase/migration-source-archive/exported-sql -maxdepth 1 -type f -name '*.sql' | wc -l | tr -d ' ')"
+          test "$count" = "63"
+          if find supabase/migrations -maxdepth 1 -type f -name '20261025*.sql' -print -quit | grep -q .; then
+            echo "Unexpected recovered historical SQL in active migration folder" >&2
+            exit 1
+          fi
+          echo "PASS: exported $count SQL files outside supabase/migrations."
