@@ -6,6 +6,8 @@ CONFIG_FILE="$ROOT_DIR/supabase/config.toml"
 STORAGE_BASELINE_FILE="$ROOT_DIR/supabase/bootstrap/storage-baseline.sql"
 ASSERTIONS_FILE="$ROOT_DIR/tests/db/current-state-schema.assertions.sql"
 STORAGE_API_TEST="$ROOT_DIR/tests/db/storage-api-baseline.mjs"
+CRM_API_TEST="$ROOT_DIR/tests/db/admin-crm-api.mjs"
+APPROVAL_GATE_TEST="$ROOT_DIR/tests/ui/admin-approval-gate.mjs"
 TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/asyut-aqar-current-state.XXXXXX")"
 STACK_STARTED=0
 
@@ -17,7 +19,29 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST"; do
+node --check "$ROOT_DIR/admin-crm.js"
+node --check "$ROOT_DIR/admin-approval.js"
+node --check "$CRM_API_TEST"
+node --check "$APPROVAL_GATE_TEST"
+node "$APPROVAL_GATE_TEST"
+
+if ! grep -Fq 'id="adminCrm"' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-crm.js?v=20261114-1' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-crm.js?v=20261114-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-approval.js?v=20261114-1' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-approval.js?v=20261114-1' "$ROOT_DIR/sw.js"; then
+  echo "The CRM admin workspace is not fully wired into the admin page and PWA shell." >&2
+  exit 1
+fi
+
+# Phase 2 service-company categories must stay out of the phase 1 admin UI.
+if grep -Eq 'option value="(supplier_factory|finishing_furniture|service_provider)"' "$ROOT_DIR/admin.html" \
+  || grep -Eq 'supplier_factory:|finishing_furniture:|service_provider:' "$ROOT_DIR/admin-crm.js"; then
+  echo "Phase 2 service-company categories are exposed in the phase 1 CRM UI." >&2
+  exit 1
+fi
+
+for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST" "$CRM_API_TEST" "$APPROVAL_GATE_TEST"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required current-state rehearsal file is missing or empty: $required_file" >&2
     exit 1
@@ -121,6 +145,7 @@ export API_URL ANON_KEY SERVICE_ROLE_KEY
 export DATABASE_URL="$DB_URL"
 export MAILPIT_URL="http://127.0.0.1:54324"
 node "$STORAGE_API_TEST"
+node "$CRM_API_TEST"
 unset MAILPIT_URL DATABASE_URL SERVICE_ROLE_KEY ANON_KEY
 
-echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local Storage/Auth API checks."
+echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local Storage/Auth/CRM API checks."

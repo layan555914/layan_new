@@ -11,6 +11,7 @@
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
   <link rel="stylesheet" href="./admin.css?v=20261110-4">
+  <link rel="stylesheet" href="./admin-crm.css?v=20261113-1">
 </head>
 <body class="adm-body">
 <header class="adm-top">
@@ -50,9 +51,12 @@
     </nav>
     <p class="adm-side-title">المتابعة والتقارير</p>
     <nav class="adm-steps">
-      <button type="button" data-view="customers" data-admin-tab="users"><i>5</i><span class="adm-short">العملاء</span><span><b>العملاء والحسابات</b><small>ملف كل عميل وتحركاته</small></span></button>
-      <button type="button" data-view="activity" data-admin-tab="activity"><i>6</i><span class="adm-short">الزوار</span><span><b>الزوار والتواصل</b><small>المحافظات والمراكز والاتصالات</small></span></button>
-      <button type="button" data-view="team" data-admin-tab="admins"><i>7</i><span class="adm-short">الفريق</span><span><b>فريق الإدارة</b><small>من يدخل لوحة الإدارة</small></span></button>
+      <button type="button" data-view="crm"><i>5</i><span class="adm-short">المعلنين</span><span><b>المعلنين والمتابعة</b><small>الشركات والرعاة والعملاء التجاريون</small></span></button>
+    </nav>
+    <nav class="adm-steps">
+      <button type="button" data-view="customers" data-admin-tab="users"><i>6</i><span class="adm-short">العملاء</span><span><b>العملاء والحسابات</b><small>ملف كل عميل وتحركاته</small></span></button>
+      <button type="button" data-view="activity" data-admin-tab="activity"><i>7</i><span class="adm-short">الزوار</span><span><b>الزوار والتواصل</b><small>المحافظات والمراكز والاتصالات</small></span></button>
+      <button type="button" data-view="team" data-admin-tab="admins"><i>8</i><span class="adm-short">الفريق</span><span><b>فريق الإدارة</b><small>من يدخل لوحة الإدارة</small></span></button>
     </nav>
   </aside>
 
@@ -111,6 +115,37 @@
       <section class="adm-card" id="secSponsoredAds"><div class="as-card-head"><div><h2 class="adm-card-title"><i>◆</i>الإعلانات الممولة</h2><p class="adm-card-lead">تظهر في «خدمات تحتاجها بعد شراء عقارك» بالصفحة الرئيسية، وبين العقارات، وفي صفحة الإعلانات المميزة. الحذف من مشرف ينتظر اعتماد المدير.</p></div><button type="button" class="btn btn-gold" id="addSponsoredAdBtn">＋ إعلان ممول</button></div><div id="adminSponsoredAdsList" class="as-list"><p class="admin-empty">جارٍ التحميل...</p></div></section>
     </section>
 
+    <section class="adm-view" data-view-panel="crm" hidden>
+      <header class="adm-view-head">
+        <span class="adm-kicker">العلاقات التجارية</span>
+        <h1>المعلنين والمتابعة</h1>
+        <p>سجل داخلي لمتابعة المطورين العقاريين وشركات التسويق والوساطة والمكاتب العقارية والبنوك وجهات التمويل والرعاة المحتملين. لا يرسل رسائل أو يتصل تلقائيًا، ولا يظهر للزوار.</p>
+      </header>
+      <section class="adm-card admin-crm-card" id="adminCrm">
+        <div class="admin-crm-head">
+          <div><h2 class="adm-card-title">سجل العلاقات التجارية</h2><p class="adm-card-lead">سجّل كل مكالمة أو رسالة وموعد المتابعة القادم حتى لا تضيع أي فرصة.</p></div>
+          <button type="button" class="btn btn-gold" id="crmAddLead">＋ إضافة جهة جديدة</button>
+        </div>
+        <div class="admin-crm-summary" id="crmSummary">
+          <div><strong>—</strong><span>إجمالي الجهات</span></div>
+          <div><strong>—</strong><span>متابعات متأخرة</span></div>
+          <div><strong>—</strong><span>متابعات اليوم</span></div>
+          <div><strong>—</strong><span>مهتمون / تفاوض</span></div>
+          <div><strong>—</strong><span>تم التعاقد</span></div>
+        </div>
+        <form class="admin-crm-filters" id="crmFilters">
+          <label>بحث<input type="search" name="search" placeholder="اسم الشركة أو المسؤول أو الهاتف"></label>
+          <label>المرحلة<select name="stage"><option value="all">كل المراحل</option><option value="new">جديد</option><option value="contacted">تم التواصل</option><option value="interested">مهتم</option><option value="follow_up">متابعة لاحقة</option><option value="negotiation">تفاوض</option><option value="converted">تعاقد / تحويل</option><option value="not_interested">غير مهتم</option></select></label>
+          <label>نوع الجهة<select name="category"><option value="all">كل الأنواع</option><option value="developer">مطور عقاري</option><option value="brokerage">شركة تسويق / وساطة</option><option value="real_estate_office">مكتب عقاري</option><option value="bank_finance">بنك / تمويل عقاري</option><option value="potential_sponsor">راعٍ محتمل</option><option value="other">جهة عقارية أخرى</option></select></label>
+          <label>موعد المتابعة<select name="due"><option value="all">كل المواعيد</option><option value="overdue">متأخر</option><option value="today">اليوم</option><option value="upcoming">قادم</option></select></label>
+          <button type="submit" class="btn btn-outline-dark">تطبيق الفلاتر</button>
+          <button type="button" class="btn btn-outline-dark" id="crmExport">تنزيل Excel / CSV</button>
+        </form>
+        <div id="crmLeadEditor" hidden></div>
+        <div id="crmLeads" class="admin-crm-leads"><p class="admin-empty">افتح قسم المتابعة لتحميل البيانات.</p></div>
+      </section>
+    </section>
+
     <section class="adm-view" data-view-panel="customers" hidden>
       <header class="adm-view-head"><span class="adm-kicker">الخطوة 5</span><h1>العملاء والحسابات</h1><p>كل الحسابات المسجلة ببيانات التسجيل. افتح «ملف العميل» لرؤية تحركاته واتصالاته، أو نزّلها Excel.</p></header>
       <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="users"></div></section>
@@ -127,11 +162,11 @@
       <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="admins"></div></section>
     </section>
 
-    <p id="adminStatus" class="adm-status" role="status" aria-live="polite"></p>
   </div>
 </div>
+    <p id="adminStatus" class="adm-status" role="status" aria-live="polite"></p>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261110-2"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261110-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261108-4"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261114-1"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261114-2"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261108-4"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script><script src="./admin-crm.js?v=20261114-1"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>

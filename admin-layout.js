@@ -1,5 +1,5 @@
 // ASYUT AQAR admin layout: one view at a time, in the order of the daily workflow
-// (1 today → 2 review → 3 owner approvals → 4 published → 5 customers → 6 visitors → 7 team).
+// (1 today → 2 review → 3 owner approvals → 4 published → 5 CRM → 6 customers → 7 visitors → 8 team).
 // Data loading stays in admin.js / admin-console.js; this file only switches views.
 (() => {
   "use strict";
@@ -15,6 +15,7 @@
     buttons.forEach(b => b.toggleAttribute("aria-current", b.dataset.view === name));
     shell.querySelector(`[data-view="${name}"]`)?.scrollIntoView({ block: "nearest", inline: "center" });
     if (TAB_OF[name] && window.AsyutConsole?.open) window.AsyutConsole.open(TAB_OF[name]);
+    window.dispatchEvent(new CustomEvent("asyut:admin-view", { detail: { name, anchor: anchor || null } }));
     try { history.replaceState(null, "", "#" + name); } catch (_) {}
     const target = anchor && document.getElementById(anchor);
     (target || document.querySelector(".adm-main")).scrollIntoView({ behavior: "smooth", block: "start" });
