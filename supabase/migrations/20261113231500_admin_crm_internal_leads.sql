@@ -4,9 +4,10 @@
 
 CREATE TABLE IF NOT EXISTS private.admin_crm_leads (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  -- Phase 1: real-estate companies and related commercial partners only.
+  -- Service providers, suppliers, finishing and furniture are added in phase 2.
   category text NOT NULL CHECK (category IN (
     'developer','brokerage','real_estate_office','bank_finance',
-    'supplier_factory','finishing_furniture','service_provider',
     'potential_sponsor','other'
   )),
   name text NOT NULL CHECK (char_length(btrim(name)) BETWEEN 2 AND 180),
