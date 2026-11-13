@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     data.get("representative_email")?"البريد الإلكتروني: "+String(data.get("representative_email")).trim():"",
     data.get("representative_notes")?"معلومات إضافية: "+String(data.get("representative_notes")).trim():"",
     "أرجو توضيح خطوات التحقق وإثبات التفويض. أفهم أن الطلب يخضع للمراجعة اليدوية ولا يمنح صلاحية تلقائية."
-   ].filter(Boolean).join("\\n");
+   ].filter(Boolean).join("\n");
    window.open("https://wa.me/201007044265?text="+encodeURIComponent(message),"_blank","noopener,noreferrer");
    claimDialog?.close();
   });
