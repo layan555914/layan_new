@@ -1,5 +1,15 @@
 -- Serialize approvals for one company directory entity.
--- This prevents concurrent claims from being approved for conflicting representatives.
+-- On a fresh database, the later reconciliation migration creates the feature tables
+-- and the final locked function. Skip this historical function replacement until then.
+-- On environments where the feature tables and admin guard already exist, apply the lock.
+DO $migration$
+BEGIN
+  IF to_regclass('public.company_claim_requests') IS NOT NULL
+     AND to_regclass('public.company_entity_managers') IS NOT NULL
+     AND to_regclass('public.directory_entities') IS NOT NULL
+     AND to_regprocedure('private.layan_is_admin()') IS NOT NULL
+  THEN
+    EXECUTE $ddl$
 CREATE OR REPLACE FUNCTION private.company_claim_admin_review(
   p_id uuid,
   p_action text,
@@ -100,3 +110,7 @@ BEGIN
   END IF;
 END;
 $function$;
+$ddl$;
+  END IF;
+END;
+$migration$;
