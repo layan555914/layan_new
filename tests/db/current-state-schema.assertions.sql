@@ -13,8 +13,8 @@ DECLARE
   v_has_lock boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 23 THEN
-    RAISE EXCEPTION 'Expected 23 clean-install migrations (Nov 3 baseline + 18 main migrations + 2 company claim migrations); found %', v_count;
+  IF v_count <> 24 THEN
+    RAISE EXCEPTION 'Expected 24 clean-install migrations (23 baseline/current migrations + CLI-generated CRM migration); found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
@@ -126,6 +126,81 @@ BEGIN
     WHERE n.nspname='public' AND p.proname='layan_admin_review_logo'
   ) THEN
     RAISE EXCEPTION 'Current admin team, owner gate, or advertiser logo RPC is missing';
+  END IF;
+
+  -- Advertiser CRM is internal: authenticated admins may read; direct writes are owner-only.
+  IF to_regclass('public.advertiser_leads') IS NULL
+     OR to_regclass('public.advertiser_lead_activities') IS NULL THEN
+    RAISE EXCEPTION 'Advertiser CRM tables are missing';
+  END IF;
+
+  IF NOT (SELECT relrowsecurity FROM pg_class WHERE oid='public.advertiser_leads'::regclass)
+     OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='public.advertiser_lead_activities'::regclass) THEN
+    RAISE EXCEPTION 'Advertiser CRM tables must have RLS enabled';
+  END IF;
+
+  IF has_table_privilege('anon','public.advertiser_leads','SELECT')
+     OR has_table_privilege('anon','public.advertiser_leads','INSERT')
+     OR has_table_privilege('anon','public.advertiser_lead_activities','SELECT')
+     OR has_table_privilege('anon','public.advertiser_lead_activities','INSERT')
+     OR NOT has_table_privilege('authenticated','public.advertiser_leads','SELECT')
+     OR NOT has_table_privilege('authenticated','public.advertiser_leads','INSERT')
+     OR NOT has_table_privilege('authenticated','public.advertiser_leads','UPDATE')
+     OR has_table_privilege('authenticated','public.advertiser_leads','DELETE')
+     OR NOT has_table_privilege('authenticated','public.advertiser_lead_activities','SELECT')
+     OR NOT has_table_privilege('authenticated','public.advertiser_lead_activities','INSERT')
+     OR has_table_privilege('authenticated','public.advertiser_lead_activities','UPDATE')
+     OR has_table_privilege('authenticated','public.advertiser_lead_activities','DELETE') THEN
+    RAISE EXCEPTION 'Advertiser CRM table grants exceed the intended admin/owner model';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public'
+      AND tablename='advertiser_leads' AND policyname='advertiser_leads_admin_read'
+      AND cmd='SELECT' AND coalesce(qual,'') ILIKE '%layan_is_admin%'
+  ) OR NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public'
+      AND tablename='advertiser_leads' AND policyname='advertiser_leads_owner_insert'
+      AND cmd='INSERT' AND coalesce(with_check,'') ILIKE '%layan_is_owner%'
+  ) OR NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public'
+      AND tablename='advertiser_leads' AND policyname='advertiser_leads_owner_update'
+      AND cmd='UPDATE' AND coalesce(qual,'') ILIKE '%layan_is_owner%'
+      AND coalesce(with_check,'') ILIKE '%layan_is_owner%'
+  ) OR NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public'
+      AND tablename='advertiser_lead_activities' AND policyname='advertiser_lead_activities_admin_read'
+      AND cmd='SELECT' AND coalesce(qual,'') ILIKE '%layan_is_admin%'
+  ) OR NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public'
+      AND tablename='advertiser_lead_activities' AND policyname='advertiser_lead_activities_owner_insert'
+      AND cmd='INSERT' AND coalesce(with_check,'') ILIKE '%layan_is_owner%'
+  ) THEN
+    RAISE EXCEPTION 'Advertiser CRM admin-read or owner-write RLS policies are incomplete';
+  END IF;
+
+  SELECT NOT p.prosecdef, p.proconfig @> ARRAY['search_path=""']
+    INTO v_invoker, v_has_lock
+    FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+   WHERE n.nspname='private' AND p.proname='asyut_crm_sync_lead_after_activity';
+  IF v_invoker IS DISTINCT FROM true OR v_has_lock IS DISTINCT FROM true
+     OR has_function_privilege('anon','private.asyut_crm_sync_lead_after_activity()','EXECUTE')
+     OR has_function_privilege('authenticated','private.asyut_crm_sync_lead_after_activity()','EXECUTE') THEN
+    RAISE EXCEPTION 'CRM activity trigger helper must be invoker-only with an empty search_path and no direct API EXECUTE';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger
+    WHERE tgrelid='public.advertiser_lead_activities'::regclass
+      AND tgname='advertiser_lead_activities_sync_lead'
+      AND NOT tgisinternal
+  ) THEN
+    RAISE EXCEPTION 'CRM activity trigger that refreshes last contact and follow-up state is missing';
+  END IF;
+
+  IF (SELECT count(*) FROM public.advertiser_leads) <> 0
+     OR (SELECT count(*) FROM public.advertiser_lead_activities) <> 0 THEN
+    RAISE EXCEPTION 'Clean CRM schema rehearsal must not include any production lead or contact records';
   END IF;
 
   IF EXISTS (
