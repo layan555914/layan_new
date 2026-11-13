@@ -102,7 +102,7 @@ psql -X -v ON_ERROR_STOP=1 -f "$MIGRATIONS/20261113165309_serialize_company_clai
 
 echo "Checking RLS, grants, function security modes and the company-row lock..."
 psql -X -v ON_ERROR_STOP=1 <<'SQL'
-DO \$check\$
+DO $check$
 DECLARE
   v_lock boolean;
   v_private_definer boolean;
@@ -164,7 +164,7 @@ BEGIN
     RAISE EXCEPTION 'Unexpected RLS policy count for the company-claim tables';
   END IF;
 END
-\$check\$;
+$check$;
 SQL
 
 echo "4/5 RLS smoke test: each signed-in requester can create and read only their own pending request."
@@ -302,7 +302,7 @@ if [[ "$approval_two_status" -ne 0 ]] && ! grep -Fq 'هذا الملف مرتب�
 fi
 
 psql -X -v ON_ERROR_STOP=1 <<'SQL'
-DO \$concurrency\$
+DO $concurrency$
 BEGIN
   IF (SELECT count(*) FROM public.company_entity_managers) <> 1 THEN
     RAISE EXCEPTION 'Exactly one manager link must remain after concurrent approvals';
@@ -322,7 +322,7 @@ BEGIN
     RAISE EXCEPTION 'The manager link must correspond to the approved requester';
   END IF;
 END
-\$concurrency\$;
+$concurrency$;
 SQL
 
 echo "PASS: clean-install guard, reconciliation idempotency, existing-schema upgrade, RLS/grants, admin RPC security and concurrent company approvals."
