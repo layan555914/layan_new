@@ -103,6 +103,21 @@ BEGIN
     RAISE EXCEPTION 'Phase 2 service-company categories must not be enabled in CRM phase 1';
   END IF;
 
+  IF EXISTS (
+    SELECT 1
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.proname = 'layan_admin_crm_save_lead'
+      AND (
+        p.prosrc ILIKE '%supplier_factory%'
+        OR p.prosrc ILIKE '%finishing_furniture%'
+        OR p.prosrc ILIKE '%service_provider%'
+      )
+  ) THEN
+    RAISE EXCEPTION 'CRM save RPC must reject phase 2 service-company categories';
+  END IF;
+
   IF NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.admin_crm_leads'::regclass)
      OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.admin_crm_activities'::regclass) THEN
     RAISE EXCEPTION 'Internal CRM tables must have RLS enabled';
