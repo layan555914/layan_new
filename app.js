@@ -304,6 +304,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
         <label>كلمة المرور<span class="auth-password"><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل"><button type="button" id="authShowPassword" aria-label="إظهار كلمة المرور" aria-pressed="false">👁</button></span></label>
         <label class="auth-signup-only auth-terms" hidden><input id="authTerms" type="checkbox"> أوافق على <a href="./terms.html" target="_blank" rel="noopener">الشروط</a> و<a href="./privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></label>
+        <label class="auth-email-optin"><input id="authEmailAnnouncements" type="checkbox"> أرغب في استقبال إشعارات البريد عند اعتماد ونشر عقارات وخدمات وشركات جديدة. يمكنني إلغاء الاشتراك في أي وقت.</label>
         <p id="authStatus" role="status" aria-live="polite"></p>
         <button class="btn btn-outline-dark" id="resendConfirmationBtn" type="button" hidden>إعادة إرسال رسالة التأكيد</button>
         <button class="btn btn-outline-dark auth-forgot-password" id="forgotPasswordBtn" type="button" aria-label="استعادة كلمة المرور عبر البريد الإلكتروني">نسيت كلمة المرور؟</button>
@@ -388,6 +389,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         if (mode === "login") {
           await api.signIn(email, pass);
+          try { await syncEmailNotificationSubscription(); }
+          catch (emailPreferenceError) { console.warn("Email notification preference sync failed:", emailPreferenceError); }
           window.dispatchEvent(new CustomEvent("layan-auth-state-changed", { detail: { authenticated: true } }));
           status.textContent = "تم تسجيل الدخول بنجاح.";
           updateAuthButton();
@@ -400,7 +403,16 @@ document.addEventListener("DOMContentLoaded", async () => {
           if (name.length < 3) throw new Error("اكتب الاسم الكامل.");
           if (!/^01[0125][0-9]{8}$/.test(mobile)) throw new Error("اكتب رقم موبايل مصري صحيح مثل 01012345678.");
           if (!terms.checked) throw new Error("يلزم الموافقة على الشروط وسياسة الخصوصية.");
-          const result = await api.signUp(email, pass, { full_name: name, phone: mobile, account_type: accountType });
+          const result = await api.signUp(email, pass, {
+            full_name: name,
+            phone: mobile,
+            account_type: accountType,
+            email_notifications: authDialog.querySelector("#authEmailAnnouncements")?.checked === true
+          });
+          if (!result.needsEmailConfirmation) {
+            try { await syncEmailNotificationSubscription(); }
+            catch (emailPreferenceError) { console.warn("Email notification subscription setup failed:", emailPreferenceError); }
+          }
           if (result.needsEmailConfirmation) {
             status.textContent = "تم إنشاء الحساب بنجاح. افتح رسالة تأكيد البريد واضغط رابط التأكيد، ثم ارجع إلى منصة أسيوط عقار وسجّل الدخول. لو لم تصلك الرسالة، راجع مجلد الرسائل غير المرغوب فيها أو اضغط «إعادة إرسال رسالة التأكيد».";
             resendButton.hidden = false;
@@ -425,6 +437,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     authDialog._setMode = value => { mode = value || "login"; paintMode(); };
     return authDialog;
   }
+  async function syncEmailNotificationSubscription() {
+    const cfg = window.LAYAN_CONFIG || {};
+    const api = window.LAYAN_SUPABASE;
+    const current = api?.getSession?.();
+    const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
+    if (!base || !cfg.SUPABASE_PUBLISHABLE_KEY || !current?.access_token) return null;
+    const optedIn = authDialog?.querySelector("#authEmailAnnouncements")?.checked === true;
+    const response = await fetch(base + "/functions/v1/email-notifications", {
+      method: "POST",
+      headers: {
+        apikey: cfg.SUPABASE_PUBLISHABLE_KEY,
+        Authorization: "Bearer " + current.access_token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(optedIn
+        ? { action: "set_subscription", enabled: true }
+        : { action: "sync_subscription" })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "تعذرت مزامنة اشتراك البريد.");
+    return data;
+  }
+
   function friendlyAuthError(message) {
     const text = String(message || "");
     if (/Invalid login credentials/i.test(text)) return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
@@ -1665,6 +1700,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function handleAuthCallback(event) {
     if (event.detail?.success) {
+      syncEmailNotificationSubscription().catch(error => console.warn("Email notification callback sync failed:", error));
       updateAuthButton();
       if (continueCompanyRegistration()) return;
       setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في أسيوط عقار.");
