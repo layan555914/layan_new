@@ -40,7 +40,7 @@ jobs:
           if (archive.record_count !== 63 || archive.records?.length !== 63) throw new Error('Expected exactly 63 recovered source records');
           const seen = new Set();
           for (const record of archive.records) {
-            if (!/^\\d{14}$/.test(String(record.version))) throw new Error('Invalid migration version: ' + record.version);
+            if (!/^\d{14}$/.test(String(record.version))) throw new Error('Invalid migration version: ' + record.version);
             if (!/^[a-zA-Z0-9_]+$/.test(String(record.name))) throw new Error('Invalid migration name: ' + record.name);
             if (seen.has(record.version)) throw new Error('Duplicate migration version: ' + record.version);
             seen.add(record.version);
@@ -49,7 +49,7 @@ jobs:
           }
           if (archive.withheld?.length !== 2) throw new Error('Expected the two owner-specific migrations to remain withheld');
           const raw = JSON.stringify(archive);
-          if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(raw)) throw new Error('Archive unexpectedly contains an email literal');
+          if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(raw)) throw new Error('Archive unexpectedly contains an email literal');
           if (raw.includes('c859cbba-2952-421d-a0fd-71e276d0d59d')) throw new Error('Archive unexpectedly contains a withheld Auth UUID');
           console.log('PASS: 63 ordered source records, metadata, statement payloads and privacy exclusions.');
           NODE
