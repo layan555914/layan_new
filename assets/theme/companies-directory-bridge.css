@@ -43,3 +43,19 @@
 
 .company-card-cover--directory img{width:100%;height:100%;padding:17px;object-fit:contain;background:#fff8f0}
 .company-directory-entity-monogram img{width:100%;height:100%;padding:12px;object-fit:contain;background:#fff8f0;border-radius:14px}
+
+/* Company representative claim request — no account or permission changes */
+.company-claim-panel button{cursor:pointer;font:inherit}
+.company-claim-dialog{width:min(560px,calc(100% - 28px));max-height:min(88vh,820px);overflow:auto;padding:22px;border:1px solid #e7ceb6;border-radius:18px;background:#fffaf5;color:#2b211b;box-shadow:0 20px 70px rgba(43,33,27,.28)}
+.company-claim-dialog::backdrop{background:rgba(28,21,17,.58);backdrop-filter:blur(3px)}
+.company-claim-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.company-claim-dialog-head h2{margin:5px 0 0;font-size:19px}
+.company-claim-dialog-head>button{width:36px;height:36px;border:1px solid #ead6c4;border-radius:50%;background:#fff;color:#503f33;font-size:24px;cursor:pointer}
+.company-claim-dialog-note{margin:12px 0;color:#6b5d52;font-size:12px;line-height:1.9}
+.company-claim-form{display:grid;gap:13px}
+.company-claim-form label{display:grid;gap:6px;color:#503f33;font-size:12px;font-weight:700}
+.company-claim-form input,.company-claim-form select,.company-claim-form textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid #dfcbb8;border-radius:10px;background:#fff;color:#2b211b;font:inherit;font-size:13px}
+.company-claim-form textarea{resize:vertical}
+.company-claim-form input:focus,.company-claim-form select:focus,.company-claim-form textarea:focus{outline:2px solid #c98a64;outline-offset:1px}
+.company-claim-form .btn{width:100%;min-height:46px}
+@media(max-width:700px){.company-claim-dialog{padding:17px}.company-claim-dialog .btn{width:100%}}
