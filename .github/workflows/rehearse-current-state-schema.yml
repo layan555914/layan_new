@@ -7,6 +7,7 @@ on:
       - recovery/current-state-schema-rehearsal-20261113
     paths:
       - "admin-crm.js"
+      - "admin-approval.js"
       - "admin-crm.css"
       - "admin.html"
       - "admin-layout.js"
@@ -19,6 +20,7 @@ on:
       - "tests/db/current-state-schema.assertions.sql"
       - "tests/db/storage-api-baseline.mjs"
       - "tests/db/admin-crm-api.mjs"
+      - "tests/ui/admin-approval-gate.mjs"
       - ".github/workflows/rehearse-current-state-schema.yml"
   workflow_dispatch:
 
