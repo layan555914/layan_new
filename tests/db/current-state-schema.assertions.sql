@@ -14,7 +14,7 @@ DECLARE
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
   IF v_count <> 24 THEN
-    RAISE EXCEPTION 'Expected 24 clean-install migrations (Nov 3 baseline + 18 main migrations + 2 company-claim migrations + 1 internal CRM migration) (Nov 3 baseline + 18 main migrations + 2 company claim migrations); found %', v_count;
+    RAISE EXCEPTION 'Expected 24 clean-install migrations (Nov 3 baseline + 18 main migrations + 2 company-claim migrations + 1 internal CRM migration); found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
