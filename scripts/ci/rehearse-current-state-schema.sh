@@ -28,6 +28,13 @@ if ! grep -Fq 'id="adminCrm"' "$ROOT_DIR/admin.html" \
   exit 1
 fi
 
+# Phase 2 service-company categories must stay out of the phase 1 admin UI.
+if grep -Eq 'option value="(supplier_factory|finishing_furniture|service_provider)"' "$ROOT_DIR/admin.html" \
+  || grep -Eq 'supplier_factory:|finishing_furniture:|service_provider:' "$ROOT_DIR/admin-crm.js"; then
+  echo "Phase 2 service-company categories are exposed in the phase 1 CRM UI." >&2
+  exit 1
+fi
+
 for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST" "$CRM_API_TEST"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required current-state rehearsal file is missing or empty: $required_file" >&2
