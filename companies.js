@@ -7,6 +7,9 @@ function session(){return window.LAYAN_SUPABASE?.getSession?.()||null}
 async function verifiedSession(){const auth=window.LAYAN_SUPABASE;if(!auth?.requireAuthenticated)throw Error("تعذر تحميل نظام تسجيل الدخول. حدّث الصفحة وحاول مرة أخرى.");return await auth.requireAuthenticated()}
 async function api(path,options={}){if(!base||!key)throw Error("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");const s=session();const r=await fetch(base+"/rest/v1/"+path,{...options,headers:{apikey:key,Authorization:"Bearer "+(s?.access_token||key),"Content-Type":"application/json",...(options.headers||{})}});const raw=await r.text();let d=null;try{d=raw?JSON.parse(raw):null}catch(_){}if(!r.ok)throw Error(d?.message||d?.details||"تعذر تنفيذ الطلب.");return d}
 let companies=[],directoryEntities=[],existingProfileId=null,existingStatus=null,supportsDraft=false,submissionSaved=false,profileLookupComplete=false;
+const ENTITY_LOGO_ASSETS=Object.freeze({
+ "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
+});
 function entityCategory(entity){
  const map={
   developer:"شركات تطوير ومشروعات عقارية",
@@ -34,11 +37,13 @@ function card(c){
 function directoryCard(c){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
  const name=String(c.name_ar||c.name_en||"جهة عقارية");
+ const logo=ENTITY_LOGO_ASSETS[c.id]||"";
  const category=entityCategory(c);
  const description=String(c.description||"بيانات تعريفية منشورة في الدليل العقاري. راجع المصادر داخل الملف لمعرفة تفاصيل الإدراج.");
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
- return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-card-cover company-card-cover--directory"><span>'+esc(name.trim().slice(0,1))+'</span><small>ASYUT AQAR DIRECTORY</small></div><div class="company-directory-card-body"><span class="company-source-label company-source-label--directory">سجل منشور من الدليل العقاري · ليس إعلان شراكة</span><div class="company-card-meta"><span>'+esc(category)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3><p>'+esc(description)+'</p><div class="company-card-meta">'+contact+address+'</div><span class="company-card-open">عرض البيانات والمصادر وطلب إدارة الملف ←</span></div></a></article>';
+ const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':'<span>'+esc(name.trim().slice(0,1))+'</span>';
+ return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-card-cover company-card-cover--directory">'+visual+'<small>ASYUT AQAR DIRECTORY</small></div><div class="company-directory-card-body"><span class="company-source-label company-source-label--directory">سجل منشور من الدليل العقاري · ليس إعلان شراكة</span><div class="company-card-meta"><span>'+esc(category)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3><p>'+esc(description)+'</p><div class="company-card-meta">'+contact+address+'</div><span class="company-card-open">عرض البيانات والمصادر وطلب إدارة الملف ←</span></div></a></article>';
 }
 function render(){
  const q=($( "companyDirectorySearch")?.value||"").trim().toLocaleLowerCase("ar");
