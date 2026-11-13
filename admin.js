@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("pendingAds");
   const propertyDocsList = document.getElementById("pendingPropertyDocuments");
   const companyProfilesList = document.getElementById("pendingCompanyProfiles");
+  const companyClaimsList = document.getElementById("pendingCompanyClaims");
   const marketplaceList = document.getElementById("pendingMarketplaceListings");
   const companyAdsList = document.getElementById("pendingCompanyAds");
   const adSlotsList = document.getElementById("pendingAdSlots");
@@ -223,6 +224,50 @@ document.addEventListener("DOMContentLoaded", () => {
     }).join("");
   }
 
+  async function loadPendingCompanyClaims() {
+    if (!companyClaimsList) return;
+    companyClaimsList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات استلام الشركات...</p>';
+    try {
+      const rows = await request("/rest/v1/rpc/company_claim_admin_list", { method: "POST", body: "{}" });
+      const count = Array.isArray(rows) ? rows.length : 0;
+      const countEl = document.getElementById("statPendingCompanyClaims");
+      if (countEl) countEl.textContent = String(count);
+      if (!count) {
+        companyClaimsList.innerHTML = '<p class="admin-empty">لا توجد طلبات استلام شركات معلقة.</p>';
+        return;
+      }
+      companyClaimsList.innerHTML = rows.map(row => {
+        const phone = String(row.contact_phone || "");
+        const phoneDigits = phone.replace(/[^0-9]/g, "");
+        const createdAt = row.created_at ? new Date(row.created_at).toLocaleString("ar-EG-u-nu-latn") : "—";
+        const profileUrl = "./company.html?entity_id=" + encodeURIComponent(row.directory_entity_id);
+        const waText = "مرحبًا " + String(row.representative_name || "") + "، بخصوص طلب استلام ملف " + String(row.company_name || "") + " على أسيوط عقار: " + String(row.admin_notes || "نحتاج استكمال التحقق من الصفة والتفويض.");
+        const whatsapp = phoneDigits.length >= 7
+          ? '<a class="btn btn-outline-dark" href="https://wa.me/' + esc(phoneDigits) + '?text=' + encodeURIComponent(waText) + '" target="_blank" rel="noopener noreferrer">مراسلة واتساب</a>'
+          : "";
+        return '<article class="admin-ad" data-company-claim-id="' + esc(row.id) + '">' +
+          '<div><span class="admin-chip">طلب استلام ملف · قيد المراجعة</span>' +
+          '<h2>' + esc(row.company_name || "شركة غير محددة") + '</h2>' +
+          '<p><strong>ممثل الشركة:</strong> ' + esc(row.representative_name) + ' — ' + esc(row.representative_role) + '</p>' +
+          '<p><strong>رقم التواصل:</strong> <a href="tel:' + esc(phoneDigits) + '">' + esc(phone) + '</a>' +
+          (row.contact_email ? ' — <strong>البريد:</strong> ' + esc(row.contact_email) : '') + '</p>' +
+          (row.notes ? '<p><strong>ملاحظات الممثل:</strong> ' + esc(row.notes) + '</p>' : '') +
+          (row.admin_notes ? '<p><strong>ملاحظات الإدارة:</strong> ' + esc(row.admin_notes) + '</p>' : '') +
+          '<p><strong>تاريخ الطلب:</strong> ' + esc(createdAt) + '</p>' +
+          '<p><a href="' + esc(profileUrl) + '" target="_blank" rel="noopener noreferrer">فتح ملف الشركة</a> · <span>معرّف حساب مقدم الطلب: ' + esc(row.requester_user_id) + '</span></p></div>' +
+          '<div class="admin-actions">' + whatsapp +
+          '<button type="button" class="btn btn-gold" data-company-claim-action="approve">اعتماد وربط الحساب</button>' +
+          '<button type="button" class="btn btn-outline-dark" data-company-claim-action="request_info">طلب استكمال البيانات</button>' +
+          '<button type="button" class="btn btn-outline-dark" data-company-claim-action="reject">رفض الطلب</button>' +
+          '</div></article>';
+      }).join("");
+    } catch (error) {
+      companyClaimsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل طلبات استلام الشركات.") + '</p>';
+      const countEl = document.getElementById("statPendingCompanyClaims");
+      if (countEl) countEl.textContent = "—";
+    }
+  }
+
   async function loadPendingMarketplaceListings() {
     if (!marketplaceList) return;
     marketplaceList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات سوق الخدمات...</p>';
@@ -322,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showState(false);
         list.innerHTML = "";
         if (companyProfilesList) companyProfilesList.innerHTML = "";
+        if (companyClaimsList) companyClaimsList.innerHTML = "";
         if (marketplaceList) marketplaceList.innerHTML = "";
         if (propertyDocsList) propertyDocsList.innerHTML = "";
         setStatus("هذا الحساب غير مخوّل بدخول لوحة إدارة أسيوط عقار. يمكنك متابعة ملف شركتك من صفحة دليل الشركات.");
@@ -332,6 +378,7 @@ document.addEventListener("DOMContentLoaded", () => {
       render(rows);
       await loadAdminStats();
       await loadPendingCompanyProfiles();
+      await loadPendingCompanyClaims();
       await loadPendingMarketplaceListings();
       await loadPendingPropertyOffers();
       await loadPendingPropertyDocuments();
@@ -430,6 +477,38 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
     finally { button.disabled = false; }
   });
+  companyClaimsList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-company-claim-action]");
+    const card = event.target.closest("[data-company-claim-id]");
+    if (!button || !card) return;
+    const action = button.dataset.companyClaimAction;
+    let note = null;
+    if (action === "approve") {
+      if (!window.confirm("بعد التحقق من هوية الممثل وتفويض الشركة، سيتم اعتماد الطلب وربط حسابه بسجل الشركة. هذا لا يفتح تعديل بيانات الدليل مباشرة. هل تؤكد؟")) return;
+    } else {
+      note = window.prompt(action === "request_info" ? "اكتب البيانات أو الإثباتات المطلوبة من ممثل الشركة:" : "اكتب سبب رفض طلب استلام الشركة:");
+      if (note === null) return;
+      if (note.trim().length < 3) { setStatus("اكتب ملاحظة واضحة من 3 أحرف على الأقل."); return; }
+    }
+    button.disabled = true;
+    try {
+      const result = await request("/rest/v1/rpc/company_claim_admin_review", {
+        method: "POST",
+        body: JSON.stringify({ p_id: card.dataset.companyClaimId, p_action: action, p_note: note })
+      });
+      setStatus(action === "approve"
+        ? "تم اعتماد الطلب وربط حساب ممثل الشركة بالملف. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة."
+        : action === "request_info"
+          ? "تم تسجيل ملاحظة استكمال البيانات. تواصل مع الممثل عبر الهاتف أو واتساب."
+          : "تم رفض طلب استلام الشركة وتسجيل السبب.");
+      await loadPendingCompanyClaims();
+    } catch (error) {
+      setStatus(error.message || "تعذر تنفيذ طلب استلام الشركة.");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
   document.getElementById("pendingPropertyOffers")?.addEventListener("click", async event => {
     const button = event.target.closest("button[data-property-action]");
     const card = event.target.closest("[data-property-offer-id]");
