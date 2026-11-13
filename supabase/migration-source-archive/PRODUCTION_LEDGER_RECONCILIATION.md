@@ -95,7 +95,7 @@ A clean-install strategy must be designed as a **new current-state chain**, not 
 4. Owner/admin account provisioning must remain a separate, parameterized post-install operation. Two historical owner-provisioning statements were withheld from the public archive because they contained private account identifiers.
 5. Rebuild and compare schema objects, RLS, grants, routines, triggers, storage configuration, and required reference data in a disposable database before any decision about production migration history.
 
-The historical archive at `production-ledger-statements-2026-11-13.json` is source material for review only. It must not be moved into `supabase/migrations` or replayed as a batch. One source record (`20261102175735`) was sanitized before publication: the public entity seed is retained, but the `INSERT INTO public.directory_entity_private` block containing internal addresses and phone numbers was removed and documented in the record's `redactions` field.
+The historical archive at `production-ledger-statements-2026-11-13.json` is source material for review only. It must not be moved into `supabase/migrations` or replayed as a batch. Two source records were sanitized before publication: `20261102175735` retains the public entity seed but omits the `INSERT INTO public.directory_entity_private` block containing internal addresses and phone numbers; `20261102180129` retains the public project seed but omits the `INSERT INTO public.directory_project_private` block containing internal size/status/confidence/review notes. Both redactions are documented in their records' `redactions` fields.
 
 ## Production safety
 
