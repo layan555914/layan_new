@@ -126,7 +126,7 @@
       "address": "18 شارع الجمهورية، برج اللؤلؤة الإداري، الدور الثاني، أمام بنك الاتحاد الوطني",
       "phone": "",
       "phones": [],
-      "website": "https://www.morshedy.com/",
+      "website": "https://morshedy-eg.com/pages/الفروع",
       "map_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D8%B9%D9%85%D8%A7%D8%B1%20%D8%A7%D9%84%D9%85%D8%B1%D8%B4%D8%AF%D9%8A%20%E2%80%93%20%D9%81%D8%B1%D8%B9%20%D8%A3%D8%B3%D9%8A%D9%88%D8%B7%20Assiut%20Egypt",
       "description": "شركة تطوير عقاري لها فرع مدرج في شارع الجمهورية بمدينة أسيوط.",
       "services": [
@@ -765,10 +765,10 @@
         "التوريدات",
         "التصميم الداخلي"
       ],
-      "source_type": "local_directory",
-      "source_label": "EgyFinder – دليل أعمال محلي",
-      "source_url": "https://egyfinder.net/categories/ar/real-estate/assyout",
-      "source_note": "بيانات تعريفية كما ظهرت في دليل أعمال عام، ويُرجى تأكيدها مباشرة مع الشركة قبل الزيارة أو الاعتماد عليها.",
+      "source_type": "unverified",
+      "source_label": "لم يتم العثور على مصدر مباشر",
+      "source_url": "",
+      "source_note": "لم يظهر سجل مباشر موثوق باسم الشركة في المصادر التي تمت مراجعتها. بيانات العنوان والهاتف غير معروضة وتظل قيد التحقق لحين تقديم مصدر رسمي أو تأكيد مباشر.",
       "verification_status": "needs_confirmation",
       "verification_label": "قيد التحقق – لا توجد بيانات اتصال معتمدة",
       "verification_note": "لم نعثر على مصدر مستقل كافٍ يثبت بيانات العنوان أو رقم الهاتف المسجلين. أُخفيت بيانات الاتصال مؤقتًا لحين تقديم مستند أو مصدر مباشر."
