@@ -1,9 +1,13 @@
 name: Rehearse ASYUT AQAR current-state schema
 
 on:
+  push:
+    branches:
+      - feature/admin-advertiser-crm-20261113
   pull_request:
     branches:
       - main
+      - recovery/current-state-schema-rehearsal-20261113
     paths:
       - "supabase/config.toml"
       - "supabase/bootstrap/**"
