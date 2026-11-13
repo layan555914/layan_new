@@ -1,4 +1,4 @@
-name: Rehearse ASYUT AQAR current-state schema
+name: Rehearse ASYUT AQAR current-state schema and CRM
 
 on:
   pull_request:
