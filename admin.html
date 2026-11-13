@@ -50,6 +50,7 @@
     </nav>
     <p class="adm-side-title">المتابعة والتقارير</p>
     <nav class="adm-steps">
+      <button type="button" data-view="crm"><i>8</i><span class="adm-short">المعلنين</span><span><b>متابعة المعلنين والرعاة</b><small>الجهات · التواصل · مواعيد المتابعة</small></span></button>
       <button type="button" data-view="customers" data-admin-tab="users"><i>5</i><span class="adm-short">العملاء</span><span><b>العملاء والحسابات</b><small>ملف كل عميل وتحركاته</small></span></button>
       <button type="button" data-view="activity" data-admin-tab="activity"><i>6</i><span class="adm-short">الزوار</span><span><b>الزوار والتواصل</b><small>المحافظات والمراكز والاتصالات</small></span></button>
       <button type="button" data-view="team" data-admin-tab="admins"><i>7</i><span class="adm-short">الفريق</span><span><b>فريق الإدارة</b><small>من يدخل لوحة الإدارة</small></span></button>
@@ -111,6 +112,11 @@
       <section class="adm-card" id="secSponsoredAds"><div class="as-card-head"><div><h2 class="adm-card-title"><i>◆</i>الإعلانات الممولة</h2><p class="adm-card-lead">تظهر في «خدمات تحتاجها بعد شراء عقارك» بالصفحة الرئيسية، وبين العقارات، وفي صفحة الإعلانات المميزة. الحذف من مشرف ينتظر اعتماد المدير.</p></div><button type="button" class="btn btn-gold" id="addSponsoredAdBtn">＋ إعلان ممول</button></div><div id="adminSponsoredAdsList" class="as-list"><p class="admin-empty">جارٍ التحميل...</p></div></section>
     </section>
 
+    <section class="adm-view" data-view-panel="crm" hidden>
+      <header class="adm-view-head"><span class="adm-kicker">المتابعة التجارية</span><h1>متابعة المعلنين والرعاة</h1><p>سجل داخلي للشركات والمطورين والمكاتب والموردين والرعاة المحتملين، مع مراحل التواصل وسجل المكالمات ومواعيد المتابعة. هذا القسم منفصل عن حسابات العملاء ونشاط الزوار ولا يظهر للعامة.</p></header>
+      <section class="adm-card" id="advertiserCrmCard"><div id="advertiserCrmPanel"><p class="admin-empty">افتح القسم لتحميل سجل الجهات.</p></div></section>
+    </section>
+
     <section class="adm-view" data-view-panel="customers" hidden>
       <header class="adm-view-head"><span class="adm-kicker">الخطوة 5</span><h1>العملاء والحسابات</h1><p>كل الحسابات المسجلة ببيانات التسجيل. افتح «ملف العميل» لرؤية تحركاته واتصالاته، أو نزّلها Excel.</p></header>
       <section class="adm-card"><div class="admin-tabpanel" data-admin-panel="users"></div></section>
@@ -131,7 +137,7 @@
   </div>
 </div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261110-2"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261110-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261108-4"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261110-2"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261110-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261108-4"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script><script src="./admin-crm.js?v=20261113-1"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>
