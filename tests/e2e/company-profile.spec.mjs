@@ -20,6 +20,9 @@ const approvedCompany = {
 };
 
 async function mockApprovedCompanyView(page) {
+  await page.route(SUPABASE + "/rest/v1/directory_entities**", async route => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([]) });
+  });
   await page.route(SUPABASE + "/rest/v1/company_profiles_public**", async route => {
     const requestUrl = new URL(route.request().url());
     if (requestUrl.searchParams.get("id") === "eq." + COMPANY_ID) {
@@ -48,7 +51,8 @@ test("company directory continues to render approved profiles from the public vi
   await mockApprovedCompanyView(page);
   await page.goto("/companies.html");
 
-  await expect(page.locator("#companyDirectoryGrid .company-directory-card")).toHaveCount(1);
-  await expect(page.locator("#companyDirectoryGrid")).toContainText(approvedCompany.company_name);
-  await expect(page.locator("#companyDirectoryCount")).toContainText("1 شركة معتمدة");
+  const companyCard = page.locator("#companyDirectoryGrid .company-directory-card").filter({ hasText: approvedCompany.company_name });
+  await expect(companyCard).toHaveCount(1);
+  await expect(companyCard).toContainText(approvedCompany.company_name);
+  await expect(page.locator("#companyDirectoryCount")).toContainText("1 ملفًا متاحًا");
 });
