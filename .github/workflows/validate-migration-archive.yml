@@ -48,10 +48,21 @@ jobs:
             if (record.statements.some(statement => typeof statement !== 'string' || !statement.trim())) throw new Error('Invalid statement: ' + record.version);
           }
           if (archive.withheld?.length !== 2) throw new Error('Expected the two owner-specific migrations to remain withheld');
-          const privateDirectorySeed = archive.records.find(record => record.version === '20261102175735');
+          const privateSeedChecks = [
+            { version: '20261102175735', table: 'directory_entity_private' },
+            { version: '20261102180129', table: 'directory_project_private' }
+          ];
+          for (const item of privateSeedChecks) {
+            const record = archive.records.find(candidate => candidate.version === item.version);
+            const sql = (record?.statements || []).join('\n');
+            const escapedTable = item.table.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\const privateDirectorySeed = archive.records.find(record => record.version === '20261102175735');
           const privateSeedSql = (privateDirectorySeed?.statements || []).join('\n');
           if (!privateDirectorySeed?.redactions?.length || /insert\s+into\s+public\.directory_entity_private/i.test(privateSeedSql) || /\$private\$/i.test(privateSeedSql)) {
             throw new Error('Private directory address/phone seed data must remain redacted from the public archive');
+          }');
+            if (!record?.redactions?.length || new RegExp('insert\\\\s+into\\\\s+public\\\\.' + escapedTable, 'i').test(sql)) {
+              throw new Error('Private directory internal seed data must remain redacted for ' + item.version);
+            }
           }
           const raw = JSON.stringify(archive);
           if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(raw)) throw new Error('Archive unexpectedly contains an email literal');
