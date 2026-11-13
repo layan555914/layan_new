@@ -20,16 +20,15 @@
     const shifted = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
     return shifted.toISOString().slice(0, 16);
   };
+  // Phase 1 is limited to real-estate companies and real-estate commercial partners.
+  // Service providers, suppliers, finishing and furniture categories are deferred to phase 2.
   const categoryLabels = {
     developer: "مطور عقاري",
     brokerage: "شركة تسويق / وساطة",
     real_estate_office: "مكتب عقاري",
-    bank_finance: "بنك / تمويل",
-    supplier_factory: "مصنع / مورد",
-    finishing_furniture: "تشطيبات / أثاث",
-    service_provider: "مقدم خدمات",
+    bank_finance: "بنك / تمويل عقاري",
     potential_sponsor: "راعٍ محتمل",
-    other: "أخرى"
+    other: "جهة عقارية أخرى"
   };
   const stageLabels = {
     new: "جديد",
