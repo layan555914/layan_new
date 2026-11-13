@@ -6,6 +6,7 @@ CONFIG_FILE="$ROOT_DIR/supabase/config.toml"
 STORAGE_BASELINE_FILE="$ROOT_DIR/supabase/bootstrap/storage-baseline.sql"
 ASSERTIONS_FILE="$ROOT_DIR/tests/db/current-state-schema.assertions.sql"
 STORAGE_API_TEST="$ROOT_DIR/tests/db/storage-api-baseline.mjs"
+CRM_MIGRATION_TEMPLATE="$ROOT_DIR/supabase/migration-templates/advertiser_crm_pipeline.sql"
 TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/asyut-aqar-current-state.XXXXXX")"
 STACK_STARTED=0
 
@@ -17,7 +18,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST"; do
+for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST" "$CRM_MIGRATION_TEMPLATE"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required current-state rehearsal file is missing or empty: $required_file" >&2
     exit 1
@@ -60,10 +61,21 @@ path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 PY
 
 mkdir -p "$TEST_DIR/supabase/migrations"
-# Copy the reviewed Nov 3 schema baseline, its stable marketplace seed, the
-# current main-branch incremental migrations, and the company-claim feature
-# migrations. No production data or no-op historical ledger markers are copied.
+# Copy the 23 reviewed baseline and incremental migrations. No production
+# data or no-op historical ledger markers are copied.
 cp "$ROOT_DIR"/supabase/migrations/*.sql "$TEST_DIR/supabase/migrations/"
+
+# Create the new CRM migration path with Supabase CLI (rather than hand-writing
+# a migration timestamp), then populate that generated file from the reviewed
+# SQL template. This happens only in the disposable CI project.
+supabase migration new advertiser_crm_pipeline
+CRM_MIGRATION_FILE="$(find "$TEST_DIR/supabase/migrations" -maxdepth 1 -type f -name '*_advertiser_crm_pipeline.sql' -print -quit)"
+if [[ -z "$CRM_MIGRATION_FILE" ]]; then
+  echo "Supabase CLI did not create the advertiser CRM migration file." >&2
+  exit 1
+fi
+cp "$CRM_MIGRATION_TEMPLATE" "$CRM_MIGRATION_FILE"
+echo "Generated local CRM migration with Supabase CLI: $(basename "$CRM_MIGRATION_FILE")"
 
 echo "Starting a disposable local Supabase stack; no hosted project is linked."
 supabase start -x "studio,edge-runtime,logflare,vector,postgres-meta,imgproxy"
