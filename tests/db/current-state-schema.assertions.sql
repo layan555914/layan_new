@@ -89,6 +89,20 @@ BEGIN
     RAISE EXCEPTION 'Private internal CRM relations are missing';
   END IF;
 
+  IF EXISTS (
+    SELECT 1
+    FROM pg_constraint c
+    WHERE c.conrelid = 'private.admin_crm_leads'::regclass
+      AND c.contype = 'c'
+      AND (
+        pg_get_constraintdef(c.oid) ILIKE '%supplier_factory%'
+        OR pg_get_constraintdef(c.oid) ILIKE '%finishing_furniture%'
+        OR pg_get_constraintdef(c.oid) ILIKE '%service_provider%'
+      )
+  ) THEN
+    RAISE EXCEPTION 'Phase 2 service-company categories must not be enabled in CRM phase 1';
+  END IF;
+
   IF NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.admin_crm_leads'::regclass)
      OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.admin_crm_activities'::regclass) THEN
     RAISE EXCEPTION 'Internal CRM tables must have RLS enabled';
