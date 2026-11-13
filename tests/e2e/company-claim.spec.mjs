@@ -187,6 +187,7 @@ test("admin can review and approve a pending company claim from the claim queue"
   const state = await mockCompanyClaimBackend(page, { claims: CLAIM });
 
   await page.goto("/admin.html");
+  await page.locator("[data-view='review']").click();
   const card = page.locator("#pendingCompanyClaims [data-company-claim-id]");
   await expect(card).toHaveCount(1, { timeout: 15000 });
   await expect(card).toContainText(ENTITY.name_ar);
