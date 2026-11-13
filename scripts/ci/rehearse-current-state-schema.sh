@@ -135,4 +135,4 @@ export MAILPIT_URL="http://127.0.0.1:54324"
 node "$STORAGE_API_TEST"
 unset MAILPIT_URL DATABASE_URL SERVICE_ROLE_KEY ANON_KEY
 
-echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local Storage/Auth API checks."
+echo "PASS: clean current-state schema + CLI-generated advertiser CRM migration, CRM owner/admin RLS, company-claim lock assertions, private admin isolation, and local Storage/Auth API checks."
