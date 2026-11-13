@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     propertyDocsList.innerHTML = '<p class="admin-empty">جارٍ تحميل مستندات العقارات...</p>';
     try {
       const rows = await request("/rest/v1/property_offers?select=id,title,developer_name,project_name,document_urls,created_at&status=eq.pending&order=created_at.asc");
-      const documentCount = rows.reduce((total, offer) => total + (Array.isArray(offer.document_urls) ? offer.document_urls.filter(path => typeof path === "string" && path.startsWith("documents/")).length : 0), 0);
+      const documentCount = Array.isArray(rows) ? rows.reduce((total, offer) => total + (Array.isArray(offer.document_urls) ? offer.document_urls.filter(path => typeof path === "string" && path.startsWith("documents/")).length : 0), 0) : 0;
       const documentCountEl = document.getElementById("statPendingDocuments");
       if (documentCountEl) documentCountEl.textContent = String(documentCount);
       if (!Array.isArray(rows) || !rows.length) {
