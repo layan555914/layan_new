@@ -49,8 +49,8 @@ jobs:
           }
           if (archive.withheld?.length !== 2) throw new Error('Expected the two owner-specific migrations to remain withheld');
           const privateDirectorySeed = archive.records.find(record => record.version === '20261102175735');
-          const privateSeedSql = (privateDirectorySeed?.statements || []).join('\\n');
-          if (!privateDirectorySeed?.redactions?.length || /insert\\s+into\\s+public\\.directory_entity_private/i.test(privateSeedSql) || /\\$private\\$/i.test(privateSeedSql)) {
+          const privateSeedSql = (privateDirectorySeed?.statements || []).join('\n');
+          if (!privateDirectorySeed?.redactions?.length || /insert\s+into\s+public\.directory_entity_private/i.test(privateSeedSql) || /\$private\$/i.test(privateSeedSql)) {
             throw new Error('Private directory address/phone seed data must remain redacted from the public archive');
           }
           const raw = JSON.stringify(archive);
