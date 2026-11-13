@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch]);
   }
   // Only http/https links are ever rendered as clickable; anything else (javascript:, data:, ...) is disabled.
-  const safeUrl = value => { try { const u = new URL(String(value || "")); return ["https:", "http:"].includes(u.protocol) ? u.href : ""; } catch (_) { return ""; } };
+  const safeUrl = value => { try { const u = new URL(String(value || "")); if (u.protocol === "http:") u.protocol = "https:"; return u.protocol === "https:" ? u.href : ""; } catch (_) { return ""; } };
   const linkHtml = (url, label) => {
     if (!url) return "";
     const s = safeUrl(url);
