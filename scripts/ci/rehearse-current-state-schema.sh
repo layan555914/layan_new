@@ -27,7 +27,9 @@ node "$APPROVAL_GATE_TEST"
 
 if ! grep -Fq 'id="adminCrm"' "$ROOT_DIR/admin.html" \
   || ! grep -Fq './admin-crm.js?v=20261114-1' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-crm.js?v=20261114-1' "$ROOT_DIR/sw.js"; then
+  || ! grep -Fq './admin-crm.js?v=20261114-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-approval.js?v=20261114-1' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-approval.js?v=20261114-1' "$ROOT_DIR/sw.js"; then
   echo "The CRM admin workspace is not fully wired into the admin page and PWA shell." >&2
   exit 1
 fi
