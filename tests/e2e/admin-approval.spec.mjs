@@ -62,9 +62,7 @@ test("added admin change goes to the owner, owner approves and it is performed",
   await page.locator("[data-view='sponsors']").click();
   await expect(page.locator("#adminSponsorsList")).toContainText("Rahma Builders");
   await page.locator("[data-sponsor-id='s1'] [data-sp='toggle']").click();
-  await expect.poll(() => state.changes.length).toBeGreaterThan(0);
-  console.log("ADMIN_APPROVAL_CAPTURED_CHANGES", JSON.stringify(state.changes));
-  expect(state.changes).toHaveLength(1);
+  await expect.poll(() => state.changes.length).toBe(1);
   expect(state.patches.length).toBe(0); // nothing written directly
   expect(state.changes[0].p_payload).toMatchObject({ method: "PATCH", body: { is_active: false } });
   expect(state.changes[0].p_payload.path).toContain("/rest/v1/platform_sponsors?id=eq.s1");
