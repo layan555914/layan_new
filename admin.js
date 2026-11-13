@@ -155,6 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
     propertyDocsList.innerHTML = '<p class="admin-empty">جارٍ تحميل مستندات العقارات...</p>';
     try {
       const rows = await request("/rest/v1/property_offers?select=id,title,developer_name,project_name,document_urls,created_at&status=eq.pending&order=created_at.asc");
+      const documentCount = rows.reduce((total, offer) => total + (Array.isArray(offer.document_urls) ? offer.document_urls.filter(path => typeof path === "string" && path.startsWith("documents/")).length : 0), 0);
+      const documentCountEl = document.getElementById("statPendingDocuments");
+      if (documentCountEl) documentCountEl.textContent = String(documentCount);
       if (!Array.isArray(rows) || !rows.length) {
         propertyDocsList.innerHTML = '<p class="admin-empty">لا توجد مستندات عقارات معلقة للمراجعة حاليًا.</p>';
         return;
@@ -180,6 +183,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       propertyDocsList.innerHTML = cards.length ? cards.join("") : '<p class="admin-empty">لا توجد مستندات مرفقة بعقارات قيد المراجعة حاليًا.</p>';
     } catch (error) {
+      const documentCountEl = document.getElementById("statPendingDocuments");
+      if (documentCountEl) documentCountEl.textContent = "—";
       propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
     }
   }
@@ -286,6 +291,8 @@ document.addEventListener("DOMContentLoaded", () => {
     companyAdsList.innerHTML = '<p class="admin-empty">جارٍ تحميل إعلانات الشركات...</p>';
     try {
       const rows = await request("/rest/v1/company_property_ads?select=id,business_name,plan_code,status,starts_at,ends_at,created_at&status=eq.pending&order=created_at.asc");
+      const countEl = document.getElementById("statPendingCompanyAds");
+      if (countEl) countEl.textContent = String(Array.isArray(rows) ? rows.length : 0);
       if (!Array.isArray(rows) || !rows.length) {
         companyAdsList.innerHTML = '<p class="admin-empty">لا توجد طلبات إعلانات شركات معلّقة.</p>';
         return;
@@ -294,6 +301,8 @@ document.addEventListener("DOMContentLoaded", () => {
         '<article class="admin-ad" data-company-ad-id="' + esc(row.id) + '"><div><span class="admin-chip">' + esc(row.plan_code) + '</span><h2>' + esc(row.business_name) + '</h2><p>تاريخ الطلب: ' + esc(new Date(row.created_at).toLocaleString("ar-EG-u-nu-latn")) + '</p></div><div class="admin-actions"><button type="button" class="btn btn-gold" data-company-ad-action="activate">تفعيل 30 يومًا</button><button type="button" class="btn btn-outline-dark" data-company-ad-action="reject">رفض الطلب</button></div></article>'
       ).join("");
     } catch (error) {
+      const countEl = document.getElementById("statPendingCompanyAds");
+      if (countEl) countEl.textContent = "—";
       companyAdsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل إعلانات الشركات.") + '</p>';
     }
   }
@@ -376,6 +385,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
+      const supplierCountEl = document.getElementById("statPendingSupplierAds");
+      if (supplierCountEl) supplierCountEl.textContent = String(Array.isArray(rows) ? rows.length : 0);
       render(rows);
       await loadAdminStats();
       await loadPendingCompanyProfiles();
