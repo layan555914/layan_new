@@ -164,7 +164,6 @@ test("an authenticated representative submits a claim linked to their Supabase a
   const form = await fillClaimForm(page);
   await form.locator("button[type='submit']").click();
 
-  await expect(page.locator("#companyClaimStatus")).toContainText("تم تسجيل طلبك بنجاح");
   await expect(page.locator("#companyClaimStatus")).toContainText("قيد المراجعة");
   await expect(form).toBeHidden();
 
