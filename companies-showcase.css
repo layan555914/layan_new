@@ -85,3 +85,7 @@
 .company-showcase-status[data-state="company_supplied"]{border-color:#c8b9d9;background:#f6f1fb;color:#60447f}
 .company-showcase-card-actions .company-showcase-contact-pending{display:inline-flex;align-items:center;min-height:36px;padding:7px 10px;border:1px dashed var(--aa-line,#E6DACB);border-radius:9px;color:var(--aa-muted,#6B5D52);font-size:11px;font-weight:700}
 .company-data-pending{display:inline-flex;align-items:center;padding:9px 12px;border:1px dashed #d9a5a0;border-radius:9px;background:#fff4f2;color:#8d302a;font-size:12px;font-weight:700}
+
+.company-showcase-status{max-width:calc(100% - 20px);white-space:normal;line-height:1.4;text-align:center}
+.company-showcase-flags span[data-state="needs_confirmation"]{border-color:#d9a5a0;background:rgba(255,244,242,.12)}
+.company-showcase-flags span[data-state="project_only"]{border-color:#d6c5a7;background:rgba(251,244,230,.12)}
