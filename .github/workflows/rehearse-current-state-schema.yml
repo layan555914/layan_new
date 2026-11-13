@@ -10,6 +10,12 @@ on:
       - recovery/current-state-schema-rehearsal-20261113
     paths:
       - "supabase/config.toml"
+      - "supabase/migration-templates/**"
+      - "admin.html"
+      - "admin.css"
+      - "admin-crm.js"
+      - "admin-approval.js"
+      - "admin-layout.js"
       - "supabase/bootstrap/**"
       - "supabase/migrations/**"
       - "supabase/README.md"
