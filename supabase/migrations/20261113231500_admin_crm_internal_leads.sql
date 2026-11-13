@@ -392,7 +392,7 @@ BEGIN
 
   IF p_activity_type <> 'note' THEN
     UPDATE private.admin_crm_leads
-    SET last_contact_at = GREATEST(COALESCE(last_contact_at, p_occurred_at), p_occurred_at),
+    SET last_contact_at = GREATEST(COALESCE(last_contact_at, COALESCE(p_occurred_at, now())), COALESCE(p_occurred_at, now())),
         updated_at = now(),
         updated_by = auth.uid()
     WHERE id = p_lead_id;
