@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const email = document.getElementById("adminEmail");
   const password = document.getElementById("adminPassword");
   const authPanel = document.getElementById("authPanel");
+  const adminConsole = document.getElementById("adminConsole");
   const reviewPanel = document.getElementById("reviewPanel");
   // The admin page uses the same verified Supabase session as every other platform page.
   const auth = window.LAYAN_SUPABASE;
@@ -79,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function showState(isLoggedIn) {
     authPanel.hidden = isLoggedIn;
+    if (adminConsole) adminConsole.hidden = !isLoggedIn;
     reviewPanel.hidden = !isLoggedIn;
   }
   function esc(value) {
