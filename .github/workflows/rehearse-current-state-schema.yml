@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - recovery/current-state-schema-rehearsal-20261113
     paths:
       - "supabase/config.toml"
       - "supabase/bootstrap/**"
