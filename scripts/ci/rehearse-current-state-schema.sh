@@ -7,6 +7,7 @@ STORAGE_BASELINE_FILE="$ROOT_DIR/supabase/bootstrap/storage-baseline.sql"
 ASSERTIONS_FILE="$ROOT_DIR/tests/db/current-state-schema.assertions.sql"
 STORAGE_API_TEST="$ROOT_DIR/tests/db/storage-api-baseline.mjs"
 CRM_API_TEST="$ROOT_DIR/tests/db/admin-crm-api.mjs"
+APPROVAL_GATE_TEST="$ROOT_DIR/tests/ui/admin-approval-gate.mjs"
 TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/asyut-aqar-current-state.XXXXXX")"
 STACK_STARTED=0
 
@@ -19,7 +20,10 @@ cleanup() {
 trap cleanup EXIT
 
 node --check "$ROOT_DIR/admin-crm.js"
+node --check "$ROOT_DIR/admin-approval.js"
 node --check "$CRM_API_TEST"
+node --check "$APPROVAL_GATE_TEST"
+node "$APPROVAL_GATE_TEST"
 
 if ! grep -Fq 'id="adminCrm"' "$ROOT_DIR/admin.html" \
   || ! grep -Fq './admin-crm.js?v=20261114-1' "$ROOT_DIR/admin.html" \
@@ -35,7 +39,7 @@ if grep -Eq 'option value="(supplier_factory|finishing_furniture|service_provide
   exit 1
 fi
 
-for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST" "$CRM_API_TEST"; do
+for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST" "$CRM_API_TEST" "$APPROVAL_GATE_TEST"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required current-state rehearsal file is missing or empty: $required_file" >&2
     exit 1
