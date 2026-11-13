@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="./assets/build/base.min.css?v=fe45b2b02eaa0f7d">
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
-  <link rel="stylesheet" href="./admin.css?v=20261110-4">
+  <link rel="stylesheet" href="./admin.css?v=20261113-1">
 </head>
 <body class="adm-body">
 <header class="adm-top">
@@ -58,16 +58,29 @@
 
   <div class="adm-main">
     <section class="adm-view" data-view-panel="today">
-      <header class="adm-view-head"><span class="adm-kicker">الخطوة 1</span><h1>لوحة اليوم</h1><p>ابدأ من هنا كل يوم: راجع ما ينتظر قرارك، ثم تابع أرقام الزوار والتواصل.</p></header>
+      <header class="adm-view-head"><span class="adm-kicker">مركز التشغيل</span><h1>مركز تشغيل أسيوط عقار</h1><p>ملخص واحد للطلبات التي تحتاج مراجعتك، مع وصول مباشر إلى الشركات والإعلانات والرعاة والعملاء.</p></header>
       <section class="adm-card admin-stats" id="adminStats" hidden aria-label="ما ينتظر قرارك">
-        <h2 class="adm-card-title">ما ينتظر قرارك الآن</h2>
+        <h2 class="adm-card-title">طلبات ومهام تنتظر إجراءك</h2>
         <div class="adm-todo">
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secProperties"><strong id="statPendingProperties">—</strong><span>عقار قيد المراجعة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secDocuments"><strong id="statPendingDocuments">—</strong><span>مستند عقاري للمراجعة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secMarketplace"><strong id="statPendingMarketplace">—</strong><span>خدمة قيد المراجعة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secEdits"><strong id="statPendingEdits">—</strong><span>تعديل على إعلان منشور</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanies"><strong id="statPendingCompanies">—</strong><span>ملف شركة قيد المراجعة</span></button><button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanyClaims"><strong id="statPendingCompanyClaims">—</strong><span>طلب استلام شركة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secSupplierAds"><strong id="statPendingSupplierAds">—</strong><span>طلب إعلان مميز</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanyAds"><strong id="statPendingCompanyAds">—</strong><span>طلب إعلان شركة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="requests"><strong data-requests-total>0</strong><span>طلب ينتظر المدير</span></button>
           <button type="button" class="admin-stat adm-todo-item is-info" data-goto="published"><strong data-published-total>—</strong><span>منشور للزوار (عقارات + خدمات + شركات)</span><i hidden id="statApprovedMarketplace"></i></button>
+        </div>
+      </section>
+      <section class="adm-card adm-quick-card" aria-label="اختصارات التشغيل">
+        <h2 class="adm-card-title">اختصارات التشغيل</h2>
+        <div class="adm-quicklinks">
+          <button type="button" class="adm-quicklink" data-goto="review" data-goto-anchor="secCompanyClaims">طلبات استلام الشركات</button>
+          <button type="button" class="adm-quicklink" data-goto="sponsors">الرعاة والإعلانات الممولة</button>
+          <button type="button" class="adm-quicklink" data-goto="customers">العملاء والحسابات</button>
+          <button type="button" class="adm-quicklink" data-goto="activity">الزوار والتواصل</button>
+          <button type="button" class="adm-quicklink" data-goto="team">فريق الإدارة</button>
         </div>
       </section>
       <section class="adm-card">
@@ -131,7 +144,7 @@
   </div>
 </div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261110-2"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261113-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261108-4"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261110-2"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261113-2"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261113-2"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>
