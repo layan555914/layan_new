@@ -61,7 +61,7 @@ const egPhone=v=>{let d=String(v||"").replace(/[^0-9]/g,"");if(d.startsWith("20"
 const normText=v=>String(v||"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه");
 
 const SERVICE_PROFILE_CATEGORY_CODES={
- "الشركات والمكاتب العقارية":["real_estate_marketing","real_estate_brokerage","real_estate_sales"],
+ "الشركات والمكاتب العقارية":["real_estate_marketing","real_estate_brokerage","real_estate_sales","real_estate_development"],
  "مواد البناء والتشطيب":["contracting_construction","building_materials","finishing_decoration"],
  "الأثاث والفرش وتجهيز الوحدات":["furniture_furnishings"],
  "المشروعات والمطورون العقاريون":["real_estate_development"],
