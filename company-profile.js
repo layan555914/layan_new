@@ -112,8 +112,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':'')+
    (gallery.length?'<section class="company-profile-section"><h2>معرض أعمال الجهة</h2><div class="company-gallery">'+gallery.map((u,i)=>'<img src="'+esc(u)+'" alt="صورة من أعمال '+esc(name)+' رقم '+(i+1)+'" loading="lazy">').join('')+'</div></section>':'')+
    '<section class="company-profile-section"><h2>مصادر المعلومات</h2>'+sourceLinks(sources)+'</section>'+
-   '<section class="company-claim-panel"><div><span class="eyebrow">ممثل الشركة؟</span><h2>اطلب استلام وإدارة الملف التعريفي مجانًا</h2><p>املأ بياناتك وصفَتك بالجهة. سيُرسل الطلب إلى إدارة أسيوط عقار للمراجعة اليدوية والتحقق من التفويض. إرسال الطلب لا يمنحك صلاحية تعديل الملف تلقائيًا.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">ابدأ طلب استلام الملف</button></section>'+
-   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف جهة</span><h2 id="companyClaimTitle">بيانات ممثل الجهة</h2></div><button type="button" id="companyClaimClose" aria-label="إغلاق">×</button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الشركة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم ممثل الشركة *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الشركة *<select name="representative_role" required><option value="">اختر الصفة</option><option>مالك الشركة</option><option>شريك</option><option>مدير الشركة</option><option>مدير فرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><p class="company-claim-dialog-note">جهّز ما يثبت صفتك وموافقة الشركة. لا ترسل مستندات هوية حساسة إلا بعد أن تطلبها الإدارة عبر قناة مناسبة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
+   '<section class="company-claim-panel"><div><span class="eyebrow">ممثل الجهة؟</span><h2>اطلب استلام وإدارة الملف التعريفي مجانًا</h2><p>املأ بياناتك وصفَتك بالجهة. سيُرسل الطلب إلى إدارة أسيوط عقار للمراجعة اليدوية والتحقق من التفويض. إرسال الطلب لا يمنحك صلاحية تعديل الملف تلقائيًا.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">ابدأ طلب استلام الملف</button></section>'+
+   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف جهة</span><h2 id="companyClaimTitle">بيانات ممثل الجهة</h2></div><button type="button" id="companyClaimClose" aria-label="إغلاق">×</button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الجهة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم ممثل الجهة *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>مالك الشركة</option><option>شريك</option><option>مدير الشركة</option><option>مدير فرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><p class="company-claim-dialog-note">جهّز ما يثبت صفتك وموافقة الشركة. لا ترسل مستندات هوية حساسة إلا بعد أن تطلبها الإدارة عبر قناة مناسبة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
   const claimDialog=document.getElementById("companyClaimDialog");
   document.getElementById("companyClaimOpen")?.addEventListener("click",()=>{claimDialog?.showModal();refreshMyClaimStatus();});
   document.getElementById("companyClaimClose")?.addEventListener("click",()=>claimDialog?.close());
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=false;
     }else if(row.status==="approved"){
-     showClaimStatus("تم اعتماد طلبك وربط حسابك بملف الشركة. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة.",false);
+     showClaimStatus("تم اعتماد طلبك وربط حسابك بملف الجهة. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة.",false);
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=true;
     }else if(row.status==="rejected"){
@@ -248,6 +248,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
       const result=await response.json().catch(()=>null);
       if(!response.ok)throw Error(result?.message||result?.details||"تعذر إرسال التعديل.");
       status.textContent="تم إرسال التعديل بنجاح. سيظل الملف الحالي ظاهرًا حتى مراجعة الإدارة واعتماد النسخة الجديدة.";
+      button.textContent="التعديل قيد المراجعة";
+      button.disabled=true;
      }catch(error){status.textContent=error.message||"تعذر إرسال التعديل.";button.disabled=false;}
     });
    }catch(error){console.warn("Company manager editor unavailable:",error);}
@@ -267,7 +269,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    }
    const auth=window.LAYAN_SUPABASE;
    if(!auth?.isAuthenticated?.()){
-    showClaimStatus("سجّل الدخول أولًا من الصفحة الرئيسية، ثم ارجع إلى ملف الشركة وأرسل الطلب.",true);
+    showClaimStatus("سجّل الدخول أولًا من الصفحة الرئيسية، ثم ارجع إلى ملف الجهة وأرسل الطلب.",true);
     if(claimLoginLink)claimLoginLink.hidden=false;
     return;
    }
@@ -304,7 +306,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    }catch(error){
     const message=String(error?.message||"");
     showClaimStatus(/company_claim_requests_one_pending_per_user_entity|duplicate key|unique constraint/i.test(message)
-     ?"لديك طلب استلام مفتوح بالفعل لهذه الشركة. تواصل مع الإدارة لمتابعته."
+     ?"لديك طلب استلام مفتوح بالفعل لهذا الملف. تواصل مع الإدارة لمتابعته."
      :(message||"تعذر تسجيل الطلب. حاول مرة أخرى بعد التأكد من تسجيل الدخول."),true);
    }finally{
     if(submitButton){submitButton.disabled=false;submitButton.textContent="إرسال طلب الاستلام";}

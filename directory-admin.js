@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function arrayField(name, label, values, wide) {
-    const value = Array.isArray(values) ? values.join("\\n") : "";
+    const value = Array.isArray(values) ? values.join("\n") : "";
     return '<label class="' + (wide ? "wide" : "") + '">' + esc(label) +
       '<textarea data-array-field="' + esc(name) + '" rows="3">' + esc(value) + '</textarea><small>كل عنصر في سطر منفصل.</small></label>';
   }
@@ -447,7 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
         (element.value.trim() === "" ? null : element.value.trim());
     });
     card.querySelectorAll("[data-array-field]").forEach(element => {
-      patch[element.dataset.arrayField] = element.value.split("\\n").map(value => value.trim()).filter(Boolean);
+      patch[element.dataset.arrayField] = element.value.split("\n").map(value => value.trim()).filter(Boolean);
     });
     return patch;
   }
