@@ -231,36 +231,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadPendingCompanyClaims() {
     if (!companyClaimsList) return;
-    companyClaimsList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات استلام الشركات...</p>';
+    companyClaimsList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات استلام ملفات الجهات والشركات ومقدمي الخدمات...</p>';
     try {
       const rows = await request("/rest/v1/rpc/company_claim_admin_list", { method: "POST", body: "{}" });
       const count = Array.isArray(rows) ? rows.length : 0;
       const countEl = document.getElementById("statPendingCompanyClaims");
       if (countEl) countEl.textContent = String(count);
       if (!count) {
-        companyClaimsList.innerHTML = '<p class="admin-empty">لا توجد طلبات استلام شركات معلقة.</p>';
+        companyClaimsList.innerHTML = '<p class="admin-empty">لا توجد طلبات استلام ملفات معلقة.</p>';
         return;
       }
+      const entityIds = [...new Set(rows.map(row => String(row.directory_entity_id || "")).filter(id => /^[0-9a-f-]{36}$/i.test(id)))];
+      const entityDetailsById = new Map();
+      if (entityIds.length) {
+        try {
+          const filter = encodeURIComponent("(" + entityIds.join(",") + ")");
+          const entities = await request("/rest/v1/directory_entities?select=id,entity_type,service_category&id=in." + filter);
+          if (Array.isArray(entities)) entities.forEach(entity => entityDetailsById.set(String(entity.id), entity));
+        } catch (error) {
+          console.warn("تعذر تحميل تصنيفات ملفات طلبات الاستلام؛ ستظل المراجعة متاحة:", error);
+        }
+      }
+      const serviceCategoryLabels = {
+        contracting_construction: "مقاولات وإنشاءات",
+        real_estate_marketing: "تسويق عقاري",
+        real_estate_brokerage: "وساطة ومكتب عقاري",
+        building_materials: "مواد بناء وتشطيب",
+        finishing_decoration: "تشطيب وديكور",
+        furniture_furnishings: "أثاث وفرش وتجهيز وحدات",
+        engineering_design: "مكاتب هندسية وتصميم معماري",
+        maintenance_property_management: "صيانة وإدارة عقارات",
+        real_estate_consultancy: "استشارات عقارية",
+        real_estate_development: "تطوير ومشروعات عقارية",
+        real_estate_sales: "مبيعات عقارية",
+        other_real_estate_services: "خدمات عقارية مساندة"
+      };
+      const legacyEntityLabels = {
+        developer: "مطور عقاري", marketing: "تسويق عقاري", brokerage: "وساطة عقارية",
+        contractor: "مقاولات", public_authority: "جهة عامة", sales_office: "مكتب مبيعات",
+        consultant: "استشارات عقارية", other: "جهة أخرى"
+      };
       companyClaimsList.innerHTML = rows.map(row => {
+        const entity = entityDetailsById.get(String(row.directory_entity_id)) || {};
+        const entityCategory = serviceCategoryLabels[entity.service_category] || legacyEntityLabels[entity.entity_type] || "ملف جهة";
         const phone = String(row.contact_phone || "");
         const phoneDigits = phone.replace(/[^0-9]/g, "");
         const createdAt = row.created_at ? new Date(row.created_at).toLocaleString("ar-EG-u-nu-latn") : "—";
         const profileUrl = "./company.html?entity_id=" + encodeURIComponent(row.directory_entity_id);
-        const waText = "مرحبًا " + String(row.representative_name || "") + "، بخصوص طلب استلام ملف " + String(row.company_name || "") + " على أسيوط عقار: " + String(row.admin_notes || "نحتاج استكمال التحقق من الصفة والتفويض.");
+        const waText = "مرحبًا " + String(row.representative_name || "") + "، بخصوص طلب استلام ملف " + String(row.company_name || "الجهة") + " على أسيوط عقار: " + String(row.admin_notes || "نحتاج استكمال التحقق من الصفة والتفويض.");
         const whatsappNumber = phoneDigits.startsWith("0") ? "20" + phoneDigits.slice(1) : phoneDigits;
         const whatsapp = whatsappNumber.length >= 10
           ? '<a class="btn btn-outline-dark" href="https://wa.me/' + esc(whatsappNumber) + '?text=' + encodeURIComponent(waText) + '" target="_blank" rel="noopener noreferrer">مراسلة واتساب</a>'
           : "";
         return '<article class="admin-ad" data-company-claim-id="' + esc(row.id) + '">' +
-          '<div><span class="admin-chip">طلب استلام ملف · قيد المراجعة</span>' +
-          '<h2>' + esc(row.company_name || "شركة غير محددة") + '</h2>' +
-          '<p><strong>ممثل الشركة:</strong> ' + esc(row.representative_name) + ' — ' + esc(row.representative_role) + '</p>' +
+          '<div><span class="admin-chip">طلب استلام ملف · قيد المراجعة</span><span class="admin-chip">' + esc(entityCategory) + '</span>' +
+          '<h2>' + esc(row.company_name || "جهة غير محددة") + '</h2>' +
+          '<p><strong>ممثل الجهة:</strong> ' + esc(row.representative_name) + ' — ' + esc(row.representative_role) + '</p>' +
           '<p><strong>رقم التواصل:</strong> <a href="tel:' + esc(phoneDigits) + '">' + esc(phone) + '</a>' +
           (row.contact_email ? ' — <strong>البريد:</strong> ' + esc(row.contact_email) : '') + '</p>' +
           (row.notes ? '<p><strong>ملاحظات الممثل:</strong> ' + esc(row.notes) + '</p>' : '') +
           (row.admin_notes ? '<p><strong>ملاحظات الإدارة:</strong> ' + esc(row.admin_notes) + '</p>' : '') +
           '<p><strong>تاريخ الطلب:</strong> ' + esc(createdAt) + '</p>' +
-          '<p><a href="' + esc(profileUrl) + '" target="_blank" rel="noopener noreferrer">فتح ملف الشركة</a> · <span>معرّف حساب مقدم الطلب: ' + esc(row.requester_user_id) + '</span></p></div>' +
+          '<p><a href="' + esc(profileUrl) + '" target="_blank" rel="noopener noreferrer">فتح ملف الجهة</a> · <span>معرّف حساب مقدم الطلب: ' + esc(row.requester_user_id) + '</span></p></div>' +
           '<div class="admin-actions">' + whatsapp +
           '<button type="button" class="btn btn-gold" data-company-claim-action="approve">اعتماد وربط الحساب</button>' +
           '<button type="button" class="btn btn-outline-dark" data-company-claim-action="request_info">طلب استكمال البيانات</button>' +
@@ -268,7 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
           '</div></article>';
       }).join("");
     } catch (error) {
-      companyClaimsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل طلبات استلام الشركات.") + '</p>';
+      companyClaimsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل طلبات استلام الملفات.") + '</p>';
       const countEl = document.getElementById("statPendingCompanyClaims");
       if (countEl) countEl.textContent = "—";
     }
@@ -497,9 +529,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const action = button.dataset.companyClaimAction;
     let note = null;
     if (action === "approve") {
-      if (!window.confirm("بعد التحقق من هوية الممثل وتفويض الشركة، سيتم اعتماد الطلب وربط حسابه بسجل الشركة. هذا لا يفتح تعديل بيانات الدليل مباشرة. هل تؤكد؟")) return;
+      if (!window.confirm("بعد التحقق من هوية الممثل وتفويض الجهة، سيتم اعتماد الطلب وربط حسابه بالملف. هذا لا يفتح تعديل بيانات الدليل مباشرة. هل تؤكد؟")) return;
     } else {
-      note = window.prompt(action === "request_info" ? "اكتب البيانات أو الإثباتات المطلوبة من ممثل الشركة:" : "اكتب سبب رفض طلب استلام الشركة:");
+      note = window.prompt(action === "request_info" ? "اكتب البيانات أو الإثباتات المطلوبة من ممثل الجهة:" : "اكتب سبب رفض طلب استلام الملف:");
       if (note === null) return;
       if (note.trim().length < 3) { setStatus("اكتب ملاحظة واضحة من 3 أحرف على الأقل."); return; }
     }
@@ -510,13 +542,13 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ p_id: card.dataset.companyClaimId, p_action: action, p_note: note })
       });
       setStatus(action === "approve"
-        ? "تم اعتماد الطلب وربط حساب ممثل الشركة بالملف. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة."
+        ? "تم اعتماد الطلب وربط حساب ممثل الجهة بالملف. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة."
         : action === "request_info"
-          ? "تم تسجيل ملاحظة استكمال البيانات. تواصل مع الممثل عبر الهاتف أو واتساب."
-          : "تم رفض طلب استلام الشركة وتسجيل السبب.");
+          ? "تم تسجيل ملاحظة استكمال البيانات. تواصل مع ممثل الجهة عبر الهاتف أو واتساب."
+          : "تم رفض طلب استلام الملف وتسجيل السبب.");
       await loadPendingCompanyClaims();
     } catch (error) {
-      setStatus(error.message || "تعذر تنفيذ طلب استلام الشركة.");
+      setStatus(error.message || "تعذر تنفيذ طلب استلام الملف.");
     } finally {
       button.disabled = false;
     }
