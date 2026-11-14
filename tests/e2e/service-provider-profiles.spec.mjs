@@ -322,3 +322,60 @@ test("admin can approve a service provider profile update from the dedicated rev
   });
   await expect(card).toHaveCount(0);
 });
+
+test("marketplace keeps engineering design offices and interior designers in separate categories", async ({ page }) => {
+  const engineeringOffice = {
+    id: "dddddddd-dddd-4ddd-8ddd-dddddddddd01",
+    name_ar: "مكتب اختبار التصميم الهندسي",
+    entity_type: "consultant",
+    service_category: "engineering_design",
+    description: "ملف تجريبي لمكتب استشارات وتصميم هندسي.",
+    public_address: "شارع الجمهورية، أسيوط",
+    verification_status: "published",
+    public_visible: true
+  };
+  const interiorDesigner = {
+    id: "dddddddd-dddd-4ddd-8ddd-dddddddddd02",
+    name_ar: "استوديو اختبار الديكور الداخلي",
+    entity_type: "other",
+    service_category: "finishing_decoration",
+    description: "ملف تجريبي لمهندس تصميم داخلي وديكور.",
+    public_address: "شارع النميس، أسيوط",
+    verification_status: "published",
+    public_visible: true
+  };
+  const categoryNames = [
+    "سوق العقارات", "التنازلات العقارية", "أراضي للبيع", "أراضي التنازلات",
+    "إيجار يومي ومفروش", "الشركات والمكاتب العقارية", "مواد البناء والتشطيب",
+    "الأثاث والفرش وتجهيز الوحدات", "المشروعات والمطورون العقاريون",
+    "الصيانة وإدارة العقارات", "الاستشارات والخدمات العقارية",
+    "مكاتب التصميم الهندسي", "مهندسو الديكور والتصميم الداخلي"
+  ];
+
+  await page.route("**/rest/v1/**", async route => {
+    const url = new URL(route.request().url());
+    const table = url.pathname.split("/").pop();
+    if (table === "marketplace_categories") {
+      return reply(route, categoryNames.map((name, index) => ({
+        name, description: "وصف اختبار", display_order: index + 1
+      })));
+    }
+    if (table === "directory_entities") return reply(route, [engineeringOffice, interiorDesigner]);
+    if (table === "marketplace_listings") return reply(route, []);
+    return route.request().method() === "POST" ? reply(route, [], 201) : reply(route, []);
+  });
+
+  await page.goto("/marketplace.html");
+  const cards = page.locator("#marketplaceServiceProfiles .mk-profile-card");
+  await expect(cards).toHaveCount(2);
+
+  await page.locator("#marketplaceCategoryFilter").selectOption({ label: "مكاتب التصميم الهندسي" });
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText(engineeringOffice.name_ar);
+  await expect(cards).not.toContainText(interiorDesigner.name_ar);
+
+  await page.locator("#marketplaceCategoryFilter").selectOption({ label: "مهندسو الديكور والتصميم الداخلي" });
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText(interiorDesigner.name_ar);
+  await expect(cards).not.toContainText(engineeringOffice.name_ar);
+});
