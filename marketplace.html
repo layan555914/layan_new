@@ -43,7 +43,21 @@
   .listing-body { padding: 12px; }
 }
 
- .marketplace-pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px auto 0}.marketplace-pagination button{min-height:42px;padding:8px 16px;border:1px solid var(--navy);border-radius:9px;background:#fff;color:var(--navy);font-weight:700;cursor:pointer}.marketplace-pagination button:disabled{opacity:.45;cursor:not-allowed}.marketplace-pagination span{font-weight:700;color:var(--muted)}.marketplace-location-coordinates{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:10px}.marketplace-location-coordinates summary{cursor:pointer;color:var(--navy);font-weight:700}.marketplace-pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px auto 0}.marketplace-pagination button{min-height:42px;padding:8px 16px;border:1px solid var(--navy);border-radius:9px;background:#fff;color:var(--navy);font-weight:700;cursor:pointer}.marketplace-pagination button:disabled{opacity:.45;cursor:not-allowed}.marketplace-pagination span{font-weight:700;color:var(--muted)}.mk-featured-label{display:inline-flex;align-items:center;margin-inline-end:5px;padding:2px 7px;border:1px solid #C8963E;border-radius:999px;background:#FFF5DF;color:#765015;font-size:10px;font-weight:900;line-height:1.5}.mk-featured-label[hidden]{display:none!important}</style>
+ .marketplace-pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px auto 0}.marketplace-pagination button{min-height:42px;padding:8px 16px;border:1px solid var(--navy);border-radius:9px;background:#fff;color:var(--navy);font-weight:700;cursor:pointer}.marketplace-pagination button:disabled{opacity:.45;cursor:not-allowed}.marketplace-pagination span{font-weight:700;color:var(--muted)}.marketplace-location-coordinates{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:10px}.marketplace-location-coordinates summary{cursor:pointer;color:var(--navy);font-weight:700}.marketplace-pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin:20px auto 0}.marketplace-pagination button{min-height:42px;padding:8px 16px;border:1px solid var(--navy);border-radius:9px;background:#fff;color:var(--navy);font-weight:700;cursor:pointer}.marketplace-pagination button:disabled{opacity:.45;cursor:not-allowed}.marketplace-pagination span{font-weight:700;color:var(--muted)}.mk-featured-label{display:inline-flex;align-items:center;margin-inline-end:5px;padding:2px 7px;border:1px solid #C8963E;border-radius:999px;background:#FFF5DF;color:#765015;font-size:10px;font-weight:900;line-height:1.5}.mk-featured-label[hidden]{display:none!important}
+.mk-directory-block{margin:22px 0 30px;padding:18px;border:1px solid var(--line);border-radius:14px;background:#FCFAF7}
+.mk-profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+.mk-profile-card{display:flex;gap:12px;align-items:flex-start;min-width:0;padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);text-decoration:none}
+.mk-profile-card:hover{border-color:var(--gold);background:#fffdfa}
+.mk-profile-logo{flex:0 0 58px;width:58px;height:58px;display:grid;place-items:center;overflow:hidden;border-radius:10px;background:#F7F0E9;color:var(--navy);font-size:22px;font-weight:800}
+.mk-profile-logo img{width:100%;height:100%;object-fit:contain}
+.mk-profile-content{min-width:0;display:grid;gap:3px}
+.mk-profile-content strong{color:var(--navy);font-size:14px;overflow-wrap:anywhere}
+.mk-profile-content small{color:#8A5638;font-size:11px;font-weight:800}
+.mk-profile-content span{color:var(--muted);font-size:12px;line-height:1.7}
+.mk-profile-status{grid-column:1/-1;padding:16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}
+.mk-directory-note{margin:12px 0 0;color:var(--muted);font-size:12px}
+.mk-directory-note a{color:#8A5638;font-weight:800;text-decoration:underline}
+</style>
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
   <meta property="og:type" content="website">
@@ -80,6 +94,11 @@
 <label><span class="sr-only">المدينة / المركز</span><select id="marketplaceCityFilter"><option value="">المدينة / المركز</option><option>مدينة أسيوط</option><option>أسيوط الجديدة</option><option>ديروط</option><option>القوصية</option><option>منفلوط</option><option>أبنوب</option><option>الفتح</option><option>ساحل سليم</option><option>البداري</option><option>أبو تيج</option><option>صدفا</option><option>الغنايم</option></select></label>
 </div>
 <div class="mk-chips"><button type="button" class="mk-chip is-active" data-mk-chip="">الكل</button><button type="button" class="mk-chip" data-mk-chip="الشركات والمكاتب العقارية">الشركات والمكاتب العقارية</button><button type="button" class="mk-chip" data-mk-chip="مواد البناء والتشطيب">مواد البناء والتشطيب</button><button type="button" class="mk-chip" data-mk-chip="الأثاث والفرش وتجهيز الوحدات">الأثاث والفرش وتجهيز الوحدات</button><button type="button" class="mk-chip" data-mk-chip="المشروعات والمطورون العقاريون">المشروعات والمطورون العقاريون</button><button type="button" class="mk-chip" data-mk-chip="الصيانة وإدارة العقارات">الصيانة وإدارة العقارات</button><button type="button" class="mk-chip" data-mk-chip="الاستشارات والخدمات العقارية">الاستشارات والخدمات العقارية</button></div>
+<section class="mk-directory-block" aria-labelledby="marketplaceServiceProfilesTitle">
+ <div class="heading-row mk-heading"><div><h2 id="marketplaceServiceProfilesTitle">ملفات الشركات ومقدمي الخدمات</h2><p>ملفات تعريفية مجانية للجهات المنشورة بعد مراجعة أسيوط عقار. يمكن لممثل الجهة طلب استلام الملف مجانًا.</p></div><span id="marketplaceServiceProfilesCount" role="status">جارٍ تحميل الملفات...</span></div>
+ <div id="marketplaceServiceProfiles" class="mk-profile-grid" aria-live="polite"><p class="muted">جارٍ تحميل ملفات الجهات...</p></div>
+ <p class="mk-directory-note"><a href="./companies.html">عرض كل ملفات الشركات والخدمات ←</a> · الملفات التعريفية منفصلة عن إعلانات الخدمات أدناه.</p>
+</section>
 <div class="heading-row mk-heading"><h2>مقدمو الخدمات المعتمدون</h2><p id="marketplaceCount" role="status">جارٍ تحميل الإعلانات...</p></div>
 <div id="marketplaceListings" class="listings-grid mk-grid" aria-live="polite"><p>جارٍ تحميل الإعلانات...</p></div><nav id="marketplacePagination" class="marketplace-pagination" aria-label="صفحات سوق الخدمات" hidden></nav>
 <p class="mk-property-note">تبحث عن شقة أو أرض أو تنازل؟ العقارات في <a href="./offers.html">صفحة العقارات</a>.</p>
@@ -104,7 +123,7 @@
 </form></div></dialog>
 <script src="./config.js?v=20261105-7"></script>
 <script src="./gubabase.js?v=20261110-2"></script>
-<script src="./marketplace.js?v=20261110-1"></script>
+<script src="./marketplace.js?v=20261114-service-profiles-1"></script>
   <script src="./share.js?v=20261105-7"></script>
   <script src="./assistant.js?v=20261108-2" defer></script>
   <script src="./mascot.js?v=20261110-1" defer></script>
