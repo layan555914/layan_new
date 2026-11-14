@@ -230,3 +230,11 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
   .adm-body [data-admin-panel="users"] .admin-actions-cell { display: flex; flex-wrap: wrap; gap: 4px; min-width: 150px; max-width: 170px; }
   .adm-body [data-admin-panel="users"] .admin-actions-cell button { padding: 4px 8px; font-size: 12px; min-height: 30px; border-radius: 8px; }
 }
+
+
+/* Operations-center quick navigation */
+.adm-quicklinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.adm-quicklink{min-height:42px;padding:8px 14px;border:1px solid var(--adm-line);border-radius:12px;background:var(--adm-soft);color:var(--adm-ink);font:700 13px var(--adm-body);cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+.adm-quicklink:hover{background:#FBF1E9;border-color:var(--adm-accent-2);transform:translateY(-1px)}
+.adm-quicklink:focus-visible{outline:3px solid rgba(164,71,42,.25);outline-offset:2px}
+@media(max-width:640px){.adm-quicklinks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.adm-quicklink{width:100%;min-height:46px;padding:8px;font-size:12.5px}}
