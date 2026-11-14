@@ -460,6 +460,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     otpRequestButton.addEventListener("click", () => sendEmailOtp(false));
     otpResendButton.addEventListener("click", () => sendEmailOtp(true));
     otpVerifyButton.addEventListener("click", finishOtpSignIn);
+    otpCodeInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        finishOtpSignIn();
+      }
+    });
     otpBackButton.addEventListener("click", () => {
       clearOtpFlow();
       status.textContent = "يمكنك استخدام كلمة المرور أو طلب كود جديد.";
