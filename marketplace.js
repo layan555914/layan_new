@@ -8,6 +8,11 @@ const $=id=>document.getElementById(id);
 const authDialog=$("authDialog"),listingDialog=$("marketplaceListingDialog");
 const authForm=$("authForm"),listingForm=$("marketplaceListingForm");
 const authStatus=$("authStatus"),listingStatus=$("marketplaceFormStatus");
+const marketplacePasswordField=$("marketplacePasswordField"),marketplaceOtpField=$("marketplaceOtpField");
+const marketplaceOtpInput=$("marketplaceOtpInput"),marketplaceOtpRequest=$("marketplaceOtpRequest");
+const marketplaceOtpVerify=$("marketplaceOtpVerify"),marketplaceOtpResend=$("marketplaceOtpResend");
+const marketplaceOtpBack=$("marketplaceOtpBack");
+let pendingMarketplaceOtp=null;
 const categoryFilter=$("marketplaceCategoryFilter"),listingGrid=$("marketplaceListings");
 let authMode="login",currentSession=null,listings=[],shouldOpenListingAfterAuth=false,marketplacePage=1;const MARKETPLACE_PER_PAGE=12;
 let categories=["سوق العقارات","التنازلات العقارية","أراضي للبيع","أراضي التنازلات","إيجار يومي ومفروش","الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية"];
@@ -30,8 +35,91 @@ function saveSession(session){currentSession=session||null;updateAuthButton()}
 function updateAuthButton(){const btn=$("authOpen");if(!btn)return;const email=currentSession?.user?.email;btn.textContent=email?"تسجيل الخروج":"تسجيل الدخول";btn.title=email?"مسجّل الدخول باسم "+email+" — اضغط لتسجيل الخروج":"تسجيل الدخول أو إنشاء حساب"}
 async function getSession(){const service=auth();if(!service)return null;const stored=service.getSession?.();if(!stored?.access_token)return null;try{const verified=await service.requireAuthenticated();saveSession(verified);return verified}catch(_){saveSession(null);return null}}
 async function api(path,options={}){const session=await getSession();const headers={"apikey":SUPABASE_KEY,"Authorization":"Bearer "+(session?.access_token||SUPABASE_KEY),"Content-Type":"application/json","Accept":"application/json",...(options.headers||{})};if(options.method==="POST")headers.Prefer="return=representation";const response=await fetch(SUPABASE_URL+"/rest/v1/"+path,{...options,headers});const raw=await response.text();let data=null;try{data=raw?JSON.parse(raw):null}catch(_){}if(!response.ok){const message=data?.message||data?.details||data?.hint||"تعذر الاتصال بقاعدة البيانات.";throw Error(message)}return data}
-function setAuthMode(mode){if(mode==="signup"){/* signup needs account type, name and phone: use the main signup form */window.location.href="./?auth=signup";return}authMode=mode;const signup=mode==="signup";$("authTitle").textContent=signup?"إنشاء حساب جديد":"تسجيل الدخول";$("authSubmit").textContent=signup?"إنشاء الحساب":"دخول";$("switchAuth").textContent=signup?"لديك حساب بالفعل؟ تسجيل الدخول":"إنشاء حساب جديد";$("forgotPassword").hidden=signup;authForm.elements.password.autocomplete=signup?"new-password":"current-password";authStatus.textContent=""}
+function resetMarketplaceOtpFlow(){
+ pendingMarketplaceOtp=null;
+ authForm.elements.email.readOnly=false;
+ marketplacePasswordField.hidden=false;
+ marketplaceOtpField.hidden=true;
+ marketplaceOtpInput.value="";
+ marketplaceOtpRequest.hidden=false;
+ marketplaceOtpRequest.disabled=false;
+ marketplaceOtpVerify.hidden=true;
+ marketplaceOtpVerify.disabled=false;
+ marketplaceOtpResend.hidden=true;
+ marketplaceOtpResend.disabled=true;
+ marketplaceOtpBack.hidden=true;
+ authSubmit.hidden=false;
+ $("forgotPassword").hidden=false;
+}
+function setAuthMode(mode){
+ if(mode==="signup"){/* signup needs account type, name and phone: use the main signup form */window.location.href="./?auth=signup";return}
+ authMode=mode;
+ resetMarketplaceOtpFlow();
+ $("authTitle").textContent="تسجيل الدخول";
+ $("authSubmit").textContent="دخول";
+ $("switchAuth").textContent="إنشاء حساب جديد";
+ $("forgotPassword").hidden=false;
+ authForm.elements.password.autocomplete="current-password";
+ authStatus.textContent="";
+}
 function openAuth(){authStatus.textContent="";setAuthMode("login");authDialog.showModal()}
+async function sendMarketplaceOtp(resend=false){
+ const service=auth();
+ if(!service?.requestEmailOtp){authStatus.textContent="تسجيل الدخول بالكود غير جاهز حاليًا.";return}
+ const email=resend&&pendingMarketplaceOtp?pendingMarketplaceOtp.email:authForm.elements.email.value.trim().toLowerCase();
+ if(!email){authStatus.textContent="اكتب بريدك الإلكتروني أولًا.";authForm.elements.email.focus();return}
+ if(!resend&&!authForm.elements.email.checkValidity()){authStatus.textContent="راجع صيغة البريد الإلكتروني وحاول مرة أخرى.";authForm.elements.email.focus();return}
+ const button=resend?marketplaceOtpResend:marketplaceOtpRequest;
+ button.disabled=true;
+ authStatus.textContent=resend?"جارٍ إرسال كود جديد...":"جارٍ إرسال كود التحقق إلى بريدك...";
+ try{
+  await service.requestEmailOtp(email,{shouldCreateUser:false});
+  pendingMarketplaceOtp={email};
+  authForm.elements.email.readOnly=true;
+  marketplacePasswordField.hidden=true;
+  marketplaceOtpField.hidden=false;
+  marketplaceOtpRequest.hidden=true;
+  marketplaceOtpVerify.hidden=false;
+  marketplaceOtpResend.hidden=false;
+  marketplaceOtpBack.hidden=false;
+  authSubmit.hidden=true;
+  $("forgotPassword").hidden=true;
+  marketplaceOtpInput.focus();
+  authStatus.textContent="تم إرسال كود من 6 أرقام إلى بريدك. اكتبه هنا لإكمال الدخول.";
+  marketplaceOtpResend.disabled=true;
+  marketplaceOtpResend.textContent="إعادة إرسال الكود بعد دقيقة";
+  window.setTimeout(()=>{
+   if(!pendingMarketplaceOtp)return;
+   marketplaceOtpResend.disabled=false;
+   marketplaceOtpResend.textContent="إعادة إرسال الكود";
+  },60000);
+ }catch(error){
+  authStatus.textContent=error.message||"تعذر إرسال كود التحقق.";
+  button.disabled=false;
+ }
+}
+async function verifyMarketplaceOtp(){
+ if(!pendingMarketplaceOtp){authStatus.textContent="اطلب كود التحقق أولًا.";return}
+ const service=auth();
+ marketplaceOtpVerify.disabled=true;
+ authStatus.textContent="جارٍ التحقق من الكود...";
+ try{
+  await service.verifyEmailOtp(pendingMarketplaceOtp.email,marketplaceOtpInput.value);
+  currentSession=service.getSession?.()||null;
+  if(!currentSession?.access_token||!currentSession?.user?.id)throw Error("تم التحقق من الكود، لكن لم تصل جلسة دخول صالحة. حاول مرة أخرى.");
+  saveSession(currentSession);
+  pendingMarketplaceOtp=null;
+  authDialog.close();
+  if(shouldOpenListingAfterAuth){
+   listingStatus.textContent="تم تسجيل الدخول بنجاح. يمكنك الآن إرسال إعلانك.";
+   listingDialog.showModal();
+  }
+  shouldOpenListingAfterAuth=false;
+ }catch(error){
+  authStatus.textContent=error.message||"تعذر التحقق من الكود.";
+  marketplaceOtpVerify.disabled=false;
+ }
+}
 async function compressImage(file){if(!/^image\//.test(file.type||"")&&!/\.(jpe?g|png|heic|heif|webp)$/i.test(file.name||""))throw Error("اختر صورة (JPG أو PNG أو HEIC).");if(file.size>15*1024*1024)throw Error("حجم كل صورة يجب ألا يتجاوز 15 ميجابايت.");const bitmap=await createImageBitmap(file);const scale=Math.min(1,1200/Math.max(bitmap.width,bitmap.height));const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));const ctx=canvas.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close?.();if(typeof window.LAYAN_WATERMARK==="function")window.LAYAN_WATERMARK(ctx,canvas.width,canvas.height);const data=canvas.toDataURL("image/jpeg",.68);if(data.length>380000)throw Error("إحدى الصور كبيرة بعد الضغط؛ اختر صورة أصغر.");return data}
 async function loadCategories(){
  try{
@@ -109,6 +197,11 @@ async function submitListing(event){event.preventDefault();listingStatus.textCon
 async function init(){currentSession=readSession();updateAuthButton();if(currentSession)await getSession();updateAuthButton();await loadCategories();const requested=new URLSearchParams(location.search).get("category");if(requested&&categories.includes(requested)){categoryFilter.value=requested;listingForm.elements.category.value=requested}renderCategoryFields();await loadListings()}
 $("authOpen").addEventListener("click",async()=>{if(currentSession?.user?.id){if(confirm("هل تريد تسجيل الخروج؟")){try{await auth()?.signOut?.()}catch(error){authStatus.textContent=error.message||"تعذر تسجيل الخروج.";return}saveSession(null)}return}shouldOpenListingAfterAuth=false;openAuth()});
 $("switchAuth").addEventListener("click",()=>setAuthMode(authMode==="login"?"signup":"login"));
+marketplaceOtpRequest.addEventListener("click",()=>sendMarketplaceOtp(false));
+marketplaceOtpResend.addEventListener("click",()=>sendMarketplaceOtp(true));
+marketplaceOtpVerify.addEventListener("click",verifyMarketplaceOtp);
+marketplaceOtpBack.addEventListener("click",()=>{resetMarketplaceOtpFlow();authStatus.textContent="يمكنك الدخول بكلمة المرور أو طلب كود جديد."});
+marketplaceOtpInput.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();verifyMarketplaceOtp()}});
 $("forgotPassword").addEventListener("click",async()=>{const email=authForm.elements.email.value.trim();if(!email){authStatus.textContent="اكتب بريدك الإلكتروني أولًا ثم اضغط نسيت كلمة المرور.";return}authStatus.textContent="جارٍ إرسال رابط استعادة كلمة المرور...";try{await auth()?.resetPasswordForEmail?.(email);authStatus.textContent="إذا كان البريد مسجلًا، سيصلك رابط استعادة كلمة المرور."}catch(error){authStatus.textContent=error.message||"تعذر إرسال رابط الاستعادة."}});
 authForm.addEventListener("submit",async event=>{event.preventDefault();const email=authForm.elements.email.value.trim();const password=authForm.elements.password.value;authStatus.textContent="جارٍ التحقق...";const submit=$("authSubmit");submit.disabled=true;try{const service=auth();if(!service)throw Error("تعذر تحميل خدمة تسجيل الدخول. حدّث الصفحة وحاول مرة أخرى.");if(authMode==="signup"){const result=await service.signUp(email,password);if(result?.session?.access_token){saveSession(service.getSession?.()||result.session);authDialog.close();if(shouldOpenListingAfterAuth){listingStatus.textContent="تم إنشاء الحساب وتسجيل الدخول. يمكنك الآن إرسال إعلانك.";listingDialog.showModal()}}else{authStatus.textContent="تم إنشاء طلب الحساب. افتح رسالة تأكيد البريد الإلكتروني ثم سجّل الدخول."}}else{await service.signIn(email,password);currentSession=await getSession();if(!currentSession?.user?.id)throw Error("لم يتم التحقق من جلسة الدخول. حاول مرة أخرى.");saveSession(currentSession);authDialog.close();if(shouldOpenListingAfterAuth){listingStatus.textContent="تم تسجيل الدخول. يمكنك الآن إرسال إعلانك.";listingDialog.showModal()}}shouldOpenListingAfterAuth=false}catch(error){authStatus.textContent=error.message||"تعذر تسجيل الدخول."}finally{submit.disabled=false}});
 $("openListingForm").addEventListener("click",openListing);$("heroAdd").addEventListener("click",openListing);
