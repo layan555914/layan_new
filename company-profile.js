@@ -53,6 +53,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
    contractor:"مقاولات وإنشاءات",public_authority:"جهة عامة",sales_office:"مكتب مبيعات",
    consultant:"استشارات عقارية",other:"جهة عقارية"})[type]||"جهة عقارية";
  }
+ const SERVICE_PROVIDER_CATEGORIES=new Set(["contracting_construction","building_materials","finishing_decoration","furniture_furnishings","engineering_design","maintenance_property_management","other_real_estate_services"]);
+ function directoryEntityTerms(entity){
+  const serviceProvider=SERVICE_PROVIDER_CATEGORIES.has(String(entity?.service_category||""));
+  return {serviceProvider,subject:serviceProvider?"مقدم الخدمة":"الشركة",representative:serviceProvider?"ممثل مقدم الخدمة":"ممثل الشركة"};
+ }
  function sourceLinks(sources){
   if(!sources.length)return '<p class="company-source-empty">لا تتوفر مراجع عامة مرتبطة بهذا السجل حاليًا.</p>';
   return '<ul class="company-source-list">'+sources.map(source=>{
@@ -65,11 +70,13 @@ document.addEventListener("DOMContentLoaded",async()=>{
  async function loadDirectoryEntity(){
   if(!/^[0-9a-f-]{36}$/i.test(entityId||"")){renderError("رابط ملف الجهة غير صحيح.");return;}
   const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,verification_status,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
+  const core="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,primary_area_id,verification_status,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
   const basic="directory_entities?select=id,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id,verification_status,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
   let rows;
-  try{rows=await api(extended)}catch(_){rows=await api(basic)}
+  try{rows=await api(extended)}catch(_){try{rows=await api(core)}catch(__){rows=await api(basic)}}
   const entity=Array.isArray(rows)?rows[0]:null;
   if(!entity){renderError("هذا السجل غير متاح للعامة أو لم يعد منشورًا في الدليل.");return;}
+  const terms=directoryEntityTerms(entity);
   const name=entity.name_ar||entity.name_en||"جهة عقارية";
   const logo=safeUrl(entity.public_logo_url)||ENTITY_LOGO_ASSETS[entity.id]||"";
   const type=categoryLabel(entity.entity_type,entity.service_category);
@@ -91,7 +98,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     sources=Array.isArray(rows)?rows:[];
    }
   }catch(error){console.warn("Public source references unavailable:",error);}
-  document.title=name+" | دليل الشركات – أسيوط عقار";
+  document.title=name+" | ملف "+terms.subject+" – أسيوط عقار";
   const canonical=new URL("./company.html",location.href);
   canonical.searchParams.set("entity_id",entity.id);
   const canonicalEl=document.querySelector('link[rel="canonical"]');
@@ -112,8 +119,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':'')+
    (gallery.length?'<section class="company-profile-section"><h2>معرض أعمال الجهة</h2><div class="company-gallery">'+gallery.map((u,i)=>'<img src="'+esc(u)+'" alt="صورة من أعمال '+esc(name)+' رقم '+(i+1)+'" loading="lazy">').join('')+'</div></section>':'')+
    '<section class="company-profile-section"><h2>مصادر المعلومات</h2>'+sourceLinks(sources)+'</section>'+
-   '<section class="company-claim-panel"><div><span class="eyebrow">ممثل الشركة؟</span><h2>اطلب استلام وإدارة الملف التعريفي مجانًا</h2><p>املأ بياناتك وصفَتك بالشركة. سيُرسل الطلب إلى إدارة أسيوط عقار للمراجعة اليدوية والتحقق من التفويض. إرسال الطلب لا يمنحك صلاحية تعديل الملف تلقائيًا.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">ابدأ طلب استلام الملف</button></section>'+
-   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب إدارة ملف شركة</span><h2 id="companyClaimTitle">بيانات ممثل الشركة</h2></div><button type="button" id="companyClaimClose" aria-label="إغلاق">×</button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الشركة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم ممثل الشركة *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الشركة *<select name="representative_role" required><option value="">اختر الصفة</option><option>مالك الشركة</option><option>شريك</option><option>مدير الشركة</option><option>مدير فرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><p class="company-claim-dialog-note">جهّز ما يثبت صفتك وموافقة الشركة. لا ترسل مستندات هوية حساسة إلا بعد أن تطلبها الإدارة عبر قناة مناسبة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
+   '<section class="company-claim-panel"><div><span class="eyebrow">'+terms.representative+'؟</span><h2>اطلب استلام وإدارة ملف '+terms.subject+' مجانًا</h2><p>املأ بياناتك وصفتك داخل الجهة. سيُرسل الطلب إلى إدارة أسيوط عقار للمراجعة اليدوية والتحقق من التفويض. إرسال الطلب لا يمنحك صلاحية تعديل الملف تلقائيًا.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">ابدأ طلب استلام الملف</button></section>'+
+   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب إدارة ملف '+terms.subject+'</span><h2 id="companyClaimTitle">بيانات '+terms.representative+'</h2></div><button type="button" id="companyClaimClose" aria-label="إغلاق">×</button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة صفتك وتفويض الجهة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم '+terms.representative+' *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>المالك</option><option>شريك</option><option>مدير النشاط</option><option>مدير الفرع</option><option>مسؤول التسويق أو المبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><p class="company-claim-dialog-note">جهّز ما يثبت صفتك وموافقة الجهة. لا ترسل مستندات هوية حساسة إلا بعد أن تطلبها الإدارة عبر قناة مناسبة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
   const claimDialog=document.getElementById("companyClaimDialog");
   document.getElementById("companyClaimOpen")?.addEventListener("click",()=>{claimDialog?.showModal();refreshMyClaimStatus();});
   document.getElementById("companyClaimClose")?.addEventListener("click",()=>claimDialog?.close());
@@ -153,7 +160,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=false;
     }else if(row.status==="approved"){
-     showClaimStatus("تم اعتماد طلبك وربط حسابك بملف الشركة. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة.",false);
+     showClaimStatus("تم اعتماد طلبك وربط حسابك بالملف. تظل تعديلات الدليل خاضعة لمراجعة الإدارة.",false);
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=true;
     }else if(row.status==="rejected"){
@@ -185,7 +192,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     target.className="company-manager-panel company-profile-section";
     const list=values=>Array.isArray(values)?values.join("\n"):"";
     target.innerHTML=
-     '<div><span class="eyebrow">إدارة الملف بعد الاستلام</span><h2>تحديث بيانات شركتك أو خدماتك</h2><p>أي تعديل ترسله يمر بمراجعة الإدارة. تظل البيانات المعتمدة الحالية ظاهرة للزوار حتى اعتماد التعديل الجديد.</p></div>'+
+     '<div><span class="eyebrow">إدارة الملف بعد الاستلام</span><h2>تحديث بيانات '+(terms.serviceProvider?"مقدم الخدمة":"الشركة")+'</h2><p>أي تعديل ترسله يمر بمراجعة الإدارة. تظل البيانات المعتمدة الحالية ظاهرة للزوار حتى اعتماد التعديل الجديد.</p></div>'+
      '<p class="company-manager-status" id="companyManagerStatus" role="status" aria-live="polite"></p>'+
      '<form class="company-manager-form" id="companyManagerForm">'+
       '<label>اسم الجهة<input name="name_ar" required minlength="2" maxlength="180" value="'+esc(entity.name_ar||"")+'"></label>'+
@@ -304,7 +311,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    }catch(error){
     const message=String(error?.message||"");
     showClaimStatus(/company_claim_requests_one_pending_per_user_entity|duplicate key|unique constraint/i.test(message)
-     ?"لديك طلب استلام مفتوح بالفعل لهذه الشركة. تواصل مع الإدارة لمتابعته."
+     ?"لديك طلب استلام مفتوح بالفعل لهذا الملف. تواصل مع الإدارة لمتابعته."
      :(message||"تعذر تسجيل الطلب. حاول مرة أخرى بعد التأكد من تسجيل الدخول."),true);
    }finally{
     if(submitButton){submitButton.disabled=false;submitButton.textContent="إرسال طلب الاستلام";}
