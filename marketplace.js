@@ -116,8 +116,10 @@ async function loadServiceProfiles(){
  const target=$("marketplaceServiceProfiles");
  if(!target)return;
  const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,public_address,public_logo_url,public_services&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
+ const core="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,public_address&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
  try{
-  const rows=await api(extended);
+  let rows;
+  try{rows=await api(extended)}catch(_){rows=await api(core)}
   if(!Array.isArray(rows))throw new Error("استجابة ملفات مقدمي الخدمات غير صالحة.");
   serviceProfiles=rows;
   renderServiceProfiles();
