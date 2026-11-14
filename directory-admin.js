@@ -273,8 +273,8 @@ document.addEventListener("DOMContentLoaded", () => {
         selectField("service_category", "مجال الخدمة / التخصص", record.service_category, [
           ["", "غير مصنف"], ["contracting_construction", "مقاولات وإنشاءات"],
           ["real_estate_marketing", "تسويق عقاري"], ["real_estate_brokerage", "وساطة ومكتب عقاري"],
-          ["building_materials", "مواد بناء وتشطيب"], ["finishing_decoration", "تشطيب وديكور"],
-          ["furniture_furnishings", "أثاث وفرش وتجهيز وحدات"], ["engineering_design", "مكاتب هندسية وتصميم معماري"],
+          ["building_materials", "مواد بناء وتشطيب"], ["finishing_decoration", "تصميم داخلي وديكور"],
+          ["furniture_furnishings", "أثاث وفرش وتجهيز وحدات"], ["engineering_design", "مكاتب التصميم الهندسي"],
           ["maintenance_property_management", "صيانة وإدارة عقارات"], ["real_estate_consultancy", "استشارات عقارية"],
           ["real_estate_development", "تطوير ومشروعات عقارية"], ["real_estate_sales", "مبيعات عقارية"],
           ["other_real_estate_services", "خدمات عقارية مساندة"]
