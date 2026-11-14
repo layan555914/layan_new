@@ -35,11 +35,19 @@ if (!publicOffers.response.ok || !Array.isArray(publicOffers.data)) {
 console.log("PASS: production public property_offers endpoint is reachable (HTTP " + publicOffers.response.status + ").");
 
 const categories = await read("marketplace_categories?select=name,is_active&is_active=eq.true&order=display_order.asc");
-if (!categories.response.ok || !Array.isArray(categories.data) || categories.data.length !== 11) {
-  throw new Error("Expected 11 active marketplace categories; received HTTP " + categories.response.status +
+const requiredCategories = [
+  "السيراميك والبورسلين والأدوات الصحية",
+  "الإضاءة ووحدات الإنارة",
+  "الستائر والمفروشات",
+  "مكاتب التصميم الهندسي",
+  "مهندسو الديكور والتصميم الداخلي"
+];
+if (!categories.response.ok || !Array.isArray(categories.data) || categories.data.length !== 16 ||
+    requiredCategories.some(name => !categories.data.some(row => row.name === name && row.is_active === true))) {
+  throw new Error("Expected all 16 active marketplace categories, including the five new home-finishing and design sections; received HTTP " + categories.response.status +
     " and " + (Array.isArray(categories.data) ? categories.data.length : "non-array") + " rows.");
 }
-console.log("PASS: production marketplace categories are publicly readable (11 active categories).");
+console.log("PASS: production marketplace categories are publicly readable (16 active categories, including the new service sections).");
 
 for (const [table, columns] of [
   ["user_favorite_offers", "user_id,offer_id"],
