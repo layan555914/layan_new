@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function load() {
     listStatus.textContent = "جارٍ تحميل قاعدة البيانات...";
     try {
-      const entityRows = rows("directory_entities", "id,legacy_code,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc")
+      const entityRows = rows("directory_entities", "id,legacy_code,name_ar,name_en,entity_type,service_category,marketplace_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc")
         .catch(() => rows("directory_entities", "id,legacy_code,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc"));
       const result = await Promise.all([
         entityRows,
@@ -273,11 +273,18 @@ document.addEventListener("DOMContentLoaded", () => {
         selectField("service_category", "مجال الخدمة / التخصص", record.service_category, [
           ["", "غير مصنف"], ["contracting_construction", "مقاولات وإنشاءات"],
           ["real_estate_marketing", "تسويق عقاري"], ["real_estate_brokerage", "وساطة ومكتب عقاري"],
-          ["building_materials", "مواد بناء وتشطيب"], ["finishing_decoration", "تشطيب وديكور"],
-          ["furniture_furnishings", "أثاث وفرش وتجهيز وحدات"], ["engineering_design", "مكاتب هندسية وتصميم معماري"],
+          ["building_materials", "مواد بناء وتشطيب"], ["finishing_decoration", "تصميم داخلي وديكور"],
+          ["furniture_furnishings", "أثاث وفرش وتجهيز وحدات"], ["engineering_design", "مكاتب التصميم الهندسي"],
           ["maintenance_property_management", "صيانة وإدارة عقارات"], ["real_estate_consultancy", "استشارات عقارية"],
           ["real_estate_development", "تطوير ومشروعات عقارية"], ["real_estate_sales", "مبيعات عقارية"],
           ["other_real_estate_services", "خدمات عقارية مساندة"]
+        ]) +
+        selectField("marketplace_category", "التصنيف الدقيق في سوق الخدمات", record.marketplace_category, [
+          ["", "بدون تصنيف خاص — استخدم مجال الخدمة"],
+          ["الأثاث والفرش وتجهيز الوحدات", "الموبيليا والأثاث والفرش"],
+          ["السيراميك والبورسلين والأدوات الصحية", "السيراميك والبورسلين والأدوات الصحية"],
+          ["الإضاءة ووحدات الإنارة", "الإضاءة ووحدات الإنارة"],
+          ["الستائر والمفروشات", "الستائر والمفروشات"]
         ]) +
         textField("description", "النشاط والوصف", record.description, true) +
         inputField("website_url", "الموقع الرسمي", record.website_url, true, "url") +

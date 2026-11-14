@@ -35,11 +35,32 @@ if (!publicOffers.response.ok || !Array.isArray(publicOffers.data)) {
 console.log("PASS: production public property_offers endpoint is reachable (HTTP " + publicOffers.response.status + ").");
 
 const categories = await read("marketplace_categories?select=name,is_active&is_active=eq.true&order=display_order.asc");
-if (!categories.response.ok || !Array.isArray(categories.data) || categories.data.length !== 11) {
-  throw new Error("Expected 11 active marketplace categories; received HTTP " + categories.response.status +
+const requiredCategories = [
+  "السيراميك والبورسلين والأدوات الصحية",
+  "الإضاءة ووحدات الإنارة",
+  "الستائر والمفروشات",
+  "مكاتب التصميم الهندسي",
+  "مهندسو الديكور والتصميم الداخلي"
+];
+if (!categories.response.ok || !Array.isArray(categories.data) || categories.data.length !== 16 ||
+    requiredCategories.some(name => !categories.data.some(row => row.name === name && row.is_active === true))) {
+  throw new Error("Expected all 16 active marketplace categories, including the five new home-finishing and design sections; received HTTP " + categories.response.status +
     " and " + (Array.isArray(categories.data) ? categories.data.length : "non-array") + " rows.");
 }
-console.log("PASS: production marketplace categories are publicly readable (11 active categories).");
+console.log("PASS: production marketplace categories are publicly readable (16 active categories, including the new service sections).");
+
+const publicCompanyProfiles = await read("company_profiles_public?select=id,company_name,representative_verified_at&limit=1");
+if (!publicCompanyProfiles.response.ok || !Array.isArray(publicCompanyProfiles.data)) {
+  throw new Error("Public company_profiles_public view read failed (HTTP " + publicCompanyProfiles.response.status + ").");
+}
+console.log("PASS: public company profile view is readable through invoker security.");
+
+const privateCompanyOwnerData = await read("company_profiles?select=owner_id&limit=1");
+if (![401, 403].includes(privateCompanyOwnerData.response.status)) {
+  throw new Error("Expected anonymous access to company profile owner_id to be denied with HTTP 401/403; got HTTP " +
+    privateCompanyOwnerData.response.status + ". Recheck the view grants and column-level privileges.");
+}
+console.log("PASS: anonymous access to private company owner identifiers is denied.");
 
 for (const [table, columns] of [
   ["user_favorite_offers", "user_id,offer_id"],

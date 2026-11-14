@@ -2,9 +2,9 @@
 
 > **Deployment safety hold — do not run `supabase db push`, `migration repair`, or apply a baseline against production until this audit is resolved and explicitly reviewed.**
 
-Audit date: 2026-11-13
+Audit date: 2026-11-15 (updated after forward migrations)
 Repository: `layan555914/layan_new`
-Branch audited: `feature/company-profile-claim-form`
+Branch audited: `feature/service-provider-claim-review-final-20261114`
 Production project: `ebyhwqkmhxbgocngpqfe`
 Test project: `wisnmlbefdrkcbbqvdlg`
 
@@ -12,10 +12,10 @@ Test project: `wisnmlbefdrkcbbqvdlg`
 
 | Environment | Recorded migration versions | Matching SQL files in this branch | Recorded versions without a matching SQL file |
 |---|---:|---:|---:|
-| Production | 77 | 12 | 65 |
-| Test | 38 | 8 | 30 |
+| Production | 91 | 26 | 65 |
+| Test | 48 | 18 | 30 |
 
-The repository currently contains 20 SQL migration files. A matching filename/version is a source-presence check only; it does not establish that the SQL is identical to what was applied remotely.
+The repository currently contains 32 SQL migration files. Matching is counted by migration name, not by the original timestamp: the 14 forward migrations applied during the November 15 rollout were recorded by the Supabase migration tool under generated UTC version stamps. A matching name/source file does not prove that the SQL is identical to what was applied remotely.
 
 ## Production versions without a matching source file
 
@@ -102,14 +102,35 @@ The repository currently contains 20 SQL migration files. A matching filename/ve
 4. Rehearse the chosen strategy on an isolated database and verify schema objects, RLS, grants, policies, triggers, functions, indexes, seed data, and application workflows.
 5. Only after independent review and explicit owner approval should a production migration-history or schema action be scheduled.
 
-## What has and has not changed
+## Production rollout — November 15, 2026
 
-- The production migration ledger was read only during this audit.
-- No production migration was applied, repaired, deleted, or reordered.
-- No production table, policy, function, role, or data was modified.
-- PostgreSQL 16 smoke tests for the company-claim feature passed in an ephemeral GitHub Actions service database. That test starts from a minimal platform contract, not a full reconstruction of every historical platform migration.
-- The feature branch remains a Draft PR and is not merged.
+The owner requested that the previously reviewed platform work begin being applied to ASYUT AQAR. The following 14 forward migrations were applied directly through the Supabase migration tool to production. The tool recorded generated UTC version stamps in the migration ledger; their migration names correspond to SQL source files in this branch:
+
+1. `serialize_company_claim_approvals_by_entity`
+2. `company_claim_feature_schema_reconciliation`
+3. `service_provider_profiles_and_claimed_edits`
+4. `verified_representatives_self_service`
+5. `company_profile_verified_owner_controls`
+6. `engineering_and_interior_design_marketplace_categories`
+7. `backfill_engineering_design_candidate_sources`
+8. `home_finishing_marketplace_categories`
+9. `audit_ceramics_candidates_assiut`
+10. `audit_assiut_lighting_candidates`
+11. `repair_lighting_candidate_private_links`
+12. `assiut_furniture_design_discovery_candidates`
+13. `company_profiles_public_invoker_security`
+14. `company_profiles_public_invoker_column_grant`
+
+Production now has 16 active marketplace categories and 127 directory entities. Across the six new service/design groups there are 53 candidate profiles: 11 engineering, 8 interior-decoration, 9 furniture, 11 lighting, 6 curtains/furnishings, and 8 ceramics. All 53 remain `needs_review`, `public_visible=false`, have private detail records, and have at least one private source link. None are published. Anonymous-role checks returned zero visible candidates.
+
+The company-claim, manager/member, profile-update, and company-profile team tables and RPCs are installed. Their production rows remain empty: no claimant or representative has been linked to a real directory entity. This is deliberate; a listing is not made public or claimed on behalf of a business merely because it appeared in a discovery source.
+
+The public company view `company_profiles_public` is now configured with `security_invoker=true`. Only the `verified_at` column was added to the browser-role column grants; `owner_id` remains unreadable to `anon`, and neither browser role has table-wide SELECT on `company_profiles`. The Supabase security advisor no longer reports the security-definer-view error.
+
+The original 65 historical production migration sources remain missing. The original migration ledger has not been repaired, rewritten, reordered, or baselined. No `supabase db push`, migration repair, or guessed baseline was run. Do not run those commands until the recovery procedure above is completed and independently reviewed. The Vercel workflows in this repository perform static validation and listing-page generation; they do not run Supabase migrations during deploy.
+
+PostgreSQL 16 smoke tests and the current GitHub Actions workflow passed on the feature branch. The latest workflow also passed its read-only production Supabase integration checks, including the 16-category response, public company-view access, and denial of anonymous access to private `owner_id` data.
 
 ## Important distinction
 
-Missing migration source files are a repository traceability/reproducibility problem. They do not, by themselves, prove that the currently running production schema is broken. Production was observed with RLS enabled on both company-claim tables, zero test claim rows and zero manager links, while the company-row concurrency lock still remains unapplied there.
+The remaining 65 missing historical sources are a repository traceability/reproducibility problem. They do not by themselves prove that the current production schema is broken, and they do not prevent an independently reviewed static front-end release once all required forward migrations are already applied. They do prevent safe reconstruction of the entire database migration history from this repository and block any use of `db push`, migration repair, or baseline operations until the source gap is resolved.

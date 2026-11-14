@@ -10,7 +10,7 @@ const authForm=$("authForm"),listingForm=$("marketplaceListingForm");
 const authStatus=$("authStatus"),listingStatus=$("marketplaceFormStatus");
 const categoryFilter=$("marketplaceCategoryFilter"),listingGrid=$("marketplaceListings");
 let authMode="login",currentSession=null,listings=[],shouldOpenListingAfterAuth=false,marketplacePage=1;const MARKETPLACE_PER_PAGE=12;
-let categories=["سوق العقارات","التنازلات العقارية","أراضي للبيع","أراضي التنازلات","إيجار يومي ومفروش","الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية"];
+let categories=["سوق العقارات","التنازلات العقارية","أراضي للبيع","أراضي التنازلات","إيجار يومي ومفروش","الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية","مكاتب التصميم الهندسي","مهندسو الديكور والتصميم الداخلي","السيراميك والبورسلين والأدوات الصحية","الإضاءة ووحدات الإنارة","الستائر والمفروشات"];
 const specs={
 "سوق العقارات":[["نوع العقار","property_kind","select","شقة|فيلا|محل تجاري|مكتب|عيادة|مخزن|مبنى"],["الغرض","purpose","select","بيع|إيجار"],["المساحة بالمتر","area_m2","number"],["عدد الغرف","bedrooms","number"],["عدد الحمامات","bathrooms","number"],["التشطيب","finishing","text"]],
 "التنازلات العقارية":[["اسم المطور","developer","text"],["اسم المشروع","project","text"],["المقدم المطلوب","required_down_payment","number"],["المبلغ المدفوع","paid_amount","number"],["المتبقي","remaining_amount","number"],["القسط الشهري","monthly_installment","number"],["رسوم التنازل","assignment_fee","number"],["الخصم المتاح","discount","number"]],
@@ -22,7 +22,12 @@ const specs={
 "الأثاث والفرش وتجهيز الوحدات":[["نوع الأثاث","furniture_kind","text"],["الحالة","condition","select","جديد|مستعمل بحالة جيدة|حسب الطلب"],["التوصيل والتركيب","delivery_installation","text"]],
 "المشروعات والمطورون العقاريون":[["اسم المشروع","project_name","text"],["اسم المطور","developer","text"],["نوع المشروع","project_kind","text"],["موقف التنفيذ","construction_status","text"],["أنظمة السداد","payment_plans","text"]],
 "الصيانة وإدارة العقارات":[["نوع الخدمة","service_kind","text"],["نطاق التغطية","coverage","text"],["مواعيد العمل","working_hours","text"],["الضمان","warranty","text"]],
-"الاستشارات والخدمات العقارية":[["نوع الاستشارة","consultation_kind","text"],["مقدم الخدمة","provider","text"],["طريقة تقديم الخدمة","delivery_method","text"],["التخصص أو المؤهل","qualification","text"]]
+"الاستشارات والخدمات العقارية":[["نوع الاستشارة","consultation_kind","text"],["مقدم الخدمة","provider","text"],["طريقة تقديم الخدمة","delivery_method","text"],["التخصص أو المؤهل","qualification","text"]],
+"مكاتب التصميم الهندسي":[["نوع التصميم","design_kind","select","معماري|إنشائي|كهرباء|ميكانيكا|تخطيط عمراني"],["خدمات المكتب","engineering_services","text"],["الإشراف الهندسي","supervision","text"],["التراخيص والدراسات","permits_studies","text"]],
+"مهندسو الديكور والتصميم الداخلي":[["نوع المشروع","interior_project","select","شقة|فيلا|محل تجاري|مكتب|عيادة"],["خدمات التصميم","interior_services","text"],["التصميم المتاح","design_deliverables","select","2D|3D|2D و3D"],["التنفيذ والتشطيب","fitout_execution","text"]],
+"السيراميك والبورسلين والأدوات الصحية":[["نوع المنتج","ceramic_product_kind","select","سيراميك أرضيات|سيراميك حوائط|بورسلين|أطقم حمامات|أحواض|خلاطات|أدوات صحية"],["العلامات التجارية","ceramic_brands","text"],["المقاسات والموديلات","ceramic_sizes_models","text"],["التوصيل والتركيب","ceramic_delivery_installation","text"]],
+"الإضاءة ووحدات الإنارة":[["نوع الإضاءة","lighting_kind","select","نجف|أباليك|إضاءة مخفية|سبوتات|إضاءة خارجية|وحدات حديثة"],["الطراز","lighting_style","select","مودرن|كلاسيك|نيو كلاسيك|متنوع"],["التصميم والتوريد","lighting_design_supply","text"],["التركيب","lighting_installation","text"]],
+"الستائر والمفروشات":[["نوع الخدمة","curtain_service_kind","select","تفصيل ستائر|ستائر جاهزة|أقمشة|مفروشات|تنجيد"],["نوع الخامات","curtain_fabrics","text"],["التفصيل حسب المقاس","custom_curtains","select","متاح|غير متاح|حسب الطلب"],["المعاينة والتركيب","curtain_measure_install","text"]]
 };
 const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function readSession(){return auth()?.getSession?.()||null}
@@ -36,7 +41,8 @@ async function compressImage(file){if(!/^image\//.test(file.type||"")&&!/\.(jpe?
 async function loadCategories(){
  try{
   let rows=await api("marketplace_categories?select=name,description,display_order&is_active=eq.true&order=display_order.asc");
-  if(!Array.isArray(rows)||rows.length!==11)throw Error("قائمة الأقسام من قاعدة البيانات غير مكتملة.");
+  const requiredCategories=["مكاتب التصميم الهندسي","مهندسو الديكور والتصميم الداخلي","السيراميك والبورسلين والأدوات الصحية","الإضاءة ووحدات الإنارة","الستائر والمفروشات"];
+  if(!Array.isArray(rows)||!requiredCategories.every(name=>rows.some(row=>row.name===name)))throw Error("قائمة أقسام سوق الخدمات غير مكتملة.");
   categories=rows.map(row=>row.name);
   // The services marketplace lists services only; property categories are handled on offers.html.
   const propertyCategories=["سوق العقارات","التنازلات العقارية","أراضي للبيع","أراضي التنازلات","إيجار يومي ومفروش"];
@@ -56,26 +62,47 @@ async function loadCategories(){
 }
 function renderCategoryFields(){const category=listingForm.elements.category.value;const target=$("marketplaceCategoryFields");const fields=specs[category]||[];if(!fields.length){target.innerHTML='<p class="muted">اختر القسم لإظهار التفاصيل المناسبة.</p>';return}target.innerHTML="<h3>تفاصيل خاصة بالقسم</h3>"+fields.map(([label,name,type,options])=>{let control;if(type==="select")control='<select name="detail_'+name+'"><option value="">اختر</option>'+options.split("|").map(v=>"<option>"+esc(v)+"</option>").join("")+"</select>";else control='<input name="detail_'+name+'" type="'+type+'" '+(type==="number"?'min="0" step="0.01"':'maxlength="240"')+'>';return "<label>"+esc(label)+control+"</label>"}).join("")}
 // Services-only marketplace (reference design): property categories live on offers.html.
-const SERVICE_CATEGORIES=["الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية"];
+const SERVICE_CATEGORIES=["الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية","مكاتب التصميم الهندسي","مهندسو الديكور والتصميم الداخلي","السيراميك والبورسلين والأدوات الصحية","الإضاءة ووحدات الإنارة","الستائر والمفروشات"];
 const egPhone=v=>{let d=String(v||"").replace(/[^0-9]/g,"");if(d.startsWith("20"))d=d.slice(2);if(d&&!d.startsWith("0"))d="0"+d;return /^01[0125][0-9]{8}$/.test(d)?d:""};
 const normText=v=>String(v||"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه");
 
 const SERVICE_PROFILE_CATEGORY_CODES={
- "الشركات والمكاتب العقارية":["real_estate_marketing","real_estate_brokerage","real_estate_sales"],
- "مواد البناء والتشطيب":["contracting_construction","building_materials","finishing_decoration"],
+ "الشركات والمكاتب العقارية":["real_estate_marketing","real_estate_brokerage","real_estate_sales","real_estate_development"],
+ "مواد البناء والتشطيب":["contracting_construction","building_materials"],
  "الأثاث والفرش وتجهيز الوحدات":["furniture_furnishings"],
  "المشروعات والمطورون العقاريون":["real_estate_development"],
  "الصيانة وإدارة العقارات":["maintenance_property_management"],
- "الاستشارات والخدمات العقارية":["engineering_design","real_estate_consultancy","other_real_estate_services"]
+ "الاستشارات والخدمات العقارية":["real_estate_consultancy","other_real_estate_services"],
+ "مكاتب التصميم الهندسي":["engineering_design"],
+ "مهندسو الديكور والتصميم الداخلي":["finishing_decoration"],
+ "السيراميك والبورسلين والأدوات الصحية":[],
+ "الإضاءة ووحدات الإنارة":[],
+ "الستائر والمفروشات":[]
 };
 const SERVICE_PROFILE_LABELS={
  contracting_construction:"مقاولات وإنشاءات",real_estate_marketing:"تسويق عقاري",
  real_estate_brokerage:"وساطة ومكتب عقاري",building_materials:"مواد بناء وتشطيب",
- finishing_decoration:"تشطيب وديكور",furniture_furnishings:"أثاث وفرش وتجهيز وحدات",
- engineering_design:"مكاتب هندسية وتصميم معماري",maintenance_property_management:"صيانة وإدارة عقارات",
+ finishing_decoration:"تصميم داخلي وديكور",furniture_furnishings:"أثاث وفرش وتجهيز وحدات",
+ engineering_design:"مكاتب التصميم الهندسي والاستشارات المعمارية",maintenance_property_management:"صيانة وإدارة عقارات",
  real_estate_consultancy:"استشارات عقارية",real_estate_development:"تطوير ومشروعات عقارية",
  real_estate_sales:"مبيعات عقارية",other_real_estate_services:"خدمات عقارية مساندة"
 };
+const SERVICE_PROFILE_ALLOWED_CODES=new Set(Object.values(SERVICE_PROFILE_CATEGORY_CODES).flat());
+// Curated real-estate companies already present in the company directory.
+// They are referenced by directory entity ID; no duplicate marketplace listing is created.
+const FEATURED_REAL_ESTATE_COMPANY_IDS=new Set([
+ "f853fb29-c535-4abf-b5c2-8b58e7bc1d7a", // Home Town Developments — West Gardens, Assiut
+ "9a04337c-2b6d-4403-90c8-10cf9c7ebc94", // Madinet Masr — Zahw, West Assiut
+ "be32e9e6-5d57-48d7-af81-42462c1647f4", // Amer Group / Porto Assiut
+ "2d4d4044-4540-4c2d-8ee4-0d73b77ae5b4", // Tayel Group / Vuvuzela — Hayah City
+ "2700ddd4-93aa-4247-b36c-9c078148518e", // Mabany Edris — Asayla, New Assiut
+ "fb8b1c41-93f3-4484-8695-9fa44b5a2a95", // Venecia Developments — Assiut New City
+ "37c12e5b-eb95-48fc-b43d-7d1ba7a52bed", // Global House — Konoz projects, Assiut
+ "c232159a-66fd-432d-9468-1c7ffabb3fb9", // RDF Developments — Paradise, New Assiut
+ "83a687c0-eee6-497b-89d9-9fba70d4474f", // Prime Developments — Assiut sales office
+ "c1111111-1111-4111-8111-111111111301"  // Test-only synthetic developer fixture
+]);
+const REAL_ESTATE_COMPANY_CODES=new Set(["real_estate_development","real_estate_sales"]);
 let serviceProfiles=[];
 function serviceProfileCode(item){
  const legacy={contractor:"contracting_construction",marketing:"real_estate_marketing",brokerage:"real_estate_brokerage",consultant:"real_estate_consultancy",developer:"real_estate_development",sales_office:"real_estate_sales"};
@@ -90,9 +117,18 @@ function renderServiceProfiles(){
  const allowed=selected?SERVICE_PROFILE_CATEGORY_CODES[selected]||[]:null;
  const rows=serviceProfiles.filter(item=>{
   const code=serviceProfileCode(item);
-  const searchable=normText([item.name_ar,item.name_en,item.description,code,item.public_address,(item.public_services||[]).join(" ")].join(" "));
-  return Boolean(code)&&(!allowed||allowed.includes(code))&&(!query||searchable.includes(query));
- });
+  const isRealEstateCompany=item.entity_type==="developer"||item.entity_type==="sales_office"||REAL_ESTATE_COMPANY_CODES.has(code);
+  const isCuratedCompany=FEATURED_REAL_ESTATE_COMPANY_IDS.has(item.id);
+  const companyCategoryVisible=!selected||selected==="الشركات والمكاتب العقارية"||selected==="المشروعات والمطورون العقاريون";
+  const marketplaceCategory=String(item.marketplace_category||"");
+  const categoryVisible=isRealEstateCompany
+   ? isCuratedCompany&&companyCategoryVisible
+   : marketplaceCategory
+     ? (!selected||marketplaceCategory===selected)
+     : SERVICE_PROFILE_ALLOWED_CODES.has(code)&&(!allowed||allowed.includes(code));
+  const searchable=normText([item.name_ar,item.name_en,item.description,code,marketplaceCategory,item.public_address,(item.public_services||[]).join(" ")].join(" "));
+  return categoryVisible&&(!query||searchable.includes(query));
+ }).sort((a,b)=>Number(FEATURED_REAL_ESTATE_COMPANY_IDS.has(b.id))-Number(FEATURED_REAL_ESTATE_COMPANY_IDS.has(a.id)));
  if(count)count.textContent=rows.length+" ملف";
  if(!rows.length){
   target.innerHTML='<div class="mk-profile-status">لا توجد ملفات تعريفية منشورة في هذا المجال حتى الآن. يمكنك استكشاف <a href="./companies.html">دليل الشركات</a>.</div>';
@@ -102,25 +138,34 @@ function renderServiceProfiles(){
   const name=String(item.name_ar||item.name_en||"جهة خدمية");
   const rawLogo=String(item.public_logo_url||"");
   const logo=rawLogo.startsWith("https://")||rawLogo.startsWith("http://")?rawLogo:"";
-  const category=SERVICE_PROFILE_LABELS[serviceProfileCode(item)]||"خدمات عقارية";
+  const category=String(item.marketplace_category||SERVICE_PROFILE_LABELS[serviceProfileCode(item)]||"خدمات عقارية");
+  const isCuratedCompany=FEATURED_REAL_ESTATE_COMPANY_IDS.has(item.id);
+  const profileLabel=isCuratedCompany
+   ? (item.entity_type==="sales_office"?"مكتب مبيعات عقاري من دليل الشركات":"شركة عقارية مختارة من دليل أسيوط عقار")
+   : "ملف تعريفي مجاني · "+category;
   const services=Array.isArray(item.public_services)?item.public_services:[];
-  const summary=String(item.description||services.slice(0,3).join("، ")||"ملف تعريفي مجاني منشور بعد مراجعة الإدارة.").slice(0,120);
+  const summary=String(item.description||services.slice(0,3).join("، ")||"ملف تعريفي منشور في دليل أسيوط عقار.").slice(0,120);
   const place=String(item.public_address||"محافظة أسيوط");
   const href="./company.html?entity_id="+encodeURIComponent(item.id);
   const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':esc(name.trim().slice(0,1));
-  return '<a class="mk-profile-card" href="'+href+'"><span class="mk-profile-logo">'+visual+'</span><span class="mk-profile-content"><small>'+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span></span></a>';
+  return '<a class="mk-profile-card" href="'+href+'"><span class="mk-profile-logo">'+visual+'</span><span class="mk-profile-content"><small>'+esc(profileLabel)+' · '+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span></span></a>';
  }).join("");
 }
 async function loadServiceProfiles(){
  const target=$("marketplaceServiceProfiles");
  if(!target)return;
- const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,public_address,public_logo_url,public_services&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
- const basic="directory_entities?select=id,name_ar,name_en,entity_type,description,public_address&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc&limit=150";
+ const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,public_address,public_logo_url,public_services&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
+ const core="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,public_address&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
  try{
-  serviceProfiles=await api(extended).catch(()=>api(basic))||[];
+  let rows;
+  try{rows=await api(extended)}catch(_){rows=await api(core)}
+  if(!Array.isArray(rows))throw new Error("استجابة ملفات مقدمي الخدمات غير صالحة.");
+  serviceProfiles=rows;
   renderServiceProfiles();
  }catch(error){
-  target.innerHTML='<div class="mk-profile-status">تعذر تحميل الملفات التعريفية حاليًا. تظل إعلانات الخدمات المنشورة أدناه متاحة.</div>';
+  serviceProfiles=[];
+  if($("marketplaceServiceProfilesCount"))$("marketplaceServiceProfilesCount").textContent="تعذر التحميل";
+  target.innerHTML='<div class="mk-profile-status">تعذر تحميل الملفات التعريفية المعتمدة. لم نعرض سجلات غير مصنفة بدلًا منها. تظل إعلانات الخدمات المنشورة أدناه متاحة.</div>';
   console.warn("Service provider profiles unavailable:",error);
  }
 }

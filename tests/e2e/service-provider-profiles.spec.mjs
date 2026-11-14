@@ -87,7 +87,7 @@ test("marketplace displays approved service provider profiles separately from su
   const ads = page.locator("#marketplaceListings .mk-card");
   await expect(profiles).toHaveCount(1);
   await expect(profiles).toContainText(ENTITY.name_ar);
-  await expect(profiles).toContainText("مواد بناء وتشطيب");
+  await expect(profiles).toContainText("ملف تعريفي مجاني");
   await expect(profiles).toHaveAttribute("href", "./company.html?entity_id=" + ENTITY_ID);
   await expect(ads).toHaveCount(1);
   await expect(ads).toContainText(serviceAd.title);
@@ -98,9 +98,9 @@ test("marketplace displays approved service provider profiles separately from su
   await expect(ads).toHaveCount(1);
 });
 
-test("an approved representative submits profile changes for review without directly updating the public entity", async ({ page }) => {
+test("verified owner can publish operational edits immediately and queue identity changes for review", async ({ page }) => {
   await seedAuthenticatedSession(page);
-  const state = { submitted: [], directEntityPatches: 0 };
+  const state = { directUpdates: [], submitted: [], directEntityPatches: 0 };
 
   await page.route("**/auth/v1/user", async route => reply(route, USER));
   await page.route("**/rest/v1/**", async route => {
@@ -117,9 +117,15 @@ test("an approved representative submits profile changes for review without dire
     if (table === "directory_entity_sources") return reply(route, []);
     if (table === "directory_sources") return reply(route, []);
     if (table === "company_entity_managers") {
-      return reply(route, [{ directory_entity_id: ENTITY_ID, owner_user_id: USER_ID }]);
+      return reply(route, [{
+        directory_entity_id: ENTITY_ID, owner_user_id: USER_ID, verified_at: "2026-11-14T10:00:00Z"
+      }]);
     }
     if (table === "company_entity_profile_update_requests") return reply(route, []);
+    if (path.endsWith("/rpc/company_entity_profile_update_direct")) {
+      state.directUpdates.push(request.postDataJSON());
+      return reply(route, "updated");
+    }
     if (path.endsWith("/rpc/company_entity_profile_update_submit")) {
       state.submitted.push(request.postDataJSON());
       return reply(route, "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbb401");
@@ -130,29 +136,137 @@ test("an approved representative submits profile changes for review without dire
 
   await page.goto("/company.html?entity_id=" + ENTITY_ID);
 
-  const form = page.locator("#companyManagerForm");
-  await expect(form).toBeVisible({ timeout: 15000 });
+  const directForm = page.locator("#companyManagerDirectForm");
+  await expect(directForm).toBeVisible({ timeout: 15000 });
   await expect(page.locator(".company-claim-panel")).toBeHidden();
-  await form.locator("[name='name_ar']").fill("شركة اختبار خدمات التشطيب بعد التحديث");
-  await form.locator("[name='service_category']").selectOption("finishing_decoration");
-  await form.locator("[name='description']").fill("خدمات تشطيب وديكور تجريبية.");
-  await form.locator("[name='public_services']").fill("تشطيب داخلي\nديكور");
-  await form.locator("[name='public_coverage_areas']").fill("مدينة أسيوط\nأسيوط الجديدة");
-  await form.locator("button[type='submit']").click();
+  await directForm.locator("[name='description']").fill("وصف محدث لخدمات التشطيب.");
+  await directForm.locator("[name='public_business_hours']").fill("من 9 صباحًا إلى 8 مساءً");
+  await directForm.locator("[name='public_services']").fill("تشطيب داخلي\nديكور");
+  await directForm.locator("[name='public_coverage_areas']").fill("مدينة أسيوط\nأسيوط الجديدة");
+  await directForm.locator("[name='public_gallery_urls']").fill("https://assets.example.invalid/new-work.jpg");
+  await directForm.locator("button[type='submit']").click();
 
-  await expect(page.locator("#companyManagerStatus")).toContainText("تم إرسال التعديل بنجاح");
+  await expect(page.locator("#companyManagerStatus")).toContainText("تم حفظ التحديثات مباشرة");
+  expect(state.directUpdates).toHaveLength(1);
+  expect(state.directUpdates[0]).toMatchObject({
+    p_directory_entity_id: ENTITY_ID,
+    p_payload: {
+      description: "وصف محدث لخدمات التشطيب.",
+      public_business_hours: "من 9 صباحًا إلى 8 مساءً",
+      public_services: ["تشطيب داخلي", "ديكور"],
+      public_coverage_areas: ["مدينة أسيوط", "أسيوط الجديدة"],
+      public_gallery_urls: ["https://assets.example.invalid/new-work.jpg"]
+    }
+  });
+  expect(state.directUpdates[0].p_payload).not.toHaveProperty("name_ar");
+  expect(state.directEntityPatches).toBe(0);
+
+  const reviewForm = page.locator("#companyManagerReviewForm");
+  await expect(reviewForm).toBeVisible();
+  await reviewForm.locator("[name='name_ar']").fill("شركة اختبار خدمات التشطيب بعد التحديث");
+  await reviewForm.locator("[name='service_category']").selectOption("finishing_decoration");
+  await reviewForm.locator("[name='public_phone']").fill("01012345679");
+  await reviewForm.locator("button[type='submit']").click();
+
+  await expect(page.locator("#companyManagerReviewStatus")).toContainText("تم إرسال التغيير");
   expect(state.submitted).toHaveLength(1);
   expect(state.submitted[0]).toMatchObject({
     p_directory_entity_id: ENTITY_ID,
     p_payload: {
       name_ar: "شركة اختبار خدمات التشطيب بعد التحديث",
       service_category: "finishing_decoration",
-      public_services: ["تشطيب داخلي", "ديكور"],
-      public_coverage_areas: ["مدينة أسيوط", "أسيوط الجديدة"]
+      public_phone: "01012345679"
     }
   });
-  expect(state.directEntityPatches).toBe(0);
-  await expect(form.locator("button[type='submit']")).toBeDisabled();
+  await expect(reviewForm.locator("button[type='submit']")).toBeDisabled();
+});
+
+test("a delegated editor can manage operational fields but cannot access owner-only controls", async ({ page }) => {
+  await seedAuthenticatedSession(page);
+  const state = { directUpdates: [] };
+  await page.route("**/auth/v1/user", async route => reply(route, USER));
+  await page.route("**/rest/v1/**", async route => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const path = url.pathname;
+    const table = path.split("/").pop();
+    if (table === "directory_entities") return reply(route, [ENTITY]);
+    if (table === "directory_entity_sources") return reply(route, []);
+    if (table === "directory_sources") return reply(route, []);
+    if (table === "company_entity_managers") return reply(route, []);
+    if (table === "company_entity_manager_members") return reply(route, [{ member_role: "editor" }]);
+    if (path.endsWith("/rpc/company_entity_profile_update_direct")) {
+      state.directUpdates.push(request.postDataJSON());
+      return reply(route, "updated");
+    }
+    return request.method() === "POST" ? reply(route, [], 201) : reply(route, []);
+  });
+
+  await page.goto("/company.html?entity_id=" + ENTITY_ID);
+  const directForm = page.locator("#companyManagerDirectForm");
+  await expect(directForm).toBeVisible({ timeout: 15000 });
+  await expect(page.locator("#companyManagerReviewForm")).toHaveCount(0);
+  await expect(page.locator("#companyManagerInviteForm")).toHaveCount(0);
+  await directForm.locator("[name='description']").fill("تحديث بواسطة محرر مفوض.");
+  await directForm.locator("button[type='submit']").click();
+  await expect(page.locator("#companyManagerStatus")).toContainText("تم حفظ التحديثات مباشرة");
+  expect(state.directUpdates).toHaveLength(1);
+});
+
+test("verified owner can invite and revoke a delegated editor", async ({ page }) => {
+  page.on("dialog", dialog => dialog.accept());
+  await seedAuthenticatedSession(page);
+  const state = { members: [], invited: [], revoked: [] };
+  await page.route("**/auth/v1/user", async route => reply(route, USER));
+  await page.route("**/rest/v1/**", async route => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname;
+    const table = path.split("/").pop();
+    if (table === "directory_entities") return reply(route, [ENTITY]);
+    if (table === "directory_entity_sources") return reply(route, []);
+    if (table === "directory_sources") return reply(route, []);
+    if (table === "company_entity_managers") {
+      return reply(route, [{ directory_entity_id: ENTITY_ID, owner_user_id: USER_ID, verified_at: "2026-11-14T10:00:00Z" }]);
+    }
+    if (table === "company_entity_profile_update_requests") return reply(route, []);
+    if (path.endsWith("/rpc/company_entity_manager_member_list")) return reply(route, state.members);
+    if (path.endsWith("/rpc/company_entity_manager_invite")) {
+      state.invited.push(request.postDataJSON());
+      state.members = [{
+        user_id: "f7f77640-ae97-4722-8adb-5a88191eb402",
+        email: "employee@example.invalid",
+        member_role: "editor"
+      }];
+      return reply(route, "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbb402");
+    }
+    if (path.endsWith("/rpc/company_entity_manager_revoke")) {
+      state.revoked.push(request.postDataJSON());
+      state.members = [];
+      return reply(route, true);
+    }
+    return request.method() === "POST" ? reply(route, [], 201) : reply(route, []);
+  });
+
+  await page.goto("/company.html?entity_id=" + ENTITY_ID);
+  const inviteForm = page.locator("#companyManagerInviteForm");
+  await expect(inviteForm).toBeVisible({ timeout: 15000 });
+  await inviteForm.locator("[name='email']").fill("employee@example.invalid");
+  await inviteForm.locator("[name='role']").selectOption("editor");
+  await inviteForm.locator("button[type='submit']").click();
+
+  await expect(page.locator("#companyManagerMembers")).toContainText("employee@example.invalid");
+  expect(state.invited).toEqual([{
+    p_directory_entity_id: ENTITY_ID,
+    p_email: "employee@example.invalid",
+    p_role: "editor"
+  }]);
+
+  await page.locator("#companyManagerMembers [data-manager-revoke]").click();
+  await expect(page.locator("#companyManagerMembers")).toContainText("لا يوجد موظفون مفوضون");
+  expect(state.revoked).toEqual([{
+    p_directory_entity_id: ENTITY_ID,
+    p_user_id: "f7f77640-ae97-4722-8adb-5a88191eb402"
+  }]);
 });
 
 test("admin can approve a service provider profile update from the dedicated review queue", async ({ page }) => {
@@ -207,4 +321,147 @@ test("admin can approve a service provider profile update from the dedicated rev
     p_note: null
   });
   await expect(card).toHaveCount(0);
+});
+
+test("marketplace keeps engineering design offices and interior designers in separate categories", async ({ page }) => {
+  const engineeringOffice = {
+    id: "dddddddd-dddd-4ddd-8ddd-dddddddddd01",
+    name_ar: "مكتب اختبار التصميم الهندسي",
+    entity_type: "consultant",
+    service_category: "engineering_design",
+    description: "ملف تجريبي لمكتب استشارات وتصميم هندسي.",
+    public_address: "شارع الجمهورية، أسيوط",
+    verification_status: "published",
+    public_visible: true
+  };
+  const interiorDesigner = {
+    id: "dddddddd-dddd-4ddd-8ddd-dddddddddd02",
+    name_ar: "استوديو اختبار الديكور الداخلي",
+    entity_type: "other",
+    service_category: "finishing_decoration",
+    description: "ملف تجريبي لمهندس تصميم داخلي وديكور.",
+    public_address: "شارع النميس، أسيوط",
+    verification_status: "published",
+    public_visible: true
+  };
+  const categoryNames = [
+    "سوق العقارات", "التنازلات العقارية", "أراضي للبيع", "أراضي التنازلات",
+    "إيجار يومي ومفروش", "الشركات والمكاتب العقارية", "مواد البناء والتشطيب",
+    "الأثاث والفرش وتجهيز الوحدات", "المشروعات والمطورون العقاريون",
+    "الصيانة وإدارة العقارات", "الاستشارات والخدمات العقارية",
+    "مكاتب التصميم الهندسي", "مهندسو الديكور والتصميم الداخلي"
+  ];
+
+  await page.route("**/rest/v1/**", async route => {
+    const url = new URL(route.request().url());
+    const table = url.pathname.split("/").pop();
+    if (table === "marketplace_categories") {
+      return reply(route, categoryNames.map((name, index) => ({
+        name, description: "وصف اختبار", display_order: index + 1
+      })));
+    }
+    if (table === "directory_entities") return reply(route, [engineeringOffice, interiorDesigner]);
+    if (table === "marketplace_listings") return reply(route, []);
+    return route.request().method() === "POST" ? reply(route, [], 201) : reply(route, []);
+  });
+
+  await page.goto("/marketplace.html");
+  const cards = page.locator("#marketplaceServiceProfiles .mk-profile-card");
+  await expect(cards).toHaveCount(2);
+
+  await page.locator("#marketplaceCategoryFilter").selectOption({ label: "مكاتب التصميم الهندسي" });
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText(engineeringOffice.name_ar);
+  await expect(cards).not.toContainText(interiorDesigner.name_ar);
+
+  await page.locator("#marketplaceCategoryFilter").selectOption({ label: "مهندسو الديكور والتصميم الداخلي" });
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toContainText(interiorDesigner.name_ar);
+  await expect(cards).not.toContainText(engineeringOffice.name_ar);
+});
+
+test("marketplace separates ceramics, lighting, furniture and curtains profiles", async ({ page }) => {
+  const categories = [
+    "سوق العقارات", "التنازلات العقارية", "أراضي للبيع", "أراضي التنازلات",
+    "إيجار يومي ومفروش", "الشركات والمكاتب العقارية", "مواد البناء والتشطيب",
+    "الأثاث والفرش وتجهيز الوحدات", "المشروعات والمطورون العقاريون",
+    "الصيانة وإدارة العقارات", "الاستشارات والخدمات العقارية",
+    "مكاتب التصميم الهندسي", "مهندسو الديكور والتصميم الداخلي",
+    "السيراميك والبورسلين والأدوات الصحية", "الإضاءة ووحدات الإنارة", "الستائر والمفروشات"
+  ];
+  const profiles = [
+    {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeee01",
+      name_ar: "معرض اختبار السيراميك",
+      entity_type: "other",
+      service_category: "building_materials",
+      marketplace_category: "السيراميك والبورسلين والأدوات الصحية",
+      description: "ملف تجريبي لمعرض سيراميك وبورسلين.",
+      public_address: "شارع الجمهورية، أسيوط",
+      public_visible: true,
+      verification_status: "published"
+    },
+    {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeee02",
+      name_ar: "متجر اختبار الإضاءة",
+      entity_type: "other",
+      service_category: "building_materials",
+      marketplace_category: "الإضاءة ووحدات الإنارة",
+      description: "ملف تجريبي لمتجر وحدات إنارة.",
+      public_address: "شارع الجلاء، أسيوط",
+      public_visible: true,
+      verification_status: "published"
+    },
+    {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeee03",
+      name_ar: "معرض اختبار الموبيليا",
+      entity_type: "other",
+      service_category: "furniture_furnishings",
+      marketplace_category: "الأثاث والفرش وتجهيز الوحدات",
+      description: "ملف تجريبي للأثاث والموبيليا.",
+      public_address: "شارع النميس، أسيوط",
+      public_visible: true,
+      verification_status: "published"
+    },
+    {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeee04",
+      name_ar: "محل اختبار الستائر",
+      entity_type: "other",
+      service_category: "furniture_furnishings",
+      marketplace_category: "الستائر والمفروشات",
+      description: "ملف تجريبي للستائر والمفروشات.",
+      public_address: "شارع القيسارية، أسيوط",
+      public_visible: true,
+      verification_status: "published"
+    }
+  ];
+
+  await page.route("**/rest/v1/**", async route => {
+    const url = new URL(route.request().url());
+    const table = url.pathname.split("/").pop();
+    if (table === "marketplace_categories") {
+      return reply(route, categories.map((name, index) => ({
+        name, description: "وصف اختبار", display_order: index + 1
+      })));
+    }
+    if (table === "directory_entities") return reply(route, profiles);
+    if (table === "marketplace_listings") return reply(route, []);
+    return route.request().method() === "POST" ? reply(route, [], 201) : reply(route, []);
+  });
+
+  await page.goto("/marketplace.html");
+  const cards = page.locator("#marketplaceServiceProfiles .mk-profile-card");
+  await expect(cards).toHaveCount(4);
+
+  const cases = [
+    ["السيراميك والبورسلين والأدوات الصحية", profiles[0].name_ar],
+    ["الإضاءة ووحدات الإنارة", profiles[1].name_ar],
+    ["الأثاث والفرش وتجهيز الوحدات", profiles[2].name_ar],
+    ["الستائر والمفروشات", profiles[3].name_ar]
+  ];
+  for (const [category, expectedName] of cases) {
+    await page.locator("#marketplaceCategoryFilter").selectOption({ label: category });
+    await expect(cards).toHaveCount(1);
+    await expect(cards).toContainText(expectedName);
+  }
 });
