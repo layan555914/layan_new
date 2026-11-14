@@ -214,7 +214,9 @@
   }
   async function verifyEmailOtp(email, token) {
     const cleanEmail = normalizeEmail(email);
-    const cleanToken = String(token || "").trim();
+    const cleanToken = String(token || "").trim()
+      .replace(/[٠-٩]/g, digit => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+      .replace(/[۰-۹]/g, digit => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
     if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
     if (!/^\d{6}$/.test(cleanToken)) throw new Error("اكتب كود التحقق المكوّن من 6 أرقام.");
     const data = await authRequest("verify", {
