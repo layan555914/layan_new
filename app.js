@@ -460,12 +460,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (/otp_expired|token has expired|invalid.*token|token.*invalid/i.test(text)) return "كود التحقق غير صحيح أو انتهت صلاحيته. اطلب كودًا جديدًا وحاول مرة أخرى.";
     if (/already registered|User already registered/i.test(text)) return "هذا البريد مسجّل بالفعل. سجّل الدخول بدلًا من إنشاء حساب جديد.";
     if (/Email not confirmed/i.test(text)) return "أكّد بريدك الإلكتروني من الرسالة التي وصلتك ثم سجّل الدخول.";
-    if (/captcha_failed|captcha protection|captcha_token/i.test(text)) return "التسجيل متوقف بسبب إعداد CAPTCHA في خدمة المصادقة. يجب ضبط إعداد CAPTCHA في لوحة Supabase؛ ليست المشكلة في البريد أو كلمة المرور.";
+    if (/captcha_failed|captcha protection|captcha_token/i.test(text)) return "التسجيل متوقف بسبب إعداد CAPTCHA في خدمة المصادقة. يجب ضبط إعداد CAPTCHA في لوحة Supabase؛ راجع إعدادات المصادقة.";
     if (/redirect.*(allow|url)|not allowed.*redirect|invalid.*redirect/i.test(text)) return "رابط العودة بعد تأكيد البريد غير مسموح به في إعدادات Supabase Auth. أضف رابط منصة أسيوط عقار إلى قائمة Redirect URLs المسموح بها.";
     if (/rate limit|over_email_send_rate_limit/i.test(text)) return "تم تجاوز عدد محاولات الإرسال المسموح. انتظر قليلًا ثم حاول مرة أخرى.";
     if (/email_address_invalid|invalid email/i.test(text)) return "صيغة البريد الإلكتروني غير صحيحة. راجع كتابة البريد وحاول مرة أخرى.";
     if (/signup_disabled|signups not allowed/i.test(text)) return "إنشاء الحسابات متوقف حاليًا من إعدادات المنصة. يلزم تفعيل التسجيل في إعدادات Supabase Auth.";
-    if (/user already registered/i.test(text)) return "هذا البريد مسجّل بالفعل. ارجع إلى تسجيل الدخول أو استخدم «نسيت كلمة المرور؟».";
+    if (/user already registered/i.test(text)) return "هذا البريد مسجّل بالفعل. ارجع إلى تسجيل الدخول واطلب كود البريد.";
     return text.length < 220 ? text : "تعذر إتمام العملية. راجع البريد الإلكتروني وحاول مجددًا.";
   }
   function updateAuthButton() {
