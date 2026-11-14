@@ -212,6 +212,7 @@ jobs:
           }
           const app = fs.readFileSync('app.js', 'utf8');
           const marketplace = fs.readFileSync('marketplace.js', 'utf8');
+          const marketplaceHtml = fs.readFileSync('marketplace.html', 'utf8');
           const sponsor = fs.readFileSync('sponsor.js', 'utf8');
           // vm, configSource, configForHost and productionConfig are declared above (directory map checks).
           const privateCompanyMigration = fs.readFileSync('supabase/migrations/20261104045129_move_company_profile_definers_to_private.sql', 'utf8');
@@ -262,6 +263,13 @@ jobs:
               !appAuthJs.includes('authOtpResendBtn') ||
               !appAuthJs.includes('authOtpBackBtn')) {
             errors.push('Main auth dialog must keep OTP as an additional method with resend and password fallback');
+          }
+          if (!marketplace.includes('sendMarketplaceOtp') ||
+              !marketplace.includes('verifyMarketplaceOtp') ||
+              !marketplaceHtml.includes('id="marketplaceOtpRequest"') ||
+              !marketplaceHtml.includes('id="marketplaceOtpInput"') ||
+              !emailOtpTests.includes('marketplace login dialog can authenticate with email OTP')) {
+            errors.push('Services marketplace login must support passwordless OTP without breaking the listing flow');
           }
           if (!emailOtpTests.includes('existing-account OTP login never requests automatic account creation') ||
               !emailOtpTests.includes('successful email OTP verification creates the normal authenticated session') ||
