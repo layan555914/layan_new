@@ -49,6 +49,19 @@ if (!categories.response.ok || !Array.isArray(categories.data) || categories.dat
 }
 console.log("PASS: production marketplace categories are publicly readable (16 active categories, including the new service sections).");
 
+const publicCompanyProfiles = await read("company_profiles_public?select=id,company_name,representative_verified_at&limit=1");
+if (!publicCompanyProfiles.response.ok || !Array.isArray(publicCompanyProfiles.data)) {
+  throw new Error("Public company_profiles_public view read failed (HTTP " + publicCompanyProfiles.response.status + ").");
+}
+console.log("PASS: public company profile view is readable through invoker security.");
+
+const privateCompanyOwnerData = await read("company_profiles?select=owner_id&limit=1");
+if (![401, 403].includes(privateCompanyOwnerData.response.status)) {
+  throw new Error("Expected anonymous access to company profile owner_id to be denied with HTTP 401/403; got HTTP " +
+    privateCompanyOwnerData.response.status + ". Recheck the view grants and column-level privileges.");
+}
+console.log("PASS: anonymous access to private company owner identifiers is denied.");
+
 for (const [table, columns] of [
   ["user_favorite_offers", "user_id,offer_id"],
   ["buyer_preferences", "owner_id"]
