@@ -64,6 +64,7 @@ async function seedAuthenticatedSession(page) {
 }
 
 async function mockCompanyClaimBackend(page, options = {}) {
+  const entity = options.entity || ENTITY;
   const state = {
     claims: options.claims ? [structuredClone(options.claims)] : [],
     submissions: [],
@@ -79,7 +80,7 @@ async function mockCompanyClaimBackend(page, options = {}) {
     if (path === "/auth/v1/user") return reply(route, USER);
     if (path.startsWith("/auth/v1/")) return reply(route, {});
 
-    if (path === "/rest/v1/directory_entities") return reply(route, [ENTITY]);
+    if (path === "/rest/v1/directory_entities") return reply(route, [entity]);
     if (path === "/rest/v1/directory_entity_sources") return reply(route, []);
 
     if (path === "/rest/v1/company_claim_requests") {
@@ -129,10 +130,10 @@ async function mockCompanyClaimBackend(page, options = {}) {
   return state;
 }
 
-async function fillClaimForm(page) {
+async function fillClaimForm(page, role = "مدير النشاط") {
   const form = page.locator("#companyClaimForm");
   await form.locator("[name='representative_name']").fill("ممثل الشركة التجريبي");
-  await form.locator("[name='representative_role']").selectOption({ label: "مدير الشركة" });
+  await form.locator("[name='representative_role']").selectOption({ label: role });
   await form.locator("[name='representative_phone']").fill("01012345678");
   await form.locator("[name='representative_email']").fill("company-claim-test@example.invalid");
   await form.locator("[name='representative_notes']").fill("طلب تجريبي من اختبار Playwright");
@@ -172,10 +173,43 @@ test("an authenticated representative submits a claim linked to their Supabase a
     directory_entity_id: ENTITY_ID,
     requester_user_id: USER_ID,
     representative_name: "ممثل الشركة التجريبي",
-    representative_role: "مدير الشركة",
+    representative_role: "مدير النشاط",
     contact_phone: "01012345678",
     contact_email: "company-claim-test@example.invalid",
     notes: "طلب تجريبي من اختبار Playwright"
+  });
+  expect(state.submissions[0]).not.toHaveProperty("status");
+  expect(state.submissions[0]).not.toHaveProperty("reviewed_by");
+});
+
+test("a service provider representative can submit a claim for a published provider profile", async ({ page }) => {
+  await seedAuthenticatedSession(page);
+  const serviceEntity = {
+    ...ENTITY,
+    id: "d2222222-2222-4222-8222-222222222222",
+    name_ar: "معرض اختبار لمواد البناء",
+    entity_type: "other",
+    service_category: "building_materials",
+    description: "مقدم خدمات مواد البناء والتشطيب للاختبار."
+  };
+  const state = await mockCompanyClaimBackend(page, { entity: serviceEntity });
+
+  await page.goto("/company.html?entity_id=" + serviceEntity.id);
+  await expect(page.locator("#companyProfileRoot")).toContainText("ممثل مقدم الخدمة؟");
+  await page.locator("#companyClaimOpen").click();
+  await expect(page.locator("#companyClaimTitle")).toContainText("ممثل مقدم الخدمة");
+
+  const form = await fillClaimForm(page, "مدير الفرع");
+  await form.locator("button[type='submit']").click();
+
+  await expect(page.locator("#companyClaimStatus")).toContainText("قيد المراجعة");
+  await expect(form).toBeHidden();
+  expect(state.submissions).toHaveLength(1);
+  expect(state.submissions[0]).toMatchObject({
+    directory_entity_id: serviceEntity.id,
+    requester_user_id: USER_ID,
+    representative_name: "ممثل الشركة التجريبي",
+    representative_role: "مدير الفرع"
   });
   expect(state.submissions[0]).not.toHaveProperty("status");
   expect(state.submissions[0]).not.toHaveProperty("reviewed_by");
@@ -194,7 +228,7 @@ test("admin can review and approve a pending company claim from the claim queue"
   await expect(card).toContainText("ممثل الشركة التجريبي");
   await card.locator("[data-company-claim-action='approve']").click();
 
-  await expect(page.locator("#adminStatus")).toContainText("تم اعتماد الطلب وربط حساب ممثل الشركة بالملف.");
+  await expect(page.locator("#adminStatus")).toContainText("تم اعتماد الطلب وربط حساب ممثل الجهة بالملف.");
   expect(state.reviews).toHaveLength(1);
   expect(state.reviews[0]).toMatchObject({
     p_id: CLAIM.id,

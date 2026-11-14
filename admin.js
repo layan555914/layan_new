@@ -242,7 +242,44 @@ document.addEventListener("DOMContentLoaded", () => {
         companyClaimsList.innerHTML = '<p class="admin-empty">لا توجد طلبات استلام ملفات معلقة.</p>';
         return;
       }
+      const entityIds = [...new Set(rows.map(row => String(row.directory_entity_id || "")).filter(id => /^[0-9a-f-]{36}$/i.test(id)))];
+      const entityDetailsById = new Map();
+      if (entityIds.length) {
+        try {
+          const filter = encodeURIComponent("(" + entityIds.join(",") + ")");
+          let entities;
+          try {
+            entities = await request("/rest/v1/directory_entities?select=id,entity_type,service_category&id=in." + filter);
+          } catch (_) {
+            entities = await request("/rest/v1/directory_entities?select=id,entity_type&id=in." + filter);
+          }
+          if (Array.isArray(entities)) entities.forEach(entity => entityDetailsById.set(String(entity.id), entity));
+        } catch (error) {
+          console.warn("تعذر تحميل تصنيفات ملفات طلبات الاستلام؛ ستظل المراجعة متاحة:", error);
+        }
+      }
+      const serviceCategoryLabels = {
+        contracting_construction: "مقاولات وإنشاءات",
+        real_estate_marketing: "تسويق عقاري",
+        real_estate_brokerage: "وساطة ومكتب عقاري",
+        building_materials: "مواد بناء وتشطيب",
+        finishing_decoration: "تشطيب وديكور",
+        furniture_furnishings: "أثاث وفرش وتجهيز وحدات",
+        engineering_design: "مكاتب هندسية وتصميم معماري",
+        maintenance_property_management: "صيانة وإدارة عقارات",
+        real_estate_consultancy: "استشارات عقارية",
+        real_estate_development: "تطوير ومشروعات عقارية",
+        real_estate_sales: "مبيعات عقارية",
+        other_real_estate_services: "خدمات عقارية مساندة"
+      };
+      const legacyEntityLabels = {
+        developer: "مطور عقاري", marketing: "تسويق عقاري", brokerage: "وساطة عقارية",
+        contractor: "مقاولات", public_authority: "جهة عامة", sales_office: "مكتب مبيعات",
+        consultant: "استشارات عقارية", other: "جهة أخرى"
+      };
       companyClaimsList.innerHTML = rows.map(row => {
+        const entity = entityDetailsById.get(String(row.directory_entity_id)) || {};
+        const entityCategory = serviceCategoryLabels[entity.service_category] || legacyEntityLabels[entity.entity_type] || "ملف جهة";
         const phone = String(row.contact_phone || "");
         const phoneDigits = phone.replace(/[^0-9]/g, "");
         const createdAt = row.created_at ? new Date(row.created_at).toLocaleString("ar-EG-u-nu-latn") : "—";
@@ -253,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ? '<a class="btn btn-outline-dark" href="https://wa.me/' + esc(whatsappNumber) + '?text=' + encodeURIComponent(waText) + '" target="_blank" rel="noopener noreferrer">مراسلة واتساب</a>'
           : "";
         return '<article class="admin-ad" data-company-claim-id="' + esc(row.id) + '">' +
-          '<div><span class="admin-chip">طلب استلام ملف · قيد المراجعة</span>' +
+          '<div><span class="admin-chip">طلب استلام ملف · قيد المراجعة</span><span class="admin-chip">' + esc(entityCategory) + '</span>' +
           '<h2>' + esc(row.company_name || "جهة غير محددة") + '</h2>' +
           '<p><strong>ممثل الجهة:</strong> ' + esc(row.representative_name) + ' — ' + esc(row.representative_role) + '</p>' +
           '<p><strong>رقم التواصل:</strong> <a href="tel:' + esc(phoneDigits) + '">' + esc(phone) + '</a>' +
@@ -269,7 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
           '</div></article>';
       }).join("");
     } catch (error) {
-      companyClaimsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل طلبات استلام الشركات.") + '</p>';
+      companyClaimsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل طلبات استلام الملفات.") + '</p>';
       const countEl = document.getElementById("statPendingCompanyClaims");
       if (countEl) countEl.textContent = "—";
     }
