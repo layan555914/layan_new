@@ -10,7 +10,7 @@ const authForm=$("authForm"),listingForm=$("marketplaceListingForm");
 const authStatus=$("authStatus"),listingStatus=$("marketplaceFormStatus");
 const categoryFilter=$("marketplaceCategoryFilter"),listingGrid=$("marketplaceListings");
 let authMode="login",currentSession=null,listings=[],shouldOpenListingAfterAuth=false,marketplacePage=1;const MARKETPLACE_PER_PAGE=12;
-let categories=["سوق العقارات","التنازلات العقارية","أراضي للبيع","أراضي التنازلات","إيجار يومي ومفروش","الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية"];
+let categories=["سوق العقارات","التنازلات العقارية","أراضي للبيع","أراضي التنازلات","إيجار يومي ومفروش","الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية","مكاتب التصميم الهندسي","مهندسو الديكور والتصميم الداخلي"];
 const specs={
 "سوق العقارات":[["نوع العقار","property_kind","select","شقة|فيلا|محل تجاري|مكتب|عيادة|مخزن|مبنى"],["الغرض","purpose","select","بيع|إيجار"],["المساحة بالمتر","area_m2","number"],["عدد الغرف","bedrooms","number"],["عدد الحمامات","bathrooms","number"],["التشطيب","finishing","text"]],
 "التنازلات العقارية":[["اسم المطور","developer","text"],["اسم المشروع","project","text"],["المقدم المطلوب","required_down_payment","number"],["المبلغ المدفوع","paid_amount","number"],["المتبقي","remaining_amount","number"],["القسط الشهري","monthly_installment","number"],["رسوم التنازل","assignment_fee","number"],["الخصم المتاح","discount","number"]],
@@ -22,7 +22,7 @@ const specs={
 "الأثاث والفرش وتجهيز الوحدات":[["نوع الأثاث","furniture_kind","text"],["الحالة","condition","select","جديد|مستعمل بحالة جيدة|حسب الطلب"],["التوصيل والتركيب","delivery_installation","text"]],
 "المشروعات والمطورون العقاريون":[["اسم المشروع","project_name","text"],["اسم المطور","developer","text"],["نوع المشروع","project_kind","text"],["موقف التنفيذ","construction_status","text"],["أنظمة السداد","payment_plans","text"]],
 "الصيانة وإدارة العقارات":[["نوع الخدمة","service_kind","text"],["نطاق التغطية","coverage","text"],["مواعيد العمل","working_hours","text"],["الضمان","warranty","text"]],
-"الاستشارات والخدمات العقارية":[["نوع الاستشارة","consultation_kind","text"],["مقدم الخدمة","provider","text"],["طريقة تقديم الخدمة","delivery_method","text"],["التخصص أو المؤهل","qualification","text"]]
+"الاستشارات والخدمات العقارية":[["نوع الاستشارة","consultation_kind","text"],["مقدم الخدمة","provider","text"],["طريقة تقديم الخدمة","delivery_method","text"],["التخصص أو المؤهل","qualification","text"]],\n"مكاتب التصميم الهندسي":[["نوع التصميم","design_kind","select","معماري|إنشائي|كهرباء|ميكانيكا|تخطيط عمراني"],["خدمات المكتب","engineering_services","text"],["الإشراف الهندسي","supervision","text"],["التراخيص والدراسات","permits_studies","text"]],\n"مهندسو الديكور والتصميم الداخلي":[["نوع المشروع","interior_project","select","شقة|فيلا|محل تجاري|مكتب|عيادة"],["خدمات التصميم","interior_services","text"],["التصميم المتاح","design_deliverables","select","2D|3D|2D و3D"],["التنفيذ والتشطيب","fitout_execution","text"]]
 };
 const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function readSession(){return auth()?.getSession?.()||null}
@@ -36,7 +36,7 @@ async function compressImage(file){if(!/^image\//.test(file.type||"")&&!/\.(jpe?
 async function loadCategories(){
  try{
   let rows=await api("marketplace_categories?select=name,description,display_order&is_active=eq.true&order=display_order.asc");
-  if(!Array.isArray(rows)||rows.length!==11)throw Error("قائمة الأقسام من قاعدة البيانات غير مكتملة.");
+  if(!Array.isArray(rows)||!rows.some(row=>row.name==="مكاتب التصميم الهندسي")||!rows.some(row=>row.name==="مهندسو الديكور والتصميم الداخلي"))throw Error("قائمة أقسام سوق الخدمات لا تتضمن تصنيفات التصميم الجديدة.");
   categories=rows.map(row=>row.name);
   // The services marketplace lists services only; property categories are handled on offers.html.
   const propertyCategories=["سوق العقارات","التنازلات العقارية","أراضي للبيع","أراضي التنازلات","إيجار يومي ومفروش"];
@@ -56,23 +56,23 @@ async function loadCategories(){
 }
 function renderCategoryFields(){const category=listingForm.elements.category.value;const target=$("marketplaceCategoryFields");const fields=specs[category]||[];if(!fields.length){target.innerHTML='<p class="muted">اختر القسم لإظهار التفاصيل المناسبة.</p>';return}target.innerHTML="<h3>تفاصيل خاصة بالقسم</h3>"+fields.map(([label,name,type,options])=>{let control;if(type==="select")control='<select name="detail_'+name+'"><option value="">اختر</option>'+options.split("|").map(v=>"<option>"+esc(v)+"</option>").join("")+"</select>";else control='<input name="detail_'+name+'" type="'+type+'" '+(type==="number"?'min="0" step="0.01"':'maxlength="240"')+'>';return "<label>"+esc(label)+control+"</label>"}).join("")}
 // Services-only marketplace (reference design): property categories live on offers.html.
-const SERVICE_CATEGORIES=["الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية"];
+const SERVICE_CATEGORIES=["الشركات والمكاتب العقارية","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","المشروعات والمطورون العقاريون","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية","مكاتب التصميم الهندسي","مهندسو الديكور والتصميم الداخلي"];
 const egPhone=v=>{let d=String(v||"").replace(/[^0-9]/g,"");if(d.startsWith("20"))d=d.slice(2);if(d&&!d.startsWith("0"))d="0"+d;return /^01[0125][0-9]{8}$/.test(d)?d:""};
 const normText=v=>String(v||"").toLowerCase().replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه");
 
 const SERVICE_PROFILE_CATEGORY_CODES={
  "الشركات والمكاتب العقارية":["real_estate_marketing","real_estate_brokerage","real_estate_sales","real_estate_development"],
- "مواد البناء والتشطيب":["contracting_construction","building_materials","finishing_decoration"],
+ "مواد البناء والتشطيب":["contracting_construction","building_materials"],
  "الأثاث والفرش وتجهيز الوحدات":["furniture_furnishings"],
  "المشروعات والمطورون العقاريون":["real_estate_development"],
  "الصيانة وإدارة العقارات":["maintenance_property_management"],
- "الاستشارات والخدمات العقارية":["engineering_design","real_estate_consultancy","other_real_estate_services"]
+ "الاستشارات والخدمات العقارية":["real_estate_consultancy","other_real_estate_services"],\n "مكاتب التصميم الهندسي":["engineering_design"],\n "مهندسو الديكور والتصميم الداخلي":["finishing_decoration"]
 };
 const SERVICE_PROFILE_LABELS={
  contracting_construction:"مقاولات وإنشاءات",real_estate_marketing:"تسويق عقاري",
  real_estate_brokerage:"وساطة ومكتب عقاري",building_materials:"مواد بناء وتشطيب",
- finishing_decoration:"تشطيب وديكور",furniture_furnishings:"أثاث وفرش وتجهيز وحدات",
- engineering_design:"مكاتب هندسية وتصميم معماري",maintenance_property_management:"صيانة وإدارة عقارات",
+ finishing_decoration:"تصميم داخلي وديكور",furniture_furnishings:"أثاث وفرش وتجهيز وحدات",
+ engineering_design:"مكاتب التصميم الهندسي والاستشارات المعمارية",maintenance_property_management:"صيانة وإدارة عقارات",
  real_estate_consultancy:"استشارات عقارية",real_estate_development:"تطوير ومشروعات عقارية",
  real_estate_sales:"مبيعات عقارية",other_real_estate_services:"خدمات عقارية مساندة"
 };
