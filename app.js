@@ -408,7 +408,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         resendButton.hidden = true;
         otpVerifyButton.disabled = false;
         otpCodeInput.focus();
-        status.textContent = "بعتنالك كود من 6 أرقام على البريد. اكتبه هنا لإكمال الدخول. إعادة الإرسال متاحة بعد دقيقة.";
+        status.textContent = "تم إرسال كود من 6 أرقام على البريد. اكتبه هنا لإكمال الدخول. إعادة الإرسال متاحة بعد دقيقة.";
         applyOtpCooldown();
       } catch (error) {
         status.textContent = friendlyAuthError(error.message);
