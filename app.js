@@ -444,7 +444,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     const paintMode = () => {
       clearOtpFlow();
-      otpRequestButton.textContent = mode === "login" ? "الدخول بكود البريد" : "إنشاء الحساب بالكود";
+      otpRequestButton.textContent = mode === "login" ? "الدخول بكود البريد بدون كلمة مرور" : "إنشاء الحساب بالكود بدون كلمة مرور";
       resendButton.hidden = true;
       forgotButton.hidden = mode !== "login";
       signupOnly.forEach(node => { node.hidden = mode !== "signup"; });
