@@ -18,7 +18,7 @@ async function openHome(page) {
     window.LAYAN_SUPABASE?.verifyEmailOtp));
 }
 
-test("existing-account OTP login never requests automatic account creation", async ({ page }) => {
+test("email OTP request defaults to automatic account creation for new email addresses", async ({ page }) => {
   await openHome(page);
   let payload = null;
   await page.route(SUPABASE + "/auth/v1/otp", async route => {
@@ -30,49 +30,30 @@ test("existing-account OTP login never requests automatic account creation", asy
     });
   });
 
-  await page.evaluate(() => window.LAYAN_SUPABASE.requestEmailOtp(
-    "  OTP-TEST@EXAMPLE.INVALID ",
-    { shouldCreateUser: false }
-  ));
+  await page.evaluate(() => window.LAYAN_SUPABASE.requestEmailOtp(" New-User@Example.Invalid "));
 
   expect(payload).toEqual({
-    email: "otp-test@example.invalid",
-    create_user: false
+    email: "new-user@example.invalid",
+    create_user: true
   });
 });
 
-test("new-account OTP request sends the validated signup profile metadata", async ({ page }) => {
+test("callers may explicitly disable automatic account creation when needed", async ({ page }) => {
   await openHome(page);
   let payload = null;
   await page.route(SUPABASE + "/auth/v1/otp", async route => {
     payload = route.request().postDataJSON();
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ message_id: "otp-signup-fixture" })
-    });
+    await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
   });
 
   await page.evaluate(() => window.LAYAN_SUPABASE.requestEmailOtp(
-    " New-User@Example.Invalid ",
-    {
-      shouldCreateUser: true,
-      data: {
-        full_name: "  أحمد   محمد ",
-        phone: "01012345678",
-        account_type: "owner"
-      }
-    }
+    "existing@example.invalid",
+    { shouldCreateUser: false }
   ));
 
   expect(payload).toEqual({
-    email: "new-user@example.invalid",
-    create_user: true,
-    data: {
-      full_name: "أحمد محمد",
-      phone: "01012345678",
-      account_type: "owner"
-    }
+    email: "existing@example.invalid",
+    create_user: false
   });
 });
 
@@ -134,7 +115,7 @@ test("successful email OTP verification creates the normal authenticated session
   expect(session.stored).toContain("otp-fixture-access-token");
 });
 
-test("login dialog uses email OTP as the only method and completes a mocked login", async ({ page }) => {
+test("login dialog uses one email OTP flow for existing and new users", async ({ page }) => {
   await openHome(page);
   let otpPayload = null;
   await page.route(SUPABASE + "/auth/v1/otp", async route => {
@@ -158,8 +139,10 @@ test("login dialog uses email OTP as the only method and completes a mocked logi
   }));
 
   await page.locator("#loginBtn").click();
+  await expect(page.locator("#authToggle")).toHaveCount(0);
   await expect(page.locator("#authPassword")).toHaveCount(0);
   await expect(page.locator("#authSubmit")).toHaveCount(0);
+  await expect(page.locator(".auth-signup-only")).toHaveCount(0);
   await expect(page.locator("#authOtpRequestBtn")).toBeVisible();
   await page.locator("#authEmail").fill("otp-test@example.invalid");
   await page.locator("#authOtpRequestBtn").click();
@@ -170,11 +153,11 @@ test("login dialog uses email OTP as the only method and completes a mocked logi
   await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
   expect(otpPayload).toEqual({
     email: "otp-test@example.invalid",
-    create_user: false
+    create_user: true
   });
 });
 
-test("marketplace login dialog can authenticate with email OTP", async ({ page }) => {
+test("marketplace login dialog can authenticate with the same automatic email OTP flow", async ({ page }) => {
   await page.route(SUPABASE + "/rest/v1/**", route => route.fulfill({
     status: 200,
     contentType: "application/json",
@@ -202,6 +185,7 @@ test("marketplace login dialog can authenticate with email OTP", async ({ page }
   await page.locator("#openListingForm").click();
   await expect(page.locator('#authDialog input[type="password"]')).toHaveCount(0);
   await expect(page.locator("#authDialog #authSubmit")).toHaveCount(0);
+  await expect(page.locator("#authDialog #switchAuth")).toHaveCount(0);
   await expect(page.locator("#authDialog")).toBeVisible();
   await page.locator("#marketAuthEmail").fill("otp-test@example.invalid");
   await page.locator("#marketplaceOtpRequest").click();
@@ -213,42 +197,7 @@ test("marketplace login dialog can authenticate with email OTP", async ({ page }
   await expect(page.locator("#marketplaceListingDialog")).toBeVisible();
   expect(otpPayload).toEqual({
     email: "otp-test@example.invalid",
-    create_user: false
+    create_user: true
   });
   expect(await page.evaluate(() => window.LAYAN_SUPABASE.isAuthenticated())).toBe(true);
-});
-
-test("signup dialog can request OTP without submitting a password", async ({ page }) => {
-  await openHome(page);
-  let payload = null;
-  await page.route(SUPABASE + "/auth/v1/otp", async route => {
-    payload = route.request().postDataJSON();
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ message_id: "otp-signup-ui-fixture" })
-    });
-  });
-
-  await page.locator("#loginBtn").click();
-  await page.locator("#authToggle").click();
-  await expect(page.locator("#authPassword")).toHaveCount(0);
-  await expect(page.locator("#authSubmit")).toHaveCount(0);
-  await page.locator("#authEmail").fill("new-owner@example.invalid");
-  await page.locator("#authFullName").fill("أحمد محمد");
-  await page.locator("#authPhone").fill("01012345678");
-  await page.locator('[name="authAccountType"][value="owner"]').check();
-  await page.locator("#authTerms").check();
-  await page.locator("#authOtpRequestBtn").click();
-
-  await expect(page.locator("#authOtpCode")).toBeVisible();
-  expect(payload).toEqual({
-    email: "new-owner@example.invalid",
-    create_user: true,
-    data: {
-      full_name: "أحمد محمد",
-      phone: "01012345678",
-      account_type: "owner"
-    }
-  });
 });
