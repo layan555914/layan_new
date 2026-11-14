@@ -39,7 +39,6 @@ function resetMarketplaceOtpFlow(){
  pendingMarketplaceOtp=null;
  authForm.elements.email.readOnly=false;
  marketplaceOtpField.hidden=true;
- marketplaceOtpField.hidden=true;
  marketplaceOtpInput.value="";
  marketplaceOtpRequest.hidden=false;
  marketplaceOtpRequest.disabled=false;
@@ -54,7 +53,6 @@ function setAuthMode(mode){
  resetMarketplaceOtpFlow();
  $("authTitle").textContent="تسجيل الدخول";
  $("switchAuth").textContent="إنشاء حساب جديد";
- $("forgotPassword").hidden=false;
  authStatus.textContent="";
 }
 function openAuth(){authStatus.textContent="";setAuthMode("login");authDialog.showModal()}
