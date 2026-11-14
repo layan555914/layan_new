@@ -201,7 +201,7 @@
     const payload = {
       email: cleanEmail,
       // Existing-account login must never create a new account by accident.
-      create_user: options.shouldCreateUser === true
+      create_user: options.shouldCreateUser !== false
     };
     if (options.data && typeof options.data === "object") {
       payload.data = {
