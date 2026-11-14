@@ -624,6 +624,8 @@ AS $function$
   );
 $function$;
 
+DROP FUNCTION IF EXISTS public.layan_review_company_profile(uuid,text,text,text,text);
+DROP FUNCTION IF EXISTS private.layan_review_company_profile(uuid,text,text,text,text);
 DROP FUNCTION IF EXISTS public.layan_review_company_profile(uuid,text,text);
 DROP FUNCTION IF EXISTS private.layan_review_company_profile(uuid,text,text);
 
