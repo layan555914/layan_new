@@ -51,11 +51,75 @@ GRANT USAGE ON SCHEMA private TO authenticated;
 -- Minimal pre-existing platform contract used by the feature migrations.
 CREATE TABLE public.directory_entities (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  legacy_code text,
+  slug text UNIQUE,
   name_ar text NOT NULL,
+  name_en text,
+  entity_type text,
+  description text,
+  website_url text,
+  public_phone text,
+  public_email text,
+  public_address text,
+  primary_area_id uuid,
+  latitude numeric,
+  longitude numeric,
+  location_precision text,
+  location_source_id uuid,
+  location_verified_at date,
+  location_public boolean NOT NULL DEFAULT false,
   public_visible boolean NOT NULL DEFAULT true,
-  verification_status text NOT NULL DEFAULT 'published'
+  verification_status text NOT NULL DEFAULT 'published',
+  last_verified_at date,
+  next_review_at date,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 GRANT SELECT ON public.directory_entities TO authenticated;
+
+CREATE TABLE public.directory_sources (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  source_code text UNIQUE NOT NULL,
+  title text NOT NULL,
+  publisher text,
+  source_type text,
+  source_url text,
+  confidence_level text,
+  is_public boolean NOT NULL DEFAULT false,
+  notes text,
+  accessed_at date,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE public.directory_entity_sources (
+  entity_id uuid NOT NULL REFERENCES public.directory_entities(id) ON DELETE CASCADE,
+  source_id uuid NOT NULL REFERENCES public.directory_sources(id) ON DELETE CASCADE,
+  claim_key text NOT NULL,
+  PRIMARY KEY (entity_id, source_id, claim_key)
+);
+CREATE TABLE public.directory_entity_private (
+  entity_id uuid PRIMARY KEY REFERENCES public.directory_entities(id) ON DELETE CASCADE,
+  internal_address text,
+  internal_phone text,
+  verification_label text,
+  confidence_level text,
+  notes text
+);
+CREATE TABLE public.directory_change_log (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  table_name text NOT NULL,
+  record_id uuid NOT NULL,
+  changed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  old_values jsonb,
+  new_values jsonb,
+  reason text,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE OR REPLACE FUNCTION public.layan_is_http_url(p_value text)
+RETURNS boolean
+LANGUAGE sql IMMUTABLE
+AS $function$
+  SELECT COALESCE(p_value ~* '^https?://', false);
+$function$;
 
 CREATE OR REPLACE FUNCTION private.layan_is_admin()
 RETURNS boolean
@@ -77,12 +141,24 @@ AS \$function\$
 \$function\$;
 GRANT EXECUTE ON FUNCTION public.layan_is_admin() TO authenticated;
 
+ALTER TABLE public.directory_entities ENABLE ROW LEVEL SECURITY;
+CREATE POLICY directory_entities_public_read
+  ON public.directory_entities FOR SELECT TO anon, authenticated
+  USING (public_visible = true AND verification_status = 'published');
+CREATE POLICY directory_entities_admin_update
+  ON public.directory_entities FOR UPDATE TO authenticated
+  USING (public.layan_is_admin())
+  WITH CHECK (public.layan_is_admin());
+
 INSERT INTO auth.users (id)
 VALUES ('$USER_ONE'), ('$USER_TWO'), ('$ADMIN_ID')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO public.directory_entities (id, name_ar, public_visible, verification_status)
-VALUES ('$ENTITY_ID', 'شركة اختبار معزولة', true, 'published')
+INSERT INTO public.directory_entities (id, slug, name_ar, entity_type, public_address, location_public, public_visible, verification_status)
+VALUES
+  ('$ENTITY_ID', 'isolated-company-claim-test', 'شركة اختبار معزولة', 'other', 'شارع قديم - أسيوط', true, true, 'published'),
+  ('33333333-3333-4333-8333-333333333333', 'existing-contractor-test', 'مقاولات اختبار موجودة', 'contractor', NULL, false, true, 'published'),
+  ('44444444-4444-4444-8444-444444444444', 'existing-marketing-test', 'تسويق عقاري اختبار موجود', 'marketing', NULL, false, true, 'published')
 ON CONFLICT (id) DO NOTHING;
 SQL
 

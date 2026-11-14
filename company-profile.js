@@ -39,17 +39,19 @@ document.addEventListener("DOMContentLoaded",async()=>{
  function renderError(message){
   root.innerHTML='<p class="company-directory-state">'+esc(message)+'</p>';
  }
- function categoryLabel(type){
-  return ({
-   developer:"مطور عقاري",
-   marketing:"تسويق عقاري",
-   brokerage:"وساطة ومكتب عقاري",
-   contractor:"مقاولات وإنشاءات",
-   public_authority:"جهة عامة",
-   sales_office:"مكتب مبيعات",
-   consultant:"استشارات عقارية",
-   other:"جهة عقارية"
-  })[type]||"جهة عقارية";
+ function categoryLabel(type,serviceCategory){
+  const labels={
+   contracting_construction:"مقاولات وإنشاءات",real_estate_marketing:"تسويق عقاري",
+   real_estate_brokerage:"وساطة ومكتب عقاري",building_materials:"مواد بناء وتشطيب",
+   finishing_decoration:"تشطيب وديكور",furniture_furnishings:"أثاث وفرش وتجهيز وحدات",
+   engineering_design:"مكاتب هندسية وتصميم معماري",maintenance_property_management:"صيانة وإدارة عقارات",
+   real_estate_consultancy:"استشارات عقارية",real_estate_development:"تطوير ومشروعات عقارية",
+   real_estate_sales:"مبيعات عقارية",other_real_estate_services:"خدمات عقارية مساندة"
+  };
+  if(serviceCategory&&labels[serviceCategory])return labels[serviceCategory];
+  return ({developer:"مطور عقاري",marketing:"تسويق عقاري",brokerage:"وساطة ومكتب عقاري",
+   contractor:"مقاولات وإنشاءات",public_authority:"جهة عامة",sales_office:"مكتب مبيعات",
+   consultant:"استشارات عقارية",other:"جهة عقارية"})[type]||"جهة عقارية";
  }
  function sourceLinks(sources){
   if(!sources.length)return '<p class="company-source-empty">لا تتوفر مراجع عامة مرتبطة بهذا السجل حاليًا.</p>';
@@ -62,17 +64,31 @@ document.addEventListener("DOMContentLoaded",async()=>{
  }
  async function loadDirectoryEntity(){
   if(!/^[0-9a-f-]{36}$/i.test(entityId||"")){renderError("رابط ملف الجهة غير صحيح.");return;}
-  const query="directory_entities?select=id,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id,verification_status,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
-  const rows=await api(query);
+  const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,latitude,longitude,location_public,location_precision,location_source_id,location_verified_at,verification_status,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
+  const basic="directory_entities?select=id,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id,latitude,longitude,location_public,location_precision,location_source_id,location_verified_at,verification_status,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
+  let rows;
+  try{rows=await api(extended)}catch(_){rows=await api(basic)}
   const entity=Array.isArray(rows)?rows[0]:null;
   if(!entity){renderError("هذا السجل غير متاح للعامة أو لم يعد منشورًا في الدليل.");return;}
   const name=entity.name_ar||entity.name_en||"جهة عقارية";
-  const logo=ENTITY_LOGO_ASSETS[entity.id]||"";
-  const type=categoryLabel(entity.entity_type);
+  const logo=safeUrl(entity.public_logo_url)||ENTITY_LOGO_ASSETS[entity.id]||"";
+  const type=categoryLabel(entity.entity_type,entity.service_category);
   const website=safeUrl(entity.website_url);
   const phone=digits(entity.public_phone);
+  const whatsapp=digits(entity.public_whatsapp);
+  const services=Array.isArray(entity.public_services)?entity.public_services:[];
+  const gallery=Array.isArray(entity.public_gallery_urls)?entity.public_gallery_urls.filter(safeUrl):[];
+  const coverage=Array.isArray(entity.public_coverage_areas)?entity.public_coverage_areas:[];
   const address=String(entity.public_address||"").trim();
-  const mapUrl=address?"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(address+", أسيوط، مصر"):"";
+  const latitude=Number(entity.latitude),longitude=Number(entity.longitude);
+  const hasVerifiedMapPoint=entity.location_public===true&&Boolean(entity.location_source_id)&&Boolean(entity.location_verified_at)&&entity.latitude!==null&&entity.latitude!==undefined&&entity.longitude!==null&&entity.longitude!==undefined&&Number.isFinite(latitude)&&Number.isFinite(longitude)&&latitude>=-90&&latitude<=90&&longitude>=-180&&longitude<=180;
+  const mapQuery=hasVerifiedMapPoint?String(latitude+","+longitude):(address?address+", محافظة أسيوط، مصر":"");
+  const mapUrl=mapQuery?"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(mapQuery):"";
+  const mapEmbedUrl=mapQuery?"https://maps.google.com/maps?q="+encodeURIComponent(mapQuery)+"&output=embed":"";
+  const mapNote=hasVerifiedMapPoint?"دبوس الموقع مبني على إحداثيات منشورة في الدليل بعد مراجعة مصدرها.":"هذا بحث استرشادي عن العنوان، وليس دبوسًا جغرافيًا معتمدًا للجهة.";
+  const mapMarkup=mapQuery
+   ? '<section class="company-map-panel" aria-labelledby="companyProviderMapTitle"><div><span class="eyebrow">الموقع الجغرافي</span><h2 id="companyProviderMapTitle">موقع الجهة على الخريطة</h2><p>'+esc(mapNote)+'</p></div><div class="company-map-frame"><iframe title="خريطة موقع الجهة" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="'+esc(mapEmbedUrl)+'"></iframe></div><a href="'+esc(mapUrl)+'" target="_blank" rel="noopener noreferrer">فتح الموقع على خرائط Google ↗</a></section>'
+   : "";
   let sources=[];
   try{
    const links=await api("directory_entity_sources?select=source_id&entity_id=eq."+encodeURIComponent(entity.id));
@@ -94,15 +110,19 @@ document.addEventListener("DOMContentLoaded",async()=>{
   setProperty("og:description",description);
   const contact=[];
   if(phone)contact.push('<a class="company-contact-primary" href="tel:'+esc(phone)+'">اتصال بالجهة</a>');
+  if(whatsapp){const wa=whatsapp.startsWith("0")?"2"+whatsapp.slice(1):whatsapp;contact.push('<a class="company-contact-secondary" href="https://wa.me/'+esc(wa)+'" target="_blank" rel="noopener noreferrer">واتساب</a>');}
   if(entity.public_email)contact.push('<a class="company-contact-secondary" href="mailto:'+esc(entity.public_email)+'">البريد الإلكتروني</a>');
   if(website){const isFacebook=/^(?:www\.)?facebook\.com$/i.test(new URL(website).hostname);const websiteLabel=isFacebook?"صفحة الشركة على فيسبوك ↗":"الموقع الإلكتروني ↗";contact.push('<a class="company-contact-secondary" href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">'+websiteLabel+'</a>');}
   if(mapUrl)contact.push('<a class="company-contact-secondary" href="'+esc(mapUrl)+'" target="_blank" rel="noopener noreferrer">بحث العنوان على الخريطة ↗</a>');
   root.innerHTML=
    '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'">':esc(name.trim().slice(0,1)))+'</div><div><span class="eyebrow">سجل منشور من الدليل العقاري</span><h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div><div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
-   '<section class="company-profile-section company-source-note"><h2>طبيعة هذا الإدراج</h2><p>هذا ملف معلوماتي مبني على مصادر منشورة، وليس إعلانًا مدفوعًا أو إعلان شراكة أو تزكية أو شهادة ترخيص من أسيوط عقار. راجع المصادر وتواصل مع الجهة مباشرة للتحقق من التفاصيل قبل اتخاذ أي قرار.</p>'+(address?'<p><strong>العنوان المنشور:</strong> '+esc(address)+'</p>':'')+'</section>'+
+   '<section class="company-profile-section company-source-note"><h2>طبيعة هذا الإدراج</h2><p>هذا ملف تعريفي مجاني للجهة، وليس إعلانًا مدفوعًا أو شراكة أو تزكية أو شهادة ترخيص من أسيوط عقار. راجع المصادر وتواصل مع الجهة للتحقق من التفاصيل.</p>'+(address?'<p><strong>العنوان المنشور:</strong> '+esc(address)+'</p>':'')+(entity.public_business_hours?'<p><strong>مواعيد العمل:</strong> '+esc(entity.public_business_hours)+'</p>':'')+(coverage.length?'<p><strong>نطاق الخدمة:</strong> '+coverage.map(esc).join('، ')+'</p>':'')+'</section>'+
+   mapMarkup+
+   (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':'')+
+   (gallery.length?'<section class="company-profile-section"><h2>معرض أعمال الجهة</h2><div class="company-gallery">'+gallery.map((u,i)=>'<img src="'+esc(u)+'" alt="صورة من أعمال '+esc(name)+' رقم '+(i+1)+'" loading="lazy">').join('')+'</div></section>':'')+
    '<section class="company-profile-section"><h2>مصادر المعلومات</h2>'+sourceLinks(sources)+'</section>'+
-   '<section class="company-claim-panel"><div><span class="eyebrow">ممثل الشركة؟</span><h2>اطلب استلام وإدارة الملف التعريفي مجانًا</h2><p>املأ بياناتك وصفَتك بالشركة. سيُرسل الطلب إلى إدارة أسيوط عقار للمراجعة اليدوية والتحقق من التفويض. إرسال الطلب لا يمنحك صلاحية تعديل الملف تلقائيًا.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">ابدأ طلب استلام الملف</button></section>'+
-   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب إدارة ملف شركة</span><h2 id="companyClaimTitle">بيانات ممثل الشركة</h2></div><button type="button" id="companyClaimClose" aria-label="إغلاق">×</button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الشركة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم ممثل الشركة *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الشركة *<select name="representative_role" required><option value="">اختر الصفة</option><option>مالك الشركة</option><option>شريك</option><option>مدير الشركة</option><option>مدير فرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><p class="company-claim-dialog-note">جهّز ما يثبت صفتك وموافقة الشركة. لا ترسل مستندات هوية حساسة إلا بعد أن تطلبها الإدارة عبر قناة مناسبة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
+   '<section class="company-claim-panel"><div><span class="eyebrow">ممثل الجهة؟</span><h2>اطلب استلام وإدارة الملف التعريفي مجانًا</h2><p>املأ بياناتك وصفَتك بالجهة. سيُرسل الطلب إلى إدارة أسيوط عقار للمراجعة اليدوية والتحقق من التفويض. إرسال الطلب لا يمنحك صلاحية تعديل الملف تلقائيًا.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">ابدأ طلب استلام الملف</button></section>'+
+   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف جهة</span><h2 id="companyClaimTitle">بيانات ممثل الجهة</h2></div><button type="button" id="companyClaimClose" aria-label="إغلاق">×</button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الجهة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم ممثل الجهة *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>مالك الشركة</option><option>شريك</option><option>مدير الشركة</option><option>مدير فرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><p class="company-claim-dialog-note">جهّز ما يثبت صفتك وموافقة الشركة. لا ترسل مستندات هوية حساسة إلا بعد أن تطلبها الإدارة عبر قناة مناسبة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
   const claimDialog=document.getElementById("companyClaimDialog");
   document.getElementById("companyClaimOpen")?.addEventListener("click",()=>{claimDialog?.showModal();refreshMyClaimStatus();});
   document.getElementById("companyClaimClose")?.addEventListener("click",()=>claimDialog?.close());
@@ -111,6 +131,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const claimLoginLink=document.getElementById("companyClaimLoginLink");
   const claimContactLink=document.getElementById("companyClaimContactLink");
   const claimForm=document.getElementById("companyClaimForm");
+  const claimPanel=root.querySelector(".company-claim-panel");
   const showClaimStatus=(message,isError=false)=>{
    if(!claimStatus)return;
    claimStatus.textContent=message;
@@ -141,7 +162,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=false;
     }else if(row.status==="approved"){
-     showClaimStatus("تم اعتماد طلبك وربط حسابك بملف الشركة. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة.",false);
+     showClaimStatus("تم اعتماد طلبك وربط حسابك بملف الجهة. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة.",false);
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=true;
     }else if(row.status==="rejected"){
@@ -153,6 +174,96 @@ document.addEventListener("DOMContentLoaded",async()=>{
     console.warn("Company claim status unavailable:",error);
    }
   }
+  async function mountManagerEditor(){
+   const auth=window.LAYAN_SUPABASE;
+   if(!auth?.isAuthenticated?.()||!entity?.id)return;
+   try{
+    const session=await auth.requireAuthenticated();
+    const managerUrl=base+"/rest/v1/company_entity_managers?select=directory_entity_id&directory_entity_id=eq."+encodeURIComponent(entity.id)+"&owner_user_id=eq."+encodeURIComponent(session.user.id);
+    const managerResponse=await auth.authedFetch(managerUrl,{method:"GET"});
+    const managerRows=await managerResponse.json().catch(()=>[]);
+    if(!managerResponse.ok||!Array.isArray(managerRows)||!managerRows.length)return;
+    if(claimPanel)claimPanel.hidden=true;
+
+    const statusUrl=base+"/rest/v1/company_entity_profile_update_requests?select=id,status,admin_notes,created_at&directory_entity_id=eq."+encodeURIComponent(entity.id)+"&requester_user_id=eq."+encodeURIComponent(session.user.id)+"&order=created_at.desc&limit=1";
+    const statusResponse=await auth.authedFetch(statusUrl,{method:"GET"});
+    const statusRows=await statusResponse.json().catch(()=>[]);
+    if(!statusResponse.ok)throw new Error("تعذر تحميل حالة تعديلات الملف.");
+    const latest=Array.isArray(statusRows)?statusRows[0]:null;
+    const target=document.createElement("section");
+    target.className="company-manager-panel company-profile-section";
+    const list=values=>Array.isArray(values)?values.join("\n"):"";
+    target.innerHTML=
+     '<div><span class="eyebrow">إدارة الملف بعد الاستلام</span><h2>تحديث بيانات شركتك أو خدماتك</h2><p>أي تعديل ترسله يمر بمراجعة الإدارة. تظل البيانات المعتمدة الحالية ظاهرة للزوار حتى اعتماد التعديل الجديد.</p></div>'+
+     '<p class="company-manager-status" id="companyManagerStatus" role="status" aria-live="polite"></p>'+
+     '<form class="company-manager-form" id="companyManagerForm">'+
+      '<label>اسم الجهة<input name="name_ar" required minlength="2" maxlength="180" value="'+esc(entity.name_ar||"")+'"></label>'+
+      '<label>مجال الخدمة<select name="service_category" required><option value="">اختر المجال</option>'+
+       '<option value="contracting_construction">مقاولات وإنشاءات</option><option value="real_estate_marketing">تسويق عقاري</option><option value="real_estate_brokerage">وساطة ومكتب عقاري</option><option value="building_materials">مواد بناء وتشطيب</option><option value="finishing_decoration">تشطيب وديكور</option><option value="furniture_furnishings">أثاث وفرش وتجهيز وحدات</option><option value="engineering_design">مكاتب هندسية وتصميم معماري</option><option value="maintenance_property_management">صيانة وإدارة عقارات</option><option value="real_estate_consultancy">استشارات عقارية</option><option value="real_estate_development">تطوير ومشروعات عقارية</option><option value="real_estate_sales">مبيعات عقارية</option><option value="other_real_estate_services">خدمات عقارية مساندة</option></select></label>'+
+      '<label class="wide">وصف النشاط والخدمات<textarea name="description" rows="3" maxlength="2000">'+esc(entity.description||"")+'</textarea></label>'+
+      '<label>رقم الهاتف<input name="public_phone" type="tel" maxlength="30" value="'+esc(entity.public_phone||"")+'"></label>'+
+      '<label>واتساب<input name="public_whatsapp" type="tel" maxlength="30" value="'+esc(entity.public_whatsapp||"")+'"></label>'+
+      '<label>البريد الإلكتروني<input name="public_email" type="email" maxlength="160" value="'+esc(entity.public_email||"")+'"></label>'+
+      '<label>الموقع الإلكتروني<input name="website_url" type="url" maxlength="500" value="'+esc(entity.website_url||"")+'"></label>'+
+      '<label class="wide">العنوان<input name="public_address" maxlength="240" value="'+esc(entity.public_address||"")+'"></label>'+
+      '<label>رابط الشعار<input name="public_logo_url" type="url" maxlength="500" value="'+esc(entity.public_logo_url||"")+'"></label>'+
+      '<label>مواعيد العمل<input name="public_business_hours" maxlength="240" value="'+esc(entity.public_business_hours||"")+'"></label>'+
+      '<label class="wide">الخدمات والتخصصات (كل خدمة في سطر)<textarea name="public_services" rows="3">'+esc(list(entity.public_services))+'</textarea></label>'+
+      '<label class="wide">مناطق التغطية (كل منطقة في سطر)<textarea name="public_coverage_areas" rows="2">'+esc(list(entity.public_coverage_areas))+'</textarea></label>'+
+      '<label class="wide">روابط صور الأعمال (رابط https في كل سطر)<textarea name="public_gallery_urls" rows="3">'+esc(list(entity.public_gallery_urls))+'</textarea></label>'+
+      '<button class="btn btn-gold" type="submit">إرسال التعديل لمراجعة الإدارة</button></form>';
+    root.appendChild(target);
+    const form=target.querySelector("#companyManagerForm");
+    const status=target.querySelector("#companyManagerStatus");
+    form.elements.service_category.value=entity.service_category||"";
+    if(latest?.status==="pending"){
+     status.textContent="لديك تعديل قيد المراجعة. لا تحتاج لإرسال طلب جديد الآن.";
+     form.querySelector('button[type="submit"]').disabled=true;
+    }else if(latest?.status==="needs_changes"){
+     status.textContent="طلبت الإدارة استكمال البيانات: "+(latest.admin_notes||"راجع البيانات ثم أعد الإرسال.");
+    }else if(latest?.status==="rejected"){
+     status.textContent="تم رفض آخر تعديل: "+(latest.admin_notes||"يمكنك مراجعة البيانات وإرسال طلب جديد.");
+    }else if(latest?.status==="approved"){
+     status.textContent="تم اعتماد آخر تعديل وإظهاره في ملف الجهة.";
+    }else{
+     status.textContent="تم التحقق من استلامك للملف. يمكنك إرسال بياناتك لتحديث الصفحة العامة.";
+    }
+    form.addEventListener("submit",async event=>{
+     event.preventDefault();
+     if(!form.reportValidity())return;
+     const data=new FormData(form);
+     const value=name=>String(data.get(name)||"").trim();
+     const validateUrl=(input)=>{if(!input)return null;const url=safeUrl(input);if(!url)throw Error("روابط الموقع والشعار والصور يجب أن تبدأ بـ http:// أو https://.");return url;};
+     const lines=name=>value(name).split(/\n+/).map(x=>x.trim()).filter(Boolean);
+     let payload;
+     try{
+      payload={
+       name_ar:value("name_ar"),service_category:value("service_category"),
+       description:value("description")||null,public_phone:value("public_phone")||null,
+       public_whatsapp:value("public_whatsapp")||null,public_email:value("public_email")||null,
+       website_url:validateUrl(value("website_url")),public_address:value("public_address")||null,
+       public_logo_url:validateUrl(value("public_logo_url")),
+       public_business_hours:value("public_business_hours")||null,
+       public_services:lines("public_services"),public_coverage_areas:lines("public_coverage_areas"),
+       public_gallery_urls:lines("public_gallery_urls").map(validateUrl)
+      };
+     }catch(error){status.textContent=error.message;return;}
+     const button=form.querySelector('button[type="submit"]');
+     button.disabled=true;status.textContent="جارٍ إرسال التعديل لمراجعة الإدارة...";
+     try{
+      const response=await auth.authedFetch(base+"/rest/v1/rpc/company_entity_profile_update_submit",{
+       method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({p_directory_entity_id:entity.id,p_payload:payload})
+      });
+      const result=await response.json().catch(()=>null);
+      if(!response.ok)throw Error(result?.message||result?.details||"تعذر إرسال التعديل.");
+      status.textContent="تم إرسال التعديل بنجاح. سيظل الملف الحالي ظاهرًا حتى مراجعة الإدارة واعتماد النسخة الجديدة.";
+      button.textContent="التعديل قيد المراجعة";
+      button.disabled=true;
+     }catch(error){status.textContent=error.message||"تعذر إرسال التعديل.";button.disabled=false;}
+    });
+   }catch(error){console.warn("Company manager editor unavailable:",error);}
+  }
+  mountManagerEditor();
   document.getElementById("companyClaimForm")?.addEventListener("submit",async event=>{
    event.preventDefault();
    const form=event.currentTarget;
@@ -167,7 +278,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    }
    const auth=window.LAYAN_SUPABASE;
    if(!auth?.isAuthenticated?.()){
-    showClaimStatus("سجّل الدخول أولًا من الصفحة الرئيسية، ثم ارجع إلى ملف الشركة وأرسل الطلب.",true);
+    showClaimStatus("سجّل الدخول أولًا من الصفحة الرئيسية، ثم ارجع إلى ملف الجهة وأرسل الطلب.",true);
     if(claimLoginLink)claimLoginLink.hidden=false;
     return;
    }
@@ -204,7 +315,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    }catch(error){
     const message=String(error?.message||"");
     showClaimStatus(/company_claim_requests_one_pending_per_user_entity|duplicate key|unique constraint/i.test(message)
-     ?"لديك طلب استلام مفتوح بالفعل لهذه الشركة. تواصل مع الإدارة لمتابعته."
+     ?"لديك طلب استلام مفتوح بالفعل لهذا الملف. تواصل مع الإدارة لمتابعته."
      :(message||"تعذر تسجيل الطلب. حاول مرة أخرى بعد التأكد من تسجيل الدخول."),true);
    }finally{
     if(submitButton){submitButton.disabled=false;submitButton.textContent="إرسال طلب الاستلام";}

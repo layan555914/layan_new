@@ -32,7 +32,7 @@
   // Counters on the side navigation from the "today" numbers.
   const paintCounts = () => {
     const num = id => Number(document.getElementById(id)?.textContent) || 0;
-    const review = ["statPendingProperties", "statPendingDocuments", "statPendingMarketplace", "statPendingEdits", "statPendingCompanies", "statPendingCompanyClaims", "statPendingSupplierAds", "statPendingCompanyAds"].reduce((total, id) => total + num(id), 0);
+    const review = ["statPendingProperties", "statPendingDocuments", "statPendingMarketplace", "statPendingEdits", "statPendingCompanies", "statPendingCompanyClaims", "statPendingCompanyEntityUpdates", "statPendingSupplierAds", "statPendingCompanyAds"].reduce((total, id) => total + num(id), 0);
     const badge = shell.querySelector('[data-count="review"]');
     if (badge) { badge.textContent = review; badge.hidden = !review; }
   };
