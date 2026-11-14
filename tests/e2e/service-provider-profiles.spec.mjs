@@ -109,6 +109,10 @@ test("an approved representative submits profile changes for review without dire
     const path = url.pathname;
     const table = path.split("/").pop();
 
+    if (table === "directory_entities" && request.method() === "PATCH") {
+      state.directEntityPatches += 1;
+      return reply(route, [ENTITY]);
+    }
     if (table === "directory_entities") return reply(route, [ENTITY]);
     if (table === "directory_entity_sources") return reply(route, []);
     if (table === "directory_sources") return reply(route, []);
@@ -119,10 +123,6 @@ test("an approved representative submits profile changes for review without dire
     if (path.endsWith("/rpc/company_entity_profile_update_submit")) {
       state.submitted.push(request.postDataJSON());
       return reply(route, "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbb401");
-    }
-    if (table === "directory_entities" && request.method() === "PATCH") {
-      state.directEntityPatches += 1;
-      return reply(route, [ENTITY]);
     }
     if (request.method() === "POST") return reply(route, [], 201);
     return reply(route, []);
