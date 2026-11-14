@@ -117,9 +117,9 @@ CREATE TABLE public.directory_change_log (
 CREATE OR REPLACE FUNCTION public.layan_is_http_url(p_value text)
 RETURNS boolean
 LANGUAGE sql IMMUTABLE
-AS $function$
+AS \$function\$
   SELECT COALESCE(p_value ~* '^https?://', false);
-$function$;
+\$function\$;
 
 CREATE OR REPLACE FUNCTION private.layan_is_admin()
 RETURNS boolean
