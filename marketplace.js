@@ -76,6 +76,7 @@ const SERVICE_PROFILE_LABELS={
  real_estate_consultancy:"استشارات عقارية",real_estate_development:"تطوير ومشروعات عقارية",
  real_estate_sales:"مبيعات عقارية",other_real_estate_services:"خدمات عقارية مساندة"
 };
+const SERVICE_PROFILE_ALLOWED_CODES=new Set(Object.values(SERVICE_PROFILE_CATEGORY_CODES).flat());
 let serviceProfiles=[];
 function serviceProfileCode(item){
  const legacy={contractor:"contracting_construction",marketing:"real_estate_marketing",brokerage:"real_estate_brokerage",consultant:"real_estate_consultancy",developer:"real_estate_development",sales_office:"real_estate_sales"};
@@ -91,7 +92,7 @@ function renderServiceProfiles(){
  const rows=serviceProfiles.filter(item=>{
   const code=serviceProfileCode(item);
   const searchable=normText([item.name_ar,item.name_en,item.description,code,item.public_address,(item.public_services||[]).join(" ")].join(" "));
-  return Boolean(code)&&(!allowed||allowed.includes(code))&&(!query||searchable.includes(query));
+  return SERVICE_PROFILE_ALLOWED_CODES.has(code)&&(!allowed||allowed.includes(code))&&(!query||searchable.includes(query));
  });
  if(count)count.textContent=rows.length+" ملف";
  if(!rows.length){
@@ -115,12 +116,15 @@ async function loadServiceProfiles(){
  const target=$("marketplaceServiceProfiles");
  if(!target)return;
  const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,public_address,public_logo_url,public_services&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
- const basic="directory_entities?select=id,name_ar,name_en,entity_type,description,public_address&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc&limit=150";
  try{
-  serviceProfiles=await api(extended).catch(()=>api(basic))||[];
+  const rows=await api(extended);
+  if(!Array.isArray(rows))throw new Error("استجابة ملفات مقدمي الخدمات غير صالحة.");
+  serviceProfiles=rows;
   renderServiceProfiles();
  }catch(error){
-  target.innerHTML='<div class="mk-profile-status">تعذر تحميل الملفات التعريفية حاليًا. تظل إعلانات الخدمات المنشورة أدناه متاحة.</div>';
+  serviceProfiles=[];
+  if(count)count.textContent="تعذر التحميل";
+  target.innerHTML='<div class="mk-profile-status">تعذر تحميل الملفات التعريفية المعتمدة. لم نعرض سجلات غير مصنفة بدلًا منها. تظل إعلانات الخدمات المنشورة أدناه متاحة.</div>';
   console.warn("Service provider profiles unavailable:",error);
  }
 }
