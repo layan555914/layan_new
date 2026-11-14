@@ -181,7 +181,7 @@ BEGIN
      OR char_length(v_email) > 254 THEN
     RAISE EXCEPTION 'أدخل بريدًا إلكترونيًا صحيحًا' USING errcode='22023';
   END IF;
-  IF p_role NOT IN ('manager','editor') THEN
+  IF p_role IS NULL OR p_role NOT IN ('manager','editor') THEN
     RAISE EXCEPTION 'صلاحية الموظف غير صحيحة' USING errcode='22023';
   END IF;
 
@@ -467,7 +467,7 @@ BEGIN
   IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
     RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING errcode='42501';
   END IF;
-  IF p_action NOT IN ('approve','request_info','reject') THEN
+  IF p_action IS NULL OR p_action NOT IN ('approve','request_info','reject') THEN
     RAISE EXCEPTION 'الإجراء المطلوب غير صحيح' USING errcode='22023';
   END IF;
 
