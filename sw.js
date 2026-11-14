@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v165-provider-profile-label-20261114";
+const CACHE_NAME = "asyut-aqar-shell-v166-marketplace-company-picks-20261114";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -23,7 +23,7 @@ const APP_SHELL = [
   "./favorites.js",
   "./marketplace.css",
   "./marketplace-page.css",
-  "./marketplace.js?v=20261114-service-claims-3",
+  "./marketplace.js?v=20261114-company-picks-4",
   "./my-listings.html",
   "./my-listings.css",
   "./my-listings.js",
