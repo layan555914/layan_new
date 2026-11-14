@@ -460,9 +460,155 @@ document.addEventListener("DOMContentLoaded",async()=>{
    ...(address?{address:{"@type":"PostalAddress","streetAddress":address,"addressRegion":"أسيوط","addressCountry":"EG"}}:{})
   });
  }
+
+ async function mountApprovedCompanyEditor(company){
+  const auth=window.LAYAN_SUPABASE;
+  if(!auth?.isAuthenticated?.())return;
+  try{
+   const session=await auth.requireAuthenticated();
+   const userId=session?.user?.id;
+   if(!userId)return;
+   let isOwner=false,accessRole=null;
+   try{
+    const response=await auth.authedFetch(base+"/rest/v1/rpc/layan_company_owner_profile",{
+     method:"POST",headers:{"Content-Type":"application/json"},body:"{}"
+    });
+    const mine=await response.json().catch(()=>null);
+    if(response.ok&&mine?.id===company.id&&mine.verified_at){
+     isOwner=true;accessRole="owner";
+    }
+   }catch(_){}
+   if(!isOwner){
+    const url=base+"/rest/v1/company_profile_manager_members?select=member_role&company_profile_id=eq."+encodeURIComponent(company.id)+"&user_id=eq."+encodeURIComponent(userId)+"&revoked_at=is.null";
+    const response=await auth.authedFetch(url,{method:"GET"});
+    const rows=await response.json().catch(()=>[]);
+    if(response.ok&&Array.isArray(rows)&&rows.length)accessRole=rows[0].member_role;
+   }
+   if(!accessRole)return;
+   const panel=document.createElement("section");
+   panel.className="company-profile-section company-manager-panel";
+   const rows=value=>Array.isArray(value)?value.join("\n"):"";
+   panel.innerHTML=
+    '<span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة بيانات الشركة</h2><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر بيانات تشغيلية")+'. تحديث الوصف والخدمات والصور والمشروعات يظهر مباشرة ويسجل في سجل التغييرات. الاسم والتصنيف ووسائل الاتصال الأساسية تحتاج موافقة الإدارة.</p>'+
+    '<p id="companyProfileManagerDirectStatus" role="status" aria-live="polite"></p>'+
+    '<form class="company-manager-form" id="companyProfileManagerDirectForm">'+
+     '<label class="wide">نبذة الشركة<textarea name="description" rows="3" minlength="20" maxlength="1200" required>'+esc(company.description||"")+'</textarea></label>'+
+     '<label class="wide">الخدمات والتخصصات (كل خدمة في سطر)<textarea name="services" rows="3">'+esc(rows(company.services))+'</textarea></label>'+
+     '<label class="wide">روابط صور الأعمال (رابط آمن في كل سطر)<textarea name="gallery_urls" rows="3">'+esc(rows(company.gallery_urls))+'</textarea></label>'+
+     '<label class="wide">المشروعات والأعمال السابقة (اسم المشروع — وصف مختصر، كل مشروع في سطر)<textarea name="projects" rows="3">'+esc((company.projects||[]).map(p=>(p.title||"")+" — "+(p.description||"")).join("\n"))+'</textarea></label>'+
+     '<button class="btn btn-gold" type="submit">حفظ التحديثات مباشرة</button></form>'+
+    (isOwner?
+     '<h3>تغييرات تحتاج موافقة الإدارة</h3><p id="companyProfileManagerReviewStatus" role="status" aria-live="polite"></p><form class="company-manager-form" id="companyProfileManagerReviewForm">'+
+      '<label>اسم الشركة<input name="company_name" required minlength="2" maxlength="140" value="'+esc(company.company_name||"")+'"></label>'+
+      '<label>مجال الشركة<input name="category" required maxlength="140" value="'+esc(company.category||"")+'"></label>'+
+      '<label>المحافظة / المدينة<input name="city" maxlength="100" value="'+esc(company.city||"أسيوط")+'"></label>'+
+      '<label>العنوان<input name="address" maxlength="240" value="'+esc(company.address||"")+'"></label>'+
+      '<label>رقم الهاتف<input name="phone" type="tel" required minlength="7" maxlength="30" value="'+esc(company.phone||"")+'"></label>'+
+      '<label>واتساب<input name="whatsapp" type="tel" maxlength="30" value="'+esc(company.whatsapp||"")+'"></label>'+
+      '<label>الموقع الإلكتروني<input name="website" type="url" maxlength="500" value="'+esc(company.website||"")+'"></label>'+
+      '<label>رابط الشعار<input name="logo_url" type="url" maxlength="500" value="'+esc(company.logo_url||"")+'"></label>'+
+      '<button class="btn btn-outline-dark" type="submit">إرسال التغيير لموافقة الإدارة</button></form>'+
+      '<section class="company-manager-team"><h3>فريق إدارة الشركة</h3><p>أضف موظفًا لديه حساب مؤكد على أسيوط عقار، واختر صلاحية مدير ملف أو محرر بيانات تشغيلية.</p>'+
+      '<form class="company-manager-form" id="companyProfileTeamInviteForm"><label>بريد الموظف<input name="email" type="email" required maxlength="254"></label><label>الصلاحية<select name="role"><option value="editor">محرر بيانات تشغيلية</option><option value="manager">مدير ملف مفوض</option></select></label><button type="submit" class="btn btn-outline-dark">إضافة الموظف</button></form><div id="companyProfileTeamMembers" role="status" aria-live="polite"></div></section>'
+     :"");
+   root.appendChild(panel);
+
+   const rpc=async(name,args)=>{
+    const response=await auth.authedFetch(base+"/rest/v1/rpc/"+name,{
+     method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(args)
+    });
+    const result=await response.json().catch(()=>null);
+    if(!response.ok)throw new Error(result?.message||result?.details||result?.hint||"تعذر تنفيذ التحديث.");
+    return result;
+   };
+   const directForm=panel.querySelector("#companyProfileManagerDirectForm");
+   const directStatus=panel.querySelector("#companyProfileManagerDirectStatus");
+   directForm.addEventListener("submit",async event=>{
+    event.preventDefault();if(!directForm.reportValidity())return;
+    const data=new FormData(directForm),value=name=>String(data.get(name)||"").trim();
+    const lines=name=>value(name).split(/\n+/).map(x=>x.trim()).filter(Boolean);
+    let gallery;
+    try{
+     gallery=lines("gallery_urls").map(item=>{const url=safeUrl(item);if(!url)throw Error("رابط صورة الأعمال غير صحيح.");return url;});
+    }catch(error){directStatus.textContent=error.message;return;}
+    const projects=lines("projects").map(line=>{const parts=line.split("—");return {title:(parts.shift()||"عمل سابق").trim(),description:parts.join("—").trim()};});
+    const button=directForm.querySelector('button[type="submit"]');button.disabled=true;
+    directStatus.textContent="جارٍ حفظ التحديثات...";
+    try{
+     await rpc("company_profile_update_direct",{
+      p_company_profile_id:company.id,
+      p_payload:{description:value("description"),services:lines("services"),gallery_urls:gallery,projects}
+     });
+     directStatus.textContent="تم حفظ التحديثات التشغيلية مباشرة وتسجيلها في سجل التغييرات.";
+    }catch(error){directStatus.textContent=error.message||"تعذر حفظ التحديثات.";}
+    finally{button.disabled=false;}
+   });
+
+   if(isOwner){
+    const reviewForm=panel.querySelector("#companyProfileManagerReviewForm");
+    const reviewStatus=panel.querySelector("#companyProfileManagerReviewStatus");
+    const reviewUrl=base+"/rest/v1/company_profiles?id=eq."+encodeURIComponent(company.id)+"&select=update_status,update_notes,pending_update";
+    const reviewResponse=await auth.authedFetch(reviewUrl,{method:"GET"});
+    const reviewRows=await reviewResponse.json().catch(()=>[]);
+    const pending=reviewResponse.ok&&Array.isArray(reviewRows)?reviewRows[0]:null;
+    const reviewButton=reviewForm.querySelector('button[type="submit"]');
+    if(pending?.update_status==="pending"){
+     reviewStatus.textContent="يوجد تغيير حساس قيد مراجعة الإدارة.";
+     reviewButton.disabled=true;
+    }else if(pending?.update_status==="needs_changes"){
+     reviewStatus.textContent="طلبت الإدارة استكمال البيانات: "+(pending.update_notes||"راجع البيانات ثم أعد الإرسال.");
+    }else if(pending?.update_status==="rejected"){
+     reviewStatus.textContent="تم رفض آخر تغيير: "+(pending.update_notes||"راجع البيانات قبل إعادة الإرسال.");
+    }else{
+     reviewStatus.textContent="يمكنك إرسال تغييرات الاسم والتصنيف والتواصل لمراجعة الإدارة.";
+    }
+    reviewForm.addEventListener("submit",async event=>{
+     event.preventDefault();if(!reviewForm.reportValidity())return;
+     const data=new FormData(reviewForm),value=name=>String(data.get(name)||"").trim();
+     const website=value("website"),logo=value("logo_url");
+     if(website&&!safeUrl(website)||logo&&!safeUrl(logo)){reviewStatus.textContent="تحقق من روابط الموقع والشعار.";return;}
+     const payload={company_name:value("company_name"),category:value("category"),city:value("city")||"أسيوط",address:value("address")||null,phone:value("phone"),whatsapp:value("whatsapp")||null,website:website||null,logo_url:logo||null};
+     reviewButton.disabled=true;reviewStatus.textContent="جارٍ إرسال التغيير لموافقة الإدارة...";
+     try{
+      await rpc("company_profile_sensitive_update_submit",{p_company_profile_id:company.id,p_payload:payload});
+      reviewStatus.textContent="تم إرسال التغيير. النسخة المنشورة الحالية ستظل ظاهرة حتى موافقة الإدارة.";
+     }catch(error){reviewStatus.textContent=error.message||"تعذر إرسال التغيير.";reviewButton.disabled=false;}
+    });
+
+    const membersRoot=panel.querySelector("#companyProfileTeamMembers");
+    async function loadMembers(){
+     membersRoot.textContent="جارٍ تحميل فريق الشركة...";
+     const rows=await rpc("company_profile_manager_member_list",{p_company_profile_id:company.id});
+     if(!Array.isArray(rows)||!rows.length){membersRoot.textContent="لا يوجد موظفون مفوضون حاليًا.";return;}
+     membersRoot.innerHTML=rows.map(row=>'<div class="company-manager-member" data-company-member="'+esc(row.user_id)+'"><strong>'+esc(row.email||"حساب أسيوط عقار")+'</strong> · '+(row.member_role==="manager"?"مدير ملف مفوض":"محرر بيانات تشغيلية")+' <button type="button" class="btn btn-outline-dark" data-company-member-revoke>إلغاء الصلاحية</button></div>').join("");
+    }
+    const inviteForm=panel.querySelector("#companyProfileTeamInviteForm");
+    inviteForm.addEventListener("submit",async event=>{
+     event.preventDefault();if(!inviteForm.reportValidity())return;
+     const data=new FormData(inviteForm),button=inviteForm.querySelector('button[type="submit"]');button.disabled=true;
+     try{
+      await rpc("company_profile_manager_invite",{p_company_profile_id:company.id,p_email:String(data.get("email")||"").trim(),p_role:String(data.get("role")||"editor")});
+      inviteForm.reset();await loadMembers();
+     }catch(error){membersRoot.textContent=error.message||"تعذرت إضافة الموظف.";}
+     finally{button.disabled=false;}
+    });
+    membersRoot.addEventListener("click",async event=>{
+     const button=event.target.closest("[data-company-member-revoke]");
+     const row=event.target.closest("[data-company-member]");
+     if(!button||!row)return;
+     if(!window.confirm("إلغاء صلاحية هذا الموظف من إدارة الشركة؟"))return;
+     button.disabled=true;
+     try{await rpc("company_profile_manager_revoke",{p_company_profile_id:company.id,p_user_id:row.dataset.companyMember});await loadMembers();}
+     catch(error){membersRoot.textContent=error.message||"تعذر إلغاء الصلاحية.";}
+     finally{button.disabled=false;}
+    });
+    await loadMembers();
+   }
+  }catch(error){console.warn("Approved company profile editor unavailable:",error);}
+ }
  async function loadApprovedCompany(){
   if(!/^[0-9a-f-]{36}$/i.test(profileId||"")){renderError("رابط ملف الشركة غير صحيح.");return;}
-  const query="company_profiles_public?select=id,company_name,category,description,services,city,logo_url,address,phone,whatsapp,website,gallery_urls,projects&id=eq."+encodeURIComponent(profileId);
+  const query="company_profiles_public?select=id,company_name,category,description,services,city,logo_url,address,phone,whatsapp,website,gallery_urls,projects,representative_verified_at&id=eq."+encodeURIComponent(profileId);
   const rows=await api(query);
   const c=Array.isArray(rows)?rows[0]:null;
   if(!c){renderError("ملف الشركة غير متاح أو لم يحصل على اعتماد الإدارة بعد.");return;}
@@ -486,10 +632,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(wa)actions.push('<a class="company-contact-secondary" target="_blank" rel="noopener noreferrer" href="https://wa.me/'+esc(wa)+'">واتساب</a>');
   if(safeUrl(c.website))actions.push('<a class="company-contact-secondary" target="_blank" rel="noopener noreferrer" href="'+esc(safeUrl(c.website))+'">الموقع الإلكتروني ↗</a>');
   root.innerHTML=
-   '<section class="company-profile-hero"><div class="company-profile-logo">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'">':esc(String(c.company_name||"ش").slice(0,1)))+'</div><div><span class="eyebrow">ملف شركة مقدم من الشركة ومعتمد من الإدارة</span><h1>'+esc(c.company_name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span>'+(c.address?'<span>'+esc(c.address)+'</span>':"")+'</div><div class="company-contact-actions">'+actions.join("")+'</div></div></section>'+
+   '<section class="company-profile-hero"><div class="company-profile-logo">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'">':esc(String(c.company_name||"ش").slice(0,1)))+'</div><div><span class="eyebrow">ملف شركة مقدم من الشركة ومعتمد من الإدارة</span>'+(c.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الشركة وصفته · لا يمثل ذلك شهادة ترخيص</span>':'')+'<h1>'+esc(c.company_name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span>'+(c.address?'<span>'+esc(c.address)+'</span>':"")+'</div><div class="company-contact-actions">'+actions.join("")+'</div></div></section>'+
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></section>':"")+
    (projects.length?'<section class="company-profile-section"><h2>المشروعات والأعمال السابقة</h2><div class="company-project-list">'+projects.map(p=>'<article class="company-project"><h3>'+esc(p.title||"عمل سابق")+'</h3><p>'+esc(p.description||"")+'</p></article>').join("")+'</div></section>':"")+
    (gallery.length?'<section class="company-profile-section"><h2>معرض الأعمال</h2><div class="company-gallery">'+gallery.map((u,i)=>'<img src="'+esc(u)+'" alt="صورة من أعمال '+esc(c.company_name)+' رقم '+(i+1)+'" loading="lazy">').join("")+'</div></section>':"");
+  mountApprovedCompanyEditor(c);
   setSchema({
    "@context":"https://schema.org","@type":"Organization","name":c.company_name,"description":description,
    "url":profileUrl.href,...(phone?{telephone:c.phone}:{}),
