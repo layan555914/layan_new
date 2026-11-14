@@ -290,17 +290,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     authDialog.innerHTML = `
       <div class="details-dialog-header auth-brand-head"><span class="auth-brand"><img src="./icon.svg" alt="" width="30" height="30">أسيوط عقار</span><button type="button" id="closeAuthDialog" aria-label="إغلاق">×</button></div>
       <h2 id="authTitle" class="auth-title">تسجيل الدخول إلى أسيوط عقار</h2>
-      <p class="auth-intro" id="authIntro">سجّل الدخول لإضافة إعلاناتك ومتابعتها وحفظ العقارات.</p>
+      <p class="auth-intro" id="authIntro">اكتب بريدك الإلكتروني، وسنرسل لك كودًا للدخول أو إنشاء حسابك تلقائيًا.</p>
       <form id="authForm" class="auth-form">
-        <fieldset class="auth-signup-only auth-account-types" hidden>
-          <legend>نوع الحساب</legend>
-          <label class="auth-type"><input type="radio" name="authAccountType" value="seeker"><span><i aria-hidden="true">⌕</i>باحث عن عقار</span></label>
-          <label class="auth-type"><input type="radio" name="authAccountType" value="owner"><span><i aria-hidden="true">⌂</i>مالك عقار</span></label>
-          <label class="auth-type"><input type="radio" name="authAccountType" value="broker"><span><i aria-hidden="true">☺</i>وسيط عقاري</span></label>
-          <label class="auth-type"><input type="radio" name="authAccountType" value="company"><span><i aria-hidden="true">▦</i>شركة عقارية</span></label>
-        </fieldset>
-        <label class="auth-signup-only" hidden>الاسم الكامل<input id="authFullName" type="text" autocomplete="name" maxlength="80" placeholder="الاسم كما سيظهر للإدارة"></label>
-        <label class="auth-signup-only" hidden>رقم الموبايل<span class="auth-phone"><span dir="ltr">+20</span><input id="authPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" maxlength="13" placeholder="01xxxxxxxxx"></span></label>
         <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
         <label id="authOtpCodeField" class="auth-otp-only" hidden>كود التحقق المكوّن من 6 أرقام
           <input id="authOtpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" dir="ltr">
@@ -309,19 +300,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         <button class="btn btn-gold" id="authOtpVerifyBtn" type="button" hidden>تأكيد الكود والدخول</button>
         <button class="btn btn-outline-dark" id="authOtpResendBtn" type="button" hidden disabled>إعادة إرسال الكود بعد دقيقة</button>
         <button class="btn btn-outline-dark" id="authOtpBackBtn" type="button" hidden>تغيير البريد الإلكتروني</button>
-        <label class="auth-signup-only auth-terms" hidden><input id="authTerms" type="checkbox"> أوافق على <a href="./terms.html" target="_blank" rel="noopener">الشروط</a> و<a href="./privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></label>
         <p id="authStatus" role="status" aria-live="polite"></p>
-        <button class="btn btn-outline-dark" id="authToggle" type="button">إنشاء حساب جديد</button>
       </form>`;
     document.body.appendChild(authDialog);
-    let mode = "login";
     const title = authDialog.querySelector("#authTitle");
-    const toggle = authDialog.querySelector("#authToggle");
     const status = authDialog.querySelector("#authStatus");
-    const signupOnly = [...authDialog.querySelectorAll(".auth-signup-only")];
-    const fullName = authDialog.querySelector("#authFullName");
-    const phone = authDialog.querySelector("#authPhone");
-    const terms = authDialog.querySelector("#authTerms");
     const intro = authDialog.querySelector("#authIntro");
     const emailInput = authDialog.querySelector("#authEmail");
     const otpCodeField = authDialog.querySelector("#authOtpCodeField");
@@ -344,17 +327,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       otpResendButton.disabled = true;
       otpResendButton.textContent = "إعادة إرسال الكود بعد دقيقة";
       otpBackButton.hidden = true;
-      toggle.hidden = false;
-    };
-    const otpSignupProfile = () => {
-      const accountType = authDialog.querySelector('input[name="authAccountType"]:checked')?.value || "";
-      const name = fullName.value.trim().replace(/\s+/g, " ");
-      const mobile = phone.value.replace(/[^0-9]/g, "").replace(/^20/, "").replace(/^(?!0)/, "0");
-      if (!accountType) throw new Error("اختر نوع الحساب.");
-      if (name.length < 3) throw new Error("اكتب الاسم الكامل.");
-      if (!/^01[0125][0-9]{8}$/.test(mobile)) throw new Error("اكتب رقم موبايل مصري صحيح مثل 01012345678.");
-      if (!terms.checked) throw new Error("يلزم الموافقة على الشروط وسياسة الخصوصية.");
-      return { full_name: name, phone: mobile, account_type: accountType };
     };
     const applyOtpCooldown = () => {
       otpResendButton.disabled = true;
@@ -371,11 +343,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const email = resend && pendingOtp ? pendingOtp.email : emailInput.value.trim().toLowerCase();
       if (!email) { status.textContent = "اكتب بريدك الإلكتروني أولًا."; emailInput.focus(); return; }
       if (!resend && !emailInput.checkValidity()) { status.textContent = "راجع صيغة البريد الإلكتروني وحاول مرة أخرى."; emailInput.focus(); return; }
-      let options = resend && pendingOtp ? pendingOtp.options : { shouldCreateUser: mode === "signup" };
-      if (!resend && mode === "signup") {
-        try { options = { shouldCreateUser: true, data: otpSignupProfile() }; }
-        catch (error) { status.textContent = friendlyAuthError(error.message); return; }
-      }
+      const options = resend && pendingOtp ? pendingOtp.options : { shouldCreateUser: true };
       const button = resend ? otpResendButton : otpRequestButton;
       button.disabled = true;
       status.textContent = resend ? "جارٍ إرسال كود جديد..." : "جارٍ إرسال كود التحقق إلى بريدك...";
@@ -388,7 +356,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         otpVerifyButton.hidden = false;
         otpResendButton.hidden = false;
         otpBackButton.hidden = false;
-        toggle.hidden = true;
         otpVerifyButton.disabled = false;
         otpCodeInput.focus();
         status.textContent = "تم إرسال كود من 6 أرقام على البريد. اكتبه هنا لإكمال الدخول. إعادة الإرسال متاحة بعد دقيقة.";
@@ -421,15 +388,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
     const paintMode = () => {
       clearOtpFlow();
-      otpRequestButton.textContent = mode === "login" ? "إرسال كود الدخول" : "إرسال كود إنشاء الحساب";
-      signupOnly.forEach(node => { node.hidden = mode !== "signup"; });
-      fullName.required = phone.required = terms.required = mode === "signup";
-      intro.textContent = mode === "login" ? "اكتب بريدك الإلكتروني وسنرسل لك كود دخول مؤقت." : "أكمل بياناتك الأساسية، وسنرسل كودًا لتأكيد بريدك وإنشاء حسابك.";
-      title.textContent = mode === "login" ? "تسجيل الدخول إلى أسيوط عقار" : "إنشاء حساب مجاني";
-      toggle.textContent = mode === "login" ? "ليس لديك حساب؟ أنشئ حسابًا" : "لديك حساب بالفعل؟ سجّل الدخول";
+      otpRequestButton.textContent = "إرسال كود الدخول";
+      title.textContent = "الدخول إلى أسيوط عقار";
+      intro.textContent = "اكتب بريدك الإلكتروني، وسنرسل لك كودًا للدخول أو إنشاء حسابك تلقائيًا.";
       status.textContent = "";
     };
-    toggle.addEventListener("click", () => { mode = mode === "login" ? "signup" : "login"; paintMode(); });
     otpRequestButton.addEventListener("click", () => sendEmailOtp(false));
     otpResendButton.addEventListener("click", () => sendEmailOtp(true));
     otpVerifyButton.addEventListener("click", finishOtpSignIn);
@@ -451,7 +414,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       else sendEmailOtp(false);
     });
     authDialog.dataset.mode = "login";
-    authDialog._setMode = value => { mode = value || "login"; paintMode(); };
+    authDialog._setMode = () => paintMode();
     return authDialog;
   }
   function friendlyAuthError(message) {
@@ -491,7 +454,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!d.open) d.showModal();
   }
   // Used by the mascot and by links like "./?auth=signup" from other pages.
-  window.AsyutOpenAuth = mode => openAuth(mode === "signup" ? "signup" : "login");
+  window.AsyutOpenAuth = () => openAuth("login");
   {
     const authParam = new URLSearchParams(window.location.search).get("auth");
     if (authParam === "login" || authParam === "signup") window.setTimeout(() => openAuth(authParam), 0);
