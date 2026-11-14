@@ -226,7 +226,7 @@ test("admin can review and approve a pending company claim from the claim queue"
   await expect(card).toContainText("ممثل الشركة التجريبي");
   await card.locator("[data-company-claim-action='approve']").click();
 
-  await expect(page.locator("#adminStatus")).toContainText("تم اعتماد الطلب وربط حساب ممثل الشركة بالملف.");
+  await expect(page.locator("#adminStatus")).toContainText("تم اعتماد الطلب وربط حساب ممثل الجهة بالملف.");
   expect(state.reviews).toHaveLength(1);
   expect(state.reviews[0]).toMatchObject({
     p_id: CLAIM.id,
