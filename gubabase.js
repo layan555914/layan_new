@@ -205,7 +205,7 @@
     };
     if (options.data && typeof options.data === "object") {
       payload.data = {
-        full_name: String(options.data.full_name || "").trim().replace(/\\s+/g, " ").slice(0, 80),
+        full_name: String(options.data.full_name || "").trim().replace(/\s+/g, " ").slice(0, 80),
         phone: String(options.data.phone || "").replace(/[^0-9+]/g, "").slice(0, 20),
         account_type: String(options.data.account_type || "").slice(0, 20)
       };
@@ -216,7 +216,7 @@
     const cleanEmail = normalizeEmail(email);
     const cleanToken = String(token || "").trim();
     if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
-    if (!/^\\d{6}$/.test(cleanToken)) throw new Error("اكتب كود التحقق المكوّن من 6 أرقام.");
+    if (!/^\d{6}$/.test(cleanToken)) throw new Error("اكتب كود التحقق المكوّن من 6 أرقام.");
     const data = await authRequest("verify", {
       email: cleanEmail,
       token: cleanToken,
