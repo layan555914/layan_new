@@ -214,6 +214,7 @@ test("a delegated editor can manage operational fields but cannot access owner-o
 });
 
 test("verified owner can invite and revoke a delegated editor", async ({ page }) => {
+  page.on("dialog", dialog => dialog.accept());
   await seedAuthenticatedSession(page);
   const state = { members: [], invited: [], revoked: [] };
   await page.route("**/auth/v1/user", async route => reply(route, USER));
