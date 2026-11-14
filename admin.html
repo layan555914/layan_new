@@ -66,7 +66,8 @@
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secDocuments"><strong id="statPendingDocuments">—</strong><span>مستند عقاري للمراجعة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secMarketplace"><strong id="statPendingMarketplace">—</strong><span>خدمة قيد المراجعة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secEdits"><strong id="statPendingEdits">—</strong><span>تعديل على إعلان منشور</span></button>
-          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanies"><strong id="statPendingCompanies">—</strong><span>ملف شركة قيد المراجعة</span></button><button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanyClaims"><strong id="statPendingCompanyClaims">—</strong><span>طلب استلام شركة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanies"><strong id="statPendingCompanies">—</strong><span>ملف شركة قيد المراجعة</span></button><button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanyClaims"><strong id="statPendingCompanyClaims">—</strong><span>طلب استلام ملف جهة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanyEntityUpdates"><strong id="statPendingCompanyEntityUpdates">—</strong><span>تعديل ملف جهة بعد الاستلام</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secSupplierAds"><strong id="statPendingSupplierAds">—</strong><span>طلب إعلان مميز</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="review" data-goto-anchor="secCompanyAds"><strong id="statPendingCompanyAds">—</strong><span>طلب إعلان شركة</span></button>
           <button type="button" class="admin-stat adm-todo-item" data-goto="requests"><strong data-requests-total>0</strong><span>طلب ينتظر المدير</span></button>
@@ -76,7 +77,8 @@
       <section class="adm-card adm-quick-card" aria-label="اختصارات التشغيل">
         <h2 class="adm-card-title">اختصارات التشغيل</h2>
         <div class="adm-quicklinks">
-          <button type="button" class="adm-quicklink" data-goto="review" data-goto-anchor="secCompanyClaims">طلبات استلام الشركات</button>
+          <button type="button" class="adm-quicklink" data-goto="review" data-goto-anchor="secCompanyClaims">طلبات استلام ملفات الجهات</button>
+          <button type="button" class="adm-quicklink" data-goto="review" data-goto-anchor="secCompanyEntityUpdates">تعديلات ملفات الجهات</button>
           <button type="button" class="adm-quicklink" data-goto="sponsors">الرعاة والإعلانات الممولة</button>
           <button type="button" class="adm-quicklink" data-goto="customers">العملاء والحسابات</button>
           <button type="button" class="adm-quicklink" data-goto="activity">الزوار والتواصل</button>
@@ -91,7 +93,7 @@
 
     <section class="adm-view" data-view-panel="review" hidden>
       <header class="adm-view-head"><span class="adm-kicker">الخطوة 2</span><h1>المراجعة والاعتماد</h1><p>لا يظهر أي إعلان للزوار قبل اعتماده هنا. افتح كل طلب، راجع البيانات والصور والمستندات، ثم «اعتماد ونشر» أو «رفض مع السبب».</p>
-        <nav class="adm-jump" aria-label="أقسام المراجعة"><a href="#secProperties">العقارات</a><a href="#secDocuments">مستندات العقارات</a><a href="#secMarketplace">سوق الخدمات</a><a href="#secLogos">الشعارات</a><a href="#secEdits">تعديلات الإعلانات</a><a href="#secCompanies">ملفات الشركات</a><a href="#secCompanyClaims">طلبات استلام الشركات</a><a href="#secCompanyAds">إعلانات الشركات</a><a href="#secSupplierAds">الإعلانات المميزة</a></nav>
+        <nav class="adm-jump" aria-label="أقسام المراجعة"><a href="#secProperties">العقارات</a><a href="#secDocuments">مستندات العقارات</a><a href="#secMarketplace">سوق الخدمات</a><a href="#secLogos">الشعارات</a><a href="#secEdits">تعديلات الإعلانات</a><a href="#secCompanies">ملفات الشركات والجهات</a><a href="#secCompanyClaims">طلبات استلام الملفات</a><a href="#secCompanyEntityUpdates">تعديلات الملفات بعد الاستلام</a><a href="#secCompanyAds">إعلانات الشركات</a><a href="#secSupplierAds">الإعلانات المميزة</a></nav>
       </header>
       <div id="reviewPanel" hidden>
         <section class="adm-card" id="secProperties"><h2 class="adm-card-title"><i>أ</i>العقارات والتنازلات قيد المراجعة</h2><p class="adm-card-lead">كل أنواع العقارات (شقة، محل، أرض، مكتب…) للبيع أو الإيجار أو التنازل.</p><div id="pendingPropertyOffers"><p class="admin-empty">جارٍ التحميل...</p></div></section>
@@ -99,7 +101,8 @@
         <section class="adm-card" id="secMarketplace"><h2 class="adm-card-title"><i>ج</i>سوق الخدمات</h2><p class="adm-card-lead">خدمات التشطيب ومواد البناء والأثاث والصيانة والاستشارات قبل النشر.</p><div id="pendingMarketplaceListings"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secEdits"><h2 class="adm-card-title"><i>✎</i>تعديلات على إعلانات منشورة</h2><p class="adm-card-lead">صاحب الإعلان عدّل بياناته أو صوره. النسخة المنشورة تظل ظاهرة للزوار حتى تعتمد التعديل هنا.</p><div id="pendingListingEdits"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secLogos"><h2 class="adm-card-title"><i>◉</i>شعارات وصور المعلنين</h2><p class="adm-card-lead">الشعار يظهر في الدائرة بجانب اسم المعلن على كل إعلاناته بعد الاعتماد.</p><div id="pendingLogos" class="as-list"><p class="admin-empty">جارٍ التحميل...</p></div></section>
-        <section class="adm-card" id="secCompanies"><h2 class="adm-card-title"><i>د</i>ملفات الشركات</h2><p class="adm-card-lead">اعتماد الملف يظهره في دليل الشركات العام.</p><div id="pendingCompanyProfiles"><p class="admin-empty">جارٍ التحميل...</p></div></section><section class="adm-card" id="secCompanyClaims"><h2 class="adm-card-title"><i>هـ</i>طلبات استلام ملفات الشركات</h2><p class="adm-card-lead">راجع صفة ممثل الشركة ورقم تواصله قبل الموافقة. الموافقة تربط حسابه بسجل الشركة، لكنها لا تمنحه تعديل بيانات الدليل مباشرة.</p><div id="pendingCompanyClaims"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+        <section class="adm-card" id="secCompanies"><h2 class="adm-card-title"><i>د</i>ملفات الشركات</h2><p class="adm-card-lead">اعتماد الملف يظهره في دليل الشركات العام.</p><div id="pendingCompanyProfiles"><p class="admin-empty">جارٍ التحميل...</p></div></section><section class="adm-card" id="secCompanyClaims"><h2 class="adm-card-title"><i>هـ</i>طلبات استلام ملفات الشركات ومقدمي الخدمات</h2><p class="adm-card-lead">راجع صفة ممثل الجهة وتفويضه قبل الموافقة. الموافقة تربط حسابه بالملف، ولا تتيح تعديل بيانات الدليل دون مراجعة الإدارة.</p><div id="pendingCompanyClaims"><p class="admin-empty">جارٍ التحميل...</p></div></section>
+        <section class="adm-card" id="secCompanyEntityUpdates"><h2 class="adm-card-title"><i>و</i>تعديلات ملفات الجهات بعد الاستلام</h2><p class="adm-card-lead">طلبات تحديث الاسم والنشاط والخدمات وبيانات التواصل والصور. النسخة العامة الحالية تظل كما هي حتى تعتمد الإدارة التعديلات.</p><div id="pendingCompanyEntityUpdates"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secCompanyAds"><h2 class="adm-card-title"><i>هـ</i>إعلانات الشركات العقارية</h2><p class="adm-card-lead">تفعيل إعلانات الشركات بعد الاتفاق.</p><div id="pendingCompanyAds"><p class="admin-empty">جارٍ التحميل...</p></div></section>
         <section class="adm-card" id="secSupplierAds"><h2 class="adm-card-title"><i>و</i>طلبات الإعلانات المميزة</h2><p class="adm-card-lead">طلبات «سوّق منتجاتك» والإعلانات التجارية.</p><div id="pendingAds"></div></section>
         <div hidden><button id="reloadPending" type="button">تحديث</button></div>
@@ -144,7 +147,7 @@
   </div>
 </div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261110-2"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261113-2"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261113-2"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261110-2"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261114-service-profiles-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261114-service-profiles-1"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>

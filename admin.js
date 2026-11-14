@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const propertyDocsList = document.getElementById("pendingPropertyDocuments");
   const companyProfilesList = document.getElementById("pendingCompanyProfiles");
   const companyClaimsList = document.getElementById("pendingCompanyClaims");
+  const companyEntityUpdatesList = document.getElementById("pendingCompanyEntityUpdates");
   const marketplaceList = document.getElementById("pendingMarketplaceListings");
   const companyAdsList = document.getElementById("pendingCompanyAds");
   const adSlotsList = document.getElementById("pendingAdSlots");
@@ -274,6 +275,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function loadPendingCompanyEntityUpdates() {
+    if (!companyEntityUpdatesList) return;
+    companyEntityUpdatesList.innerHTML = '<p class="admin-empty">جارٍ تحميل تعديلات ملفات الجهات...</p>';
+    try {
+      const rows = await request("/rest/v1/rpc/company_entity_profile_update_admin_list", { method: "POST", body: "{}" });
+      const count = Array.isArray(rows) ? rows.length : 0;
+      const countEl = document.getElementById("statPendingCompanyEntityUpdates");
+      if (countEl) countEl.textContent = String(count);
+      if (!count) {
+        companyEntityUpdatesList.innerHTML = '<p class="admin-empty">لا توجد تعديلات ملفات معلقة.</p>';
+        return;
+      }
+      const labels = {
+        name_ar:"اسم الجهة",name_en:"الاسم بالإنجليزية",description:"وصف النشاط",
+        website_url:"الموقع الإلكتروني",public_phone:"الهاتف",public_whatsapp:"واتساب",
+        public_email:"البريد الإلكتروني",public_address:"العنوان",service_category:"مجال الخدمة",
+        public_logo_url:"الشعار",public_business_hours:"مواعيد العمل",
+        public_services:"الخدمات",public_gallery_urls:"صور الأعمال",public_coverage_areas:"مناطق التغطية"
+      };
+      companyEntityUpdatesList.innerHTML = rows.map(row => {
+        const payload = row.payload && typeof row.payload === "object" ? row.payload : {};
+        const details = Object.entries(payload).map(([key,value]) => {
+          const formatted = Array.isArray(value) ? value.join("، ") : (value == null ? "مسح القيمة" : String(value));
+          return '<p><strong>' + esc(labels[key] || key) + ':</strong> ' + esc(formatted) + '</p>';
+        }).join("");
+        const profileUrl = "./company.html?entity_id=" + encodeURIComponent(row.directory_entity_id);
+        const date = row.created_at ? new Date(row.created_at).toLocaleString("ar-EG-u-nu-latn") : "—";
+        return '<article class="admin-ad" data-company-entity-update-id="' + esc(row.id) + '">' +
+          '<div><span class="admin-chip">تعديل ملف جهة · قيد المراجعة</span><h2>' + esc(row.company_name || "جهة غير محددة") + '</h2>' +
+          '<p><strong>نوع الملف:</strong> ' + esc(row.service_category || row.entity_type || "غير مصنف") + '</p>' +
+          '<p><strong>معرّف الحساب:</strong> ' + esc(row.requester_user_id) + ' · <strong>تاريخ الطلب:</strong> ' + esc(date) + '</p>' +
+          '<p><a href="' + esc(profileUrl) + '" target="_blank" rel="noopener noreferrer">فتح الملف العام</a></p><div class="company-review-details">' + details + '</div>' +
+          (row.admin_notes ? '<p><strong>ملاحظات الإدارة السابقة:</strong> ' + esc(row.admin_notes) + '</p>' : '') +
+          '</div><div class="admin-actions">' +
+          '<button type="button" class="btn btn-gold" data-entity-profile-update-action="approve">اعتماد التعديلات</button>' +
+          '<button type="button" class="btn btn-outline-dark" data-entity-profile-update-action="request_changes">طلب استكمال</button>' +
+          '<button type="button" class="btn btn-outline-dark" data-entity-profile-update-action="reject">رفض التعديلات</button>' +
+          '</div></article>';
+      }).join("");
+    } catch (error) {
+      companyEntityUpdatesList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل تعديلات ملفات الجهات.") + '</p>';
+      const countEl = document.getElementById("statPendingCompanyEntityUpdates");
+      if (countEl) countEl.textContent = "—";
+    }
+  }
+
   async function loadPendingMarketplaceListings() {
     if (!marketplaceList) return;
     marketplaceList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات سوق الخدمات...</p>';
@@ -378,6 +425,7 @@ document.addEventListener("DOMContentLoaded", () => {
         list.innerHTML = "";
         if (companyProfilesList) companyProfilesList.innerHTML = "";
         if (companyClaimsList) companyClaimsList.innerHTML = "";
+        if (companyEntityUpdatesList) companyEntityUpdatesList.innerHTML = "";
         if (marketplaceList) marketplaceList.innerHTML = "";
         if (propertyDocsList) propertyDocsList.innerHTML = "";
         setStatus("هذا الحساب غير مخوّل بدخول لوحة إدارة أسيوط عقار. يمكنك متابعة ملف شركتك من صفحة دليل الشركات.");
@@ -391,6 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadAdminStats();
       await loadPendingCompanyProfiles();
       await loadPendingCompanyClaims();
+      await loadPendingCompanyEntityUpdates();
       await loadPendingMarketplaceListings();
       await loadPendingPropertyOffers();
       await loadPendingPropertyDocuments();
@@ -409,6 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
       list.innerHTML = "";
       if (companyProfilesList) companyProfilesList.innerHTML = "";
       if (companyClaimsList) companyClaimsList.innerHTML = "";
+      if (companyEntityUpdatesList) companyEntityUpdatesList.innerHTML = "";
       if (propertyDocsList) propertyDocsList.innerHTML = "";
       setStatus(/غير مصرح|permission|row-level|policy|401|403|غير مخوّل/i.test(error.message)
         ? "هذا الحساب غير مخوّل للإدارة. يمكنك متابعة ملف شركتك من صفحة دليل الشركات."
@@ -517,6 +567,36 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadPendingCompanyClaims();
     } catch (error) {
       setStatus(error.message || "تعذر تنفيذ طلب استلام الشركة.");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  companyEntityUpdatesList?.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-entity-profile-update-action]");
+    const card = event.target.closest("[data-company-entity-update-id]");
+    if (!button || !card) return;
+    const action = button.dataset.entityProfileUpdateAction;
+    let note = null;
+    if (action === "approve") {
+      if (!window.confirm("اعتماد كل تعديلات الملف وإظهار البيانات الجديدة للزوار؟ النسخة الحالية ستُستبدل بعد المراجعة. هل تؤكد؟")) return;
+    } else {
+      note = window.prompt(action === "request_changes" ? "اكتب البيانات المطلوبة لاستكمال التعديل:" : "اكتب سبب رفض تعديل الملف:");
+      if (note === null) return;
+      if (note.trim().length < 3) { setStatus("اكتب ملاحظة واضحة لا تقل عن 3 أحرف."); return; }
+    }
+    button.disabled = true;
+    try {
+      await request("/rest/v1/rpc/company_entity_profile_update_admin_review", {
+        method: "POST",
+        body: JSON.stringify({ p_id: card.dataset.companyEntityUpdateId, p_action: action, p_note: note })
+      });
+      setStatus(action === "approve" ? "تم اعتماد تعديلات الملف وتسجيلها في سجل المراجعة."
+        : action === "request_changes" ? "تم طلب استكمال تعديلات الملف."
+        : "تم رفض تعديلات الملف وتسجيل السبب.");
+      await loadPendingCompanyEntityUpdates();
+    } catch (error) {
+      setStatus(error.message || "تعذر تنفيذ مراجعة تعديل الملف.");
     } finally {
       button.disabled = false;
     }
