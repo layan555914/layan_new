@@ -134,7 +134,7 @@ test("successful email OTP verification creates the normal authenticated session
   expect(session.stored).toContain("otp-fixture-access-token");
 });
 
-test("login dialog offers OTP as an additional method and completes a mocked login", async ({ page }) => {
+test("login dialog uses email OTP as the only method and completes a mocked login", async ({ page }) => {
   await openHome(page);
   let otpPayload = null;
   await page.route(SUPABASE + "/auth/v1/otp", async route => {
@@ -158,6 +158,9 @@ test("login dialog offers OTP as an additional method and completes a mocked log
   }));
 
   await page.locator("#loginBtn").click();
+  await expect(page.locator("#authPassword")).toHaveCount(0);
+  await expect(page.locator("#authSubmit")).toHaveCount(0);
+  await expect(page.locator("#authOtpRequestBtn")).toBeVisible();
   await page.locator("#authEmail").fill("otp-test@example.invalid");
   await page.locator("#authOtpRequestBtn").click();
   await expect(page.locator("#authOtpCode")).toBeVisible();
@@ -197,6 +200,8 @@ test("marketplace login dialog can authenticate with email OTP", async ({ page }
   await page.goto("/marketplace.html");
   await page.waitForFunction(() => Boolean(window.LAYAN_SUPABASE?.requestEmailOtp));
   await page.locator("#openListingForm").click();
+  await expect(page.locator('#authDialog input[type="password"]')).toHaveCount(0);
+  await expect(page.locator("#authDialog #authSubmit")).toHaveCount(0);
   await expect(page.locator("#authDialog")).toBeVisible();
   await page.locator("#marketAuthEmail").fill("otp-test@example.invalid");
   await page.locator("#marketplaceOtpRequest").click();
@@ -227,6 +232,8 @@ test("signup dialog can request OTP without submitting a password", async ({ pag
 
   await page.locator("#loginBtn").click();
   await page.locator("#authToggle").click();
+  await expect(page.locator("#authPassword")).toHaveCount(0);
+  await expect(page.locator("#authSubmit")).toHaveCount(0);
   await page.locator("#authEmail").fill("new-owner@example.invalid");
   await page.locator("#authFullName").fill("أحمد محمد");
   await page.locator("#authPhone").fill("01012345678");
