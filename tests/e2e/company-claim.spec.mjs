@@ -137,6 +137,8 @@ async function fillClaimForm(page, role = "مدير النشاط") {
   await form.locator("[name='representative_phone']").fill("01012345678");
   await form.locator("[name='representative_email']").fill("company-claim-test@example.invalid");
   await form.locator("[name='representative_notes']").fill("طلب تجريبي من اختبار Playwright");
+  await form.locator("[name='evidence_url']").fill("https://company.example.invalid/about");
+  await form.locator("[name='evidence_description']").fill("الممثل مدرج في الصفحة الرسمية للشركة.");
   return form;
 }
 
@@ -176,7 +178,9 @@ test("an authenticated representative submits a claim linked to their Supabase a
     representative_role: "مدير النشاط",
     contact_phone: "01012345678",
     contact_email: "company-claim-test@example.invalid",
-    notes: "طلب تجريبي من اختبار Playwright"
+    notes: "طلب تجريبي من اختبار Playwright",
+    evidence_url: "https://company.example.invalid/about",
+    evidence_description: "الممثل مدرج في الصفحة الرسمية للشركة."
   });
   expect(state.submissions[0]).not.toHaveProperty("status");
   expect(state.submissions[0]).not.toHaveProperty("reviewed_by");
@@ -226,13 +230,17 @@ test("admin can review and approve a pending company claim from the claim queue"
   await expect(card).toHaveCount(1, { timeout: 15000 });
   await expect(card).toContainText(ENTITY.name_ar);
   await expect(card).toContainText("ممثل الشركة التجريبي");
+  await card.locator("[data-verification-method]").selectOption("official_phone");
+  await card.locator("[data-verification-note]").fill("تم الاتصال بالرقم الرسمي والتأكد من صفة الممثل.");
   await card.locator("[data-company-claim-action='approve']").click();
 
-  await expect(page.locator("#adminStatus")).toContainText("تم اعتماد الطلب وربط حساب ممثل الجهة بالملف.");
+  await expect(page.locator("#adminStatus")).toContainText("تم التحقق من الممثل وربط حسابه بالملف.");
   expect(state.reviews).toHaveLength(1);
   expect(state.reviews[0]).toMatchObject({
     p_id: CLAIM.id,
     p_action: "approve",
-    p_note: null
+    p_note: null,
+    p_verification_method: "official_phone",
+    p_verification_note: "تم الاتصال بالرقم الرسمي والتأكد من صفة الممثل."
   });
 });
