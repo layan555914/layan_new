@@ -145,12 +145,15 @@ BEGIN
     OR char_length(btrim(p_payload->>'name_ar')) NOT BETWEEN 2 AND 180
   ) THEN RAISE EXCEPTION 'اسم الجهة مطلوب من حرفين إلى 180 حرفًا' USING errcode='22023'; END IF;
 
-  IF p_payload ? 'service_category' AND NOT ((p_payload->>'service_category')=ANY(ARRAY[
-    'contracting_construction','real_estate_marketing','real_estate_brokerage',
-    'building_materials','finishing_decoration','furniture_furnishings',
-    'engineering_design','maintenance_property_management','real_estate_consultancy',
-    'real_estate_development','real_estate_sales','other_real_estate_services'
-  ]::text[])) THEN
+  IF p_payload ? 'service_category' AND (
+    jsonb_typeof(p_payload->'service_category') IS DISTINCT FROM 'string'
+    OR NOT ((p_payload->>'service_category')=ANY(ARRAY[
+      'contracting_construction','real_estate_marketing','real_estate_brokerage',
+      'building_materials','finishing_decoration','furniture_furnishings',
+      'engineering_design','maintenance_property_management','real_estate_consultancy',
+      'real_estate_development','real_estate_sales','other_real_estate_services'
+    ]::text[]))
+  ) THEN
     RAISE EXCEPTION 'مجال الخدمة غير صحيح' USING errcode='22023';
   END IF;
 
@@ -351,19 +354,19 @@ saved_entities AS (
   RETURNING id,slug
 ),
 all_entities AS (
-  SELECT e.id,c.* FROM candidates c JOIN public.directory_entities e ON e.slug=c.slug
+  SELECT saved.id,c.* FROM candidates c JOIN saved_entities saved ON saved.slug=c.slug
 ),
 saved_sources AS (
   INSERT INTO public.directory_sources(source_code,title,publisher,source_type,source_url,confidence_level,is_public,notes)
   SELECT source_code,source_title,publisher,source_type,source_url,confidence_level,false,
     'مصدر اكتشاف داخلي فقط. لا يثبت الترخيص أو الشراكة أو استمرار النشاط.'
   FROM candidates
-  ON CONFLICT(source_code) DO NOTHING
+  ON CONFLICT(source_code) DO UPDATE SET source_code=EXCLUDED.source_code
   RETURNING id,source_code
 )
 INSERT INTO public.directory_entity_sources(entity_id,source_id,claim_key)
 SELECT e.id,s.id,'service_provider_discovery'
-FROM all_entities e JOIN public.directory_sources s ON s.source_code=e.source_code
+FROM all_entities e JOIN saved_sources s ON s.source_code=e.source_code
 ON CONFLICT(entity_id,source_id,claim_key) DO NOTHING;
 
 WITH candidate_private AS (
