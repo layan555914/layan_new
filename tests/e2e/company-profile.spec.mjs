@@ -20,6 +20,9 @@ const approvedCompany = {
 };
 
 async function mockApprovedCompanyView(page) {
+  await page.route(SUPABASE + "/rest/v1/directory_entities**", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: "[]" })
+  );
   await page.route(SUPABASE + "/rest/v1/company_profiles_public**", async route => {
     const requestUrl = new URL(route.request().url());
     if (requestUrl.searchParams.get("id") === "eq." + COMPANY_ID) {
