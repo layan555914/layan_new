@@ -212,3 +212,36 @@ test("marketplace login dialog can authenticate with email OTP", async ({ page }
   });
   expect(await page.evaluate(() => window.LAYAN_SUPABASE.isAuthenticated())).toBe(true);
 });
+
+test("signup dialog can request OTP without submitting a password", async ({ page }) => {
+  await openHome(page);
+  let payload = null;
+  await page.route(SUPABASE + "/auth/v1/otp", async route => {
+    payload = route.request().postDataJSON();
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ message_id: "otp-signup-ui-fixture" })
+    });
+  });
+
+  await page.locator("#loginBtn").click();
+  await page.locator("#authToggle").click();
+  await page.locator("#authEmail").fill("new-owner@example.invalid");
+  await page.locator("#authFullName").fill("أحمد محمد");
+  await page.locator("#authPhone").fill("01012345678");
+  await page.locator('[name="authAccountType"][value="owner"]').check();
+  await page.locator("#authTerms").check();
+  await page.locator("#authOtpRequestBtn").click();
+
+  await expect(page.locator("#authOtpCode")).toBeVisible();
+  expect(payload).toEqual({
+    email: "new-owner@example.invalid",
+    create_user: true,
+    data: {
+      full_name: "أحمد محمد",
+      phone: "01012345678",
+      account_type: "owner"
+    }
+  });
+});
