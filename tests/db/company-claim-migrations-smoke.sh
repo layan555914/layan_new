@@ -355,8 +355,7 @@ CREATE OR REPLACE FUNCTION public.layan_is_http_url(p_url text)
 RETURNS boolean
 LANGUAGE sql IMMUTABLE
 AS \$function\$
-  SELECT p_url ~* '^https?://[^[:space:]]+
-;
+  SELECT p_url ~* '^https?://[^[:space:]]+';
 \$function\$;
 
 CREATE TABLE IF NOT EXISTS public.directory_change_log (
