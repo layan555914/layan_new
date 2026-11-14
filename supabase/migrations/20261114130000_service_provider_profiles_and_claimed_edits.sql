@@ -271,13 +271,30 @@ BEGIN
       public_services=CASE WHEN v_request.payload?'public_services' THEN ARRAY(SELECT jsonb_array_elements_text(v_request.payload->'public_services')) ELSE e.public_services END,
       public_gallery_urls=CASE WHEN v_request.payload?'public_gallery_urls' THEN ARRAY(SELECT jsonb_array_elements_text(v_request.payload->'public_gallery_urls')) ELSE e.public_gallery_urls END,
       public_coverage_areas=CASE WHEN v_request.payload?'public_coverage_areas' THEN ARRAY(SELECT jsonb_array_elements_text(v_request.payload->'public_coverage_areas')) ELSE e.public_coverage_areas END,
+      location_public=CASE
+        WHEN v_request.payload ? 'public_address'
+         AND nullif(btrim(v_request.payload->>'public_address'),'') IS DISTINCT FROM nullif(btrim(v_entity.public_address),'')
+        THEN false
+        ELSE e.location_public
+      END,
       updated_at=now()
     WHERE e.id=v_request.directory_entity_id RETURNING to_jsonb(e) INTO v_after;
+
+    IF v_request.payload ? 'public_address'
+       AND nullif(btrim(v_request.payload->>'public_address'),'') IS DISTINCT FROM nullif(btrim(v_entity.public_address),'') THEN
+      v_before := v_before || jsonb_build_object('location_public', v_entity.location_public);
+    END IF;
 
     INSERT INTO public.directory_change_log(table_name,record_id,changed_by,old_values,new_values,reason)
     VALUES('directory_entities',v_request.directory_entity_id,auth.uid(),v_before,
       (SELECT COALESCE(jsonb_object_agg(keys.key_name,v_after->keys.key_name),'{}'::jsonb)
-       FROM jsonb_object_keys(v_request.payload) AS keys(key_name)),
+       FROM jsonb_object_keys(v_request.payload) AS keys(key_name))
+      || CASE
+           WHEN v_request.payload ? 'public_address'
+            AND nullif(btrim(v_request.payload->>'public_address'),'') IS DISTINCT FROM nullif(btrim(v_entity.public_address),'')
+           THEN jsonb_build_object('location_public', v_after->'location_public')
+           ELSE '{}'::jsonb
+         END,
       'اعتماد تعديل ملف جهة بعد استلامها');
 
     UPDATE public.company_entity_profile_update_requests
