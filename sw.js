@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v162-verified-provider-maps-20261114";
+const CACHE_NAME = "asyut-aqar-shell-v163-service-provider-claims-20261114";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,7 +7,7 @@ const APP_SHELL = [
   "./property.css",
   "./property.js",
   "./admin.html",
-  "./admin.js?v=20261114-service-profiles-1",
+  "./admin.js?v=20261114-service-claims-2",
   "./admin-layout.js?v=20261114-service-profiles-1",
   "./admin-approval.js?v=20261114-service-profiles-1",
   "./admin-entry.js",
@@ -23,7 +23,7 @@ const APP_SHELL = [
   "./favorites.js",
   "./marketplace.css",
   "./marketplace-page.css",
-  "./marketplace.js?v=20261114-service-profiles-1",
+  "./marketplace.js?v=20261114-service-claims-2",
   "./my-listings.html",
   "./my-listings.css",
   "./my-listings.js",
@@ -32,7 +32,7 @@ const APP_SHELL = [
   "./company.html",
   "./companies.css",
   "./companies.js?v=20261114-service-profiles-1",
-  "./company-profile.js?v=20261114-service-profiles-2",
+  "./company-profile.js?v=20261114-service-claims-3",
   "./styles.css",
   "./buyer.css",
   "./sponsor.css",
