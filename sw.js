@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v161-service-provider-claims-reviews-20261114";
+const CACHE_NAME = "asyut-aqar-shell-v162-verified-provider-maps-20261114";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -32,7 +32,7 @@ const APP_SHELL = [
   "./company.html",
   "./companies.css",
   "./companies.js?v=20261114-service-profiles-1",
-  "./company-profile.js?v=20261114-service-profiles-1",
+  "./company-profile.js?v=20261114-service-profiles-2",
   "./styles.css",
   "./buyer.css",
   "./sponsor.css",

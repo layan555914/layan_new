@@ -235,7 +235,7 @@ BEGIN
   IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
     RAISE EXCEPTION 'هذا الإجراء متاح للإدارة فقط' USING errcode='42501';
   END IF;
-  IF p_action NOT IN ('approve','request_changes','reject') THEN
+  IF p_action IS NULL OR p_action NOT IN ('approve','request_changes','reject') THEN
     RAISE EXCEPTION 'الإجراء غير صحيح' USING errcode='22023';
   END IF;
   SELECT * INTO v_request FROM public.company_entity_profile_update_requests
