@@ -195,6 +195,39 @@
     if (!session?.access_token) throw new Error("لم يرجع النظام جلسة دخول. راجع إعدادات تأكيد البريد في Supabase.");
     return session.user;
   }
+  async function requestEmailOtp(email, options = {}) {
+    const cleanEmail = normalizeEmail(email);
+    if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
+    const payload = {
+      email: cleanEmail,
+      // Existing-account login must never create a new account by accident.
+      create_user: options.shouldCreateUser === true
+    };
+    if (options.data && typeof options.data === "object") {
+      payload.data = {
+        full_name: String(options.data.full_name || "").trim().replace(/\\s+/g, " ").slice(0, 80),
+        phone: String(options.data.phone || "").replace(/[^0-9+]/g, "").slice(0, 20),
+        account_type: String(options.data.account_type || "").slice(0, 20)
+      };
+    }
+    return authRequest("otp", payload);
+  }
+  async function verifyEmailOtp(email, token) {
+    const cleanEmail = normalizeEmail(email);
+    const cleanToken = String(token || "").trim();
+    if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني بصورة صحيحة.");
+    if (!/^\\d{6}$/.test(cleanToken)) throw new Error("اكتب كود التحقق المكوّن من 6 أرقام.");
+    const data = await authRequest("verify", {
+      email: cleanEmail,
+      token: cleanToken,
+      type: "email"
+    });
+    normalizeSession(data);
+    if (!session?.access_token || !session?.user?.id) {
+      throw new Error("تم التحقق من الكود، لكن لم تصل جلسة دخول صالحة. حاول مرة أخرى.");
+    }
+    return session.user;
+  }
   async function signOut() {
     if (session?.access_token) {
       const response = await fetch(url + "/auth/v1/logout", { method: "POST", headers: authHeaders() });
