@@ -379,3 +379,89 @@ test("marketplace keeps engineering design offices and interior designers in sep
   await expect(cards).toContainText(interiorDesigner.name_ar);
   await expect(cards).not.toContainText(engineeringOffice.name_ar);
 });
+
+test("marketplace separates ceramics, lighting, furniture and curtains profiles", async ({ page }) => {
+  const categories = [
+    "سوق العقارات", "التنازلات العقارية", "أراضي للبيع", "أراضي التنازلات",
+    "إيجار يومي ومفروش", "الشركات والمكاتب العقارية", "مواد البناء والتشطيب",
+    "الأثاث والفرش وتجهيز الوحدات", "المشروعات والمطورون العقاريون",
+    "الصيانة وإدارة العقارات", "الاستشارات والخدمات العقارية",
+    "مكاتب التصميم الهندسي", "مهندسو الديكور والتصميم الداخلي",
+    "السيراميك والبورسلين والأدوات الصحية", "الإضاءة ووحدات الإنارة", "الستائر والمفروشات"
+  ];
+  const profiles = [
+    {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeee01",
+      name_ar: "معرض اختبار السيراميك",
+      entity_type: "other",
+      service_category: "building_materials",
+      marketplace_category: "السيراميك والبورسلين والأدوات الصحية",
+      description: "ملف تجريبي لمعرض سيراميك وبورسلين.",
+      public_address: "شارع الجمهورية، أسيوط",
+      public_visible: true,
+      verification_status: "published"
+    },
+    {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeee02",
+      name_ar: "متجر اختبار الإضاءة",
+      entity_type: "other",
+      service_category: "building_materials",
+      marketplace_category: "الإضاءة ووحدات الإنارة",
+      description: "ملف تجريبي لمتجر وحدات إنارة.",
+      public_address: "شارع الجلاء، أسيوط",
+      public_visible: true,
+      verification_status: "published"
+    },
+    {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeee03",
+      name_ar: "معرض اختبار الموبيليا",
+      entity_type: "other",
+      service_category: "furniture_furnishings",
+      marketplace_category: "الأثاث والفرش وتجهيز الوحدات",
+      description: "ملف تجريبي للأثاث والموبيليا.",
+      public_address: "شارع النميس، أسيوط",
+      public_visible: true,
+      verification_status: "published"
+    },
+    {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeee04",
+      name_ar: "محل اختبار الستائر",
+      entity_type: "other",
+      service_category: "furniture_furnishings",
+      marketplace_category: "الستائر والمفروشات",
+      description: "ملف تجريبي للستائر والمفروشات.",
+      public_address: "شارع القيسارية، أسيوط",
+      public_visible: true,
+      verification_status: "published"
+    }
+  ];
+
+  await page.route("**/rest/v1/**", async route => {
+    const url = new URL(route.request().url());
+    const table = url.pathname.split("/").pop();
+    if (table === "marketplace_categories") {
+      return reply(route, categories.map((name, index) => ({
+        name, description: "وصف اختبار", display_order: index + 1
+      })));
+    }
+    if (table === "directory_entities") return reply(route, profiles);
+    if (table === "marketplace_listings") return reply(route, []);
+    return route.request().method() === "POST" ? reply(route, [], 201) : reply(route, []);
+  });
+
+  await page.goto("/marketplace.html");
+  const cards = page.locator("#marketplaceServiceProfiles .mk-profile-card");
+  await expect(cards).toHaveCount(4);
+
+  const cases = [
+    ["السيراميك والبورسلين والأدوات الصحية", profiles[0].name_ar],
+    ["الإضاءة ووحدات الإنارة", profiles[1].name_ar],
+    ["الأثاث والفرش وتجهيز الوحدات", profiles[2].name_ar],
+    ["الستائر والمفروشات", profiles[3].name_ar]
+  ];
+  for (const [category, expectedName] of cases) {
+    await page.locator("#marketplaceCategoryFilter").selectOption({ label: category });
+    await expect(cards).toHaveCount(1);
+    await expect(cards).toContainText(expectedName);
+  }
+});
