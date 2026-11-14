@@ -382,19 +382,19 @@ BEGIN
     WHERE x.value<>'null'::jsonb AND jsonb_typeof(x.value) IS DISTINCT FROM 'string') THEN
     RAISE EXCEPTION 'حقول الهوية والتواصل يجب أن تكون نصوصًا' USING errcode='22023';
   END IF;
-  IF p_payload ? 'company_name' AND char_length(btrim(p_payload->>'company_name')) NOT BETWEEN 2 AND 140 THEN
+  IF p_payload ? 'company_name' AND (p_payload->>'company_name' IS NULL OR char_length(btrim(p_payload->>'company_name')) NOT BETWEEN 2 AND 140) THEN
     RAISE EXCEPTION 'اسم الشركة يجب أن يكون من حرفين إلى 140 حرفًا' USING errcode='22023';
   END IF;
-  IF p_payload ? 'category' AND char_length(coalesce(p_payload->>'category',''))>140 THEN
+  IF p_payload ? 'category' AND (p_payload->>'category' IS NULL OR char_length(coalesce(p_payload->>'category',''))>140) THEN
     RAISE EXCEPTION 'مجال الشركة أطول من الحد المسموح' USING errcode='22023';
   END IF;
-  IF p_payload ? 'city' AND char_length(coalesce(p_payload->>'city',''))>100 THEN
+  IF p_payload ? 'city' AND (p_payload->>'city' IS NULL OR char_length(coalesce(p_payload->>'city',''))>100) THEN
     RAISE EXCEPTION 'المدينة أطول من الحد المسموح' USING errcode='22023';
   END IF;
   IF p_payload ? 'address' AND char_length(coalesce(p_payload->>'address',''))>240 THEN
     RAISE EXCEPTION 'العنوان أطول من الحد المسموح' USING errcode='22023';
   END IF;
-  IF p_payload ? 'phone' AND char_length(regexp_replace(coalesce(p_payload->>'phone',''),'[^0-9]','','g')) NOT BETWEEN 7 AND 20 THEN
+  IF p_payload ? 'phone' AND (p_payload->>'phone' IS NULL OR char_length(regexp_replace(coalesce(p_payload->>'phone',''),'[^0-9]','','g')) NOT BETWEEN 7 AND 20) THEN
     RAISE EXCEPTION 'رقم الهاتف غير صحيح' USING errcode='22023';
   END IF;
   IF p_payload ? 'whatsapp' AND p_payload->>'whatsapp' IS NOT NULL
@@ -436,7 +436,7 @@ BEGIN
   IF char_length(v_name) NOT BETWEEN 3 AND 120 THEN
     RAISE EXCEPTION 'اسم ممثل الشركة يجب أن يكون من 3 إلى 120 حرفًا' USING errcode='22023';
   END IF;
-  IF v_role NOT IN ('المالك','شريك','مدير النشاط','مدير الفرع','مسؤول تسويق أو مبيعات','موظف مفوض','وكيل / ممثل قانوني','صفة أخرى') THEN
+  IF v_role IS NULL OR v_role NOT IN ('المالك','شريك','مدير النشاط','مدير الفرع','مسؤول تسويق أو مبيعات','موظف مفوض','وكيل / ممثل قانوني','صفة أخرى') THEN
     RAISE EXCEPTION 'اختر صفة صحيحة داخل الشركة' USING errcode='22023';
   END IF;
   IF v_url IS NOT NULL AND (char_length(v_url)>500 OR NOT public.layan_is_http_url(v_url)) THEN
@@ -583,6 +583,14 @@ BEGIN
   END IF;
 END;
 $function$;
+
+
+CREATE OR REPLACE VIEW public.company_profiles_public AS
+SELECT id,company_name,category,description,services,city,logo_url,address,phone,whatsapp,website,
+       gallery_urls,projects,verified_at AS representative_verified_at
+FROM public.company_profiles
+WHERE status='active';
+GRANT SELECT ON public.company_profiles_public TO anon,authenticated;
 
 CREATE OR REPLACE FUNCTION public.company_profile_update_direct(p_company_profile_id uuid,p_payload jsonb)
 RETURNS text LANGUAGE sql SECURITY INVOKER SET search_path TO ''
