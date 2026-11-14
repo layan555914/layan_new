@@ -78,7 +78,11 @@ saved_entities AS (
   FROM candidates
   ON CONFLICT (slug) DO UPDATE
     SET marketplace_category = COALESCE(public.directory_entities.marketplace_category,EXCLUDED.marketplace_category),
-        public_visible = false,
+        public_visible = CASE
+          WHEN public.directory_entities.verification_status='published'
+          THEN public.directory_entities.public_visible
+          ELSE false
+        END,
         verification_status = CASE
           WHEN public.directory_entities.verification_status='published'
           THEN public.directory_entities.verification_status
@@ -89,7 +93,7 @@ saved_entities AS (
 resolved_entities AS (
   SELECT e.id,c.*
   FROM candidates c
-  JOIN public.directory_entities e ON e.slug=c.slug
+  JOIN saved_entities e ON e.slug=c.slug
 ),
 saved_sources AS (
   INSERT INTO public.directory_sources(
