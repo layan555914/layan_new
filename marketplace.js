@@ -48,11 +48,9 @@ function resetMarketplaceOtpFlow(){
  marketplaceOtpResend.disabled=true;
  marketplaceOtpBack.hidden=true;
 }
-function setAuthMode(mode){
- if(mode==="signup"){/* signup needs account type, name and phone: use the main signup form */window.location.href="./?auth=signup";return}
+function setAuthMode(){
  resetMarketplaceOtpFlow();
- $("authTitle").textContent="تسجيل الدخول";
- $("switchAuth").textContent="إنشاء حساب جديد";
+ $("authTitle").textContent="الدخول إلى أسيوط عقار";
  authStatus.textContent="";
 }
 function openAuth(){authStatus.textContent="";setAuthMode("login");authDialog.showModal()}
@@ -66,7 +64,7 @@ async function sendMarketplaceOtp(resend=false){
  button.disabled=true;
  authStatus.textContent=resend?"جارٍ إرسال كود جديد...":"جارٍ إرسال كود التحقق إلى بريدك...";
  try{
-  await service.requestEmailOtp(email,{shouldCreateUser:false});
+  await service.requestEmailOtp(email,{shouldCreateUser:true});
   pendingMarketplaceOtp={email};
   authForm.elements.email.readOnly=true;
   marketplaceOtpField.hidden=false;
@@ -186,7 +184,6 @@ function openListing(){if(!currentSession?.user?.id){shouldOpenListingAfterAuth=
 async function submitListing(event){event.preventDefault();listingStatus.textContent="جارٍ تجهيز الإعلان وإرساله للمراجعة...";const session=await getSession();if(!session?.user?.id){listingStatus.textContent="انتهت جلسة الدخول. سجّل الدخول ثم أعد المحاولة.";openAuth();return}const formData=new FormData(listingForm);const latitudeText=String(formData.get("latitude")||"").trim(),longitudeText=String(formData.get("longitude")||"").trim();if(Boolean(latitudeText)!==Boolean(longitudeText)){listingStatus.textContent="أدخل خط العرض والطول معًا، أو اترك الاثنين فارغين.";return}const latitude=latitudeText?Number(latitudeText):null,longitude=longitudeText?Number(longitudeText):null;if(latitudeText&&(!Number.isFinite(latitude)||latitude < -90||latitude > 90||!Number.isFinite(longitude)||longitude < -180||longitude > 180)){listingStatus.textContent="إحداثيات الموقع غير صحيحة.";return}const files=Array.from(listingForm.elements.images.files||[]);if(files.length>5){listingStatus.textContent="يمكن إضافة 5 صور كحد أقصى.";return}let imageUrls=[];try{for(const file of files)imageUrls.push(await compressImage(file))}catch(error){listingStatus.textContent=error.message;return}const priceText=String(formData.get("price")||"").trim();const details=Object.fromEntries(Array.from(listingForm.querySelectorAll("[name^=detail_]")).map(el=>[el.name.slice(7),String(el.value||"").trim()]).filter(([,value])=>value));const payload={owner_id:session.user.id,latitude,longitude,category:String(formData.get("category")),listing_type:String(formData.get("listing_type")||"خدمة"),title:String(formData.get("title")||"").trim(),description:String(formData.get("description")||"").trim(),city:String(formData.get("city")||"أسيوط").trim(),area:String(formData.get("area")||"").trim()||null,property_type:String(formData.get("property_type")||"").trim()||null,price:priceText?Number(priceText):null,price_period:String(formData.get("price_period")||"").trim()||null,contact_phone:String(formData.get("contact_phone")||"").trim(),whatsapp:String(formData.get("whatsapp")||"").trim()||null,image_urls:imageUrls,details,status:"pending"};try{await api("marketplace_listings",{method:"POST",body:JSON.stringify(payload)});listingStatus.textContent="تم استلام إعلانك وإرساله للمراجعة. سيظهر بعد اعتماد الإدارة.";listingForm.reset();renderCategoryFields();setTimeout(()=>listingDialog.close(),1400)}catch(error){listingStatus.textContent="لم يتم إرسال الإعلان: "+error.message;console.error("Marketplace insert error:",error)}}
 async function init(){currentSession=readSession();updateAuthButton();if(currentSession)await getSession();updateAuthButton();await loadCategories();const requested=new URLSearchParams(location.search).get("category");if(requested&&categories.includes(requested)){categoryFilter.value=requested;listingForm.elements.category.value=requested}renderCategoryFields();await loadListings()}
 $("authOpen").addEventListener("click",async()=>{if(currentSession?.user?.id){if(confirm("هل تريد تسجيل الخروج؟")){try{await auth()?.signOut?.()}catch(error){authStatus.textContent=error.message||"تعذر تسجيل الخروج.";return}saveSession(null)}return}shouldOpenListingAfterAuth=false;openAuth()});
-$("switchAuth").addEventListener("click",()=>setAuthMode("signup"));
 marketplaceOtpRequest.addEventListener("click",()=>sendMarketplaceOtp(false));
 marketplaceOtpResend.addEventListener("click",()=>sendMarketplaceOtp(true));
 marketplaceOtpVerify.addEventListener("click",verifyMarketplaceOtp);
