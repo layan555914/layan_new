@@ -21,6 +21,11 @@ async function mockBackend(page) {
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
   await page.route(SUPABASE + "/**", async route => {
     const req = route.request(); const url = new URL(req.url()); const path = url.pathname; const method = req.method();
+    if (path === "/auth/v1/otp" && method === "POST") return reply(route, { message_id: "otp-test-message" });
+    if (path === "/auth/v1/verify" && method === "POST") return reply(route, {
+      access_token: "t", refresh_token: "r", token_type: "bearer", expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600, user
+    });
     if (path === "/auth/v1/token" && url.searchParams.get("grant_type") === "refresh_token") state.refreshes++;
     if (path === "/auth/v1/token") return reply(route, { access_token: "t", refresh_token: "r", token_type: "bearer", expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user });
     if (path === "/auth/v1/user") return reply(route, user);
@@ -50,9 +55,12 @@ async function mockBackend(page) {
 
 async function login(page) {
   await page.locator("#addOfferTop").click();
+  await expect(page.locator("#authDialog")).toBeVisible();
   await page.locator("#authEmail").fill("all-types@example.invalid");
-  await page.locator("#authPassword").fill("Test-Only-Password-123!");
-  await page.locator("#authSubmit").click();
+  await page.locator("#authOtpRequestBtn").click();
+  await expect(page.locator("#authOtpCode")).toBeVisible();
+  await page.locator("#authOtpCode").fill("123456");
+  await page.locator("#authOtpVerifyBtn").click();
   await expect(page.locator("#authDialog")).not.toBeVisible();
 }
 
