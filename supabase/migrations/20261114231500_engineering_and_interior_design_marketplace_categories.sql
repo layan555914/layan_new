@@ -115,7 +115,7 @@ saved_entities AS (
 resolved_entities AS (
   SELECT e.id,c.*
   FROM candidates c
-  JOIN public.directory_entities e ON e.slug=c.slug
+  JOIN saved_entities e ON e.slug=c.slug
 ),
 saved_sources AS (
   INSERT INTO public.directory_sources(
