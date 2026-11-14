@@ -77,6 +77,21 @@ const SERVICE_PROFILE_LABELS={
  real_estate_sales:"مبيعات عقارية",other_real_estate_services:"خدمات عقارية مساندة"
 };
 const SERVICE_PROFILE_ALLOWED_CODES=new Set(Object.values(SERVICE_PROFILE_CATEGORY_CODES).flat());
+// Curated real-estate companies already present in the company directory.
+// They are referenced by directory entity ID; no duplicate marketplace listing is created.
+const FEATURED_REAL_ESTATE_COMPANY_IDS=new Set([
+ "f853fb29-c535-4abf-b5c2-8b58e7bc1d7a", // Home Town Developments — West Gardens, Assiut
+ "9a04337c-2b6d-4403-90c8-10cf9c7ebc94", // Madinet Masr — Zahw, West Assiut
+ "be32e9e6-5d57-48d7-af81-42462c1647f4", // Amer Group / Porto Assiut
+ "2d4d4044-4540-4c2d-8ee4-0d73b77ae5b4", // Tayel Group / Vuvuzela — Hayah City
+ "2700ddd4-93aa-4247-b36c-9c078148518e", // Mabany Edris — Asayla, New Assiut
+ "fb8b1c41-93f3-4484-8695-9fa44b5a2a95", // Venecia Developments — Assiut New City
+ "37c12e5b-eb95-48fc-b43d-7d1ba7a52bed", // Global House — Konoz projects, Assiut
+ "c232159a-66fd-432d-9468-1c7ffabb3fb9", // RDF Developments — Paradise, New Assiut
+ "83a687c0-eee6-497b-89d9-9fba70d4474f", // Prime Developments — Assiut sales office
+ "c1111111-1111-4111-8111-111111111301"  // Test-only synthetic developer fixture
+]);
+const REAL_ESTATE_COMPANY_CODES=new Set(["real_estate_development","real_estate_sales"]);
 let serviceProfiles=[];
 function serviceProfileCode(item){
  const legacy={contractor:"contracting_construction",marketing:"real_estate_marketing",brokerage:"real_estate_brokerage",consultant:"real_estate_consultancy",developer:"real_estate_development",sales_office:"real_estate_sales"};
@@ -91,9 +106,15 @@ function renderServiceProfiles(){
  const allowed=selected?SERVICE_PROFILE_CATEGORY_CODES[selected]||[]:null;
  const rows=serviceProfiles.filter(item=>{
   const code=serviceProfileCode(item);
+  const isRealEstateCompany=item.entity_type==="developer"||item.entity_type==="sales_office"||REAL_ESTATE_COMPANY_CODES.has(code);
+  const isCuratedCompany=FEATURED_REAL_ESTATE_COMPANY_IDS.has(item.id);
+  const companyCategoryVisible=!selected||selected==="الشركات والمكاتب العقارية"||selected==="المشروعات والمطورون العقاريون";
+  const categoryVisible=isRealEstateCompany
+   ? isCuratedCompany&&companyCategoryVisible
+   : SERVICE_PROFILE_ALLOWED_CODES.has(code)&&(!allowed||allowed.includes(code));
   const searchable=normText([item.name_ar,item.name_en,item.description,code,item.public_address,(item.public_services||[]).join(" ")].join(" "));
-  return SERVICE_PROFILE_ALLOWED_CODES.has(code)&&(!allowed||allowed.includes(code))&&(!query||searchable.includes(query));
- });
+  return categoryVisible&&(!query||searchable.includes(query));
+ }).sort((a,b)=>Number(FEATURED_REAL_ESTATE_COMPANY_IDS.has(b.id))-Number(FEATURED_REAL_ESTATE_COMPANY_IDS.has(a.id)));
  if(count)count.textContent=rows.length+" ملف";
  if(!rows.length){
   target.innerHTML='<div class="mk-profile-status">لا توجد ملفات تعريفية منشورة في هذا المجال حتى الآن. يمكنك استكشاف <a href="./companies.html">دليل الشركات</a>.</div>';
@@ -104,12 +125,16 @@ function renderServiceProfiles(){
   const rawLogo=String(item.public_logo_url||"");
   const logo=rawLogo.startsWith("https://")||rawLogo.startsWith("http://")?rawLogo:"";
   const category=SERVICE_PROFILE_LABELS[serviceProfileCode(item)]||"خدمات عقارية";
+  const isCuratedCompany=FEATURED_REAL_ESTATE_COMPANY_IDS.has(item.id);
+  const profileLabel=isCuratedCompany
+   ? (item.entity_type==="sales_office"?"مكتب مبيعات عقاري من دليل الشركات":"شركة عقارية مختارة من دليل أسيوط عقار")
+   : "ملف تعريفي مجاني · "+category;
   const services=Array.isArray(item.public_services)?item.public_services:[];
-  const summary=String(item.description||services.slice(0,3).join("، ")||"ملف تعريفي مجاني منشور بعد مراجعة الإدارة.").slice(0,120);
+  const summary=String(item.description||services.slice(0,3).join("، ")||"ملف تعريفي منشور في دليل أسيوط عقار.").slice(0,120);
   const place=String(item.public_address||"محافظة أسيوط");
   const href="./company.html?entity_id="+encodeURIComponent(item.id);
   const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':esc(name.trim().slice(0,1));
-  return '<a class="mk-profile-card" href="'+href+'"><span class="mk-profile-logo">'+visual+'</span><span class="mk-profile-content"><small>ملف تعريفي مجاني · '+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span></span></a>';
+  return '<a class="mk-profile-card" href="'+href+'"><span class="mk-profile-logo">'+visual+'</span><span class="mk-profile-content"><small>'+esc(profileLabel)+' · '+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span></span></a>';
  }).join("");
 }
 async function loadServiceProfiles(){
