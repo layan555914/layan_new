@@ -8,6 +8,7 @@ const $=id=>document.getElementById(id);
 const authDialog=$("authDialog"),listingDialog=$("marketplaceListingDialog");
 const authForm=$("authForm"),listingForm=$("marketplaceListingForm");
 const authStatus=$("authStatus"),listingStatus=$("marketplaceFormStatus");
+const authSubmit=$("authSubmit");
 const marketplacePasswordField=$("marketplacePasswordField"),marketplaceOtpField=$("marketplaceOtpField");
 const marketplaceOtpInput=$("marketplaceOtpInput"),marketplaceOtpRequest=$("marketplaceOtpRequest");
 const marketplaceOtpVerify=$("marketplaceOtpVerify"),marketplaceOtpResend=$("marketplaceOtpResend");
