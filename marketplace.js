@@ -109,7 +109,7 @@ function renderServiceProfiles(){
   const place=String(item.public_address||"محافظة أسيوط");
   const href="./company.html?entity_id="+encodeURIComponent(item.id);
   const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':esc(name.trim().slice(0,1));
-  return '<a class="mk-profile-card" href="'+href+'"><span class="mk-profile-logo">'+visual+'</span><span class="mk-profile-content"><small>'+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span></span></a>';
+  return '<a class="mk-profile-card" href="'+href+'"><span class="mk-profile-logo">'+visual+'</span><span class="mk-profile-content"><small>ملف تعريفي مجاني · '+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span></span></a>';
  }).join("");
 }
 async function loadServiceProfiles(){
