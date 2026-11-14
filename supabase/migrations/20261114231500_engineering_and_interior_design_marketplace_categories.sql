@@ -16,6 +16,13 @@ ALTER TABLE public.marketplace_listings
     'مكاتب التصميم الهندسي','مهندسو الديكور والتصميم الداخلي'
   ]::text[]));
 
+ALTER TABLE public.marketplace_categories
+  DROP CONSTRAINT IF EXISTS marketplace_categories_display_order_check;
+
+ALTER TABLE public.marketplace_categories
+  ADD CONSTRAINT marketplace_categories_display_order_check
+  CHECK (display_order BETWEEN 1 AND 13);
+
 INSERT INTO public.marketplace_categories(name, description, display_order, is_active)
 VALUES
   ('مكاتب التصميم الهندسي',
