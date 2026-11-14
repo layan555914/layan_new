@@ -68,7 +68,9 @@ const SERVICE_PROFILE_CATEGORY_CODES={
  "الأثاث والفرش وتجهيز الوحدات":["furniture_furnishings"],
  "المشروعات والمطورون العقاريون":["real_estate_development"],
  "الصيانة وإدارة العقارات":["maintenance_property_management"],
- "الاستشارات والخدمات العقارية":["real_estate_consultancy","other_real_estate_services"],\n "مكاتب التصميم الهندسي":["engineering_design"],\n "مهندسو الديكور والتصميم الداخلي":["finishing_decoration"]
+ "الاستشارات والخدمات العقارية":["real_estate_consultancy","other_real_estate_services"],
+ "مكاتب التصميم الهندسي":["engineering_design"],
+ "مهندسو الديكور والتصميم الداخلي":["finishing_decoration"]
 };
 const SERVICE_PROFILE_LABELS={
  contracting_construction:"مقاولات وإنشاءات",real_estate_marketing:"تسويق عقاري",
