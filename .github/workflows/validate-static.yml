@@ -247,6 +247,31 @@ jobs:
           const resetPasswordTests = fs.readFileSync('tests/e2e/reset-password.spec.mjs', 'utf8');
           const signupClientTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
           const appAuthJs = fs.readFileSync('app.js', 'utf8');
+          const emailOtpTests = fs.readFileSync('tests/e2e/email-otp.spec.mjs', 'utf8');
+          const otpEmailTemplate = fs.readFileSync('supabase/email-templates/magic-link.html', 'utf8');
+
+          if (!authClientJs.includes('async function requestEmailOtp') ||
+              !authClientJs.includes('async function verifyEmailOtp') ||
+              !authClientJs.includes('requestEmailOtp, verifyEmailOtp') ||
+              !authClientJs.includes('create_user: options.shouldCreateUser === true') ||
+              !authClientJs.includes('type: "email"')) {
+            errors.push('Email OTP client must expose request/verify helpers and prevent unintended account creation');
+          }
+          if (!appAuthJs.includes('authOtpRequestBtn') ||
+              !appAuthJs.includes('authOtpVerifyBtn') ||
+              !appAuthJs.includes('authOtpResendBtn') ||
+              !appAuthJs.includes('authOtpBackBtn')) {
+            errors.push('Main auth dialog must keep OTP as an additional method with resend and password fallback');
+          }
+          if (!emailOtpTests.includes('existing-account OTP login never requests automatic account creation') ||
+              !emailOtpTests.includes('successful email OTP verification creates the normal authenticated session') ||
+              !emailOtpTests.includes('login dialog offers OTP as an additional method')) {
+            errors.push('Email OTP browser regression coverage is incomplete');
+          }
+          if (!otpEmailTemplate.includes('{{ .Token }}') ||
+              otpEmailTemplate.includes('{{ .ConfirmationURL }}')) {
+            errors.push('Magic Link email template must send a numeric OTP token instead of a confirmation link');
+          }
 
           const signupTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
           if (!authClientJs.includes('SIGNUP_PKCE_STORAGE_KEY') ||
