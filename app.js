@@ -347,7 +347,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       otpCodeField.hidden = true;
       otpCodeInput.value = "";
       otpRequestButton.hidden = false;
+      otpRequestButton.disabled = false;
       otpVerifyButton.hidden = true;
+      otpVerifyButton.disabled = false;
       otpResendButton.hidden = true;
       otpResendButton.disabled = true;
       otpResendButton.textContent = "إعادة إرسال الكود بعد دقيقة";
@@ -359,7 +361,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
     const otpSignupProfile = () => {
       const accountType = authDialog.querySelector('input[name="authAccountType"]:checked')?.value || "";
-      const name = fullName.value.trim().replace(/\\s+/g, " ");
+      const name = fullName.value.trim().replace(/\s+/g, " ");
       const mobile = phone.value.replace(/[^0-9]/g, "").replace(/^20/, "").replace(/^(?!0)/, "0");
       if (!accountType) throw new Error("اختر نوع الحساب.");
       if (name.length < 3) throw new Error("اكتب الاسم الكامل.");
@@ -381,6 +383,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!api?.requestEmailOtp) { status.textContent = "تسجيل الدخول بالكود غير جاهز حاليًا."; return; }
       const email = resend && pendingOtp ? pendingOtp.email : emailInput.value.trim().toLowerCase();
       if (!email) { status.textContent = "اكتب بريدك الإلكتروني أولًا."; emailInput.focus(); return; }
+      if (!resend && !emailInput.checkValidity()) { status.textContent = "راجع صيغة البريد الإلكتروني وحاول مرة أخرى."; emailInput.focus(); return; }
       let options = resend && pendingOtp ? pendingOtp.options : { shouldCreateUser: mode === "signup" };
       if (!resend && mode === "signup") {
         try { options = { shouldCreateUser: true, data: otpSignupProfile() }; }
@@ -422,6 +425,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.dispatchEvent(new CustomEvent("layan-auth-state-changed", { detail: { authenticated: true } }));
         updateAuthButton();
         status.textContent = "تم التحقق وتسجيل الدخول بنجاح.";
+        pendingOtp = null;
         window.setTimeout(() => {
           if (continueCompanyRegistration()) return;
           authDialog.close();
