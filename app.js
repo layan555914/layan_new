@@ -302,37 +302,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         <label class="auth-signup-only" hidden>الاسم الكامل<input id="authFullName" type="text" autocomplete="name" maxlength="80" placeholder="الاسم كما سيظهر للإدارة"></label>
         <label class="auth-signup-only" hidden>رقم الموبايل<span class="auth-phone"><span dir="ltr">+20</span><input id="authPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" maxlength="13" placeholder="01xxxxxxxxx"></span></label>
         <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
-        <label id="authPasswordField">كلمة المرور<span class="auth-password"><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="6 أحرف على الأقل"><button type="button" id="authShowPassword" aria-label="إظهار كلمة المرور" aria-pressed="false">👁</button></span></label>
         <label id="authOtpCodeField" class="auth-otp-only" hidden>كود التحقق المكوّن من 6 أرقام
           <input id="authOtpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" dir="ltr">
         </label>
-        <button class="btn btn-outline-dark" id="authOtpRequestBtn" type="button">الدخول بكود البريد</button>
+        <button class="btn btn-gold" id="authOtpRequestBtn" type="button">إرسال كود الدخول</button>
         <button class="btn btn-gold" id="authOtpVerifyBtn" type="button" hidden>تأكيد الكود والدخول</button>
         <button class="btn btn-outline-dark" id="authOtpResendBtn" type="button" hidden disabled>إعادة إرسال الكود بعد دقيقة</button>
-        <button class="btn btn-outline-dark" id="authOtpBackBtn" type="button" hidden>العودة لطريقة الدخول السابقة</button>
+        <button class="btn btn-outline-dark" id="authOtpBackBtn" type="button" hidden>تغيير البريد الإلكتروني</button>
         <label class="auth-signup-only auth-terms" hidden><input id="authTerms" type="checkbox"> أوافق على <a href="./terms.html" target="_blank" rel="noopener">الشروط</a> و<a href="./privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></label>
         <p id="authStatus" role="status" aria-live="polite"></p>
-        <button class="btn btn-outline-dark" id="resendConfirmationBtn" type="button" hidden>إعادة إرسال رسالة التأكيد</button>
-        <button class="btn btn-outline-dark auth-forgot-password" id="forgotPasswordBtn" type="button" aria-label="استعادة كلمة المرور عبر البريد الإلكتروني">نسيت كلمة المرور؟</button>
-        <button class="btn btn-gold" id="authSubmit" type="submit">تسجيل الدخول</button>
         <button class="btn btn-outline-dark" id="authToggle" type="button">إنشاء حساب جديد</button>
       </form>`;
     document.body.appendChild(authDialog);
     let mode = "login";
     const title = authDialog.querySelector("#authTitle");
-    const submit = authDialog.querySelector("#authSubmit");
     const toggle = authDialog.querySelector("#authToggle");
-    const password = authDialog.querySelector("#authPassword");
     const status = authDialog.querySelector("#authStatus");
-    const resendButton = authDialog.querySelector("#resendConfirmationBtn");
-    const forgotButton = authDialog.querySelector("#forgotPasswordBtn");
     const signupOnly = [...authDialog.querySelectorAll(".auth-signup-only")];
     const fullName = authDialog.querySelector("#authFullName");
     const phone = authDialog.querySelector("#authPhone");
     const terms = authDialog.querySelector("#authTerms");
     const intro = authDialog.querySelector("#authIntro");
     const emailInput = authDialog.querySelector("#authEmail");
-    const passwordField = authDialog.querySelector("#authPasswordField");
     const otpCodeField = authDialog.querySelector("#authOtpCodeField");
     const otpCodeInput = authDialog.querySelector("#authOtpCode");
     const otpRequestButton = authDialog.querySelector("#authOtpRequestBtn");
@@ -343,7 +334,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const clearOtpFlow = () => {
       pendingOtp = null;
       emailInput.readOnly = false;
-      passwordField.hidden = false;
       otpCodeField.hidden = true;
       otpCodeInput.value = "";
       otpRequestButton.hidden = false;
@@ -354,10 +344,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       otpResendButton.disabled = true;
       otpResendButton.textContent = "إعادة إرسال الكود بعد دقيقة";
       otpBackButton.hidden = true;
-      submit.hidden = false;
       toggle.hidden = false;
-      forgotButton.hidden = mode !== "login";
-      resendButton.hidden = true;
     };
     const otpSignupProfile = () => {
       const accountType = authDialog.querySelector('input[name="authAccountType"]:checked')?.value || "";
@@ -396,16 +383,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         await api.requestEmailOtp(email, options);
         pendingOtp = { email, options };
         emailInput.readOnly = true;
-        passwordField.hidden = true;
         otpCodeField.hidden = false;
         otpRequestButton.hidden = true;
         otpVerifyButton.hidden = false;
         otpResendButton.hidden = false;
         otpBackButton.hidden = false;
-        submit.hidden = true;
         toggle.hidden = true;
-        forgotButton.hidden = true;
-        resendButton.hidden = true;
         otpVerifyButton.disabled = false;
         otpCodeInput.focus();
         status.textContent = "تم إرسال كود من 6 أرقام على البريد. اكتبه هنا لإكمال الدخول. إعادة الإرسال متاحة بعد دقيقة.";
@@ -436,24 +419,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         otpVerifyButton.disabled = false;
       }
     };
-    authDialog.querySelector("#authShowPassword").addEventListener("click", event => {
-      const show = password.type === "password";
-      password.type = show ? "text" : "password";
-      event.currentTarget.setAttribute("aria-pressed", String(show));
-      event.currentTarget.setAttribute("aria-label", show ? "إخفاء كلمة المرور" : "إظهار كلمة المرور");
-    });
     const paintMode = () => {
       clearOtpFlow();
-      otpRequestButton.textContent = mode === "login" ? "الدخول بكود البريد بدون كلمة مرور" : "إنشاء الحساب بالكود بدون كلمة مرور";
-      resendButton.hidden = true;
-      forgotButton.hidden = mode !== "login";
+      otpRequestButton.textContent = mode === "login" ? "إرسال كود الدخول" : "إرسال كود إنشاء الحساب";
       signupOnly.forEach(node => { node.hidden = mode !== "signup"; });
       fullName.required = phone.required = terms.required = mode === "signup";
-      intro.textContent = mode === "login" ? "سجّل الدخول لإضافة إعلاناتك ومتابعتها وحفظ العقارات." : "ابدأ البحث عن عقار أو أضف إعلانك مجانًا. كل الحقول مطلوبة.";
+      intro.textContent = mode === "login" ? "اكتب بريدك الإلكتروني وسنرسل لك كود دخول مؤقت." : "أكمل بياناتك الأساسية، وسنرسل كودًا لتأكيد بريدك وإنشاء حسابك.";
       title.textContent = mode === "login" ? "تسجيل الدخول إلى أسيوط عقار" : "إنشاء حساب مجاني";
-      submit.textContent = mode === "login" ? "تسجيل الدخول" : "إنشاء الحساب";
       toggle.textContent = mode === "login" ? "ليس لديك حساب؟ أنشئ حسابًا" : "لديك حساب بالفعل؟ سجّل الدخول";
-      password.autocomplete = mode === "login" ? "current-password" : "new-password";
       status.textContent = "";
     };
     toggle.addEventListener("click", () => { mode = mode === "login" ? "signup" : "login"; paintMode(); });
@@ -468,85 +441,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     otpBackButton.addEventListener("click", () => {
       clearOtpFlow();
-      status.textContent = "يمكنك استخدام كلمة المرور أو طلب كود جديد.";
-    });
-    forgotButton.addEventListener("click", async () => {
-      const api = window.LAYAN_SUPABASE;
-      const email = authDialog.querySelector("#authEmail").value.trim();
-      if (!email) { status.textContent = "اكتب بريدك الإلكتروني أولًا، ثم اضغط نسيت كلمة المرور."; authDialog.querySelector("#authEmail").focus(); return; }
-      if (!api?.resetPasswordForEmail) { status.textContent = "ميزة استعادة كلمة المرور غير جاهزة حاليًا."; return; }
-      forgotButton.disabled = true; status.textContent = "جارٍ إرسال رابط استعادة كلمة المرور...";
-      try { await api.resetPasswordForEmail(email); status.textContent = "لو البريد مسجل، هتوصلك رسالة استعادة. افتحها واضغط الرابط لتعيين كلمة مرور جديدة، وراجع الرسائل غير المرغوب فيها."; }
-      catch (error) { status.textContent = friendlyAuthError(error.message); }
-      finally { forgotButton.disabled = false; }
-    });
-    resendButton.addEventListener("click", async () => {
-      const api = window.LAYAN_SUPABASE;
-      const email = authDialog.querySelector("#authEmail").value.trim();
-      if (!email) { status.textContent = "اكتب بريدك الإلكتروني أولًا."; return; }
-      if (!api?.resendConfirmation) { status.textContent = "إعادة إرسال التأكيد غير متاحة حاليًا."; return; }
-      resendButton.disabled = true;
-      status.textContent = "جارٍ إرسال رسالة تأكيد جديدة...";
-      try {
-        await api.resendConfirmation(email);
-        status.textContent = "طلبنا إرسال رسالة جديدة. راجع الوارد والرسائل غير المرغوب فيها.";
-        resendButton.hidden = true;
-      } catch (error) {
-        status.textContent = friendlyAuthError(error.message);
-        if (mode === "login" && /Email not confirmed/i.test(error.message || "")) {
-          resendButton.hidden = false;
-        }
-      } finally {
-        resendButton.disabled = false;
-      }
+      status.textContent = "يمكنك تعديل البريد الإلكتروني وطلب كود جديد.";
     });
     authDialog.querySelector("#closeAuthDialog").addEventListener("click", () => authDialog.close());
     authDialog.addEventListener("click", event => { if (event.target === authDialog) authDialog.close(); });
-    authDialog.querySelector("#authForm").addEventListener("submit", async event => {
+    authDialog.querySelector("#authForm").addEventListener("submit", event => {
       event.preventDefault();
-      if (!event.currentTarget.reportValidity()) return;
-      const api = window.LAYAN_SUPABASE;
-      if (!api) { status.textContent = "الاتصال بقاعدة البيانات غير جاهز."; return; }
-      const email = authDialog.querySelector("#authEmail").value.trim().toLowerCase();
-      const pass = password.value;
-      submit.disabled = true;
-      toggle.disabled = true;
-      status.textContent = mode === "login" ? "جارٍ تسجيل الدخول..." : "جارٍ إنشاء الحساب...";
-      try {
-        if (mode === "login") {
-          await api.signIn(email, pass);
-          window.dispatchEvent(new CustomEvent("layan-auth-state-changed", { detail: { authenticated: true } }));
-          status.textContent = "تم تسجيل الدخول بنجاح.";
-          updateAuthButton();
-          window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك، يمكنك الآن إضافة عرضك."); }, 450);
-        } else {
-          const accountType = authDialog.querySelector('input[name="authAccountType"]:checked')?.value || "";
-          const name = fullName.value.trim().replace(/\s+/g, " ");
-          const mobile = phone.value.replace(/[^0-9]/g, "").replace(/^20/, "").replace(/^(?!0)/, "0");
-          if (!accountType) throw new Error("اختر نوع الحساب.");
-          if (name.length < 3) throw new Error("اكتب الاسم الكامل.");
-          if (!/^01[0125][0-9]{8}$/.test(mobile)) throw new Error("اكتب رقم موبايل مصري صحيح مثل 01012345678.");
-          if (!terms.checked) throw new Error("يلزم الموافقة على الشروط وسياسة الخصوصية.");
-          const result = await api.signUp(email, pass, { full_name: name, phone: mobile, account_type: accountType });
-          if (result.needsEmailConfirmation) {
-            status.textContent = "تم إنشاء الحساب بنجاح. افتح رسالة تأكيد البريد واضغط رابط التأكيد، ثم ارجع إلى منصة أسيوط عقار وسجّل الدخول. لو لم تصلك الرسالة، راجع مجلد الرسائل غير المرغوب فيها أو اضغط «إعادة إرسال رسالة التأكيد».";
-            resendButton.hidden = false;
-          } else {
-            status.textContent = "تم إنشاء الحساب وتسجيل الدخول.";
-            updateAuthButton();
-            window.dispatchEvent(new CustomEvent("layan-auth-state-changed", { detail: { authenticated: true } }));
-            window.setTimeout(() => { if (continueCompanyRegistration()) return; authDialog.close(); setStatus("أهلًا بك في أسيوط عقار."); }, 450);
-          }
-        }
-      } catch (error) {
-        status.textContent = friendlyAuthError(error.message);
-        if (/Email not confirmed/i.test(error.message || "")) {
-          resendButton.hidden = false;
-        }
-      } finally {
-        submit.disabled = false;
-        toggle.disabled = false;
-      }
+      if (pendingOtp) finishOtpSignIn();
+      else sendEmailOtp(false);
     });
     authDialog.dataset.mode = "login";
     authDialog._setMode = value => { mode = value || "login"; paintMode(); };
@@ -554,10 +456,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   function friendlyAuthError(message) {
     const text = String(message || "");
-    if (/Invalid login credentials/i.test(text)) return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+    if (/Invalid login credentials/i.test(text)) return "تعذر بدء الدخول بهذا البريد. راجع البريد أو اختر إنشاء حساب جديد.";
     if (/otp_expired|token has expired|invalid.*token|token.*invalid/i.test(text)) return "كود التحقق غير صحيح أو انتهت صلاحيته. اطلب كودًا جديدًا وحاول مرة أخرى.";
     if (/already registered|User already registered/i.test(text)) return "هذا البريد مسجّل بالفعل. سجّل الدخول بدلًا من إنشاء حساب جديد.";
-    if (/Password should be at least|weak password/i.test(text)) return "كلمة المرور ضعيفة؛ استخدم 6 أحرف على الأقل.";
     if (/Email not confirmed/i.test(text)) return "أكّد بريدك الإلكتروني من الرسالة التي وصلتك ثم سجّل الدخول.";
     if (/captcha_failed|captcha protection|captcha_token/i.test(text)) return "التسجيل متوقف بسبب إعداد CAPTCHA في خدمة المصادقة. يجب ضبط إعداد CAPTCHA في لوحة Supabase؛ ليست المشكلة في البريد أو كلمة المرور.";
     if (/redirect.*(allow|url)|not allowed.*redirect|invalid.*redirect/i.test(text)) return "رابط العودة بعد تأكيد البريد غير مسموح به في إعدادات Supabase Auth. أضف رابط منصة أسيوط عقار إلى قائمة Redirect URLs المسموح بها.";
@@ -565,7 +466,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (/email_address_invalid|invalid email/i.test(text)) return "صيغة البريد الإلكتروني غير صحيحة. راجع كتابة البريد وحاول مرة أخرى.";
     if (/signup_disabled|signups not allowed/i.test(text)) return "إنشاء الحسابات متوقف حاليًا من إعدادات المنصة. يلزم تفعيل التسجيل في إعدادات Supabase Auth.";
     if (/user already registered/i.test(text)) return "هذا البريد مسجّل بالفعل. ارجع إلى تسجيل الدخول أو استخدم «نسيت كلمة المرور؟».";
-    return text.length < 220 ? text : "تعذر إتمام العملية. راجع البريد وكلمة المرور ثم حاول مجددًا.";
+    return text.length < 220 ? text : "تعذر إتمام العملية. راجع البريد الإلكتروني وحاول مجددًا.";
   }
   function updateAuthButton() {
     const button = $("loginBtn");
