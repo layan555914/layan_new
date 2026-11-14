@@ -218,12 +218,18 @@ document.addEventListener("DOMContentLoaded", () => {
         '<h2>' + esc(c.company_name) + '</h2><p>' + esc(c.description) + '</p>' +
         '<p><strong>المدينة:</strong> ' + esc(c.city || "أسيوط") + (c.address ? ' — <strong>العنوان:</strong> ' + esc(c.address) : '') + '</p>' +
         '<p><strong>الهاتف:</strong> ' + esc(c.phone) + (c.whatsapp ? ' — <strong>واتساب:</strong> ' + esc(c.whatsapp) : '') + '</p>' +
+        '<p><strong>ممثل الشركة:</strong> ' + esc(row.representative_name || "لم تُسجّل بيانات الممثل") + (row.representative_role ? ' · ' + esc(row.representative_role) : '') + '</p>' +
+        (row.evidence_description ? '<p><strong>دليل الصفة:</strong> ' + esc(row.evidence_description) + '</p>' : '') +
+        (row.evidence_url ? '<p>' + linkHtml(row.evidence_url, 'رابط صفحة أو موقع رسمي') + '</p>' : '') +
         '<p><strong>الخدمات:</strong> ' + esc(services.join("، ")) + '</p>' +
         '<p><strong>المشروعات:</strong> ' + esc(projects.map(p => (p && p.title) || "").filter(Boolean).join("، ") || "لم تُضف") + '</p>' +
         (c.website ? '<p>' + linkHtml(c.website, 'الموقع الإلكتروني') + '</p>' : '') +
         (c.logo_url ? '<p>' + linkHtml(c.logo_url, 'شعار الشركة') + '</p>' : '') +
         '<p><strong>صور الأعمال:</strong> ' + gallery.length + '</p>' + gallery.map((u, i) => linkHtml(u, 'صورة ' + (i + 1))).join(' · ') +
-        '</div><div class="admin-actions"><button type="button" class="btn btn-outline-dark" data-company-action="review" aria-expanded="false">مراجعة البيانات</button>' +
+        '</div>' + (!isUpdate ?
+          '<div class="admin-verification-controls"><label>وسيلة التحقق من ممثل الشركة<select data-company-verification-method><option value="">اختر وسيلة التحقق</option><option value="official_phone">اتصال بالهاتف</option><option value="official_website">التحقق من الموقع أو الصفحة الرسمية</option><option value="authorization_letter">مراجعة تفويض من الشركة</option><option value="registration_document">مراجعة مستند تسجيل النشاط</option><option value="in_person">تحقق مباشر بالحضور</option></select></label><label>ملخص التحقق<textarea data-company-verification-note rows="2" maxlength="500" placeholder="اذكر وسيلة التواصل وما الذي تأكدت منه."></textarea></label></div>' :
+          '<p class="admin-chip">الممثل سبق التحقق منه؛ هذا الطلب خاص بتحديث بيانات الملف.</p>') +
+        '<div class="admin-actions"><button type="button" class="btn btn-outline-dark" data-company-action="review" aria-expanded="false">مراجعة البيانات</button>' +
         '<button type="button" class="btn btn-gold" data-company-action="approve">اعتماد ونشر الملف</button>' +
         '<button type="button" class="btn btn-outline-dark" data-company-action="request_changes">طلب استكمال البيانات</button>' +
         '<button type="button" class="btn btn-outline-dark" data-company-action="reject">رفض الطلب</button></div></article>';
@@ -564,6 +570,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     let notes = null;
+    let verificationMethod = null;
+    let verificationNote = null;
+    const isNewProfile = card.dataset.companyKind !== "update";
     if (action === "reject") {
       notes = window.prompt("اكتب سبب رفض ملف الشركة:");
       if (notes === null) return;
@@ -572,15 +581,26 @@ document.addEventListener("DOMContentLoaded", () => {
       notes = window.prompt("اكتب البيانات أو التعديلات المطلوبة من الشركة:");
       if (notes === null) return;
       if (notes.trim().length < 3) { setStatus("اكتب تفاصيل واضحة لاستكمال البيانات."); return; }
-    } else if (!window.confirm(card.dataset.companyKind === "update" ? "اعتماد التعديلات وتحديث النسخة العامة لملف الشركة؟" : "اعتماد ملف الشركة ونشره في دليل أسيوط عقار؟")) return;
+    } else {
+      if (isNewProfile) {
+        verificationMethod = card.querySelector("[data-company-verification-method]")?.value || "";
+        verificationNote = card.querySelector("[data-company-verification-note]")?.value.trim() || "";
+        if (!verificationMethod) { setStatus("اختر وسيلة التحقق من ممثل الشركة قبل الاعتماد."); return; }
+        if (verificationNote.length < 6) { setStatus("اكتب ملخصًا واضحًا للتحقق (6 أحرف على الأقل)."); return; }
+      }
+      if (!window.confirm(card.dataset.companyKind === "update" ? "اعتماد التغييرات وتحديث النسخة العامة لملف الشركة؟" : "هل تحققت من ممثل الشركة وصفته وتفويضه؟ سيتم اعتماد الملف بعد تسجيل وسيلة التحقق.")) return;
+    }
     button.disabled = true;
     try {
-      // All new-company and published-profile decisions use the same admin-only database RPC.
       await request("/rest/v1/rpc/layan_review_company_profile", {
         method: "POST",
-        body: JSON.stringify({ p_id: id, p_action: action, p_notes: notes })
+        body: JSON.stringify({
+          p_id: id, p_action: action, p_notes: notes,
+          p_verification_method: verificationMethod,
+          p_verification_note: verificationNote
+        })
       });
-      setStatus(action === "approve" ? "تم اعتماد ملف الشركة ونشره." : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
+      setStatus(action === "approve" ? (isNewProfile ? "تم التحقق من ممثل الشركة واعتماد ملفها ونشره." : "تم اعتماد تحديث ملف الشركة.") : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
     finally { button.disabled = false; }
