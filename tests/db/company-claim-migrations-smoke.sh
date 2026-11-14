@@ -141,6 +141,15 @@ AS \$function\$
 \$function\$;
 GRANT EXECUTE ON FUNCTION public.layan_is_admin() TO authenticated;
 
+ALTER TABLE public.directory_entities ENABLE ROW LEVEL SECURITY;
+CREATE POLICY directory_entities_public_read
+  ON public.directory_entities FOR SELECT TO anon, authenticated
+  USING (public_visible = true AND verification_status = 'published');
+CREATE POLICY directory_entities_admin_update
+  ON public.directory_entities FOR UPDATE TO authenticated
+  USING (public.layan_is_admin())
+  WITH CHECK (public.layan_is_admin());
+
 INSERT INTO auth.users (id)
 VALUES ('$USER_ONE'), ('$USER_TWO'), ('$ADMIN_ID')
 ON CONFLICT (id) DO NOTHING;
