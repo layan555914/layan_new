@@ -422,6 +422,8 @@ $function$;
 -- Recreate claim review/list RPCs so approval records the evidence actually checked by staff.
 DROP FUNCTION IF EXISTS public.company_claim_admin_list();
 DROP FUNCTION IF EXISTS private.company_claim_admin_list();
+DROP FUNCTION IF EXISTS public.company_claim_admin_review(uuid,text,text,text,text);
+DROP FUNCTION IF EXISTS private.company_claim_admin_review(uuid,text,text,text,text);
 DROP FUNCTION IF EXISTS public.company_claim_admin_review(uuid,text,text);
 DROP FUNCTION IF EXISTS private.company_claim_admin_review(uuid,text,text);
 
