@@ -16,10 +16,10 @@
   if (!base || !key) return;
 
   // RPCs that only read, or already have their own owner-approval flow, or are owner-only on the server.
-  const PASS_RPC = /^(layan_is_admin|layan_admin_whoami|layan_admin_list_[a-z_]+|layan_admin_activity(_summary)?|layan_admin_pending_[a-z_]+|layan_track_event|layan_admin_request_change|layan_admin_finish_change|layan_admin_decide_request|company_claim_admin_list|layan_admin_delete_[a-z_]+|layan_admin_set_user_suspended|layan_admin_set_admin|layan_list_[a-z_]+|layan_get_[a-z_]+|directory_admin_list[a-z_]*)$/;
+  const PASS_RPC = /^(layan_is_admin|layan_admin_whoami|layan_admin_list_[a-z_]+|layan_admin_activity(_summary)?|layan_admin_pending_[a-z_]+|layan_track_event|layan_admin_request_change|layan_admin_finish_change|layan_admin_decide_request|company_claim_admin_list|company_entity_profile_update_admin_list|layan_admin_delete_[a-z_]+|layan_admin_set_user_suspended|layan_admin_set_admin|layan_list_[a-z_]+|layan_get_[a-z_]+|directory_admin_list[a-z_]*)$/;
   const TABLES = {
     platform_sponsors: "الرعاة الرسميين", supplier_ads: "الإعلانات الممولة", property_offers: "إعلانات العقارات",
-    marketplace_listings: "خدمات السوق", company_profiles: "ملفات الشركات", company_property_ads: "إعلانات الشركات",
+    marketplace_listings: "خدمات السوق", company_profiles: "ملفات الشركات", company_property_ads: "إعلانات الشركات", company_entity_profile_update_requests: "تعديلات ملفات الجهات",
     partner_ad_slots: "مساحات الإعلانات", directory_sources: "مصادر الدليل العقاري", directory_change_log: "سجل الدليل العقاري"
   };
   const RPCS = {
@@ -28,7 +28,8 @@
     layan_review_company_profile: "مراجعة ملف شركة", layan_admin_review_edit: "مراجعة تعديل على إعلان",
     directory_admin_mutate_with_audit: "تعديل في الدليل العقاري", layan_approve_free_trial_ad: "اعتماد إعلان تجريبي",
     layan_admin_review_logo: "مراجعة شعار معلن",
-    company_claim_admin_review: "مراجعة طلب استلام ملف شركة"
+    company_claim_admin_review: "مراجعة طلب استلام ملف جهة",
+    company_entity_profile_update_admin_review: "مراجعة تعديل ملف جهة"
   };
   const VERB = { POST: "إضافة", PATCH: "تعديل", DELETE: "حذف", PUT: "تعديل" };
 

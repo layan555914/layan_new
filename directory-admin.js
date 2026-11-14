@@ -117,8 +117,10 @@ document.addEventListener("DOMContentLoaded", () => {
   async function load() {
     listStatus.textContent = "جارٍ تحميل قاعدة البيانات...";
     try {
+      const entityRows = rows("directory_entities", "id,legacy_code,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc")
+        .catch(() => rows("directory_entities", "id,legacy_code,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc"));
       const result = await Promise.all([
-        rows("directory_entities", "id,legacy_code,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc"),
+        entityRows,
         rows("directory_projects", "id,legacy_code,name_ar,name_en,project_type,description,location_text,project_status,area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at", "name_ar.asc"),
         rows("directory_areas", "id,legacy_code,slug,name_ar,name_en,area_type,parent_id,description,is_active,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,last_verified_at,next_review_at,notes", "name_ar.asc"),
         rows("directory_opportunities", "id,legacy_code,name_ar,city,activity,size_description,terms_as_published,announcement_date,opportunity_type,source_claimed_status,verification_status,public_visible,notes", "name_ar.asc"),
@@ -177,6 +179,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function textField(name, label, value, wide) {
     return '<label class="' + (wide ? "wide" : "") + '">' + esc(label) +
       '<textarea data-field="' + esc(name) + '">' + esc(value || "") + '</textarea></label>';
+  }
+
+  function arrayField(name, label, values, wide) {
+    const value = Array.isArray(values) ? values.join("\n") : "";
+    return '<label class="' + (wide ? "wide" : "") + '">' + esc(label) +
+      '<textarea data-array-field="' + esc(name) + '" rows="3">' + esc(value) + '</textarea><small>كل عنصر في سطر منفصل.</small></label>';
   }
 
   function selectField(name, label, value, options, wide) {
@@ -262,11 +270,26 @@ document.addEventListener("DOMContentLoaded", () => {
     if (type === "entities") {
       fields = inputField("name_ar", "اسم الجهة", record.name_ar) +
         inputField("name_en", "الاسم بالإنجليزية", record.name_en) +
+        selectField("service_category", "مجال الخدمة / التخصص", record.service_category, [
+          ["", "غير مصنف"], ["contracting_construction", "مقاولات وإنشاءات"],
+          ["real_estate_marketing", "تسويق عقاري"], ["real_estate_brokerage", "وساطة ومكتب عقاري"],
+          ["building_materials", "مواد بناء وتشطيب"], ["finishing_decoration", "تشطيب وديكور"],
+          ["furniture_furnishings", "أثاث وفرش وتجهيز وحدات"], ["engineering_design", "مكاتب هندسية وتصميم معماري"],
+          ["maintenance_property_management", "صيانة وإدارة عقارات"], ["real_estate_consultancy", "استشارات عقارية"],
+          ["real_estate_development", "تطوير ومشروعات عقارية"], ["real_estate_sales", "مبيعات عقارية"],
+          ["other_real_estate_services", "خدمات عقارية مساندة"]
+        ]) +
         textField("description", "النشاط والوصف", record.description, true) +
         inputField("website_url", "الموقع الرسمي", record.website_url, true, "url") +
         inputField("public_phone", "هاتف معلن رسميًا", record.public_phone) +
+        inputField("public_whatsapp", "واتساب معلن بموافقة الجهة", record.public_whatsapp) +
         inputField("public_email", "بريد معلن رسميًا", record.public_email, false, "email") +
         inputField("public_address", "عنوان معلن رسميًا", record.public_address, true) +
+        inputField("public_logo_url", "رابط شعار بموافقة الجهة", record.public_logo_url, true, "url") +
+        inputField("public_business_hours", "مواعيد العمل", record.public_business_hours, true) +
+        arrayField("public_services", "الخدمات والتخصصات المعلنة", record.public_services, true) +
+        arrayField("public_coverage_areas", "مناطق التغطية", record.public_coverage_areas, true) +
+        arrayField("public_gallery_urls", "روابط صور الأعمال المعتمدة", record.public_gallery_urls, true) +
         '<label>المنطقة الرئيسية' + selectedArea(record.primary_area_id) + '</label>' +
         mapLocationFields(type, record);
       extra = '<p><strong>التصنيف:</strong> ' + esc(record.entity_type) + ' · <strong>الكود:</strong> ' + esc(record.legacy_code || "—") + '</p>';
@@ -422,6 +445,9 @@ document.addEventListener("DOMContentLoaded", () => {
     card.querySelectorAll("[data-field]").forEach(element => {
       patch[element.dataset.field] = element.type === "checkbox" ? element.checked :
         (element.value.trim() === "" ? null : element.value.trim());
+    });
+    card.querySelectorAll("[data-array-field]").forEach(element => {
+      patch[element.dataset.arrayField] = element.value.split("\n").map(value => value.trim()).filter(Boolean);
     });
     return patch;
   }

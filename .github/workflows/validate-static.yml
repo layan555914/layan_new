@@ -17,6 +17,7 @@ on:
       - research/directory-assiut-batch-20261102
       - fix/company-profile-security-flow-20261104
       - feature/company-profile-claim-form
+      - feature/service-provider-company-profiles-claim-20261114
       - fix/auth-recovery-pkce-flow-20261104
       - fix/signup-confirmation-pkce-20261104
       - feature/assyut-directory-maps-taxonomy-refresh-20261104
