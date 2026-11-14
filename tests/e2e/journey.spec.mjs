@@ -3,7 +3,6 @@ import { test, expect } from "@playwright/test";
 const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 const USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const EMAIL = "journey-test@example.invalid";
-const PASSWORD = "Test-Only-Password-123!";
 const FIRST_ID = "101";
 const CREATED_ID = "202";
 
@@ -62,6 +61,17 @@ async function installBackendMocks(page) {
     const path = url.pathname;
 
     // Supabase Auth is simulated locally. No real account is accessed or changed.
+    if (path === "/auth/v1/otp" && method === "POST") return reply(route, { message_id: "journey-otp-message" });
+    if (path === "/auth/v1/verify" && method === "POST") {
+      return reply(route, {
+        access_token: "e2e-access-token",
+        refresh_token: "e2e-refresh-token",
+        token_type: "bearer",
+        expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        user
+      });
+    }
     if (path === "/auth/v1/token" && method === "POST") {
       return reply(route, {
         access_token: "e2e-access-token",
@@ -197,9 +207,11 @@ test("customer can search, open, save, submit, track and admin-review a property
   await page.locator("#addOfferTop").click();
   await expect(page.locator("#authDialog")).toBeVisible();
   await page.locator("#authEmail").fill(EMAIL);
-  await page.locator("#authPassword").fill(PASSWORD);
-  await page.locator("#authSubmit").click();
-  await expect(page.locator("#authStatus")).toContainText("تم تسجيل الدخول بنجاح");
+  await page.locator("#authOtpRequestBtn").click();
+  await expect(page.locator("#authOtpCode")).toBeVisible();
+  await page.locator("#authOtpCode").fill("123456");
+  await page.locator("#authOtpVerifyBtn").click();
+  await expect(page.locator("#authStatus")).toContainText("تم التحقق وتسجيل الدخول بنجاح");
   await expect(page.locator("#authDialog")).not.toBeVisible();
 
   await page.locator("#addOfferTop").click();
