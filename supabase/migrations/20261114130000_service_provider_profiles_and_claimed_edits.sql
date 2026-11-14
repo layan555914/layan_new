@@ -118,7 +118,7 @@ BEGIN
      OR p_payload='{}'::jsonb OR length(p_payload::text)>20000 THEN
     RAISE EXCEPTION 'بيانات التعديل غير صحيحة أو فارغة' USING errcode='22023';
   END IF;
-  IF EXISTS(SELECT 1 FROM jsonb_object_keys(p_payload) k WHERE NOT (k=ANY(v_allowed))) THEN
+  IF EXISTS(SELECT 1 FROM jsonb_object_keys(p_payload) AS keys(key_name) WHERE NOT (key_name=ANY(v_allowed))) THEN
     RAISE EXCEPTION 'يتضمن الطلب حقولًا غير مسموح بتعديلها' USING errcode='22023';
   END IF;
   IF NOT EXISTS(
@@ -170,22 +170,22 @@ BEGIN
   IF p_payload ? 'public_services' AND (
     jsonb_typeof(p_payload->'public_services') IS DISTINCT FROM 'array'
     OR jsonb_array_length(p_payload->'public_services')>50
-    OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload->'public_services') x
-      WHERE jsonb_typeof(x) IS DISTINCT FROM 'string' OR char_length(btrim(x #>> '{}')) NOT BETWEEN 1 AND 120)
+    OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload->'public_services') AS item(value)
+      WHERE jsonb_typeof(item.value) IS DISTINCT FROM 'string' OR char_length(btrim(item.value #>> '{}')) NOT BETWEEN 1 AND 120)
   ) THEN RAISE EXCEPTION 'قائمة الخدمات غير صحيحة' USING errcode='22023'; END IF;
 
   IF p_payload ? 'public_coverage_areas' AND (
     jsonb_typeof(p_payload->'public_coverage_areas') IS DISTINCT FROM 'array'
     OR jsonb_array_length(p_payload->'public_coverage_areas')>50
-    OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload->'public_coverage_areas') x
-      WHERE jsonb_typeof(x) IS DISTINCT FROM 'string' OR char_length(btrim(x #>> '{}')) NOT BETWEEN 1 AND 120)
+    OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload->'public_coverage_areas') AS item(value)
+      WHERE jsonb_typeof(item.value) IS DISTINCT FROM 'string' OR char_length(btrim(item.value #>> '{}')) NOT BETWEEN 1 AND 120)
   ) THEN RAISE EXCEPTION 'قائمة مناطق التغطية غير صحيحة' USING errcode='22023'; END IF;
 
   IF p_payload ? 'public_gallery_urls' AND (
     jsonb_typeof(p_payload->'public_gallery_urls') IS DISTINCT FROM 'array'
     OR jsonb_array_length(p_payload->'public_gallery_urls')>20
-    OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload->'public_gallery_urls') x
-      WHERE jsonb_typeof(x) IS DISTINCT FROM 'string' OR NOT public.layan_is_http_url(x #>> '{}'))
+    OR EXISTS(SELECT 1 FROM jsonb_array_elements(p_payload->'public_gallery_urls') AS item(value)
+      WHERE jsonb_typeof(item.value) IS DISTINCT FROM 'string' OR NOT public.layan_is_http_url(item.value #>> '{}'))
   ) THEN RAISE EXCEPTION 'روابط معرض الأعمال غير صحيحة' USING errcode='22023'; END IF;
 
   IF EXISTS(SELECT 1 FROM jsonb_each(p_payload) x
@@ -250,8 +250,8 @@ BEGIN
     SELECT * INTO v_entity FROM public.directory_entities
       WHERE id=v_request.directory_entity_id FOR UPDATE;
     IF NOT FOUND THEN RAISE EXCEPTION 'ملف الجهة غير موجود' USING errcode='P0002'; END IF;
-    SELECT COALESCE(jsonb_object_agg(k,to_jsonb(v_entity)->k),'{}'::jsonb)
-      INTO v_before FROM jsonb_object_keys(v_request.payload) k;
+    SELECT COALESCE(jsonb_object_agg(keys.key_name,to_jsonb(v_entity)->keys.key_name),'{}'::jsonb)
+      INTO v_before FROM jsonb_object_keys(v_request.payload) AS keys(key_name);
 
     UPDATE public.directory_entities e SET
       name_ar=CASE WHEN v_request.payload?'name_ar' THEN v_request.payload->>'name_ar' ELSE e.name_ar END,
@@ -273,8 +273,8 @@ BEGIN
 
     INSERT INTO public.directory_change_log(table_name,record_id,changed_by,old_values,new_values,reason)
     VALUES('directory_entities',v_request.directory_entity_id,auth.uid(),v_before,
-      (SELECT COALESCE(jsonb_object_agg(k,v_after->k),'{}'::jsonb)
-       FROM jsonb_object_keys(v_request.payload) k),
+      (SELECT COALESCE(jsonb_object_agg(keys.key_name,v_after->keys.key_name),'{}'::jsonb)
+       FROM jsonb_object_keys(v_request.payload) AS keys(key_name)),
       'اعتماد تعديل ملف جهة بعد استلامها');
 
     UPDATE public.company_entity_profile_update_requests
