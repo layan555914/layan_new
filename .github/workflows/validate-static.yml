@@ -283,7 +283,7 @@ jobs:
               !marketplace.includes('verifyMarketplaceOtp') ||
               !marketplaceHtml.includes('id="marketplaceOtpRequest"') ||
               !marketplaceHtml.includes('id="marketplaceOtpInput"') ||
-              !emailOtpTests.includes('marketplace login dialog can authenticate with email OTP')) {
+              !emailOtpTests.includes('marketplace login dialog can authenticate with the same automatic email OTP flow')) {
             errors.push('Services marketplace login must support email OTP without breaking the listing flow');
           }
           if (!emailOtpTests.includes('email OTP request defaults to automatic account creation for new email addresses') ||
