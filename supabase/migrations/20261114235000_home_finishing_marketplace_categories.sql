@@ -11,10 +11,6 @@ ALTER TABLE public.marketplace_categories
   ADD CONSTRAINT marketplace_categories_display_order_check
   CHECK (display_order BETWEEN 1 AND 16);
 
-ALTER TABLE public.marketplace_categories
-  ADD CONSTRAINT marketplace_categories_display_order_check
-  CHECK (display_order BETWEEN 1 AND 16);
-
 INSERT INTO public.marketplace_categories(name, description, display_order, is_active)
 VALUES
   ('السيراميك والبورسلين والأدوات الصحية',
@@ -146,7 +142,7 @@ WITH candidates(
    'SP-20261114-HERO-LIGHTING','هيرو للإضاءة الحديثة — خرائط الأعمال','Google Maps','مصدر اكتشاف فقط',
    'https://www.google.com/maps/search/?api=1&query=هيرو+للإضاءة+الحديثة+أسيوط','business_directory',
    '01201564666','7 برج الحرية، شارع الجمهورية، حي شرق، أسيوط','مدرج كمتجر إضاءة ومستلزمات كهرباء؛ يلزم تأكيد الفرع وبيانات التواصل.'),
-  ('ier eny-wood-industries-assiut','إيريني للصناعات الخشبية والأثاث — أسيوط','other','furniture_furnishings','الأثاث والفرش وتجهيز الوحدات',
+  ('iereny-wood-industries-assiut','إيريني للصناعات الخشبية والأثاث — أسيوط','other','furniture_furnishings','الأثاث والفرش وتجهيز الوحدات',
    'SP-20261114-IERENY-WOOD','Iereny For Wood Industries — بيانات النشاط','Google Maps','مصدر اكتشاف فقط',
    'https://www.google.com/maps/search/?api=1&query=Iereny+For+Wood+Industries+Assiut','business_directory',
    '01003412323','شارع الجمهورية، الحمراء الثانية، أسيوط 2','توجد قوائم محلية أخرى باسم Original Furniture Gamal Soliman قريبة من نطاق العلامة؛ نتعامل معها كملف واحد حتى تؤكد الجهة علاقة الفروع، ولا ننشئ سجلًا ثانيًا.'),
@@ -218,7 +214,7 @@ WITH candidates(slug,internal_phone,internal_address,confidence_level,notes) AS 
   ('chapeau-lighting-assiut','01221140900','موريس دوس، الحمراء الثانية، أسيوط 2','business_directory','تأكيد بيانات الفرع الحالية مطلوب.'),
   ('jalal-amer-lighting-assiut','01015151785','شارع 26 يوليو، العتبة الزرقاء، أسيوط','business_directory','تأكيد الهاتف والعنوان مطلوب.'),
   ('hero-modern-lighting-assiut','01201564666','7 برج الحرية، شارع الجمهورية، حي شرق، أسيوط','business_directory','تأكيد الهاتف والفرع مطلوب.'),
-  ('ier eny-wood-industries-assiut','01003412323','شارع الجمهورية، الحمراء الثانية، أسيوط 2','business_directory','التحقق من علاقته بقائمة Original Furniture Gamal Soliman ضروري لتجنب تكرار العلامة.'),
+  ('iereny-wood-industries-assiut','01003412323','شارع الجمهورية، الحمراء الثانية، أسيوط 2','business_directory','التحقق من علاقته بقائمة Original Furniture Gamal Soliman ضروري لتجنب تكرار العلامة.'),
   ('shezell-textiles-assiut','01286457428','بجوار بنك القاهرة، شارع الجمهورية، الحمراء الثانية، أسيوط 2','business_directory','تأكيد استمرار الفرع والخدمات مطلوب.'),
   ('hesham-antar-curtains-assiut','01007205575','شارع القيسارية، بجوار مسجد سيدي جلال، أسيوط','business_directory','تأكيد التفصيل والتركيب مطلوب.'),
   ('menatex-curtains-fabrics-assiut','01061516157','55GJ+R9H، شارع القيسارية الرئيسي، أسيوط 2','business_directory','تأكيد توفر خدمة الستائر مطلوب.'),
