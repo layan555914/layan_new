@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v163-service-provider-claims-20261114";
+const CACHE_NAME = "asyut-aqar-shell-v164-provider-css-bundles-20261114";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -60,7 +60,8 @@ const APP_SHELL = [
   "./manifest.json",
   "./pwa.js",
   "./icon.svg",
-  "./assets/build/home.min.css",
+  "./assets/build/home.min.css?v=324ba89cabdce679",
+  "./assets/build/companies.min.css?v=d0d6846f715691ed",
   "./assets/build/property.min.css",
   "./assets/build/base.min.css"
 ];
