@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v158-buyer-notifications-20261112";
+const CACHE_NAME = "asyut-aqar-shell-v159-service-provider-profiles-20261114";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -29,8 +29,8 @@ const APP_SHELL = [
   "./payment.html",
   "./company.html",
   "./companies.css",
-  "./companies.js",
-  "./company-profile.js",
+  "./companies.js?v=20261114-service-profiles-1",
+  "./company-profile.js?v=20261114-service-profiles-1",
   "./styles.css",
   "./buyer.css",
   "./sponsor.css",

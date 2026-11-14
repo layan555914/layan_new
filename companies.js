@@ -11,15 +11,22 @@ const ENTITY_LOGO_ASSETS=Object.freeze({
  "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
 });
 function entityCategory(entity){
- const map={
-  developer:"شركات تطوير ومشروعات عقارية",
-  marketing:"شركات عقارية",
-  brokerage:"شركات عقارية",
-  sales_office:"شركات عقارية",
-  contractor:"مقاولات وتشطيبات",
-  consultant:"استشارات قانونية وعقود عقارية",
-  other:"خدمات عقارية أخرى"
+ const serviceMap={
+  contracting_construction:"مقاولات وتشطيبات",
+  real_estate_marketing:"شركات عقارية",
+  real_estate_brokerage:"شركات عقارية",
+  building_materials:"مواد بناء ومستلزمات تشطيب",
+  finishing_decoration:"ديكور وأثاث",
+  furniture_furnishings:"أثاث وفرش ومفروشات",
+  engineering_design:"مكاتب هندسية وتصميم معماري",
+  maintenance_property_management:"صيانة وإدارة عقارات",
+  real_estate_consultancy:"استشارات قانونية وعقود عقارية",
+  real_estate_development:"شركات تطوير ومشروعات عقارية",
+  real_estate_sales:"شركات عقارية",
+  other_real_estate_services:"خدمات عقارية أخرى"
  };
+ if(entity.service_category&&serviceMap[entity.service_category])return serviceMap[entity.service_category];
+ const map={developer:"شركات تطوير ومشروعات عقارية",marketing:"شركات عقارية",brokerage:"شركات عقارية",sales_office:"شركات عقارية",contractor:"مقاولات وتشطيبات",consultant:"استشارات قانونية وعقود عقارية",other:"خدمات عقارية أخرى"};
  return map[entity.entity_type]||"خدمات عقارية أخرى";
 }
 function normalizeName(value){
@@ -37,13 +44,15 @@ function card(c){
 function directoryCard(c){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
  const name=String(c.name_ar||c.name_en||"جهة عقارية");
- const logo=ENTITY_LOGO_ASSETS[c.id]||"";
+ const logo=safeUrl(c.public_logo_url)||ENTITY_LOGO_ASSETS[c.id]||"";
  const category=entityCategory(c);
  const description=String(c.description||"بيانات تعريفية منشورة في الدليل العقاري. راجع المصادر داخل الملف لمعرفة تفاصيل الإدراج.");
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
+ const services=Array.isArray(c.public_services)?c.public_services.slice(0,3):[];
  const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':'<span>'+esc(name.trim().slice(0,1))+'</span>';
- return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-card-cover company-card-cover--directory">'+visual+'<small>ASYUT AQAR DIRECTORY</small></div><div class="company-directory-card-body"><span class="company-source-label company-source-label--directory">سجل منشور من الدليل العقاري · ليس إعلان شراكة</span><div class="company-card-meta"><span>'+esc(category)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3><p>'+esc(description)+'</p><div class="company-card-meta">'+contact+address+'</div><span class="company-card-open">عرض البيانات والمصادر وطلب إدارة الملف ←</span></div></a></article>';
+ const isService=Boolean(c.service_category);
+ return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-card-cover company-card-cover--directory">'+visual+'<small>ASYUT AQAR DIRECTORY</small></div><div class="company-directory-card-body"><span class="company-source-label company-source-label--directory">'+(isService?'ملف تعريفي مجاني · يمكن لممثل الجهة طلب استلامه':'سجل منشور من الدليل العقاري · ليس إعلان شراكة')+'</span><div class="company-card-meta"><span>'+esc(category)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(' · ')+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">'+(isService?'عرض الملف وطلب استلامه ←':'عرض البيانات والمصادر وطلب إدارة الملف ←')+'</span></div></a></article>';
 }
 function render(){
  const q=($( "companyDirectorySearch")?.value||"").trim().toLocaleLowerCase("ar");
@@ -66,7 +75,7 @@ function render(){
 async function load(){
  const results=await Promise.allSettled([
   api("company_profiles_public?select=id,company_name,category,description,services,city,logo_url&order=company_name.asc"),
-  api("directory_entities?select=id,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc")
+  api("directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc").catch(()=>api("directory_entities?select=id,name_ar,name_en,entity_type,description,website_url,public_phone,public_email,public_address,primary_area_id&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"))
  ]);
  companies=results[0].status==="fulfilled"?(results[0].value||[]):[];
  directoryEntities=results[1].status==="fulfilled"?(results[1].value||[]):[];
