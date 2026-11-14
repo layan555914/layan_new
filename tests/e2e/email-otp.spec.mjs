@@ -116,7 +116,7 @@ test("successful email OTP verification creates the normal authenticated session
     });
   });
 
-  await page.evaluate(() => window.LAYAN_SUPABASE.verifyEmailOtp("OTP-TEST@EXAMPLE.INVALID", "123456"));
+  await page.evaluate(() => window.LAYAN_SUPABASE.verifyEmailOtp("OTP-TEST@EXAMPLE.INVALID", "١٢٣٤٥٦"));
 
   const session = await page.evaluate(() => ({
     current: window.LAYAN_SUPABASE.getSession(),
