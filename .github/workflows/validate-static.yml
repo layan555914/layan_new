@@ -261,7 +261,8 @@ jobs:
           if (!appAuthJs.includes('authOtpRequestBtn') ||
               !appAuthJs.includes('authOtpVerifyBtn') ||
               !appAuthJs.includes('authOtpResendBtn') ||
-              !appAuthJs.includes('authOtpBackBtn')) {
+              !appAuthJs.includes('authOtpBackBtn') ||
+              !appAuthJs.includes('بدون كلمة مرور')) {
             errors.push('Main auth dialog must keep OTP as an additional method with resend and password fallback');
           }
           if (!marketplace.includes('sendMarketplaceOtp') ||
