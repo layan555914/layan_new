@@ -245,11 +245,14 @@ document.addEventListener("DOMContentLoaded",async()=>{
      const data=new FormData(directForm);
      const value=name=>String(data.get(name)||"").trim();
      const lines=name=>value(name).split(/\n+/).map(item=>item.trim()).filter(Boolean);
-     const gallery=lines("public_gallery_urls").map(item=>{
-      const url=safeUrl(item);
-      if(!url)throw new Error("روابط صور الأعمال يجب أن تبدأ بـ http:// أو https://.");
-      return url;
-     });
+     let gallery;
+     try{
+      gallery=lines("public_gallery_urls").map(item=>{
+       const url=safeUrl(item);
+       if(!url)throw new Error("روابط صور الأعمال يجب أن تبدأ بـ http:// أو https://.");
+       return url;
+      });
+     }catch(error){directStatus.textContent=error.message;return;}
      const payload={
       description:value("description")||null,
       public_business_hours:value("public_business_hours")||null,
