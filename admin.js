@@ -246,7 +246,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (entityIds.length) {
         try {
           const filter = encodeURIComponent("(" + entityIds.join(",") + ")");
-          const entities = await request("/rest/v1/directory_entities?select=id,entity_type,service_category&id=in." + filter);
+          let entities;
+          try {
+            entities = await request("/rest/v1/directory_entities?select=id,entity_type,service_category&id=in." + filter);
+          } catch (_) {
+            entities = await request("/rest/v1/directory_entities?select=id,entity_type&id=in." + filter);
+          }
           if (Array.isArray(entities)) entities.forEach(entity => entityDetailsById.set(String(entity.id), entity));
         } catch (error) {
           console.warn("تعذر تحميل تصنيفات ملفات طلبات الاستلام؛ ستظل المراجعة متاحة:", error);
