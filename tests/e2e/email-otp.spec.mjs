@@ -170,3 +170,45 @@ test("login dialog offers OTP as an additional method and completes a mocked log
     create_user: false
   });
 });
+
+test("marketplace login dialog can authenticate with email OTP", async ({ page }) => {
+  await page.route(SUPABASE + "/rest/v1/**", route => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: "[]"
+  }));
+  let otpPayload = null;
+  await page.route(SUPABASE + "/auth/v1/otp", async route => {
+    otpPayload = route.request().postDataJSON();
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ message_id: "market-otp-fixture" }) });
+  });
+  await page.route(SUPABASE + "/auth/v1/verify", async route => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({
+      access_token: "market-otp-access-token",
+      refresh_token: "market-otp-refresh-token",
+      token_type: "bearer",
+      expires_in: 3600,
+      user: USER
+    })
+  }));
+
+  await page.goto("/marketplace.html");
+  await page.waitForFunction(() => Boolean(window.LAYAN_SUPABASE?.requestEmailOtp));
+  await page.locator("#openListingForm").click();
+  await expect(page.locator("#authDialog")).toBeVisible();
+  await page.locator("#marketAuthEmail").fill("otp-test@example.invalid");
+  await page.locator("#marketplaceOtpRequest").click();
+  await expect(page.locator("#marketplaceOtpInput")).toBeVisible();
+  await page.locator("#marketplaceOtpInput").fill("123456");
+  await page.locator("#marketplaceOtpInput").press("Enter");
+
+  await expect(page.locator("#authDialog")).toBeHidden();
+  await expect(page.locator("#marketplaceListingDialog")).toBeVisible();
+  expect(otpPayload).toEqual({
+    email: "otp-test@example.invalid",
+    create_user: false
+  });
+  expect(await page.evaluate(() => window.LAYAN_SUPABASE.isAuthenticated())).toBe(true);
+});
