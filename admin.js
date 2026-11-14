@@ -232,14 +232,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadPendingCompanyClaims() {
     if (!companyClaimsList) return;
-    companyClaimsList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات استلام الشركات...</p>';
+    companyClaimsList.innerHTML = '<p class="admin-empty">جارٍ تحميل طلبات استلام ملفات الجهات...</p>';
     try {
       const rows = await request("/rest/v1/rpc/company_claim_admin_list", { method: "POST", body: "{}" });
       const count = Array.isArray(rows) ? rows.length : 0;
       const countEl = document.getElementById("statPendingCompanyClaims");
       if (countEl) countEl.textContent = String(count);
       if (!count) {
-        companyClaimsList.innerHTML = '<p class="admin-empty">لا توجد طلبات استلام شركات معلقة.</p>';
+        companyClaimsList.innerHTML = '<p class="admin-empty">لا توجد طلبات استلام ملفات معلقة.</p>';
         return;
       }
       companyClaimsList.innerHTML = rows.map(row => {
@@ -254,14 +254,14 @@ document.addEventListener("DOMContentLoaded", () => {
           : "";
         return '<article class="admin-ad" data-company-claim-id="' + esc(row.id) + '">' +
           '<div><span class="admin-chip">طلب استلام ملف · قيد المراجعة</span>' +
-          '<h2>' + esc(row.company_name || "شركة غير محددة") + '</h2>' +
-          '<p><strong>ممثل الشركة:</strong> ' + esc(row.representative_name) + ' — ' + esc(row.representative_role) + '</p>' +
+          '<h2>' + esc(row.company_name || "جهة غير محددة") + '</h2>' +
+          '<p><strong>ممثل الجهة:</strong> ' + esc(row.representative_name) + ' — ' + esc(row.representative_role) + '</p>' +
           '<p><strong>رقم التواصل:</strong> <a href="tel:' + esc(phoneDigits) + '">' + esc(phone) + '</a>' +
           (row.contact_email ? ' — <strong>البريد:</strong> ' + esc(row.contact_email) : '') + '</p>' +
           (row.notes ? '<p><strong>ملاحظات الممثل:</strong> ' + esc(row.notes) + '</p>' : '') +
           (row.admin_notes ? '<p><strong>ملاحظات الإدارة:</strong> ' + esc(row.admin_notes) + '</p>' : '') +
           '<p><strong>تاريخ الطلب:</strong> ' + esc(createdAt) + '</p>' +
-          '<p><a href="' + esc(profileUrl) + '" target="_blank" rel="noopener noreferrer">فتح ملف الشركة</a> · <span>معرّف حساب مقدم الطلب: ' + esc(row.requester_user_id) + '</span></p></div>' +
+          '<p><a href="' + esc(profileUrl) + '" target="_blank" rel="noopener noreferrer">فتح ملف الجهة</a> · <span>معرّف حساب مقدم الطلب: ' + esc(row.requester_user_id) + '</span></p></div>' +
           '<div class="admin-actions">' + whatsapp +
           '<button type="button" class="btn btn-gold" data-company-claim-action="approve">اعتماد وربط الحساب</button>' +
           '<button type="button" class="btn btn-outline-dark" data-company-claim-action="request_info">طلب استكمال البيانات</button>' +
@@ -547,9 +547,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const action = button.dataset.companyClaimAction;
     let note = null;
     if (action === "approve") {
-      if (!window.confirm("بعد التحقق من هوية الممثل وتفويض الشركة، سيتم اعتماد الطلب وربط حسابه بسجل الشركة. هذا لا يفتح تعديل بيانات الدليل مباشرة. هل تؤكد؟")) return;
+      if (!window.confirm("بعد التحقق من هوية الممثل وتفويض الجهة، سيتم اعتماد الطلب وربط حسابه بملف الجهة. التعديلات تظل خاضعة لمراجعة الإدارة. هل تؤكد؟")) return;
     } else {
-      note = window.prompt(action === "request_info" ? "اكتب البيانات أو الإثباتات المطلوبة من ممثل الشركة:" : "اكتب سبب رفض طلب استلام الشركة:");
+      note = window.prompt(action === "request_info" ? "اكتب البيانات أو الإثباتات المطلوبة من ممثل الجهة:" : "اكتب سبب رفض طلب استلام الملف:");
       if (note === null) return;
       if (note.trim().length < 3) { setStatus("اكتب ملاحظة واضحة من 3 أحرف على الأقل."); return; }
     }
@@ -560,13 +560,13 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ p_id: card.dataset.companyClaimId, p_action: action, p_note: note })
       });
       setStatus(action === "approve"
-        ? "تم اعتماد الطلب وربط حساب ممثل الشركة بالملف. تعديل بيانات الدليل يظل خاضعًا لمراجعة الإدارة."
+        ? "تم اعتماد الطلب وربط حساب ممثل الجهة بالملف. تعديلات الملف تظل خاضعة لمراجعة الإدارة."
         : action === "request_info"
           ? "تم تسجيل ملاحظة استكمال البيانات. تواصل مع الممثل عبر الهاتف أو واتساب."
-          : "تم رفض طلب استلام الشركة وتسجيل السبب.");
+          : "تم رفض طلب استلام الملف وتسجيل السبب.");
       await loadPendingCompanyClaims();
     } catch (error) {
-      setStatus(error.message || "تعذر تنفيذ طلب استلام الشركة.");
+      setStatus(error.message || "تعذر تنفيذ طلب استلام الملف.");
     } finally {
       button.disabled = false;
     }
