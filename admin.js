@@ -296,11 +296,19 @@ document.addEventListener("DOMContentLoaded", () => {
           '<p><strong>رقم التواصل:</strong> <a href="tel:' + esc(phoneDigits) + '">' + esc(phone) + '</a>' +
           (row.contact_email ? ' — <strong>البريد:</strong> ' + esc(row.contact_email) : '') + '</p>' +
           (row.notes ? '<p><strong>ملاحظات الممثل:</strong> ' + esc(row.notes) + '</p>' : '') +
+          (row.evidence_description ? '<p><strong>وصف دليل الصفة:</strong> ' + esc(row.evidence_description) + '</p>' : '') +
+          (row.evidence_url ? '<p><strong>رابط دليل الصفة:</strong> <a href="' + esc(row.evidence_url) + '" target="_blank" rel="noopener noreferrer">فتح الرابط الرسمي ↗</a></p>' : '') +
+          (row.official_phone ? '<p><strong>هاتف الجهة المسجل بالدليل:</strong> ' + esc(row.official_phone) + '</p>' : '') +
+          (row.official_email ? '<p><strong>بريد الجهة المسجل بالدليل:</strong> ' + esc(row.official_email) + '</p>' : '') +
+          (row.official_website ? '<p><strong>موقع الجهة المسجل بالدليل:</strong> <a href="' + esc(row.official_website) + '" target="_blank" rel="noopener noreferrer">فتح الموقع ↗</a></p>' : '') +
           (row.admin_notes ? '<p><strong>ملاحظات الإدارة:</strong> ' + esc(row.admin_notes) + '</p>' : '') +
           '<p><strong>تاريخ الطلب:</strong> ' + esc(createdAt) + '</p>' +
           '<p><a href="' + esc(profileUrl) + '" target="_blank" rel="noopener noreferrer">فتح ملف الجهة</a> · <span>معرّف حساب مقدم الطلب: ' + esc(row.requester_user_id) + '</span></p></div>' +
-          '<div class="admin-actions">' + whatsapp +
-          '<button type="button" class="btn btn-gold" data-company-claim-action="approve">اعتماد وربط الحساب</button>' +
+          '<div class="admin-verification-controls">' +
+          '<label>وسيلة التحقق التي راجعتها الإدارة<select data-verification-method><option value="">اختر وسيلة التحقق قبل الاعتماد</option><option value="official_phone">اتصال بالهاتف الرسمي المسجل</option><option value="official_email">تأكيد من البريد الرسمي</option><option value="official_website">التحقق من الموقع أو الصفحة الرسمية</option><option value="authorization_letter">مراجعة تفويض من الجهة</option><option value="registration_document">مراجعة مستند تسجيل النشاط</option><option value="in_person">تحقق مباشر بالحضور</option></select></label>' +
+          '<label>ملخص التحقق الذي قمت به<textarea data-verification-note rows="2" maxlength="500" placeholder="مثال: تم الاتصال بالرقم الرسمي المسجل وتأكدت صفة المدير والتفويض."></textarea></label>' +
+          '</div><div class="admin-actions">' + whatsapp +
+          '<button type="button" class="btn btn-gold" data-company-claim-action="approve">اعتماد بعد التحقق</button>' +
           '<button type="button" class="btn btn-outline-dark" data-company-claim-action="request_info">طلب استكمال البيانات</button>' +
           '<button type="button" class="btn btn-outline-dark" data-company-claim-action="reject">رفض الطلب</button>' +
           '</div></article>';
@@ -583,8 +591,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!button || !card) return;
     const action = button.dataset.companyClaimAction;
     let note = null;
+    let verificationMethod = null;
+    let verificationNote = null;
     if (action === "approve") {
-      if (!window.confirm("بعد التحقق من هوية الممثل وتفويض الجهة، سيتم اعتماد الطلب وربط حسابه بملف الجهة. التعديلات تظل خاضعة لمراجعة الإدارة. هل تؤكد؟")) return;
+      verificationMethod = card.querySelector("[data-verification-method]")?.value || "";
+      verificationNote = card.querySelector("[data-verification-note]")?.value.trim() || "";
+      if (!verificationMethod) { setStatus("اختر وسيلة التحقق التي راجعتها قبل اعتماد الممثل."); return; }
+      if (verificationNote.length < 6) { setStatus("اكتب ملخصًا واضحًا لعملية التحقق (6 أحرف على الأقل)."); return; }
+      if (!window.confirm("هل أكملت التحقق من هوية الممثل وصفته وتفويضه عبر الوسيلة المحددة؟ سيتم ربط حسابه بالملف بعد التأكيد.")) return;
     } else {
       note = window.prompt(action === "request_info" ? "اكتب البيانات أو الإثباتات المطلوبة من ممثل الجهة:" : "اكتب سبب رفض طلب استلام الملف:");
       if (note === null) return;
@@ -594,10 +608,16 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const result = await request("/rest/v1/rpc/company_claim_admin_review", {
         method: "POST",
-        body: JSON.stringify({ p_id: card.dataset.companyClaimId, p_action: action, p_note: note })
+        body: JSON.stringify({
+          p_id: card.dataset.companyClaimId,
+          p_action: action,
+          p_note: note,
+          p_verification_method: verificationMethod,
+          p_verification_note: verificationNote
+        })
       });
       setStatus(action === "approve"
-        ? "تم اعتماد الطلب وربط حساب ممثل الجهة بالملف. تعديلات الملف تظل خاضعة لمراجعة الإدارة."
+        ? "تم التحقق من الممثل وربط حسابه بالملف. يمكنه تحديث البيانات التشغيلية مباشرة، وتظل بيانات الهوية والتواصل الأساسية خاضعة لمراجعة الإدارة."
         : action === "request_info"
           ? "تم تسجيل ملاحظة استكمال البيانات. تواصل مع الممثل عبر الهاتف أو واتساب."
           : "تم رفض طلب استلام الملف وتسجيل السبب.");
