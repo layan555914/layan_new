@@ -19,6 +19,7 @@ on:
       - feature/company-profile-claim-form
       - fix/auth-recovery-pkce-flow-20261104
       - fix/signup-confirmation-pkce-20261104
+      - feature/service-provider-claim-ui-review-20261114
       - feature/assyut-directory-maps-taxonomy-refresh-20261104
       - feature/verified-directory-map-coordinates-20261104
   workflow_dispatch:
