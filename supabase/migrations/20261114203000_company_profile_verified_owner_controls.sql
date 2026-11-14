@@ -501,6 +501,9 @@ BEGIN
 END;
 $function$;
 
+DROP FUNCTION IF EXISTS public.layan_review_company_profile(uuid,text,text);
+DROP FUNCTION IF EXISTS private.layan_review_company_profile(uuid,text,text);
+
 CREATE OR REPLACE FUNCTION private.layan_review_company_profile(
   p_id uuid,p_action text,p_notes text DEFAULT NULL,
   p_verification_method text DEFAULT NULL,p_verification_note text DEFAULT NULL
@@ -624,12 +627,7 @@ AS $function$
   );
 $function$;
 
-DROP FUNCTION IF EXISTS public.layan_review_company_profile(uuid,text,text,text,text);
-DROP FUNCTION IF EXISTS private.layan_review_company_profile(uuid,text,text,text,text);
-DROP FUNCTION IF EXISTS public.layan_review_company_profile(uuid,text,text);
-DROP FUNCTION IF EXISTS private.layan_review_company_profile(uuid,text,text);
-
-CREATE FUNCTION public.layan_review_company_profile(
+CREATE OR REPLACE FUNCTION public.layan_review_company_profile(
   p_id uuid,p_action text,p_notes text DEFAULT NULL,
   p_verification_method text DEFAULT NULL,p_verification_note text DEFAULT NULL
 )
