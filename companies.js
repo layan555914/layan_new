@@ -28,7 +28,7 @@ function entityType(entity){
  const category=String(entity.service_category||"");
  const identity=normalizeName([entity.name_ar,entity.name_en,entity.website_url,entity.description].join(" "));
  // A sales office belonging to a named developer remains in the developer group.
- if(kind==="developer"||category==="real_estate_development"||/تطويرعقاري|مطورعقاري|development|developer/.test(identity))return "developers";
+ if(kind==="developer"||category==="real_estate_development"||/تطوير(?:ال)?عقاري|مطور(?:ال)?عقاري|development|developer/.test(identity))return "developers";
  if(["real_estate_marketing","real_estate_brokerage","real_estate_sales"].includes(category))return "marketing";
  const legacyTypes={marketing:"marketing",brokerage:"marketing",sales_office:"marketing"};
  return legacyTypes[kind]||"";
