@@ -68,6 +68,9 @@ test("property offers require city and area before saving", async ({ page }) => 
   await login(page);
   await page.locator("#addOfferTop").click();
   const form = page.locator("#offerForm");
+  await form.locator("[name='account_type']").selectOption("individual");
+  await form.locator("[name='listing_purpose']").selectOption("بيع");
+  await form.locator("[name='property_type']").selectOption("شقة");
   await form.locator("[name='title']").fill("شقة اختبار بدون منطقة");
   await form.locator("[name='total_price']").fill("550000");
   await form.locator("[name='city']").fill("مدينة أسيوط");
