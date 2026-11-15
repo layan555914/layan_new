@@ -15,8 +15,17 @@ const labels={
 const setStatus=m=>{const el=$("#directoryStatus");if(el)el.textContent=m;};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=v=>{try{const u=new URL(v);return["https:","http:"].includes(u.protocol)?u.href:"";}catch(_){return"";}};
-function entityBrandMarkup(name,rawLogo){
- const logo=safeUrl(rawLogo),label=String(name||"جهة").trim(),initial=label.slice(0,1)||"؟";
+const ENTITY_LOGO_ASSETS=Object.freeze({
+ "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
+});
+const OFFICIAL_ENTITY_LOGOS=Object.freeze({
+ "primedev-eg.com":"https://www.primedev-eg.com/assets/img/logo-prime.png"
+});
+function officialEntityLogo(website){
+ try{const host=new URL(String(website||"")).hostname.toLowerCase().replace(/^www\./,"");return OFFICIAL_ENTITY_LOGOS[host]||""}catch(_){return ""}
+}
+function entityBrandMarkup(name,rawLogo,entity){
+ const logo=safeUrl(rawLogo)||ENTITY_LOGO_ASSETS[entity?.id]||officialEntityLogo(entity?.website_url),label=String(name||"جهة").trim(),initial=label.slice(0,1)||"؟";
  return '<span class="aq-entity-brand" role="img" aria-label="شعار '+esc(label)+'">'+
   (logo?'<img src="'+esc(logo)+'" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false">':"")+
   '<span class="aq-entity-brand__fallback"'+(logo?" hidden":"")+'><strong>'+esc(initial)+'</strong><small>الشعار غير متاح</small></span></span>';
@@ -206,7 +215,7 @@ function card(title,desc,tag,detail,url,refs,record,recordType){
  const projectProfileLink=recordType==="projects"&&recordKey
   ?'<a class="project-profile-link" href="./project.html?id='+encodeURIComponent(recordKey)+'">عرض ملف المشروع ↗</a>':"";
  const tagMarkup=tag?'<span class="directory-tag">'+esc(tag)+'</span>':"";
- const entityBrand=recordType==="entities"&&recordObj?entityBrandMarkup(title,recordObj.public_logo_url):"";
+ const entityBrand=recordType==="entities"&&recordObj?entityBrandMarkup(title,recordObj.public_logo_url,recordObj):"";
  const heading=entityBrand
   ?'<div class="aq-entity-card-head directory-card-head">'+entityBrand+'<div class="aq-entity-card-head__content"><div class="directory-card-meta">'+tagMarkup+'</div><h3>'+esc(title)+'</h3></div></div>'
   :'<div class="directory-card-meta">'+tagMarkup+'</div><h3>'+esc(title)+'</h3>';
