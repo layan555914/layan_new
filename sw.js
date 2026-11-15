@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v171-know-more-guide-20261115";
+const CACHE_NAME = "asyut-aqar-shell-v172-unified-entity-brand-20261115";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -17,7 +17,7 @@ const APP_SHELL = [
   "./directory-admin.html",
   "./directory-admin.js?v=20261114-service-profiles-1",
   "./directory.css",
-  "./directory.js",
+  "./directory.js?v=20261115-unified-entity-brand-1",
   "./project.html",
   "./project.css?v=project-profile-v1-20261115",
   "./project.js?v=project-profile-v1-20261115",
@@ -27,7 +27,7 @@ const APP_SHELL = [
   "./favorites.js",
   "./marketplace.css",
   "./marketplace-page.css",
-  "./marketplace.js?v=20261114-home-finishing-1",
+  "./marketplace.js?v=20261115-unified-entity-brand-1",
   "./my-listings.html",
   "./my-listings.css",
   "./my-listings.js",
@@ -36,7 +36,8 @@ const APP_SHELL = [
   "./company.html",
   "./companies.css",
   "./assets/theme/companies-directory-bridge.css?v=20261115-verified-company-brand-1",
-  "./companies.js?v=20261114-service-profiles-1",
+  "./assets/theme/entity-brand-cards.css?v=20261115-unified-entity-brand-1",
+  "./companies.js?v=20261115-unified-entity-brand-1",
   "./company-profile.js?v=20261115-verified-company-brand-1",
   "./styles.css",
   "./buyer.css",
