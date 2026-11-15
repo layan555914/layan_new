@@ -20,6 +20,7 @@
     ["companies.html", "الشركات", ["companies.html", "company.html"]],
     ["featured.html", "الإعلانات المميزة", ["featured.html"]],
     ["directory.html", "الدليل العقاري", ["directory.html"]],
+    ["know-more.html", "اعرف أكثر", ["know-more.html"]],
     ["favorites.html", "المفضلة", ["favorites.html"]]
   ];
   const inAreas = /\/areas\//.test(location.pathname);
