@@ -51,7 +51,7 @@ test("company directory separates company logos from service-provider profiles",
   const marketing = page.locator("#marketingCompaniesGrid");
   const developers = page.locator("#developmentCompaniesGrid");
   const ownerCard = marketing.locator(".company-directory-card--owner");
-  const primeCard = marketing.locator(".company-directory-card--directory").filter({ hasText: PRIME.name_ar });
+  const primeCard = developers.locator(".company-directory-card--directory").filter({ hasText: PRIME.name_ar });
   const developerCard = developers.locator(".company-directory-card--directory").filter({ hasText: DEVELOPER.name_ar });
   await expect(ownerCard.locator(".aq-entity-brand img")).toHaveAttribute("src", OWNER_PROFILE.logo_url);
   await expect(primeCard.locator(".aq-entity-brand img")).toHaveAttribute("src", PRIME_LOGO);
@@ -59,7 +59,7 @@ test("company directory separates company logos from service-provider profiles",
   await expect(marketing).not.toContainText(ENTITY.name_ar);
   await expect(developers).not.toContainText(ENTITY.name_ar);
   await expect(marketing).not.toContainText(DEVELOPER.name_ar);
-  await expect(developers).not.toContainText(PRIME.name_ar);
+  await expect(marketing).not.toContainText(PRIME.name_ar);
   await expect(ownerCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
   await expect(developerCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
 });
