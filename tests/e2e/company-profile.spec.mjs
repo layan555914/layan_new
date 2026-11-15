@@ -41,9 +41,9 @@ test("approved company profile page reads public contact and portfolio fields fr
   await expect(page.locator("#companyProfileRoot")).toContainText("استشارات هندسية");
   await expect(page.locator("#companyProfileRoot")).toContainText("مشروع تجريبي");
   await expect(page.locator("#companyProfileRoot")).toContainText("شارع الجمهورية");
-  await expect(page.locator("#companyProfileRoot a[href='tel:01012345678']")).toBeVisible();
-  await expect(page.locator("#companyProfileRoot a[href='https://wa.me/01012345678']")).toBeVisible();
-  await expect(page.locator("#companyProfileRoot a[href='https://example.com/']")).toBeVisible();
+  await expect(page.locator("#companyProfileRoot a.company-contact-primary[href='tel:01012345678']")).toBeVisible();
+  await expect(page.locator("#companyProfileRoot a.company-contact-secondary[href='https://wa.me/01012345678']")).toBeVisible();
+  await expect(page.locator("#companyProfileRoot a.company-contact-secondary[href='https://example.com/']")).toBeVisible();
   await expect(page.locator("#companyProfileRoot .company-gallery img").first()).toHaveAttribute("src", approvedCompany.gallery_urls[0]);
 });
 
@@ -105,6 +105,10 @@ test("directory entity profile clearly labels missing logo and all mobile action
   await expect(page.locator("#companyProfileRoot h1")).toHaveText(publicDirectoryEntity.name_ar);
   await expect(page.locator(".company-logo-fallback")).toContainText("الشعار غير مضاف");
   await expect(page.locator(".company-contact-actions a")).toHaveCount(4);
+  await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
+  await expect(page.locator(".company-claim-panel--prominent button")).toBeVisible();
+  await expect(page.locator(".company-contact-details")).toContainText("بيانات التواصل ومقر الشركة");
+  await expect(page.locator(".company-coverage-section")).toContainText("أسيوط");
   for (const action of await page.locator(".company-contact-actions a").all()) {
     await expect(action).toBeVisible();
     await expect(action).toHaveCSS("min-height", /^(48|50)px$/);
