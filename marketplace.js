@@ -147,8 +147,9 @@ function renderServiceProfiles(){
   const summary=String(item.description||services.slice(0,3).join("، ")||"ملف تعريفي منشور في دليل أسيوط عقار.").slice(0,120);
   const place=String(item.public_address||"محافظة أسيوط");
   const href="./company.html?entity_id="+encodeURIComponent(item.id);
-  const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>الشعار غير مضاف</small></span>';
-  return '<a class="mk-profile-card" href="'+href+'" aria-label="عرض ملف '+esc(name)+' والتواصل مع الجهة"><span class="mk-profile-logo">'+visual+'</span><span class="mk-profile-content"><small>'+esc(profileLabel)+' · '+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span><span class="mk-profile-open">عرض الملف والتواصل ←</span></span></a>';
+  const visual=logo?'<img src="'+esc(logo)+'" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false">':"";
+  const fallback='<span class="aq-entity-brand__fallback"'+(logo?" hidden":"")+'><strong>'+esc(name.trim().slice(0,1)||"؟")+'</strong><small>الشعار غير متاح</small></span>';
+  return '<a class="mk-profile-card" href="'+href+'" aria-label="عرض ملف '+esc(name)+' والتواصل مع الجهة"><span class="mk-profile-logo aq-entity-brand" role="img" aria-label="شعار '+esc(name)+'">'+visual+fallback+'</span><span class="mk-profile-content"><small>'+esc(profileLabel)+' · '+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span><span class="mk-profile-open">عرض الملف والتواصل ←</span></span></a>';
  }).join("");
 }
 async function loadServiceProfiles(){
