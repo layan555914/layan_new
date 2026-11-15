@@ -15,6 +15,12 @@ const labels={
 const setStatus=m=>{const el=$("#directoryStatus");if(el)el.textContent=m;};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=v=>{try{const u=new URL(v);return["https:","http:"].includes(u.protocol)?u.href:"";}catch(_){return"";}};
+function entityBrandMarkup(name,rawLogo){
+ const logo=safeUrl(rawLogo),label=String(name||"جهة").trim(),initial=label.slice(0,1)||"؟";
+ return '<span class="aq-entity-brand" role="img" aria-label="شعار '+esc(label)+'">'+
+  (logo?'<img src="'+esc(logo)+'" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false">':"")+
+  '<span class="aq-entity-brand__fallback"'+(logo?" hidden":"")+'><strong>'+esc(initial)+'</strong><small>الشعار غير متاح</small></span></span>';
+}
 async function staticData(){
  const r=await fetch("./directory-public.json",{cache:"no-cache"});
  if(!r.ok)throw Error("static");
@@ -39,7 +45,7 @@ async function refresh(){
  try{
   const d=await staticData();
   const [e,p,a,s,o,es,ps,os]=await Promise.all([
-   table("directory_entities","select=id,name_ar,entity_type,description,website_url,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
+   table("directory_entities","select=id,name_ar,entity_type,description,website_url,public_logo_url,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
    table("directory_projects","select=id,name_ar,project_type,description,location_text,project_status,area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
    table("directory_areas","select=id,slug,name_ar,name_en,area_type,parent_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,is_active&public_visible=eq.true&verification_status=eq.published&is_active=eq.true&order=name_ar.asc"),
    table("directory_sources","select=id,title,publisher,source_type,source_url,accessed_at,confidence_level,is_public&is_public=eq.true&order=accessed_at.desc"),
@@ -199,7 +205,12 @@ function card(title,desc,tag,detail,url,refs,record,recordType){
   ?'<a href="./company-albenaa-arabi-star.html">عرض الملف التعريفي وأرقام الفروع ↗</a>':"";
  const projectProfileLink=recordType==="projects"&&recordKey
   ?'<a class="project-profile-link" href="./project.html?id='+encodeURIComponent(recordKey)+'">عرض ملف المشروع ↗</a>':"";
- return '<article class="directory-card"'+(recordKey?' id="directory-record-'+esc(encodeURIComponent(recordKey))+'" data-share-url="'+esc(shareUrl)+'"':"")+'><div class="directory-card-meta">'+(tag?'<span class="directory-tag">'+esc(tag)+'</span>':"")+'</div><h3>'+esc(title)+'</h3>'+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+companyProfileLink+projectProfileLink+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(recordObj?verifiedLocationHtml(recordObj):"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
+ const tagMarkup=tag?'<span class="directory-tag">'+esc(tag)+'</span>':"";
+ const entityBrand=recordType==="entities"&&recordObj?entityBrandMarkup(title,recordObj.public_logo_url):"";
+ const heading=entityBrand
+  ?'<div class="aq-entity-card-head directory-card-head">'+entityBrand+'<div class="aq-entity-card-head__content"><div class="directory-card-meta">'+tagMarkup+'</div><h3>'+esc(title)+'</h3></div></div>'
+  :'<div class="directory-card-meta">'+tagMarkup+'</div><h3>'+esc(title)+'</h3>';
+ return '<article class="directory-card"'+(recordKey?' id="directory-record-'+esc(encodeURIComponent(recordKey))+'" data-share-url="'+esc(shareUrl)+'"':"")+'>'+heading+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+companyProfileLink+projectProfileLink+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(recordObj?verifiedLocationHtml(recordObj):"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
 }
 function setFilterAvailability(){
  $("#directoryTypeFilter").disabled=state.view!=="entities";
