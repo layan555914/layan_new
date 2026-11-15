@@ -67,3 +67,46 @@
 .company-claim-status[data-state="success"]{border-color:#c8d9c5;background:#f2f8f0;color:#345c31}
 .company-claim-login-link{display:inline-flex;margin:4px 0 12px;color:#8a4d2e;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .company-claim-form button:disabled{opacity:.65;cursor:wait}
+
+
+/* Shared profile clarity and mobile actions */
+.company-logo-fallback{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ gap:4px;width:100%;height:100%;min-height:100%;padding:8px;text-align:center;
+ color:inherit;line-height:1.25
+}
+.company-logo-fallback strong{font-size:clamp(24px,4vw,38px);font-weight:800}
+.company-logo-fallback small{font-size:9px;line-height:1.4;font-weight:700;letter-spacing:0;opacity:.9}
+.company-profile-logo .company-logo-fallback{color:#2b211b;background:#fff}
+.company-directory-entity-monogram .company-logo-fallback{color:#2b211b}
+.company-card-cover .company-logo-fallback{color:#ead6c4}
+.company-card-cover--directory>span.company-logo-fallback{
+ width:auto;height:auto;min-width:82px;min-height:60px;padding:7px 10px;
+ border-radius:12px;display:flex;flex-direction:column;gap:2px
+}
+.company-card-cover--directory>span.company-logo-fallback strong{font-size:25px;color:#2b211b}
+.company-card-cover--directory>span.company-logo-fallback small{font-size:9px;color:#805137}
+.mk-profile-logo .company-logo-fallback{color:#503f33;padding:3px}
+.mk-profile-logo .company-logo-fallback strong{font-size:21px}
+.mk-profile-logo .company-logo-fallback small{font-size:7px}
+.mk-profile-open{display:inline-flex;align-items:center;gap:5px;margin-top:5px;color:#805137;font-size:11px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.company-contact-actions{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));
+ gap:10px;margin-top:14px
+}
+.company-contact-actions a{
+ display:flex;align-items:center;justify-content:center;min-width:0;min-height:48px;
+ padding:11px 12px;border-radius:10px;text-align:center;font-size:13px;
+ line-height:1.6;overflow-wrap:anywhere
+}
+.company-claim-dialog-head>button{
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;
+ width:auto;min-width:78px;height:40px;padding:0 10px;
+ border-radius:10px;font-size:13px;font-weight:800
+}
+.company-claim-dialog-head>button span:first-child{font-size:21px;line-height:1}
+@media(max-width:620px){
+ .company-contact-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .company-contact-actions a{min-height:50px;padding:10px 8px;font-size:12px}
+ .company-claim-dialog-head>button{min-width:82px}
+}
