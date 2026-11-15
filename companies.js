@@ -39,7 +39,7 @@ function ownerCompanyType(company){
  const name=normalizeName(company.company_name||"");
  const description=normalizeName(company.description||"");
  const services=normalizeName((Array.isArray(company.services)?company.services:[]).join(" "));
- const serviceOnly=/مقاولات|تشطيبات|سيراميك|بورسلين|بويات|دهانات|ديكور|اثاث|موبيليا|اضاءه|نجف|ستائر|مفروشات|مطابخ|الوميتال|مكتب هندسي|تصميم معماري|استشارات قانونيه|ادواتصحيه|سباكه|كهرباء|نقل|صيانه|تنظيف|مواد بناء|مستلزماتتشطيب|صيانة|maintenance|contracting|finishing|furniture|lighting/.test(category);
+ const serviceOnly=/مقاولات|تشطيبات|سيراميك|بورسلين|بويات|دهانات|ديكور|اثاث|موبيليا|اضاءه|نجف|ستائر|مفروشات|مطابخ|الوميتال|مكاتبهندسي|مكتب هندسي|تصميممعماري|تصميم معماري|استشارات قانونيه|ادواتصحيه|سباكه|كهرباء|نقل|صيانه|تنظيف|موادبناء|مواد بناء|مستلزماتتشطيب|صيانة|maintenance|contracting|finishing|furniture|lighting/.test(category);
  if(serviceOnly)return "";
  if(/تطوير|مطور|مشروعات|مشروععقاري|تعمير|development|developer/.test(category+" "+name))return "developers";
  if(/تسويق|وساط|سمس|مكتبعقاري|مبيعاتعقاري|marketing|brokerage/.test(category+" "+name))return "marketing";
@@ -103,7 +103,7 @@ function render(){
  if(developmentSection)developmentSection.hidden=Boolean(selected&&selected!=="developers");
  const marketingTotal=renderGroup("marketing",ownerRows.marketing,entityRows.marketing,marketingGrid,marketingCount,q);
  const developmentTotal=renderGroup("developers",ownerRows.developers,entityRows.developers,developmentGrid,developmentCount,q);
- count.textContent=(marketingTotal+developmentTotal)+" ملفًا منشورًا";
+ count.textContent=(marketingTotal+developmentTotal)+" ملفًا متاحًا";
 }
 async function load(){
  const results=await Promise.allSettled([
