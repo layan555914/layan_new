@@ -165,6 +165,42 @@ test("official company website supplies its verified logo and clearly labeled ge
   await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
 });
 
+test("broken public logo and missing contacts show honest fallback content", async ({ page }) => {
+  const incompleteProfile = {
+    ...publicDirectoryEntity,
+    name_ar: "جهة بدون بيانات اتصال",
+    website_url: null,
+    public_phone: null,
+    public_email: null,
+    public_address: null,
+    public_whatsapp: null,
+    public_logo_url: "https://assets.example.invalid/broken-logo.svg",
+    public_services: [],
+    public_gallery_urls: [],
+    public_coverage_areas: []
+  };
+
+  await page.route(SUPABASE + "/rest/v1/directory_entities**", async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([incompleteProfile])
+    });
+  });
+  await page.route(SUPABASE + "/rest/v1/directory_entity_sources**", async route => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+  });
+  await page.route("https://assets.example.invalid/broken-logo.svg", route => route.abort());
+
+  await page.goto("/company.html?entity_id=" + DIRECTORY_ENTITY_ID);
+
+  await expect(page.locator(".company-detail-empty")).toContainText("لم تُنشر بيانات التواصل أو العنوان");
+  await expect(page.locator(".company-logo-fallback")).toContainText("تعذر تحميل الشعار الرسمي");
+  await expect(page.locator(".company-profile-logo img")).toHaveCount(0);
+  await expect(page.locator(".company-contact-actions a")).toHaveCount(0);
+  await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
+});
+
 test("static provider profile uses the shared profile layout and styled branch actions", async ({ page }) => {
   await page.goto("/company-albenaa-arabi-star.html");
 
