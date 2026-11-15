@@ -49,7 +49,7 @@ test("price guide loads only public available and verified fields and hides esti
 test("price guide shows median per square metre only after five comparable sale listings", async ({ page }) => {
   await mockOffers(page, [1, 2, 3, 4, 5].map(id => offer(id, { total_price: 1000000 + (id * 100000) })));
   await page.goto("/market-prices.html");
-  await expect(page.locator(".mp-indicator.is-ready")).toContainText("12,000 جنيه/م²");
+  await expect(page.locator(".mp-indicator.is-ready")).toContainText("13,000 جنيه/م²");
   await expect(page.locator(".mp-indicator.is-ready")).toContainText("5 إعلانات مكتملة");
 });
 
