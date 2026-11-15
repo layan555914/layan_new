@@ -110,3 +110,38 @@
  .company-contact-actions a{min-height:50px;padding:10px 8px;font-size:12px}
  .company-claim-dialog-head>button{min-width:82px}
 }
+
+
+/* Unified company and service-provider profile sections */
+.company-claim-panel--prominent{
+ position:relative;isolation:isolate;margin:18px 0 28px;padding:22px 24px;
+ border:1px solid #c98a64;background:linear-gradient(120deg,#fffaf5 0%,#f6e9dc 100%);
+ box-shadow:0 8px 24px rgba(43,33,27,.08)
+}
+.company-claim-panel--prominent:before{
+ content:"";position:absolute;inset:0 auto 0 0;width:5px;border-radius:16px 0 0 16px;
+ background:#c98a64
+}
+.company-claim-panel--prominent h2{font-size:clamp(17px,2vw,21px)}
+.company-claim-panel--prominent .btn{min-width:190px;min-height:48px;font-weight:800}
+.company-profile-highlights,.company-coverage-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.company-profile-highlights span,.company-coverage-list span{
+ display:inline-flex;align-items:center;padding:7px 11px;border:1px solid #ead6c4;
+ border-radius:999px;background:#fffaf5;color:#684a36;font-size:12px;font-weight:700
+}
+.company-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.company-detail-item{display:grid;gap:6px;min-width:0;padding:14px;border:1px solid #eadfd4;border-radius:12px;background:#fff}
+.company-detail-item strong{color:#76513a;font-size:12px}
+.company-detail-item span,.company-detail-item a{min-width:0;color:#3f332b;font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.company-detail-item a{font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.company-contact-details,.company-coverage-section{margin-top:22px}
+.company-profile-section>h2{line-height:1.6}
+.company-service-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 18px}
+.company-service-list li{padding:9px 12px;border:1px solid #eee3d9;border-radius:10px;background:#fff;line-height:1.8}
+.company-claim-contact-link{display:inline-flex;margin:4px 0 12px;color:#805137;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:620px){
+ .company-claim-panel--prominent{padding:18px 15px}
+ .company-claim-panel--prominent .btn{width:100%;min-width:0}
+ .company-detail-grid,.company-service-list{grid-template-columns:1fr}
+ .company-detail-item{padding:12px}
+}
