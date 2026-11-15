@@ -56,3 +56,76 @@ test("company directory continues to render approved profiles from the public vi
   await expect(companyCard).toContainText(approvedCompany.company_name);
   await expect(page.locator("#companyDirectoryCount")).toContainText("1 ملفًا متاحًا");
 });
+
+
+const DIRECTORY_ENTITY_ID = "d2222222-2222-4222-8222-222222222222";
+const publicDirectoryEntity = {
+  id: DIRECTORY_ENTITY_ID,
+  name_ar: "مكتب اختبار أسيوط",
+  name_en: "Assiut Test Office",
+  entity_type: "contractor",
+  service_category: "contracting_construction",
+  description: "جهة تجريبية لاختبار وضوح ملف الدليل وأزرار التواصل على الهاتف.",
+  website_url: "https://example.com",
+  public_phone: "01023456789",
+  public_email: null,
+  public_address: "شارع الجمهورية - أسيوط",
+  public_whatsapp: "01023456789",
+  public_logo_url: null,
+  public_services: ["مقاولات", "تشطيبات"],
+  public_gallery_urls: [],
+  public_business_hours: null,
+  public_coverage_areas: ["أسيوط"],
+  primary_area_id: null,
+  latitude: null,
+  longitude: null,
+  location_public: false,
+  location_precision: null,
+  location_source_id: null,
+  location_verified_at: null,
+  verification_status: "published",
+  representative_verified_at: null,
+  public_visible: true
+};
+
+test("directory entity profile clearly labels missing logo and all mobile actions", async ({ page }) => {
+  await page.route(SUPABASE + "/rest/v1/directory_entities**", async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([publicDirectoryEntity])
+    });
+  });
+  await page.route(SUPABASE + "/rest/v1/directory_entity_sources**", async route => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+  });
+
+  await page.goto("/company.html?entity_id=" + DIRECTORY_ENTITY_ID);
+
+  await expect(page.locator("#companyProfileRoot h1")).toHaveText(publicDirectoryEntity.name_ar);
+  await expect(page.locator(".company-logo-fallback")).toContainText("الشعار غير مضاف");
+  await expect(page.locator(".company-contact-actions a")).toHaveCount(4);
+  for (const action of await page.locator(".company-contact-actions a").all()) {
+    await expect(action).toBeVisible();
+    await expect(action).toHaveCSS("min-height", "48px");
+    await expect(action).not.toBeEmpty();
+  }
+
+  await page.locator("#companyClaimOpen").click();
+  const closeButton = page.locator("#companyClaimClose");
+  await expect(closeButton).toBeVisible();
+  await expect(closeButton).toContainText("إغلاق");
+  await expect(closeButton).toHaveAttribute("aria-label", "إغلاق نافذة طلب استلام الملف");
+  await closeButton.click();
+  await expect(page.locator("#companyClaimDialog")).not.toBeVisible();
+});
+
+test("static provider profile uses the shared profile layout and styled branch actions", async ({ page }) => {
+  await page.goto("/company-albenaa-arabi-star.html");
+
+  await expect(page.locator(".company-profile-hero h1")).toHaveText("البناء العربي استار");
+  await expect(page.locator(".company-profile-logo img")).toBeVisible();
+  await expect(page.locator(".branch .phone").first()).toBeVisible();
+  await expect(page.locator(".branch .phone").first()).toHaveCSS("display", "flex");
+  await expect(page.getByRole("link", { name: /اتصال: 01012588382/ })).toBeVisible();
+});
