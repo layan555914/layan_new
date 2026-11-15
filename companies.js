@@ -36,9 +36,15 @@ function entityType(entity){
 }
 function ownerCompanyType(company){
  const category=normalizeName(company.category||"");
- const combined=normalizeName([company.company_name,company.description,...(Array.isArray(company.services)?company.services:[])].join(" "));
- if(/تطوير|مطور|مشروعات|مشروععقاري|تعمير|development|developer/.test(category+" "+combined))return "developers";
- if(/تسويق|وساط|سمس|مكتبعقاري|مبيعاتعقاري|marketing|brokerage/.test(category+" "+combined))return "marketing";
+ const name=normalizeName(company.company_name||"");
+ const description=normalizeName(company.description||"");
+ const services=normalizeName((Array.isArray(company.services)?company.services:[]).join(" "));
+ const serviceOnly=/مقاولات|تشطيبات|سيراميك|بورسلين|بويات|دهانات|ديكور|اثاث|موبيليا|اضاءه|نجف|ستائر|مفروشات|مطابخ|الوميتال|مكتب هندسي|تصميم معماري|استشارات قانونيه|ادواتصحيه|سباكه|كهرباء|نقل|صيانه|تنظيف|مواد بناء|مستلزماتتشطيب|صيانة|maintenance|contracting|finishing|furniture|lighting/.test(category);
+ if(serviceOnly)return "";
+ if(/تطوير|مطور|مشروعات|مشروععقاري|تعمير|development|developer/.test(category+" "+name))return "developers";
+ if(/تسويق|وساط|سمس|مكتبعقاري|مبيعاتعقاري|marketing|brokerage/.test(category+" "+name))return "marketing";
+ if(/تطوير|مطور|مشروعات|تعمير|development|developer/.test(description))return "developers";
+ if(/تسويق|وساط|سمس|مبيعاتعقاري|marketing|brokerage/.test(description))return "marketing";
  // Legacy generic company profiles were filed under «شركات عقارية».
  if(/شركاتعقاري|شركهعقاري/.test(category))return "marketing";
  return "";
