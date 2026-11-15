@@ -23,6 +23,8 @@ const STATIC_PAGES = [
   ["/marketplace.html", "weekly", "0.8"],
   ["/companies.html", "weekly", "0.8"],
   ["/directory.html", "weekly", "0.7"],
+  ["/know-more.html", "monthly", "0.6"],
+  ["/market-prices.html", "weekly", "0.7"],
   ["/guide.html", "monthly", "0.6"],
   ["/advertise.html", "monthly", "0.6"],
   ["/about.html", "monthly", "0.5"],
