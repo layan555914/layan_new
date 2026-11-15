@@ -105,6 +105,10 @@ test("directory entity profile clearly labels missing logo and all mobile action
   await expect(page.locator("#companyProfileRoot h1")).toHaveText(publicDirectoryEntity.name_ar);
   await expect(page.locator(".company-logo-fallback")).toContainText("الشعار غير مضاف");
   await expect(page.locator(".company-contact-actions a")).toHaveCount(4);
+  await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
+  await expect(page.locator(".company-claim-panel--prominent button")).toBeVisible();
+  await expect(page.locator(".company-contact-details")).toContainText("بيانات التواصل ومقر الشركة");
+  await expect(page.locator(".company-coverage-section")).toContainText("أسيوط");
   for (const action of await page.locator(".company-contact-actions a").all()) {
     await expect(action).toBeVisible();
     await expect(action).toHaveCSS("min-height", /^(48|50)px$/);
