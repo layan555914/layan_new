@@ -3,6 +3,13 @@ const cfg=window.LAYAN_CONFIG||{},base=String(cfg.SUPABASE_URL||"").replace(/\/$
 const $=id=>document.getElementById(id),grid=$("companyDirectoryGrid"),count=$("companyDirectoryCount"),dialog=$("companyRegisterDialog"),form=$("companyRegisterForm"),status=$("companyRegisterStatus");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=v=>{try{const u=new URL(String(v||""));return ["https:","http:"].includes(u.protocol)?u.href:""}catch(_){return ""}};
+function entityBrandMarkup(name,logo){
+ const label=String(name||"جهة").trim();
+ const initial=label.slice(0,1)||"؟";
+ return '<span class="aq-entity-brand" role="img" aria-label="شعار '+esc(label)+'">'+
+  (logo?'<img src="'+esc(logo)+'" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false">':"")+
+  '<span class="aq-entity-brand__fallback"'+(logo?" hidden":"")+'><strong>'+esc(initial)+'</strong><small>الشعار غير متاح</small></span></span>';
+}
 function session(){return window.LAYAN_SUPABASE?.getSession?.()||null}
 async function verifiedSession(){const auth=window.LAYAN_SUPABASE;if(!auth?.requireAuthenticated)throw Error("تعذر تحميل نظام تسجيل الدخول. حدّث الصفحة وحاول مرة أخرى.");return await auth.requireAuthenticated()}
 async function api(path,options={}){if(!base||!key)throw Error("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");const s=session();const r=await fetch(base+"/rest/v1/"+path,{...options,headers:{apikey:key,Authorization:"Bearer "+(s?.access_token||key),"Content-Type":"application/json",...(options.headers||{})}});const raw=await r.text();let d=null;try{d=raw?JSON.parse(raw):null}catch(_){}if(!r.ok)throw Error(d?.message||d?.details||"تعذر تنفيذ الطلب.");return d}
@@ -10,6 +17,12 @@ let companies=[],directoryEntities=[],existingProfileId=null,existingStatus=null
 const ENTITY_LOGO_ASSETS=Object.freeze({
  "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
 });
+const OFFICIAL_ENTITY_LOGOS=Object.freeze({
+ "primedev-eg.com":"https://www.primedev-eg.com/assets/img/logo-prime.png"
+});
+function officialEntityLogo(website){
+ try{const host=new URL(String(website||"")).hostname.toLowerCase().replace(/^www\./,"");return OFFICIAL_ENTITY_LOGOS[host]||""}catch(_){return ""}
+}
 function entityCategory(entity){
  const serviceMap={
   contracting_construction:"مقاولات وتشطيبات",
@@ -39,20 +52,19 @@ function card(c){
  const logo=safeUrl(c.logo_url);
  const href="./company.html?id="+encodeURIComponent(c.id);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
- return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-card-cover">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="lazy">':'<span class="company-logo-fallback"><strong>'+esc(c.company_name.slice(0,1))+'</strong><small>الشعار غير مضاف</small></span>')+'</div><div class="company-directory-card-body"><span class="company-source-label company-source-label--owner">ملف مقدم من الشركة ومعتمد من الإدارة</span><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف مقدم من الشركة ومعتمد من الإدارة</span><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
 }
 function directoryCard(c){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
  const name=String(c.name_ar||c.name_en||"جهة عقارية");
- const logo=safeUrl(c.public_logo_url)||ENTITY_LOGO_ASSETS[c.id]||"";
+ const logo=safeUrl(c.public_logo_url)||ENTITY_LOGO_ASSETS[c.id]||officialEntityLogo(c.website_url)||"";
  const category=entityCategory(c);
  const description=String(c.description||"بيانات تعريفية منشورة في الدليل العقاري. راجع المصادر داخل الملف لمعرفة تفاصيل الإدراج.");
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
  const services=Array.isArray(c.public_services)?c.public_services.slice(0,3):[];
- const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>الشعار غير مضاف</small></span>';
  const isService=Boolean(c.service_category);
- return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-card-cover company-card-cover--directory">'+visual+'<small>ASYUT AQAR DIRECTORY</small></div><div class="company-directory-card-body"><span class="company-source-label company-source-label--directory">'+(isService?'ملف تعريفي مجاني · يمكن لممثل الجهة طلب استلامه':'سجل منشور من الدليل العقاري · ليس إعلان شراكة')+'</span><div class="company-card-meta"><span>'+esc(category)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(' · ')+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">'+(isService?'عرض الملف وطلب استلامه ←':'عرض البيانات والمصادر وطلب إدارة الملف ←')+'</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">'+(isService?'ملف تعريفي مجاني · يمكن لممثل الجهة طلب استلامه':'سجل منشور من الدليل العقاري · ليس إعلان شراكة')+'</span><div class="company-card-meta"><span>'+esc(category)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(' · ')+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">'+(isService?'عرض الملف وطلب استلامه ←':'عرض البيانات والمصادر وطلب إدارة الملف ←')+'</span></div></a></article>';
 }
 function render(){
  const q=($( "companyDirectorySearch")?.value||"").trim().toLocaleLowerCase("ar");

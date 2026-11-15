@@ -1,0 +1,34 @@
+/* ASYUT AQAR — shared verified company and service-provider brand cards */
+.aq-entity-card-head{display:flex;align-items:center;gap:14px;min-width:0;margin:0 0 12px}
+.aq-entity-brand{
+ box-sizing:border-box;flex:0 0 76px;width:76px;height:76px;min-width:76px;
+ display:flex;align-items:center;justify-content:center;overflow:hidden;
+ border:1px solid #eadfd4;border-radius:16px;background:#fff;
+ color:#49372b;box-shadow:0 3px 12px rgba(54,39,28,.07)
+}
+.aq-entity-brand>img{display:block;width:100%;height:100%;padding:8px;object-fit:contain}
+.aq-entity-brand__fallback{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+ width:100%;height:100%;padding:5px;text-align:center;background:linear-gradient(145deg,#fbf6f0,#f1e6da);color:#694a36
+}
+.aq-entity-brand__fallback[hidden]{display:none}
+.aq-entity-brand__fallback strong{font-size:27px;line-height:1.1;font-weight:800}
+.aq-entity-brand__fallback small{max-width:100%;font-size:9px;line-height:1.35;font-weight:700;color:#8c7665}
+.aq-entity-card-head__content{display:flex;flex:1 1 auto;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;min-width:0}
+.aq-entity-card-head__content h3{max-width:100%;margin:0;color:#342922;font-size:15px;line-height:1.6;overflow-wrap:anywhere}
+.company-directory-card--owner .company-directory-card-body,.company-directory-card--directory .company-directory-card-body{display:flex;flex-direction:column;align-items:stretch;min-height:230px}
+.company-directory-card--owner .company-card-meta,.company-directory-card--directory .company-card-meta{line-height:1.8}
+.company-directory-card--owner .company-directory-card-body>p,.company-directory-card--directory .company-directory-card-body>p{color:#806e60;font-size:13px;line-height:1.85;overflow-wrap:anywhere}
+.company-directory-card--owner .company-card-open,.company-directory-card--directory .company-card-open{margin-top:auto}
+.mk-profile-card{align-items:center}
+.mk-profile-card .mk-profile-logo.aq-entity-brand{flex:0 0 76px;width:76px;height:76px;border-radius:16px}
+.directory-card-head{margin-bottom:10px}
+.directory-card-head .directory-card-meta{margin:0}
+.directory-card-head .directory-tag{font-size:10px}
+.directory-card .aq-entity-brand{background:#fff}
+@media(max-width:520px){
+ .aq-entity-card-head{gap:11px}
+ .aq-entity-brand{flex-basis:72px;width:72px;height:72px;min-width:72px}
+ .mk-profile-card .mk-profile-logo.aq-entity-brand{flex-basis:72px;width:72px;height:72px}
+ .company-directory-card--owner .company-directory-card-body,.company-directory-card--directory .company-directory-card-body{min-height:0}
+}

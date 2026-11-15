@@ -30,6 +30,19 @@ const specs={
 "الستائر والمفروشات":[["نوع الخدمة","curtain_service_kind","select","تفصيل ستائر|ستائر جاهزة|أقمشة|مفروشات|تنجيد"],["نوع الخامات","curtain_fabrics","text"],["التفصيل حسب المقاس","custom_curtains","select","متاح|غير متاح|حسب الطلب"],["المعاينة والتركيب","curtain_measure_install","text"]]
 };
 const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ENTITY_LOGO_ASSETS=Object.freeze({
+ "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
+});
+const OFFICIAL_ENTITY_LOGOS=Object.freeze({
+ "primedev-eg.com":"https://www.primedev-eg.com/assets/img/logo-prime.png"
+});
+function verifiedEntityLogo(item){
+ const raw=String(item.public_logo_url||"");
+ try{const url=new URL(raw);if(["https:","http:"].includes(url.protocol))return url.href}catch(_){}
+ const asset=ENTITY_LOGO_ASSETS[item.id];
+ if(asset)return asset;
+ try{const host=new URL(String(item.website_url||"")).hostname.toLowerCase().replace(/^www\./,"");return OFFICIAL_ENTITY_LOGOS[host]||""}catch(_){return ""}
+}
 function readSession(){return auth()?.getSession?.()||null}
 function saveSession(session){currentSession=session||null;updateAuthButton()}
 function updateAuthButton(){const btn=$("authOpen");if(!btn)return;const email=currentSession?.user?.email;btn.textContent=email?"تسجيل الخروج":"تسجيل الدخول";btn.title=email?"مسجّل الدخول باسم "+email+" — اضغط لتسجيل الخروج":"تسجيل الدخول أو إنشاء حساب"}
@@ -136,8 +149,7 @@ function renderServiceProfiles(){
  }
  target.innerHTML=rows.map(item=>{
   const name=String(item.name_ar||item.name_en||"جهة خدمية");
-  const rawLogo=String(item.public_logo_url||"");
-  const logo=rawLogo.startsWith("https://")||rawLogo.startsWith("http://")?rawLogo:"";
+  const logo=verifiedEntityLogo(item);
   const category=String(item.marketplace_category||SERVICE_PROFILE_LABELS[serviceProfileCode(item)]||"خدمات عقارية");
   const isCuratedCompany=FEATURED_REAL_ESTATE_COMPANY_IDS.has(item.id);
   const profileLabel=isCuratedCompany
@@ -147,15 +159,16 @@ function renderServiceProfiles(){
   const summary=String(item.description||services.slice(0,3).join("، ")||"ملف تعريفي منشور في دليل أسيوط عقار.").slice(0,120);
   const place=String(item.public_address||"محافظة أسيوط");
   const href="./company.html?entity_id="+encodeURIComponent(item.id);
-  const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>الشعار غير مضاف</small></span>';
-  return '<a class="mk-profile-card" href="'+href+'" aria-label="عرض ملف '+esc(name)+' والتواصل مع الجهة"><span class="mk-profile-logo">'+visual+'</span><span class="mk-profile-content"><small>'+esc(profileLabel)+' · '+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span><span class="mk-profile-open">عرض الملف والتواصل ←</span></span></a>';
+  const visual=logo?'<img src="'+esc(logo)+'" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false">':"";
+  const fallback='<span class="aq-entity-brand__fallback"'+(logo?" hidden":"")+'><strong>'+esc(name.trim().slice(0,1)||"؟")+'</strong><small>الشعار غير متاح</small></span>';
+  return '<a class="mk-profile-card" href="'+href+'" aria-label="عرض ملف '+esc(name)+' والتواصل مع الجهة"><span class="mk-profile-logo aq-entity-brand" role="img" aria-label="شعار '+esc(name)+'">'+visual+fallback+'</span><span class="mk-profile-content"><small>'+esc(profileLabel)+' · '+esc(category)+'</small><strong>'+esc(name)+'</strong><span>'+esc(summary)+'</span><span>⌖ '+esc(place)+'</span><span class="mk-profile-open">عرض الملف والتواصل ←</span></span></a>';
  }).join("");
 }
 async function loadServiceProfiles(){
  const target=$("marketplaceServiceProfiles");
  if(!target)return;
- const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,public_address,public_logo_url,public_services&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
- const core="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,public_address&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
+ const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,website_url,public_address,public_logo_url,public_services&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
+ const core="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,website_url,public_address,public_logo_url&public_visible=eq.true&verification_status=eq.published&service_category=not.is.null&order=name_ar.asc&limit=150";
  try{
   let rows;
   try{rows=await api(extended)}catch(_){rows=await api(core)}
