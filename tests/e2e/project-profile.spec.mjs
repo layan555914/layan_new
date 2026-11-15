@@ -47,7 +47,7 @@ test("public project profile renders approved data, sources, related entity and 
   await mockProjectApi(page);
   await page.goto("/project.html?id=project-1");
   await expect(page.locator("#projectProfileRoot h1")).toHaveText("مشروع اختبار النخيل");
-  await expect(page.locator("#projectProfileRoot")).toContainText("تحت");
+  await expect(page.locator("#projectProfileRoot")).toContainText("معلن عنه");
   await expect(page.locator("#projectProfileRoot")).toContainText("أسيوط الجديدة");
   await expect(page.locator("#projectProfileRoot")).toContainText("12,000 م²");
   await expect(page.locator(".project-source-card a")).toHaveAttribute("href","https://example.org/source");
