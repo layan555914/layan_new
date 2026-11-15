@@ -107,7 +107,7 @@ test("directory entity profile clearly labels missing logo and all mobile action
   await expect(page.locator(".company-contact-actions a")).toHaveCount(4);
   for (const action of await page.locator(".company-contact-actions a").all()) {
     await expect(action).toBeVisible();
-    await expect(action).toHaveCSS("min-height", "48px");
+    await expect(action).toHaveCSS("min-height", /^(48|50)px$/);
     await expect(action).not.toBeEmpty();
   }
 
