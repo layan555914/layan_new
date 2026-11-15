@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
  });
  // Official public brand assets are keyed by an exact company website hostname.
+ // Prime publishes 15898 as its shared hotline; it is not a direct Assiut branch number.
  const OFFICIAL_BRAND_PROFILES=Object.freeze({
   "primedev-eg.com":Object.freeze({
    logoUrl:"https://www.primedev-eg.com/assets/img/logo-prime.png",
