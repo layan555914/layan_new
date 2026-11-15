@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded",()=>{"use strict";
 const cfg=window.LAYAN_CONFIG||{},base=String(cfg.SUPABASE_URL||"").replace(/\/$/,""),key=cfg.SUPABASE_PUBLISHABLE_KEY||"";
-const $=id=>document.getElementById(id),grid=$("companyDirectoryGrid"),count=$("companyDirectoryCount"),dialog=$("companyRegisterDialog"),form=$("companyRegisterForm"),status=$("companyRegisterStatus");
+const $=id=>document.getElementById(id),grid=$("companyDirectoryGrid"),count=$("companyDirectoryCount"),marketingGrid=$("marketingCompaniesGrid"),developmentGrid=$("developmentCompaniesGrid"),marketingCount=$("marketingCompaniesCount"),developmentCount=$("developmentCompaniesCount"),dialog=$("companyRegisterDialog"),form=$("companyRegisterForm"),status=$("companyRegisterStatus");
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=v=>{try{const u=new URL(String(v||""));return ["https:","http:"].includes(u.protocol)?u.href:""}catch(_){return ""}};
 function entityBrandMarkup(name,logo){
@@ -23,66 +23,81 @@ const OFFICIAL_ENTITY_LOGOS=Object.freeze({
 function officialEntityLogo(website){
  try{const host=new URL(String(website||"")).hostname.toLowerCase().replace(/^www\./,"");return OFFICIAL_ENTITY_LOGOS[host]||""}catch(_){return ""}
 }
-function entityCategory(entity){
- const serviceMap={
-  contracting_construction:"مقاولات وتشطيبات",
-  real_estate_marketing:"شركات عقارية",
-  real_estate_brokerage:"شركات عقارية",
-  building_materials:"مواد بناء ومستلزمات تشطيب",
-  finishing_decoration:"تصميم داخلي وديكور",
-  furniture_furnishings:"أثاث وفرش ومفروشات",
-  engineering_design:"مكاتب التصميم الهندسي",
-  maintenance_property_management:"صيانة وإدارة عقارات",
-  real_estate_consultancy:"استشارات قانونية وعقود عقارية",
-  real_estate_development:"شركات تطوير ومشروعات عقارية",
-  real_estate_sales:"شركات عقارية",
-  other_real_estate_services:"خدمات عقارية أخرى"
+function entityType(entity){
+ const serviceTypes={
+  real_estate_marketing:"marketing",
+  real_estate_brokerage:"marketing",
+  real_estate_sales:"marketing",
+  real_estate_development:"developers"
  };
- if(entity.service_category&&serviceMap[entity.service_category])return serviceMap[entity.service_category];
- const map={developer:"شركات تطوير ومشروعات عقارية",marketing:"شركات عقارية",brokerage:"شركات عقارية",sales_office:"شركات عقارية",contractor:"مقاولات وتشطيبات",consultant:"استشارات قانونية وعقود عقارية",other:"خدمات عقارية أخرى"};
- return map[entity.entity_type]||"خدمات عقارية أخرى";
+ if(entity.service_category&&serviceTypes[entity.service_category])return serviceTypes[entity.service_category];
+ const legacyTypes={developer:"developers",marketing:"marketing",brokerage:"marketing",sales_office:"marketing"};
+ return legacyTypes[entity.entity_type]||"";
 }
+function ownerCompanyType(company){
+ const category=normalizeName(company.category||"");
+ const combined=normalizeName([company.company_name,company.description,...(Array.isArray(company.services)?company.services:[])].join(" "));
+ if(/تطوير|مطور|مشروعات|مشروععقاري|تعمير|development|developer/.test(category+" "+combined))return "developers";
+ if(/تسويق|وساط|سمس|مكتبعقاري|مبيعاتعقاري|marketing|brokerage/.test(category+" "+combined))return "marketing";
+ // Legacy generic company profiles were filed under «شركات عقارية».
+ if(/شركاتعقاري|شركهعقاري/.test(category))return "marketing";
+ return "";
+}
+function companyTypeLabel(type){return type==="developers"?"شركات التطوير العقاري":"شركات التسويق والوساطة العقارية";}
 function normalizeName(value){
  return String(value||"").normalize("NFKC").toLocaleLowerCase("ar")
   .replace(/[\u064B-\u065F\u0670\u0640]/g,"")
   .replace(/[أإآ]/g,"ا").replace(/ة/g,"ه")
   .replace(/[^\p{L}\p{N}]/gu,"");
 }
-function card(c){
+function card(c,type){
  const logo=safeUrl(c.logo_url);
  const href="./company.html?id="+encodeURIComponent(c.id);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
- return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف مقدم من الشركة ومعتمد من الإدارة</span><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
+ const label=companyTypeLabel(type);
+ return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف مقدم من الشركة ومعتمد من الإدارة</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
 }
-function directoryCard(c){
+function directoryCard(c,type){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
- const name=String(c.name_ar||c.name_en||"جهة عقارية");
+ const name=String(c.name_ar||c.name_en||"شركة عقارية");
  const logo=safeUrl(c.public_logo_url)||ENTITY_LOGO_ASSETS[c.id]||officialEntityLogo(c.website_url)||"";
- const category=entityCategory(c);
- const description=String(c.description||"بيانات تعريفية منشورة في الدليل العقاري. راجع المصادر داخل الملف لمعرفة تفاصيل الإدراج.");
+ const label=companyTypeLabel(type);
+ const description=String(c.description||"بيانات تعريفية منشورة في دليل الشركات. راجع المصادر داخل الملف لمعرفة تفاصيل الإدراج.");
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
  const services=Array.isArray(c.public_services)?c.public_services.slice(0,3):[];
- const isService=Boolean(c.service_category);
- return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">'+(isService?'ملف تعريفي مجاني · يمكن لممثل الجهة طلب استلامه':'سجل منشور من الدليل العقاري · ليس إعلان شراكة')+'</span><div class="company-card-meta"><span>'+esc(category)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(' · ')+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">'+(isService?'عرض الملف وطلب استلامه ←':'عرض البيانات والمصادر وطلب إدارة الملف ←')+'</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">ملف شركة منشور في الدليل العقاري</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">عرض ملف الشركة وطلب استلامه ←</span></div></a></article>';
+}
+function renderGroup(type,ownerRows,entityRows,gridElement,countElement,q){
+ const owners=ownerRows.filter(c=>!q||normalizeName([c.company_name,c.description,c.city,c.category,...(c.services||[])].join(" ")).includes(q));
+ const entities=entityRows.filter(c=>!q||normalizeName([c.name_ar,c.name_en,c.description,c.public_address,c.public_phone,c.public_email,c.website_url,...(c.public_services||[])].join(" ")).includes(q));
+ const items=[
+  ...owners.map(c=>({name:c.company_name,html:card(c,type)})),
+  ...entities.map(c=>({name:c.name_ar||c.name_en,html:directoryCard(c,type)}))
+ ].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ar"));
+ gridElement.innerHTML=items.length?items.map(x=>x.html).join(""):'<p class="company-directory-state">لا توجد ملفات منشورة في هذا القسم تطابق البحث حاليًا.</p>';
+ countElement.textContent=items.length+" ملف";
+ return items.length;
 }
 function render(){
- const q=($( "companyDirectorySearch")?.value||"").trim().toLocaleLowerCase("ar");
- const cat=$("companyCategoryFilter")?.value||"";
- const profileKeys=new Set(companies.map(c=>normalizeName(c.company_name)));
- const profileMatches=companies.filter(c=>(!cat||c.category===cat)&&(!q||[c.company_name,c.description,c.city,c.category,...(c.services||[])].join(" ").toLocaleLowerCase("ar").includes(q)));
- const entityMatches=directoryEntities.filter(c=>{
-  if(c.entity_type==="public_authority")return false;
-  if(profileKeys.has(normalizeName(c.name_ar))||profileKeys.has(normalizeName(c.name_en)))return false;
-  const category=entityCategory(c);
-  return (!cat||category===cat)&&(!q||[c.name_ar,c.name_en,c.description,c.public_address,c.public_phone,c.public_email,c.website_url,category].join(" ").toLocaleLowerCase("ar").includes(q));
+ const q=normalizeName(($("companyDirectorySearch")?.value||"").trim());
+ const selected=$("companyCategoryFilter")?.value||"";
+ const ownerRows={marketing:[],developers:[]};
+ companies.forEach(c=>{const type=ownerCompanyType(c);if(type)ownerRows[type].push(c)});
+ const profileKeys=new Set(companies.filter(c=>ownerCompanyType(c)).map(c=>normalizeName(c.company_name)));
+ const entityRows={marketing:[],developers:[]};
+ directoryEntities.forEach(c=>{
+  const type=entityType(c);
+  if(!type||c.entity_type==="public_authority")return;
+  if(profileKeys.has(normalizeName(c.name_ar))||profileKeys.has(normalizeName(c.name_en)))return;
+  entityRows[type].push(c);
  });
- const items=[
-  ...profileMatches.map(c=>({name:c.company_name,html:card(c)})),
-  ...entityMatches.map(c=>({name:c.name_ar||c.name_en,html:directoryCard(c)}))
- ].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ar"));
- grid.innerHTML=items.length?items.map(x=>x.html).join(""):'<p class="company-directory-state">لا توجد شركات أو جهات منشورة تطابق البحث حاليًا.</p>';
- count.textContent=items.length+" ملفًا متاحًا";
+ const marketingSection=$("marketingCompaniesSection"),developmentSection=$("developmentCompaniesSection");
+ if(marketingSection)marketingSection.hidden=Boolean(selected&&selected!=="marketing");
+ if(developmentSection)developmentSection.hidden=Boolean(selected&&selected!=="developers");
+ const marketingTotal=renderGroup("marketing",ownerRows.marketing,entityRows.marketing,marketingGrid,marketingCount,q);
+ const developmentTotal=renderGroup("developers",ownerRows.developers,entityRows.developers,developmentGrid,developmentCount,q);
+ count.textContent=(marketingTotal+developmentTotal)+" ملفًا منشورًا";
 }
 async function load(){
  const results=await Promise.allSettled([
