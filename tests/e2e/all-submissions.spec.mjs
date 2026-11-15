@@ -172,6 +172,7 @@ test("rooms follow the property type, and a project ad can be sent without a pri
   await form.locator("[name='listing_purpose']").selectOption("بيع");
   await form.locator("[name='title']").fill("مشروع سكني جديد بأسيوط الجديدة");
   await form.locator("[name='city']").fill("أسيوط الجديدة");
+  await form.locator("[name='area']").fill("منطقة المشروع");
   await form.locator("[name='photos']").setInputFiles({ name: "project.png", mimeType: "image/png", buffer: tinyPng() });
   await form.locator("button[type='submit']").click();
   await expect.poll(() => state.offers.length, { timeout: 15000 }).toBe(1);
