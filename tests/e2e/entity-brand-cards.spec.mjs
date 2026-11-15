@@ -27,6 +27,7 @@ const OWNER_PROFILE = {
   city: "أسيوط", logo_url: "https://assets.example.invalid/owner-logo.png"
 };
 const PRIME_LOGO = "https://www.primedev-eg.com/assets/img/logo-prime.png";
+const expectedBrandWidth = page => page.viewportSize().width <= 520 ? "72px" : "76px";
 const reply = (route, body, status = 200) => route.fulfill({
   status, contentType: "application/json", body: JSON.stringify(body)
 });
@@ -45,7 +46,7 @@ test("companies section uses shared logo cards and the exact official Prime webs
   await expect(ownerCard.locator(".aq-entity-brand img")).toHaveAttribute("src", OWNER_PROFILE.logo_url);
   await expect(entityCard.locator(".aq-entity-brand img")).toHaveAttribute("src", ENTITY.public_logo_url);
   await expect(primeCard.locator(".aq-entity-brand img")).toHaveAttribute("src", PRIME_LOGO);
-  await expect(ownerCard.locator(".aq-entity-brand")).toHaveCSS("width", "76px");
+  await expect(ownerCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
 });
 
 test("services marketplace shows provider and official Prime logos in the shared frame", async ({ page }) => {
@@ -61,7 +62,7 @@ test("services marketplace shows provider and official Prime logos in the shared
   await expect(cards).toHaveCount(2);
   await expect(entityCard.locator(".aq-entity-brand img")).toHaveAttribute("src", ENTITY.public_logo_url);
   await expect(primeCard.locator(".aq-entity-brand img")).toHaveAttribute("src", PRIME_LOGO);
-  await expect(entityCard.locator(".aq-entity-brand")).toHaveCSS("width", "76px");
+  await expect(entityCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
 });
 
 test("real-estate directory displays public and official logos plus a labeled fallback when missing", async ({ page }) => {
@@ -79,7 +80,7 @@ test("real-estate directory displays public and official logos plus a labeled fa
   const fallbackCard = page.locator("#directoryResults .directory-card").filter({ hasText: "مكتب بلا شعار" });
   await expect(logoCard.locator(".aq-entity-brand img")).toHaveAttribute("src", ENTITY.public_logo_url);
   await expect(primeCard.locator(".aq-entity-brand img")).toHaveAttribute("src", PRIME_LOGO);
-  await expect(logoCard.locator(".aq-entity-brand")).toHaveCSS("width", "76px");
+  await expect(logoCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
   await expect(fallbackCard.locator(".aq-entity-brand__fallback")).toBeVisible();
   await expect(fallbackCard.locator(".aq-entity-brand__fallback strong")).toHaveText("م");
 });
