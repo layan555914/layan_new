@@ -1364,6 +1364,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const value = (name) => String(data.get(name) || "").trim();
     const amount = (name) => num(data.get(name));
 
+    // Keep new property offers searchable by requiring a real city/center and area.
+    const city = value("city");
+    const area = value("area");
+    if (!city || !area) {
+      setStatus("حدد المدينة / المركز والمنطقة قبل إرسال الإعلان.");
+      form.querySelector(!city ? '[name="city"]' : '[name="area"]')?.focus();
+      return;
+    }
+
     const offer = {
       title: value("title"),
       listing_purpose: value("listing_purpose") || "تنازل",

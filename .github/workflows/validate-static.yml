@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix/property-location-and-admin-feedback-20261115
       - feat/buyer-notifications-all-and-matched
       - feature/directory-browser-improvements-20261102
       - feature/directory-admin-console-20261103

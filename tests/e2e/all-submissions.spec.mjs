@@ -62,6 +62,27 @@ const KINDS = [
   ["مخزن", "إيجار"], ["معرض", "بيع"], ["أرض مطروحة للبناء", "بيع"], ["أرض تنازل", "تنازل"]
 ];
 
+test("property offers require city and area before saving", async ({ page }) => {
+  const state = await mockBackend(page);
+  await page.goto("/");
+  await login(page);
+  await page.locator("#addOfferTop").click();
+  const form = page.locator("#offerForm");
+  await form.locator("[name='title']").fill("شقة اختبار بدون منطقة");
+  await form.locator("[name='total_price']").fill("550000");
+  await form.locator("[name='city']").fill("مدينة أسيوط");
+
+  await expect(form.locator("[name='city']")).toHaveAttribute("required", "");
+  await expect(form.locator("[name='area']")).toHaveAttribute("required", "");
+
+  // Simulate a client bypassing the browser's required attribute; the submit handler
+  // must still refuse to send a location-incomplete offer to the database.
+  await form.locator("[name='area']").evaluate(input => input.removeAttribute("required"));
+  await form.locator("button[type='submit']").click();
+  await expect(page.locator("#statusMessage")).toContainText("حدد المدينة / المركز والمنطقة");
+  expect(state.offers).toHaveLength(0);
+});
+
 test("every property type and purpose reaches the admin review queue as pending", async ({ page }) => {
   test.setTimeout(120000);
   const state = await mockBackend(page);
@@ -77,6 +98,7 @@ test("every property type and purpose reaches the admin review queue as pending"
     await form.locator("[name='property_type']").selectOption(type);
     await form.locator("[name='title']").fill(`${type} ${purpose} اختبار`);
     await form.locator("[name='city']").fill("مدينة أسيوط");
+    await form.locator("[name='area']").fill("وسط البلد");
     await form.locator("[name='total_price']").fill(purpose === "إيجار" ? "6000" : "900000");
     await form.locator("[name='photos']").setInputFiles({ name: "IMG_0001.PNG", mimeType: "image/png", buffer: png });
     const before = state.offers.length;

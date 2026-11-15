@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 const USER_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 
-async function mock(page) {
+async function mock(page, { adminAllowed = true } = {}) {
   const state = { sponsors: [
     { id: "s1", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
     { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
@@ -20,7 +20,7 @@ async function mock(page) {
     if (path.startsWith("/auth/v1/")) return reply(route, {});
     if (path.startsWith("/rest/v1/rpc/")) {
       const name = path.split("/").pop(); const body = req.postDataJSON?.() || {}; state.rpc.push({ name, body });
-      if (name === "layan_is_admin") return reply(route, true);
+      if (name === "layan_is_admin") return reply(route, adminAllowed);
       if (name === "layan_admin_whoami") return reply(route, globalThis.__role || "owner");
       if (name === "layan_admin_request_change") { state.changes.push(body); return reply(route, "pending"); }
       if (name === "layan_admin_finish_change") { state.finished.push(body); return reply(route, body.p_ok ? "approved" : "failed"); }
@@ -82,4 +82,14 @@ test("added admin change goes to the owner, owner approves and it is performed",
   await expect.poll(() => state.owner.finished.length).toBe(1);
   expect(state.owner.finished[0]).toMatchObject({ p_id: 1, p_ok: true });
   expect(state.owner.patches.find(p => p.id === "s1")).toMatchObject({ is_active: false });
+});
+
+
+test("admin denial feedback stays visible while the admin console remains hidden", async ({ page }) => {
+  const state = await mock(page, { adminAllowed: false });
+  await login(page);
+  await expect(page.locator("#adminStatus")).toBeVisible();
+  await expect(page.locator("#adminStatus")).toContainText("غير مخوّل");
+  await expect(page.locator("#adminConsole")).toBeHidden();
+  expect(state.rpc.filter(item => item.name === "layan_is_admin")).toHaveLength(1);
 });
