@@ -175,9 +175,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         ["الحالة المنشورة", statuses[project.project_status] || statuses.unknown],
         ["النطاق", areaName || project.location_text || "غير محدد"],
         project.size_value !== null && project.size_value !== undefined && project.size_unit
-          ? ["المساحة المعلنة", Number(project.size_value).toLocaleString("ar-EG") + " " + project.size_unit] : null,
+          ? ["المساحة المعلنة", new Intl.NumberFormat("ar-EG-u-nu-latn",{maximumFractionDigits:2}).format(Number(project.size_value)) + " " + project.size_unit] : null,
         project.unit_count !== null && project.unit_count !== undefined
-          ? ["عدد الوحدات المعلن", Number(project.unit_count).toLocaleString("ar-EG")] : null,
+          ? ["عدد الوحدات المعلن", new Intl.NumberFormat("ar-EG-u-nu-latn",{maximumFractionDigits:0}).format(Number(project.unit_count))] : null,
         project.last_verified_at ? ["آخر مراجعة", dateLabel(project.last_verified_at)] : null
       ].filter(Boolean);
       const factHTML = facts.map(item =>
