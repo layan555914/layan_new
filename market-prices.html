@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2B211B">
+  <title>دليل أسعار العقارات في أسيوط | أسيوط عقار</title>
+  <meta name="description" content="تابع الأسعار المطلوبة في إعلانات العقارات المنشورة في أسيوط، مع عدد العينات وتاريخ التحديث ومؤشرات لا تظهر إلا عند توافر بيانات كافية.">
+  <link rel="canonical" href="https://www.asyutq.com/market-prices.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="أسيوط عقار | ASYUT AQAR">
+  <meta property="og:title" content="دليل أسعار العقارات في أسيوط | أسيوط عقار">
+  <meta property="og:description" content="مؤشرات مبنية على الإعلانات المنشورة في أسيوط، وليست أسعار بيع نهائية أو تقييمًا رسميًا.">
+  <meta property="og:url" content="https://www.asyutq.com/market-prices.html">
+  <link rel="icon" href="./icon.svg?v=20261105-2" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/build/home.min.css?v=324ba89cabdce679">
+  <link rel="stylesheet" href="./assets/theme/mobile-app.css?v=20261111-1">
+  <link rel="stylesheet" href="./market-prices.css?v=20261115-prices-guide-1">
+</head>
+<body class="market-prices-page">
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="أسيوط عقار — الرئيسية">
+      <img src="./icon.svg?v=20261105-2" alt="شعار أسيوط عقار" class="brand-logo" width="54" height="54">
+      <span><strong>ASYUT AQAR</strong><small>أسيوط عقار</small></span>
+    </a>
+    <nav aria-label="القائمة الرئيسية"><a href="./">الرئيسية</a><a href="./offers.html">العقارات</a></nav>
+    <div class="top-actions"><a class="btn btn-gold" href="./offers.html">تصفح العقارات</a></div>
+  </header>
+
+  <main>
+    <section class="mp-hero">
+      <div class="mp-container">
+        <span class="mp-eyebrow">مؤشرات من الإعلانات المنشورة في أسيوط</span>
+        <h1>دليل أسعار العقارات في أسيوط</h1>
+        <p>قارن الأسعار المطلوبة للعقارات المتاحة حسب المنطقة ونوع العقار والمعاملة. المؤشرات لا تظهر إلا عندما تتوفر عينة كافية من إعلانات مكتملة ومتقاربة.</p>
+        <div class="mp-hero-actions">
+          <a class="btn btn-gold" href="./offers.html">شاهد العقارات المنشورة</a>
+          <a class="btn btn-outline" href="./know-more.html">العودة إلى اعرف أكثر</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="mp-container mp-main" aria-labelledby="mpDataTitle">
+      <div class="mp-notice" role="note">
+        <strong>مهم قبل مقارنة الأسعار</strong>
+        <p>الأرقام هنا — عند توافرها — هي أسعار طلب معلنة وليست أسعار صفقات بيع تمت بالفعل. لا تمثل تقييمًا رسميًا أو ضمانًا للسعر، وقد تختلف القيمة حسب الشارع والحالة والتشطيب والمستندات وشروط السداد.</p>
+      </div>
+
+      <div class="mp-heading">
+        <div><span class="mp-eyebrow">بيانات مباشرة من العروض العامة</span><h2 id="mpDataTitle">ماذا تقول الإعلانات المتاحة؟</h2><p>نقرأ الإعلانات المتاحة والمعتمدة فقط، ولا نستخدم الطلبات المعلقة أو المرفوضة أو الأسعار غير المحددة.</p></div>
+        <button class="mp-refresh" id="mpRefresh" type="button">تحديث البيانات ↻</button>
+      </div>
+
+      <div class="mp-stats" aria-live="polite">
+        <article class="mp-stat"><span>إعلانات متاحة</span><strong id="mpTotal">—</strong><small>في قاعدة العروض العامة</small></article>
+        <article class="mp-stat"><span>بها سعر معلن</span><strong id="mpPriced">—</strong><small>ليست «السعر عند التواصل»</small></article>
+        <article class="mp-stat"><span>سعر ومساحة مكتملان</span><strong id="mpComplete">—</strong><small>صالحة للمقارنة المبدئية</small></article>
+        <article class="mp-stat"><span>أحدث تحديث للإعلانات</span><strong id="mpUpdated">—</strong><small>حسب آخر تعديل مسجل</small></article>
+      </div>
+
+      <div class="mp-filters" aria-label="تصفية مؤشرات الأسعار">
+        <label>المدينة أو المركز
+          <select id="mpCity"><option value="">كل محافظة أسيوط</option></select>
+        </label>
+        <label>نوع العقار
+          <select id="mpType"><option value="">كل أنواع العقارات</option></select>
+        </label>
+        <label>نوع المعاملة
+          <select id="mpPurpose"><option value="">بيع وإيجار وتنازل</option><option value="بيع">بيع</option><option value="إيجار">إيجار</option><option value="تنازل">تنازل</option></select>
+        </label>
+        <label>ابحث باسم الحي أو الشارع
+          <input id="mpAreaSearch" type="search" maxlength="100" placeholder="مثال: الهضبة أو شارع رياض">
+        </label>
+      </div>
+
+      <div class="mp-results-head">
+        <div><h2>المؤشرات حسب المنطقة ونوع العقار</h2><p id="mpResultsSummary" role="status" aria-live="polite">جارٍ تحميل الإعلانات المنشورة...</p></div>
+        <span class="mp-sample-rule">الحد الأدنى للمؤشر: 5 إعلانات مكتملة</span>
+      </div>
+      <div id="mpResults" class="mp-results" aria-live="polite" aria-busy="true"></div>
+      <div id="mpStatus" class="mp-status" role="status" aria-live="polite">جارٍ تحميل بيانات أسيوط عقار...</div>
+
+      <div class="mp-method">
+        <h2>كيف نحسب المؤشر؟</h2>
+        <ul>
+          <li>نستخدم الإعلانات المتاحة للعامة والمعتمدة فقط.</li>
+          <li>نقارن كل نوع عقار ومعاملة داخل نفس المدينة والحي، ولا نخلط الشقق بالأراضي أو البيع بالإيجار.</li>
+          <li>لا نحسب سعر المتر إلا من إعلانات بها سعر ومساحة، وبعد توافر 5 عينات مكتملة على الأقل في المجموعة.</li>
+          <li>نستخدم وسيط سعر المتر لتقليل تأثير إعلان شاذ، ونوضح عدد العينات المستخدمة.</li>
+          <li>لا نقارن مبالغ الإيجار قبل توحيد مدة الإيجار (يومي أو شهري أو سنوي).</li>
+        </ul>
+        <p>تاريخ تحديث البيانات يتغير مع تحديث الإعلانات. اطّلع دائمًا على الإعلان الأصلي وتواصل مع المعلن للتحقق من السعر والتفاصيل.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mp-footer">
+    <strong>أسيوط عقار | كل اللي بتدور عليه في مكان واحد</strong>
+    <p><a href="./">الرئيسية</a> · <a href="./offers.html">العقارات</a> · <a href="./marketplace.html">سوق الخدمات</a> · <a href="./companies.html">الشركات</a> · <a href="./directory.html">الدليل العقاري</a> · <a href="./know-more.html">اعرف أكثر</a></p>
+    <small>© 2026 أسيوط عقار · الأسعار المطلوبة ليست أسعار تنفيذ الصفقات.</small>
+  </footer>
+
+  <script src="./config.js" defer></script>
+  <script src="./market-prices.js?v=20261115-prices-guide-1" defer></script>
+  <script src="./site-nav.js?v=20261115-prices-guide-1" defer></script>
+  <script src="./app-shell.js?v=20261108-2" defer></script>
+</body>
+</html>

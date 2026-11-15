@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v172-unified-entity-brand-20261115";
+const CACHE_NAME = "asyut-aqar-shell-v173-market-prices-20261115";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -14,6 +14,9 @@ const APP_SHELL = [
   "./companies.html",
   "./directory.html",
   "./know-more.html",
+  "./market-prices.html",
+  "./market-prices.css?v=20261115-prices-guide-1",
+  "./market-prices.js?v=20261115-prices-guide-1",
   "./directory-admin.html",
   "./directory-admin.js?v=20261114-service-profiles-1",
   "./directory.css",
