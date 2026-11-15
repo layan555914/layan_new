@@ -39,7 +39,7 @@ function card(c){
  const logo=safeUrl(c.logo_url);
  const href="./company.html?id="+encodeURIComponent(c.id);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
- return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-card-cover">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="lazy">':esc(c.company_name.slice(0,1)))+'</div><div class="company-directory-card-body"><span class="company-source-label company-source-label--owner">ملف مقدم من الشركة ومعتمد من الإدارة</span><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-card-cover">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="lazy">':'<span class="company-logo-fallback"><strong>'+esc(c.company_name.slice(0,1))+'</strong><small>الشعار غير مضاف</small></span>')+'</div><div class="company-directory-card-body"><span class="company-source-label company-source-label--owner">ملف مقدم من الشركة ومعتمد من الإدارة</span><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
 }
 function directoryCard(c){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
@@ -50,7 +50,7 @@ function directoryCard(c){
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
  const services=Array.isArray(c.public_services)?c.public_services.slice(0,3):[];
- const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':'<span>'+esc(name.trim().slice(0,1))+'</span>';
+ const visual=logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="lazy">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>الشعار غير مضاف</small></span>';
  const isService=Boolean(c.service_category);
  return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-card-cover company-card-cover--directory">'+visual+'<small>ASYUT AQAR DIRECTORY</small></div><div class="company-directory-card-body"><span class="company-source-label company-source-label--directory">'+(isService?'ملف تعريفي مجاني · يمكن لممثل الجهة طلب استلامه':'سجل منشور من الدليل العقاري · ليس إعلان شراكة')+'</span><div class="company-card-meta"><span>'+esc(category)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(' · ')+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">'+(isService?'عرض الملف وطلب استلامه ←':'عرض البيانات والمصادر وطلب إدارة الملف ←')+'</span></div></a></article>';
 }
