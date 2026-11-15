@@ -1,0 +1,52 @@
+:root{--project-ink:#30251E;--project-dark:#2B211B;--project-gold:#C5835D;--project-paper:#F3ECE1;--project-muted:#897668;--project-line:#EFE5DA}
+*{box-sizing:border-box}
+body.project-profile-page{margin:0;background:var(--project-paper);color:var(--project-ink);font-family:"Alexandria","Readex Pro",Tahoma,sans-serif;line-height:1.8}
+.project-profile-page a{touch-action:manipulation}
+.project-profile-page .topbar{background:var(--project-dark);color:#fff;padding:13px max(16px,calc((100% - 1160px)/2));display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.project-profile-page .brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-size:19px;font-weight:800}
+.project-profile-page .brand img{width:44px;height:44px;object-fit:contain}
+.project-profile-page .brand strong,.project-profile-page .brand small{display:block}
+.project-profile-page .brand small{font-size:11px;color:#E3C2AE;font-weight:500}
+.project-profile-page .topbar nav{display:flex;align-items:center;gap:8px 17px;flex-wrap:wrap}
+.project-profile-page .topbar nav a{color:#fff;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap}
+.project-profile-page .topbar nav a.active,.project-profile-page .topbar nav a:hover{color:#EBD2B9}
+.project-profile-page .top-actions{display:flex;gap:8px;align-items:center}
+.project-profile-page .btn{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:8px 14px;border-radius:9px;text-decoration:none;font-size:12px;font-weight:800}
+.project-profile-page .btn-gold{background:var(--project-gold);color:#30251E}
+.project-profile-page .btn-outline{border:1px solid #ffffff75;color:#fff}
+.project-main{width:min(1100px,calc(100% - 30px));margin:22px auto 55px;min-height:55vh}
+.project-breadcrumbs{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:0 0 15px;color:#9A897B;font-size:11px}
+.project-breadcrumbs a{color:#895536;text-decoration:none;font-weight:800}
+.project-hero{padding:clamp(22px,4vw,42px);border-radius:19px;background:linear-gradient(130deg,#2B211B,#49382E 70%,#594335);color:#fff;box-shadow:0 15px 36px #2B211B18}
+.project-eyebrow{display:inline-block;color:#E0B79D;font-size:11px;font-weight:800}
+.project-hero h1{margin:8px 0 10px;font-size:clamp(25px,4vw,38px);line-height:1.5}
+.project-hero p{max-width:850px;margin:0;color:#F6EFE6;font-size:14px;line-height:2}
+.project-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}
+.project-tag{display:inline-flex;align-items:center;padding:5px 11px;border:1px solid #ffffff39;border-radius:30px;background:#ffffff0c;color:#fff;font-size:11px;font-weight:700}
+.project-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
+.project-fact{padding:14px 16px;border:1px solid var(--project-line);border-radius:12px;background:#fff;min-width:0}
+.project-fact span{display:block;color:#958477;font-size:11px}
+.project-fact strong{display:block;color:var(--project-dark);font-size:14px;overflow-wrap:anywhere}
+.project-section{margin:15px 0;padding:clamp(17px,3vw,25px);border:1px solid var(--project-line);border-radius:15px;background:#fff}
+.project-section h2{margin:0 0 12px;color:var(--project-dark);font-size:19px}
+.project-section>p{margin:0;color:#746457;font-size:13px;line-height:2}
+.project-map-frame{overflow:hidden;margin-top:12px;border:1px solid var(--project-line);border-radius:11px;background:#F8F2EC}
+.project-map-frame iframe{display:block;width:100%;height:280px;border:0}
+.project-map-note{margin:9px 0 0!important;color:#958477!important;font-size:11px!important}
+.project-map-link,.project-source-card a,.project-entity-card a{display:inline-block;color:#925A38;font-size:12px;font-weight:800;overflow-wrap:anywhere}
+.project-relations,.project-sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px}
+.project-entity-card,.project-source-card{padding:14px;border:1px solid var(--project-line);border-radius:11px;background:#FEFDFB;min-width:0}
+.project-entity-card h3,.project-source-card h3{margin:0 0 5px;color:#47372D;font-size:14px}
+.project-entity-card p,.project-source-card p{margin:0 0 7px;color:#897668;font-size:11px;line-height:1.9;overflow-wrap:anywhere}
+.project-entity-kind,.project-source-kind{display:block;margin-bottom:5px;color:#A66D4A;font-size:10px;font-weight:800}
+.project-source-meta{display:flex;gap:5px 12px;flex-wrap:wrap;margin:8px 0;color:#9A8C82;font-size:10px}
+.project-disclaimer{padding:15px 17px;border-right:4px solid #B46E45;border-radius:10px;background:#FAF5EF;color:#715D4E;font-size:11px;line-height:1.9}
+.project-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.project-empty,.project-state{padding:28px 18px;border:1px dashed #E8DCCF;border-radius:14px;background:#fff;text-align:center;color:#897668}
+.project-empty h2,.project-state h1{margin:0 0 7px;color:#47372D;font-size:18px}
+.project-empty p,.project-state p{margin:0;font-size:12px;line-height:1.9}
+.project-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:20px max(16px,calc((100% - 1100px)/2));background:var(--project-dark);color:#F6EFE6;font-size:11px}
+.project-footer a{color:#DBB198;text-decoration:none;font-weight:800}
+@media(max-width:760px){.project-profile-page .topbar{align-items:flex-start}.project-profile-page .topbar nav{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;gap:15px;padding-bottom:3px}.project-profile-page .top-actions{width:100%}.project-profile-page .top-actions .btn{flex:1}.project-main{width:calc(100% - 22px);margin-top:14px}.project-hero{border-radius:14px;padding:22px 17px}.project-hero p{font-size:12px}.project-section{padding:16px}.project-map-frame iframe{height:230px}.project-footer{justify-content:center;text-align:center}}
+@media(max-width:360px){.project-profile-page .topbar{padding-inline:10px}.project-profile-page .top-actions{display:grid;grid-template-columns:1fr}.project-main{width:calc(100% - 18px)}.project-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.project-fact{padding:11px}}
+.project-profile-page a:focus-visible{outline:3px solid #BF7347;outline-offset:3px}
