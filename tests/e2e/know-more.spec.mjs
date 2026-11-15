@@ -12,14 +12,21 @@ test("know more guide exposes the Asyut buyer and seller resources without inven
 });
 
 test("valuation inquiry builds a WhatsApp message from entered property details", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__openedUrl = "";
+    window.open = (url) => { window.__openedUrl = String(url); return null; };
+  });
   await page.goto("/know-more.html");
   await page.locator("#valuationForm select[name='type']").selectOption({ label: "شقة" });
   await page.locator("#valuationForm select[name='city']").selectOption({ label: "مدينة أسيوط" });
   await page.locator("#valuationForm input[name='area']").fill("120");
   await page.locator("#valuationForm input[name='condition']").fill("نصف تشطيب");
-  const popupPromise = page.waitForEvent("popup");
   await page.getByRole("button", { name: "إرسال البيانات عبر واتساب" }).click();
-  const popup = await popupPromise;
-  await expect(popup).toHaveURL(/wa\.me\/201007044265\?text=/);
-  await expect(popup).toHaveURL(/%D8%B4%D9%82%D8%A9|%D9%85%D8%AF%D9%8A%D9%86%D8%A9/);
+  const openedUrl = await page.evaluate(() => window.__openedUrl);
+  expect(openedUrl).toMatch(/^https:\/\/wa\.me\/201007044265\?text=/);
+  const message = new URL(openedUrl).searchParams.get("text");
+  expect(message).toContain("شقة");
+  expect(message).toContain("مدينة أسيوط");
+  expect(message).toContain("120 متر مربع");
+  expect(message).toContain("نصف تشطيب");
 });
