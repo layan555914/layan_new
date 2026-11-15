@@ -20,6 +20,7 @@
     ["companies.html", "الشركات", ["companies.html", "company.html"]],
     ["featured.html", "الإعلانات المميزة", ["featured.html"]],
     ["directory.html", "الدليل العقاري", ["directory.html"]],
+    ["market-prices.html", "دليل الأسعار", ["market-prices.html"]],
     ["know-more.html", "اعرف أكثر", ["know-more.html"]],
     ["favorites.html", "المفضلة", ["favorites.html"]]
   ];
