@@ -17,6 +17,12 @@ let companies=[],directoryEntities=[],existingProfileId=null,existingStatus=null
 const ENTITY_LOGO_ASSETS=Object.freeze({
  "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
 });
+const OFFICIAL_ENTITY_LOGOS=Object.freeze({
+ "primedev-eg.com":"https://www.primedev-eg.com/assets/img/logo-prime.png"
+});
+function officialEntityLogo(website){
+ try{const host=new URL(String(website||"")).hostname.toLowerCase().replace(/^www\./,"");return OFFICIAL_ENTITY_LOGOS[host]||""}catch(_){return ""}
+}
 function entityCategory(entity){
  const serviceMap={
   contracting_construction:"مقاولات وتشطيبات",
@@ -51,7 +57,7 @@ function card(c){
 function directoryCard(c){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
  const name=String(c.name_ar||c.name_en||"جهة عقارية");
- const logo=safeUrl(c.public_logo_url)||ENTITY_LOGO_ASSETS[c.id]||"";
+ const logo=safeUrl(c.public_logo_url)||ENTITY_LOGO_ASSETS[c.id]||officialEntityLogo(c.website_url)||"";
  const category=entityCategory(c);
  const description=String(c.description||"بيانات تعريفية منشورة في الدليل العقاري. راجع المصادر داخل الملف لمعرفة تفاصيل الإدراج.");
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
