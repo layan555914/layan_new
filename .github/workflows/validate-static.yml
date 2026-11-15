@@ -27,6 +27,7 @@ on:
       - feat/verified-company-brand-contact-20261115
       - feat/know-more-assiut-guide-20261115
       - feat/unified-entity-logos-directory-cards-20261115
+      - feat/market-prices-guide-20261115
       - feature/assyut-directory-maps-taxonomy-refresh-20261104
       - feature/verified-directory-map-coordinates-20261104
   workflow_dispatch:
