@@ -10,9 +10,39 @@ document.addEventListener("DOMContentLoaded",async()=>{
  const ENTITY_LOGO_ASSETS=Object.freeze({
   "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
  });
+ // Official public brand assets are keyed by an exact company website hostname.
+ // Prime publishes 15898 as its shared hotline; it is not a direct Assiut branch number.
+ const OFFICIAL_BRAND_PROFILES=Object.freeze({
+  "primedev-eg.com":Object.freeze({
+   logoUrl:"https://www.primedev-eg.com/assets/img/logo-prime.png",
+   hotline:"+20 15898",
+   hotlineHref:"tel:+2015898",
+   hotlineLabel:"الخط الساخن الرسمي للشركة"
+  })
+ });
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const safeUrl=v=>{try{const u=new URL(String(v||""));return["https:","http:"].includes(u.protocol)?u.href:"";}catch(_){return"";}};
  const digits=v=>String(v||"").replace(/[^0-9]/g,"");
+ function officialBrandProfile(website){
+  try{
+   const hostname=new URL(website).hostname.toLowerCase().replace(/^www\./,"");
+   return OFFICIAL_BRAND_PROFILES[hostname]||null;
+  }catch(_){return null;}
+ }
+ function attachLogoFallback(container,companyName){
+  const image=container.querySelector(".company-profile-logo img");
+  if(!image)return;
+  image.addEventListener("error",()=>{
+   const fallback=document.createElement("span");
+   fallback.className="company-logo-fallback";
+   const initial=document.createElement("strong");
+   initial.textContent=String(companyName||"جهة").trim().slice(0,1)||"؟";
+   const note=document.createElement("small");
+   note.textContent="تعذر تحميل الشعار الرسمي";
+   fallback.append(initial,note);
+   image.replaceWith(fallback);
+  },{once:true});
+ }
  async function api(path){
   if(!base||!key)throw Error("إعدادات الاتصال غير متاحة.");
   const response=await fetch(base+"/rest/v1/"+path,{headers:{apikey:key,Authorization:"Bearer "+key}});
@@ -79,10 +109,15 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const profileSubject=isServiceProvider?"مقدم الخدمة":isRealEstateCompany?"الشركة":"الجهة";
   const profileRepresentative=isServiceProvider?"ممثل مقدم الخدمة":isRealEstateCompany?"ممثل الشركة":"ممثل الجهة";
   const name=entity.name_ar||entity.name_en||"جهة عقارية";
-  const logo=safeUrl(entity.public_logo_url)||ENTITY_LOGO_ASSETS[entity.id]||"";
   const type=categoryLabel(entity.entity_type,entity.service_category);
   const website=safeUrl(entity.website_url);
-  const phone=digits(entity.public_phone);
+  const officialBrand=officialBrandProfile(website);
+  const logo=safeUrl(entity.public_logo_url)||ENTITY_LOGO_ASSETS[entity.id]||safeUrl(officialBrand?.logoUrl)||"";
+  const publishedPhone=String(entity.public_phone||"").trim();
+  const phone=digits(publishedPhone||officialBrand?.hotline);
+  const phoneHref=publishedPhone?("tel:"+phone):(officialBrand?.hotlineHref||"");
+  const phoneActionLabel=publishedPhone?"اتصال بالجهة":(officialBrand?.hotlineLabel?"اتصل بالخط الساخن الرسمي":"اتصال بالجهة");
+  const phoneDetailLabel=publishedPhone?"رقم الاتصال":(officialBrand?.hotlineLabel||"رقم الاتصال");
   const whatsapp=digits(entity.public_whatsapp);
   const services=Array.isArray(entity.public_services)?entity.public_services:[];
   const gallery=Array.isArray(entity.public_gallery_urls)?entity.public_gallery_urls.filter(safeUrl):[];
@@ -94,8 +129,9 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const mapUrl=mapQuery?"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(mapQuery):"";
   const mapEmbedUrl=mapQuery?"https://maps.google.com/maps?q="+encodeURIComponent(mapQuery)+"&output=embed":"";
   const mapNote=hasVerifiedMapPoint?"دبوس الموقع مبني على إحداثيات منشورة في الدليل بعد مراجعة مصدرها.":"هذا بحث استرشادي عن العنوان، وليس دبوسًا جغرافيًا معتمدًا للجهة.";
+  const mapSubject=isServiceProvider?"مقدم الخدمة":isRealEstateCompany?"الشركة":"الجهة";
   const mapMarkup=mapQuery
-   ? '<section class="company-map-panel" aria-labelledby="companyProviderMapTitle"><div><span class="eyebrow">الموقع الجغرافي</span><h2 id="companyProviderMapTitle">موقع الجهة على الخريطة</h2><p>'+esc(mapNote)+'</p></div><div class="company-map-frame"><iframe title="خريطة موقع الجهة" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="'+esc(mapEmbedUrl)+'"></iframe></div><a href="'+esc(mapUrl)+'" target="_blank" rel="noopener noreferrer">فتح الموقع على خرائط Google ↗</a></section>'
+   ? '<section class="company-map-panel" aria-labelledby="companyProviderMapTitle"><div><span class="eyebrow">الموقع الجغرافي</span><h2 id="companyProviderMapTitle">موقع '+mapSubject+' على الخريطة</h2><p>'+esc(mapNote)+'</p></div><div class="company-map-frame"><iframe title="خريطة موقع '+mapSubject+'" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="'+esc(mapEmbedUrl)+'"></iframe></div><a href="'+esc(mapUrl)+'" target="_blank" rel="noopener noreferrer">فتح الموقع على خرائط Google ↗</a></section>'
    : "";
   let sources=[];
   try{
@@ -117,7 +153,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   setProperty("og:title",name+" | أسيوط عقار");
   setProperty("og:description",description);
   const contact=[];
-  if(phone)contact.push('<a class="company-contact-primary" href="tel:'+esc(phone)+'">اتصال بالجهة</a>');
+  if(phone)contact.push('<a class="company-contact-primary" href="'+esc(phoneHref)+'">'+phoneActionLabel+'</a>');
   if(whatsapp){const wa=whatsapp.startsWith("0")?"2"+whatsapp.slice(1):whatsapp;contact.push('<a class="company-contact-secondary" href="https://wa.me/'+esc(wa)+'" target="_blank" rel="noopener noreferrer">واتساب</a>');}
   if(entity.public_email)contact.push('<a class="company-contact-secondary" href="mailto:'+esc(entity.public_email)+'">البريد الإلكتروني</a>');
   if(website){const isFacebook=/^(?:www\.)?facebook\.com$/i.test(new URL(website).hostname);const websiteLabel=isFacebook?"صفحة الجهة على فيسبوك ↗":"الموقع الإلكتروني ↗";contact.push('<a class="company-contact-secondary" href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">'+websiteLabel+'</a>');}
@@ -126,21 +162,22 @@ document.addEventListener("DOMContentLoaded",async()=>{
    ?'<div class="company-profile-highlights" aria-label="أبرز الخدمات">'+services.slice(0,4).map(item=>'<span>'+esc(item)+'</span>').join('')+'</div>'
    :"";
   const contactDetails=[];
-  if(address)contactDetails.push('<div class="company-detail-item"><strong>العنوان / الفرع الرئيسي</strong><span>'+esc(address)+'</span></div>');
-  if(phone)contactDetails.push('<div class="company-detail-item"><strong>رقم الاتصال</strong><a href="tel:'+esc(phone)+'">'+esc(entity.public_phone||phone)+'</a></div>');
+  if(address)contactDetails.push('<div class="company-detail-item"><strong>'+(isServiceProvider?"عنوان مقدم الخدمة":"العنوان / الفرع الرئيسي")+'</strong><span>'+esc(address)+'</span></div>');
+  if(phone)contactDetails.push('<div class="company-detail-item"><strong>'+esc(phoneDetailLabel)+'</strong><a href="'+esc(phoneHref)+'">'+esc(publishedPhone||officialBrand?.hotline||phone)+'</a></div>');
   if(whatsapp){const waNumber=whatsapp.startsWith("0")?"2"+whatsapp.slice(1):whatsapp;contactDetails.push('<div class="company-detail-item"><strong>واتساب</strong><a href="https://wa.me/'+esc(waNumber)+'" target="_blank" rel="noopener noreferrer">مراسلة الشركة أو مقدم الخدمة</a></div>');}
   if(entity.public_email)contactDetails.push('<div class="company-detail-item"><strong>البريد الإلكتروني</strong><a href="mailto:'+esc(entity.public_email)+'">'+esc(entity.public_email)+'</a></div>');
   if(entity.public_business_hours)contactDetails.push('<div class="company-detail-item"><strong>مواعيد العمل</strong><span>'+esc(entity.public_business_hours)+'</span></div>');
   if(website)contactDetails.push('<div class="company-detail-item"><strong>الصفحة الرسمية</strong><a href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">زيارة الصفحة الرسمية ↗</a></div>');
-  const contactDetailsMarkup=contactDetails.length
-   ?'<section class="company-profile-section company-contact-details"><h2>بيانات التواصل ومقر الشركة</h2><div class="company-detail-grid">'+contactDetails.join("")+'</div></section>'
-   :"";
+  const contactDetailsTitle=isServiceProvider?"بيانات التواصل ومقر مقدم الخدمة":isRealEstateCompany?"بيانات التواصل ومقر الشركة":"بيانات التواصل ومقر الجهة";
+  const contactDetailsMarkup='<section class="company-profile-section company-contact-details"><h2>'+contactDetailsTitle+'</h2>'+
+   (contactDetails.length?'<div class="company-detail-grid">'+contactDetails.join("")+'</div>':'<p class="company-detail-empty">لم تُنشر بيانات التواصل أو العنوان لهذه الجهة حتى الآن. يمكن لممثلها طلب استلام الملف وتحديث البيانات بعد التحقق.</p>')+
+   '</section>';
   const coverageMarkup=coverage.length
    ?'<section class="company-profile-section company-coverage-section"><h2>نطاق تقديم الخدمات</h2><div class="company-coverage-list">'+coverage.map(area=>'<span>'+esc(area)+'</span>').join('')+'</div></section>'
    :"";
   const claimPanelMarkup='<section class="company-claim-panel company-claim-panel--prominent"><div><span class="eyebrow">'+profileRepresentative+'؟</span><h2>ملف شركتك أو نشاطك؟ استلمه وأدِره مجانًا</h2><p>قدّم طلب الاستلام باسمك وبصفتك داخل الشركة. تراجع إدارة أسيوط عقار الهوية والتفويض أولًا، ولا تُمنح صلاحية التعديل لمجرد إرسال الطلب.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">استلم ملفك مجانًا</button></section>';
   root.innerHTML=
-   '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>الشعار غير مضاف</small></span>')+'</div><div><span class="eyebrow">ملف تعريفي منشور في دليل أسيوط عقار</span>'+(entity.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الجهة وصفته · لا يعني ذلك شهادة ترخيص للنشاط</span>':'')+'<h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div>'+serviceHighlightsMarkup+'<div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
+   '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>لا يتوفر شعار موثّق</small></span>')+'</div><div><span class="eyebrow">ملف تعريفي منشور في دليل أسيوط عقار</span>'+(entity.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الجهة وصفته · لا يعني ذلك شهادة ترخيص للنشاط</span>':'')+'<h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div>'+serviceHighlightsMarkup+'<div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
    claimPanelMarkup+
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':'')+
    contactDetailsMarkup+
@@ -150,6 +187,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    '<section class="company-profile-section"><h2>مصادر المعلومات</h2>'+sourceLinks(sources)+'</section>'+
    '<section class="company-profile-section company-source-note"><h2>تنويه من أسيوط عقار</h2><p>هذا ملف تعريفي مجاني، ولا يعني الإدراج وجود شراكة أو تزكية أو ضمان أو شهادة ترخيص من المنصة. راجع التفاصيل والعناوين وبيانات الاتصال مباشرة مع الجهة قبل التعاقد.</p></section>'+
    '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف جهة</span><h2 id="companyClaimTitle">بيانات '+profileRepresentative+'</h2></div><button type="button" id="companyClaimClose" class="company-claim-close" aria-label="إغلاق نافذة طلب استلام الملف"><span aria-hidden="true">×</span><span>إغلاق</span></button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الجهة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم '+profileRepresentative+' *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>المالك</option><option>شريك</option><option>مدير النشاط</option><option>مدير الفرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><label>رابط موقع أو صفحة رسمية للجهة (اختياري)<input name="evidence_url" type="url" maxlength="500" placeholder="https://..."></label><label>وصف مختصر لما يثبت صفتك أو علاقتك بالجهة (اختياري)<textarea name="evidence_description" rows="2" maxlength="500" placeholder="مثال: اسمي مدرج كمدير في صفحة الشركة الرسمية."></textarea></label><p class="company-claim-dialog-note">لا ترفع بطاقة هوية أو مستندات حساسة في النموذج. يمكن للإدارة طلب إثبات مناسب عبر قناة آمنة عند الحاجة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
+  attachLogoFallback(root,name);
   const claimDialog=document.getElementById("companyClaimDialog");
   document.getElementById("companyClaimOpen")?.addEventListener("click",()=>{claimDialog?.showModal();refreshMyClaimStatus();});
   document.getElementById("companyClaimClose")?.addEventListener("click",()=>claimDialog?.close());
@@ -476,7 +514,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    "name":name,
    "description":description,
    "url":canonical.href,
-   ...(phone?{telephone:entity.public_phone}:{}),
+   ...(phone?{telephone:publishedPhone||officialBrand?.hotline}:{}),
    ...(entity.public_email?{email:entity.public_email}:{}),
    ...(website?{sameAs:[website]}:{}),
    ...(address?{address:{"@type":"PostalAddress","streetAddress":address,"addressRegion":"أسيوط","addressCountry":"EG"}}:{})
@@ -659,12 +697,13 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(wa)approvedContactDetails.push('<div class="company-detail-item"><strong>واتساب</strong><a href="https://wa.me/'+esc(wa)+'" target="_blank" rel="noopener noreferrer">مراسلة الشركة</a></div>');
   if(safeUrl(c.website))approvedContactDetails.push('<div class="company-detail-item"><strong>الموقع الإلكتروني</strong><a href="'+esc(safeUrl(c.website))+'" target="_blank" rel="noopener noreferrer">زيارة الموقع ↗</a></div>');
   root.innerHTML=
-   '<section class="company-profile-hero"><div class="company-profile-logo">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(String(c.company_name||"ش").slice(0,1))+'</strong><small>الشعار غير مضاف</small></span>')+'</div><div><span class="eyebrow">ملف شركة مقدم من الشركة ومعتمد من الإدارة</span>'+(c.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الشركة وصفته · لا يمثل ذلك شهادة ترخيص</span>':'')+'<h1>'+esc(c.company_name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><div class="company-contact-actions">'+actions.join("")+'</div></div></section>'+
+   '<section class="company-profile-hero"><div class="company-profile-logo">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(String(c.company_name||"ش").slice(0,1))+'</strong><small>لا يتوفر شعار موثّق</small></span>')+'</div><div><span class="eyebrow">ملف شركة مقدم من الشركة ومعتمد من الإدارة</span>'+(c.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الشركة وصفته · لا يمثل ذلك شهادة ترخيص</span>':'')+'<h1>'+esc(c.company_name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><div class="company-contact-actions">'+actions.join("")+'</div></div></section>'+
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':"")+
    (approvedContactDetails.length?'<section class="company-profile-section company-contact-details"><h2>بيانات التواصل ومقر الشركة</h2><div class="company-detail-grid">'+approvedContactDetails.join("")+'</div></section>':"")+
    (projects.length?'<section class="company-profile-section"><h2>المشروعات والأعمال السابقة</h2><div class="company-project-list">'+projects.map(p=>'<article class="company-project"><h3>'+esc(p.title||"عمل سابق")+'</h3><p>'+esc(p.description||"")+'</p></article>').join('')+'</div></section>':"")+
    (gallery.length?'<section class="company-profile-section"><h2>معرض الأعمال</h2><div class="company-gallery">'+gallery.map((u,i)=>'<img src="'+esc(u)+'" alt="صورة من أعمال '+esc(c.company_name)+' رقم '+(i+1)+'" loading="lazy">').join('')+'</div></section>':"");
-  mountApprovedCompanyEditor(c);
+  attachLogoFallback(root,c.company_name);
+   mountApprovedCompanyEditor(c);
   setSchema({
    "@context":"https://schema.org","@type":"Organization","name":c.company_name,"description":description,
    "url":profileUrl.href,...(phone?{telephone:c.phone}:{}),

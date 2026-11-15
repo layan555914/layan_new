@@ -145,3 +145,9 @@
  .company-detail-grid,.company-service-list{grid-template-columns:1fr}
  .company-detail-item{padding:12px}
 }
+
+/* Clear public-profile empty states when a provider has not published contact data */
+.company-detail-empty{
+ margin:0;padding:13px 15px;border:1px dashed #dfcbb8;border-radius:11px;
+ background:#fffaf5;color:#765b48;font-size:13px;line-height:1.9
+}

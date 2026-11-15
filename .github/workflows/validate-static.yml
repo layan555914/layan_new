@@ -24,6 +24,7 @@ on:
       - feature/service-provider-claim-review-final-20261114
       - feat/unified-company-service-profiles-20261115
       - feat/project-profiles-directory-20261115
+      - feat/verified-company-brand-contact-20261115
       - feature/assyut-directory-maps-taxonomy-refresh-20261104
       - feature/verified-directory-map-coordinates-20261104
   workflow_dispatch:

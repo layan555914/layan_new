@@ -103,11 +103,13 @@ test("directory entity profile clearly labels missing logo and all mobile action
   await page.goto("/company.html?entity_id=" + DIRECTORY_ENTITY_ID);
 
   await expect(page.locator("#companyProfileRoot h1")).toHaveText(publicDirectoryEntity.name_ar);
-  await expect(page.locator(".company-logo-fallback")).toContainText("الشعار غير مضاف");
+  await expect(page.locator(".company-logo-fallback")).toContainText("لا يتوفر شعار موثّق");
+  await expect(page.locator(".company-profile-logo img")).toHaveCount(0);
+  await expect(page.locator(".company-contact-actions")).not.toContainText("الخط الساخن الرسمي");
   await expect(page.locator(".company-contact-actions a")).toHaveCount(4);
   await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
   await expect(page.locator(".company-claim-panel--prominent button")).toBeVisible();
-  await expect(page.locator(".company-contact-details")).toContainText("بيانات التواصل ومقر الشركة");
+  await expect(page.locator(".company-contact-details")).toContainText("بيانات التواصل ومقر مقدم الخدمة");
   await expect(page.locator(".company-coverage-section")).toContainText("أسيوط");
   for (const action of await page.locator(".company-contact-actions a").all()) {
     await expect(action).toBeVisible();
@@ -122,6 +124,81 @@ test("directory entity profile clearly labels missing logo and all mobile action
   await expect(closeButton).toHaveAttribute("aria-label", "إغلاق نافذة طلب استلام الملف");
   await closeButton.click();
   await expect(page.locator("#companyClaimDialog")).not.toBeVisible();
+});
+
+test("official company website supplies its verified logo and clearly labeled general hotline when the directory has no phone", async ({ page }) => {
+  const primeOffice = {
+    ...publicDirectoryEntity,
+    id: "d3333333-3333-4333-8333-333333333333",
+    name_ar: "برايم للتطوير العقاري – مكتب مبيعات أسيوط",
+    entity_type: "sales_office",
+    service_category: "real_estate_sales",
+    website_url: "https://www.primedev-eg.com/Arabic/",
+    public_phone: null,
+    public_email: "info@primedev-eg.com",
+    public_address: "مكتب مبيعات أسيوط: مول الوطنية، الدور الأرضي",
+    public_whatsapp: null,
+    public_logo_url: null,
+    public_services: [],
+    public_gallery_urls: [],
+    public_coverage_areas: []
+  };
+
+  await page.route(SUPABASE + "/rest/v1/directory_entities**", async route => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([primeOffice]) });
+  });
+  await page.route(SUPABASE + "/rest/v1/directory_entity_sources**", async route => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+  });
+
+  await page.goto("/company.html?entity_id=" + primeOffice.id);
+
+  const logo = page.locator(".company-directory-entity-monogram img");
+  await expect(logo).toHaveAttribute("src", "https://www.primedev-eg.com/assets/img/logo-prime.png");
+  await expect(logo).toHaveAttribute("alt", "شعار " + primeOffice.name_ar);
+  await expect(page.locator(".company-contact-actions a[href='tel:+2015898']")).toHaveText("اتصل بالخط الساخن الرسمي");
+  await expect(page.locator(".company-contact-details")).toContainText("الخط الساخن الرسمي للشركة");
+  await expect(page.locator(".company-contact-details")).toContainText("+20 15898");
+  await expect(page.locator(".company-contact-details")).toContainText("مكتب مبيعات أسيوط");
+  await expect(page.locator(".company-contact-details")).toContainText("info@primedev-eg.com");
+  await expect(page.locator(".company-map-panel")).toContainText("بحث استرشادي");
+  await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
+});
+
+test("broken public logo and missing contacts show honest fallback content", async ({ page }) => {
+  const incompleteProfile = {
+    ...publicDirectoryEntity,
+    name_ar: "جهة بدون بيانات اتصال",
+    website_url: null,
+    public_phone: null,
+    public_email: null,
+    public_address: null,
+    public_whatsapp: null,
+    public_logo_url: "https://assets.example.invalid/broken-logo.svg",
+    public_services: [],
+    public_gallery_urls: [],
+    public_coverage_areas: []
+  };
+
+  await page.route(SUPABASE + "/rest/v1/directory_entities**", async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([incompleteProfile])
+    });
+  });
+  await page.route(SUPABASE + "/rest/v1/directory_entity_sources**", async route => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+  });
+  await page.route("https://assets.example.invalid/broken-logo.svg", route => route.abort());
+
+  await page.goto("/company.html?entity_id=" + DIRECTORY_ENTITY_ID);
+
+  await expect(page.locator(".company-detail-empty")).toContainText("لم تُنشر بيانات التواصل أو العنوان");
+  await expect(page.locator(".company-logo-fallback")).toContainText("تعذر تحميل الشعار الرسمي");
+  await expect(page.locator(".company-profile-logo img")).toHaveCount(0);
+  await expect(page.locator(".company-contact-actions a")).toHaveCount(0);
+  await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
 });
 
 test("static provider profile uses the shared profile layout and styled branch actions", async ({ page }) => {
