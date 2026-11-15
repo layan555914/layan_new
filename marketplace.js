@@ -10,7 +10,7 @@ const authForm=$("authForm"),listingForm=$("marketplaceListingForm");
 const authStatus=$("authStatus"),listingStatus=$("marketplaceFormStatus");
 const categoryFilter=$("marketplaceCategoryFilter"),listingGrid=$("marketplaceListings");
 let authMode="login",currentSession=null,listings=[],shouldOpenListingAfterAuth=false,marketplacePage=1;const MARKETPLACE_PER_PAGE=12;
-let categories=["سوق العقارات","التنازلات العقارية","أراضي للبيع","أراضي التنازلات","إيجار يومي ومفروش","مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية","مكاتب التصميم الهندسي","مهندسو الديكور والتصميم الداخلي","السيراميك والبورسلين والأدوات الصحية","الإضاءة ووحدات الإنارة","الستائر والمفروشات"];
+let categories=["مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية","مكاتب التصميم الهندسي","مهندسو الديكور والتصميم الداخلي","السيراميك والبورسلين والأدوات الصحية","الإضاءة ووحدات الإنارة","الستائر والمفروشات"];
 const specs={
 "سوق العقارات":[["نوع العقار","property_kind","select","شقة|فيلا|محل تجاري|مكتب|عيادة|مخزن|مبنى"],["الغرض","purpose","select","بيع|إيجار"],["المساحة بالمتر","area_m2","number"],["عدد الغرف","bedrooms","number"],["عدد الحمامات","bathrooms","number"],["التشطيب","finishing","text"]],
 "التنازلات العقارية":[["اسم المطور","developer","text"],["اسم المشروع","project","text"],["المقدم المطلوب","required_down_payment","number"],["المبلغ المدفوع","paid_amount","number"],["المتبقي","remaining_amount","number"],["القسط الشهري","monthly_installment","number"],["رسوم التنازل","assignment_fee","number"],["الخصم المتاح","discount","number"]],
