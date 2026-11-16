@@ -154,3 +154,223 @@ html body :is(input, select, textarea):focus-visible,
 html body :is(button, a, summary, [role="button"]):focus-visible {
   outline-color: rgba(163, 90, 62, .30);
 }
+
+
+/* ---------- Refined brighter palette (v2) ---------- */
+/* Lighten the full brand system one more step and keep legacy tokens aligned. */
+:root {
+  --navy: #5B4638;
+  --blue: #6A5748;
+  --gold: #D7AD75;
+  --gold-light: #F5E6D3;
+  --red: #A96043;
+  --bg: #FCFAF7;
+  --text: #47382F;
+  --muted: #786B61;
+  --border: #ECE3DA;
+  --paper: #FDFBF8;
+  --line: #EEE6DE;
+  --ink: #47382F;
+
+  --aa-page: #FCFBF9;
+  --aa-surface: #FFFFFF;
+  --aa-surface-soft: #F8F6F2;
+  --aa-surface-warm: #FFF9F3;
+  --aa-ink: #47382F;
+  --aa-muted: #786B61;
+  --aa-line: #ECE3DA;
+  --aa-brand: #A96043;
+  --aa-brand-hover: #914D36;
+  --aa-brand-soft: #F8EEE7;
+  --aa-copper: #D3A080;
+  --kp-ink: #47382F;
+}
+
+/* Medium warm-brown navigation: recognizably branded, no longer near-black. */
+html body header.topbar,
+html body header.info-topbar {
+  background: #5B4638;
+  color: #FFF9F3;
+  border-bottom: 2px solid #D7AD75;
+  box-shadow: 0 5px 18px rgba(76, 55, 40, .12);
+}
+html body header.topbar .brand,
+html body header.topbar .brand strong,
+html body header.info-topbar .info-brand,
+html body header.topbar nav a,
+html body header.info-topbar nav a {
+  color: #FFF9F3;
+}
+html body header.topbar .brand small,
+html body header.info-topbar .brand small {
+  color: #F3DCC5;
+}
+html body header.topbar nav a:hover,
+html body header.topbar nav a.active,
+html body header.topbar nav a[aria-current="page"],
+html body header.info-topbar nav a:hover,
+html body header.info-topbar nav a.active {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, .14);
+}
+html body header.topbar .btn-outline,
+html body header.info-topbar .btn-outline {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, .65);
+  background: rgba(255, 255, 255, .06);
+}
+html body header.topbar .btn-gold,
+html body header.info-topbar .btn-gold {
+  color: #47382F;
+  background: #E4C18F;
+  border-color: #E4C18F;
+}
+
+/* Brighter canvases, cards and secondary panels on EVERY public page. */
+html, html body,
+html body.directory-page,
+html body.know-page {
+  color-scheme: light;
+  background-color: #FCFBF9;
+  color: #47382F;
+}
+html body main,
+html body .directory-main,
+html body .marketplace-page,
+html body .offers-section,
+html body .featured-page {
+  background-color: transparent;
+}
+html body :is(
+  .section, .how-section, .directory-browser, .directory-method,
+  .company-map-panel, .directory-map-panel, .company-directory-card,
+  .offer-card, .listing-card, .featured-section, .featured-card,
+  .mk-profile-card, .know-card, .know-form, .company-dialog,
+  .dialog-inner, dialog, .calculator-card, .search-panel,
+  .design-hero-search, .property-search-panel
+) {
+  background-color: #FFFFFF;
+  border-color: #EEE6DE;
+}
+html body :is(.know-band, .company-join, .mk-directory-block, .directory-sources-note) {
+  background-color: #F8F3EC;
+  border-color: #E9DED3;
+}
+html body :is(.category, .detail-chip, .directory-tag, .company-service-list li, .mk-chip) {
+  background-color: #F8F5F1;
+  border-color: #EAE2D9;
+}
+html body :is(.notice, .status-message, .know-note, .company-review-note, .directory-results-note) {
+  background-color: #FBF7F2;
+  border-color: #E9DCCE;
+  color: #57493F;
+}
+
+/* Re-target body-class pages correctly so their specific dark surfaces are lifted too. */
+html body.directory-page .directory-footer,
+html body.know-page .know-footer,
+html body footer.footer.footer-pro,
+html body footer:not(.footer-pro) {
+  background: #5B4638;
+  color: #FFF9F3;
+}
+html body.know-page .know-band { background-color: #F8F3EC; }
+html body.know-page .know-card,
+html body.know-page .know-form { background-color: #FFFFFF; border-color: #EEE6DE; }
+html body.directory-page .directory-notice {
+  background-color: #FBF7F2;
+  border-color: #E8DCCE;
+}
+html body.directory-page .directory-stat,
+html body.directory-page .directory-card,
+html body.directory-page .directory-browser,
+html body.directory-page .directory-method,
+html body.directory-page .directory-map-panel,
+html body.directory-page .company-map-panel {
+  background-color: #FFFFFF;
+  border-color: #EEE6DE;
+}
+html body.directory-page .directory-method-grid article,
+html body.directory-page .directory-empty {
+  background-color: #FBF9F6;
+  border-color: #EEE6DE;
+}
+html body .company-profile-hero {
+  background: linear-gradient(125deg, #5B4638 0%, #8A705B 100%);
+  color: #FFF9F3;
+}
+html body .company-card-cover {
+  background: linear-gradient(135deg, #6B5544 0%, #947860 100%);
+  color: #FFF5EA;
+}
+html body :is(.company-profile-hero, .directory-footer, .know-footer, footer.footer-pro) :is(h1, h2, h3, p, small, a) {
+  color: inherit;
+}
+
+/* Brighter photography with a softer veil. Keep a controlled text-safe area. */
+html body .hero.design-hero {
+  background-image:
+    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .48) 42%, rgba(48, 43, 37, .08) 100%),
+    url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800");
+}
+html body main > .page-hero[aria-labelledby="offersPageTitle"] {
+  background-image:
+    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .48) 54%, rgba(48, 43, 37, .12) 100%),
+    url("https://images.pexels.com/photos/6238614/pexels-photo-6238614.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+html body .companies-page .companies-hero {
+  background-image:
+    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .47) 56%, rgba(48, 43, 37, .12) 100%),
+    url("https://images.pexels.com/photos/7534234/pexels-photo-7534234.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+html body main.marketplace-page > .hero {
+  background-image:
+    linear-gradient(270deg, rgba(43, 46, 40, .70) 0%, rgba(43, 46, 40, .48) 54%, rgba(43, 46, 40, .12) 100%),
+    url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1500");
+}
+html body.directory-page .directory-hero {
+  background-image:
+    linear-gradient(270deg, rgba(48, 43, 37, .71) 0%, rgba(48, 43, 37, .50) 60%, rgba(48, 43, 37, .16) 100%),
+    url("https://images.pexels.com/photos/5033768/pexels-photo-5033768.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+html body .featured-main .featured-hero {
+  background-image:
+    linear-gradient(270deg, rgba(48, 43, 37, .69) 0%, rgba(48, 43, 37, .46) 60%, rgba(48, 43, 37, .10) 100%),
+    url("https://images.pexels.com/photos/6438746/pexels-photo-6438746.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+html body.know-page .know-hero {
+  background-image:
+    linear-gradient(270deg, rgba(43, 46, 40, .70) 0%, rgba(43, 46, 40, .47) 56%, rgba(43, 46, 40, .12) 100%),
+    url("https://images.pexels.com/photos/5691545/pexels-photo-5691545.jpeg?auto=compress&cs=tinysrgb&w=1500");
+}
+@media (max-width: 760px) {
+  html body .hero.design-hero {
+    background-image:
+      linear-gradient(180deg, rgba(43, 46, 40, .24) 0%, rgba(43, 46, 40, .60) 48%, rgba(43, 46, 40, .86) 100%),
+      url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1100");
+  }
+}
+
+/* Keep all primary links and controls crisp against the brighter surfaces. */
+html body :is(.btn, button.btn, .property-action, .featured-card-actions a) {
+  border-radius: 11px;
+}
+html body :is(.btn-gold, .btn-red, .property-action-gold, .company-contact-primary) {
+  color: #FFFFFF;
+  background: #A96043;
+  border-color: #A96043;
+}
+html body :is(.btn-gold, .btn-red, .property-action-gold, .company-contact-primary):hover {
+  background: #914D36;
+  border-color: #914D36;
+}
+html body :is(input, select, textarea) {
+  background-color: #FFFFFF;
+  border-color: #E5DCD3;
+  color: #47382F;
+}
+html body :is(input, select, textarea):focus-visible,
+html body :is(button, a, summary, [role="button"]):focus-visible {
+  outline: 3px solid rgba(169, 96, 67, .28);
+  outline-offset: 2px;
+}
