@@ -1,0 +1,397 @@
+/* ASYUT AQAR — unified visual system (2026-11-16)
+   A brighter, calmer real-estate platform interface.
+   Visual-only layer: do not rely on these selectors for application behaviour. */
+
+:root {
+  --aa-page: #F7F8F6;
+  --aa-surface: #FFFFFF;
+  --aa-surface-soft: #F1F5F2;
+  --aa-surface-warm: #FBF5EF;
+  --aa-ink: #2C302F;
+  --aa-muted: #68736F;
+  --aa-line: #E2E8E4;
+  --aa-brand: #995038;
+  --aa-brand-hover: #7F402D;
+  --aa-brand-soft: #F7ECE6;
+  --aa-copper: #C58B6D;
+  --aa-radius: 16px;
+  --aa-radius-lg: 22px;
+  --aa-shadow: 0 10px 28px rgba(37, 47, 42, .065);
+  --aa-shadow-hover: 0 16px 34px rgba(37, 47, 42, .11);
+}
+
+/* Canvas and readable Arabic text */
+html { color-scheme: light; }
+html body {
+  background-color: var(--aa-page);
+  color: var(--aa-ink);
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+}
+html body :is(p, li, dd, dt, figcaption) { line-height: 1.85; }
+html body :is(.muted, .text-muted, .small, small) { color: var(--aa-muted); }
+
+/* Consistent heading hierarchy across all public sections */
+html body main :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+  color: var(--aa-ink);
+  letter-spacing: 0;
+  text-wrap: pretty;
+}
+html body main h1 { font-size: clamp(1.75rem, 3vw, 2.55rem); font-weight: 700; line-height: 1.32; }
+html body main h2 { font-size: clamp(1.3rem, 2.2vw, 1.85rem); font-weight: 700; line-height: 1.42; }
+html body main h3 { font-size: clamp(1.05rem, 1.5vw, 1.28rem); font-weight: 600; line-height: 1.5; }
+html body main h4 { font-size: 1.05rem; font-weight: 600; line-height: 1.55; }
+html body :is(.eyebrow, .directory-eyebrow, .featured-eyebrow, .featured-kicker, .project-eyebrow, .info-eyebrow) {
+  color: var(--aa-brand);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* Unified, brighter navigation. The home photo hero below remains distinctive. */
+html body header.topbar,
+html body header.info-topbar {
+  background: rgba(255, 255, 255, .97);
+  color: var(--aa-ink);
+  border-bottom: 1px solid var(--aa-line);
+  box-shadow: 0 4px 18px rgba(37, 47, 42, .055);
+  backdrop-filter: blur(12px);
+}
+html body header.topbar .brand,
+html body header.info-topbar .info-brand { color: var(--aa-ink); }
+html body header.topbar .brand strong { color: var(--aa-ink); font-weight: 700; }
+html body header.topbar .brand small { color: var(--aa-brand); }
+html body header.topbar nav a,
+html body header.info-topbar nav a {
+  color: #5B6762;
+  font-weight: 600;
+  border-radius: 9px;
+  transition: color .18s ease, background-color .18s ease;
+}
+html body header.topbar nav a:hover,
+html body header.topbar nav a.active,
+html body header.topbar nav a[aria-current="page"],
+html body header.info-topbar nav a:hover {
+  color: var(--aa-brand);
+  background: var(--aa-brand-soft);
+}
+html body header.topbar .btn-outline,
+html body header.info-topbar .btn-outline {
+  color: var(--aa-brand);
+  border-color: #D9BBAA;
+  background: #FFFFFF;
+}
+
+/* Inner-page heroes: brighten without flattening the home page's property photography */
+html body .companies-hero,
+html body .company-profile-hero,
+html body .directory-hero,
+html body .featured-hero,
+html body .featured-hero.page-hero,
+html body main.marketplace-page .hero,
+html body .marketplace-page-hero,
+html body .project-hero,
+html body .my-listings-hero,
+html body .info-hero,
+html body .page-hero:not(.design-hero) {
+  color: var(--aa-ink);
+  background: linear-gradient(135deg, #FFFFFF 0%, #F4F1EC 100%);
+  border: 1px solid #E7E4DE;
+  border-bottom: 1px solid #E7E4DE;
+  border-radius: var(--aa-radius-lg);
+  box-shadow: var(--aa-shadow);
+}
+html body .companies-hero h1,
+html body .company-profile-hero h1,
+html body .directory-hero h1,
+html body .featured-hero h1,
+html body .featured-hero.page-hero h1,
+html body main.marketplace-page .hero h1,
+html body .marketplace-page-hero h1,
+html body .project-hero h1,
+html body .my-listings-hero h1,
+html body .info-hero h1,
+html body .page-hero:not(.design-hero) h1 { color: var(--aa-ink); }
+html body .companies-hero p,
+html body .company-profile-hero p,
+html body .directory-hero p,
+html body .featured-hero p,
+html body .featured-hero.page-hero p,
+html body main.marketplace-page .hero p,
+html body .marketplace-page-hero p,
+html body .project-hero p,
+html body .my-listings-hero p,
+html body .info-hero p,
+html body .page-hero:not(.design-hero) p { color: #65716C; }
+html body .directory-hero .directory-eyebrow,
+html body .project-eyebrow,
+html body .info-eyebrow,
+html body .companies-hero .eyebrow,
+html body .my-listings-hero > span { color: var(--aa-brand); }
+html body .directory-hero-mark {
+  color: var(--aa-ink);
+  border-color: #E5D9CE;
+  background: rgba(255, 255, 255, .82);
+}
+html body .directory-hero-mark small { color: var(--aa-muted); }
+html body .directory-hero-mark strong { color: var(--aa-brand); }
+html body .featured-shortcuts a,
+html body .company-type-shortcuts a {
+  color: var(--aa-brand);
+  background: #FFFFFF;
+  border-color: #E4D6CC;
+}
+html body .featured-shortcuts a:hover,
+html body .company-type-shortcuts a:hover {
+  color: #FFFFFF;
+  background: var(--aa-brand);
+  border-color: var(--aa-brand);
+}
+html body .know-page .know-hero {
+  color: var(--aa-ink);
+  background: linear-gradient(135deg, #FFFFFF 0%, #F4F1EC 100%);
+  border: 1px solid var(--aa-line);
+  border-radius: var(--aa-radius-lg);
+  box-shadow: var(--aa-shadow);
+}
+html body .know-page .know-hero h1 { color: var(--aa-ink); }
+html body .know-page .know-hero p { color: #65716C; }
+html body .know-page .know-hero .eyebrow { color: var(--aa-brand); }
+
+/* Home hero: let more of the real property image show while protecting text contrast */
+html body .hero.design-hero {
+  background-color: #37332F;
+  box-shadow: inset 0 0 0 18px #37332F, inset 0 0 0 19px rgba(197, 139, 109, .4);
+}
+html body .hero.design-hero::after {
+  background: linear-gradient(270deg, rgba(38, 39, 36, .96) 0%, rgba(38, 39, 36, .84) 34%, rgba(38, 39, 36, .55) 60%, rgba(38, 39, 36, .18) 100%) !important;
+}
+html body .hero.design-hero .design-hero-sub { color: #F0EDE7; }
+html body .hero.design-hero .design-hero-lead { color: #FFF8F1; }
+@media (max-width: 760px) {
+  html body .hero.design-hero { background-color: #37332F; }
+  html body .hero.design-hero::after {
+    background: linear-gradient(180deg, rgba(38,39,36,.12) 0%, rgba(38,39,36,.58) 42%, #37332F 100%) !important;
+  }
+}
+
+/* Search panels and filter groups */
+html body :is(.design-hero-search, .search-panel, .company-search-tools, .directory-filters, .filters,
+  .property-search-panel, .filters-primary, .calculator-card) {
+  border-color: var(--aa-line);
+}
+html body :is(.design-hero-search, .search-panel) {
+  background: #FFFFFF;
+  box-shadow: 0 14px 34px rgba(37, 47, 42, .12);
+}
+html body :is(.search-panel, .design-hero-search, .company-search-tools, .directory-filters, .filters, .property-search-panel) label {
+  color: #46534D;
+  font-weight: 600;
+}
+
+/* Choices, inputs, selects, textareas and accessible focus states */
+html body :is(input, select, textarea, .directory-refresh, .filter-select) {
+  color: var(--aa-ink);
+  background-color: #FFFFFF;
+  border-color: #DCE4DF;
+  border-radius: 11px;
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+  font-size: 14px;
+  min-height: 46px;
+}
+html body :is(input, select, textarea)::placeholder { color: #96A19B; opacity: 1; }
+html body :is(input, select, textarea):focus-visible,
+html body :is(button, a, summary, [role="button"]):focus-visible {
+  outline: 3px solid rgba(153, 80, 56, .22);
+  outline-offset: 2px;
+  border-color: var(--aa-copper);
+}
+html body select { accent-color: var(--aa-brand); }
+html body :is(.directory-tabs button, .category, .mk-chip, .detail-chip, .detail-chips .detail-chip) {
+  border-color: #E3E9E5;
+  background: #F5F7F5;
+  color: #53605A;
+  border-radius: 999px;
+}
+html body :is(.directory-tabs button.is-active, .category.active, .mk-chip.is-active, .mk-chip[aria-pressed="true"]) {
+  color: #FFFFFF;
+  background: var(--aa-brand);
+  border-color: var(--aa-brand);
+}
+
+/* Buttons: one primary accent, calm secondary actions */
+html body :is(.btn, button.btn, .property-action, .featured-card-actions a) {
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+  font-weight: 600;
+  border-radius: 11px;
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+html body :is(.btn-gold, .btn-red, .property-action-gold) {
+  color: #FFFFFF;
+  background: var(--aa-brand);
+  border-color: var(--aa-brand);
+  box-shadow: 0 5px 14px rgba(153, 80, 56, .12);
+}
+html body :is(.btn-gold, .btn-red, .property-action-gold):hover {
+  color: #FFFFFF;
+  background: var(--aa-brand-hover);
+  border-color: var(--aa-brand-hover);
+}
+html body :is(.btn-outline-dark, .property-action-outline, .featured-card-actions a.secondary) {
+  color: var(--aa-brand);
+  background: #FFFFFF;
+  border: 1px solid #D8B8A7;
+}
+html body :is(.btn-outline-dark, .property-action-outline, .featured-card-actions a.secondary):hover {
+  color: var(--aa-brand-hover);
+  background: var(--aa-brand-soft);
+}
+html body :is(button, .btn, a[role="button"]) { -webkit-tap-highlight-color: transparent; }
+
+/* Cards, data panels and directory lists */
+html body :is(.offer-card, .category-tile, .marketplace-card, .marketplace-listing-card,
+  .listing-card, .company-directory-card, .directory-card, .featured-card, .property-gallery-card,
+  .property-summary-card, .property-section-card, .project-section, .project-fact,
+  .info-card, .info-doc, .info-grid article, .my-listing-card, .calculator-card,
+  .company-directory-group, .directory-browser, .directory-method, .featured-section) {
+  border-color: var(--aa-line);
+  background-color: var(--aa-surface);
+  box-shadow: var(--aa-shadow);
+}
+html body :is(.offer-card, .marketplace-card, .company-directory-card, .directory-card,
+  .featured-card, .listing-card, .marketplace-listing-card) {
+  border-radius: var(--aa-radius);
+}
+html body :is(.offer-card, .marketplace-card, .company-directory-card, .directory-card, .featured-card):hover {
+  box-shadow: var(--aa-shadow-hover);
+}
+html body :is(.company-directory-card h3, .directory-card h3, .featured-card-body h3,
+  .listing-body h3, .marketplace-listing-body h3, .property-section-card h2) {
+  color: var(--aa-ink);
+}
+html body :is(.directory-card a, .company-card-open, .company-claim-login-link, .property-breadcrumbs a) {
+  color: var(--aa-brand);
+}
+html body :is(.directory-card p, .company-directory-card p, .featured-card-desc,
+  .marketplace-listing-body p, .property-description, .company-claim-panel p) {
+  color: var(--aa-muted);
+}
+html body :is(.company-directory-card-body, .directory-card, .featured-card-body) { min-width: 0; }
+
+/* Listing photo blocks and property summary */
+html body :is(.offer-image, .offer-card-media, .featured-card-media, .listing-card img,
+  .marketplace-listing-card img, .property-gallery-main, .property-gallery-thumbs button) {
+  background-color: #EDF1EE;
+}
+html body .property-summary-card { border-radius: var(--aa-radius-lg); }
+html body .property-price-highlight {
+  background: linear-gradient(120deg, #FFF9F4, #F8EEE7);
+  border-color: #E6CFC1;
+}
+html body .property-price-highlight strong,
+html body .property-price-highlight span { color: var(--aa-brand); }
+html body :is(.property-key-figure, .property-fact) {
+  background: var(--aa-surface-soft);
+  border-color: var(--aa-line);
+}
+html body :is(.property-purpose-badge, .property-featured-badge, .directory-tag, .company-source-label) {
+  color: var(--aa-brand);
+  background: var(--aa-brand-soft);
+  border-color: #EBD8CC;
+}
+
+/* Notices and status messages: distinguish information from warnings */
+html body :is(.status-message, .notice, .directory-notice, .directory-sources-note,
+  .company-source-note, .company-claim-status, .property-disclaimer, .marketplace-page-note,
+  .company-review-note, .my-listing-note, .my-edit-intro, .form-note) {
+  background-color: var(--aa-surface-warm);
+  border-color: #EADFD6;
+  color: #675448;
+  border-radius: 12px;
+}
+html body :is(.status-approved, .company-claim-status[data-state="success"]) {
+  background: #EFF7F1;
+  border-color: #CEE2D3;
+  color: #356346;
+}
+html body :is(.status-rejected, .company-claim-status[data-state="error"]) {
+  background: #FFF3F0;
+  border-color: #E9C9C1;
+  color: #8C3D31;
+}
+
+/* Statistics, area shortcuts and sections hub */
+html body :is(.directory-stat, .area-chip, .home-hub-card, .ab-party, .ab-value) {
+  border-color: var(--aa-line);
+}
+html body .directory-stat { background: #FFFFFF; border-radius: 14px; box-shadow: var(--aa-shadow); }
+html body .directory-stat strong { color: var(--aa-brand); }
+html body :is(.area-chip, .category-tile) { transition: transform .18s ease, box-shadow .18s ease; }
+html body .area-chip {
+  border: 1px solid var(--aa-line);
+  background: #FFFFFF;
+  color: var(--aa-brand);
+}
+html body .area-chip:hover { background: var(--aa-brand-soft); border-color: #E0C4B5; }
+
+/* Forms and dialogs */
+html body :is(dialog, .company-dialog, .company-claim-dialog, .marketplace-form-dialog, .my-edit-dialog) {
+  color: var(--aa-ink);
+  background: #FFFFFF;
+  border: 1px solid var(--aa-line);
+  border-radius: 18px;
+  box-shadow: 0 22px 64px rgba(37, 47, 42, .2);
+}
+html body :is(dialog, .company-dialog, .company-claim-dialog, .marketplace-form-dialog, .my-edit-dialog)::backdrop {
+  background: rgba(37, 43, 40, .48);
+  backdrop-filter: blur(3px);
+}
+html body :is(.company-form label, .company-claim-form label, .marketplace-form-dialog label,
+  .directory-filters label, .my-edit-fields label) { color: #46534D; font-weight: 600; }
+
+/* Dark footer remains a deliberate visual anchor */
+html body :is(footer, .footer, .info-footer, .project-footer) {
+  background: #34312D;
+  color: #F3F1EC;
+  border-color: rgba(197, 139, 109, .24);
+}
+html body :is(footer, .footer, .info-footer, .project-footer) a { color: #F0CDB8; }
+
+/* App navigation is brighter and easier to read */
+html body .mobile-nav {
+  background: rgba(255,255,255,.98);
+  border-top: 1px solid var(--aa-line);
+  box-shadow: 0 -7px 24px rgba(37,47,42,.08);
+}
+html body .mobile-nav a,
+html body .mobile-nav button { color: #68736F; }
+html body .mobile-nav a.is-current,
+html body .mobile-nav a[aria-current="page"] { color: var(--aa-brand); }
+html body .mobile-nav .aa-appnav-add {
+  color: #FFFFFF;
+  background: var(--aa-brand);
+  border-radius: 13px;
+}
+
+/* Responsive rhythm and controls */
+@media (min-width: 900px) {
+  html body main :is(.section, .featured-section, .directory-browser, .directory-method) { scroll-margin-top: 24px; }
+}
+@media (max-width: 760px) {
+  html body main h1 { font-size: clamp(1.55rem, 6vw, 2rem); }
+  html body main h2 { font-size: clamp(1.2rem, 4.8vw, 1.5rem); }
+  html body :is(input, select, textarea) { min-height: 48px; font-size: 16px; }
+  html body :is(.offer-card, .company-directory-card, .directory-card, .featured-card, .listing-card) {
+    box-shadow: 0 6px 20px rgba(37, 47, 42, .055);
+  }
+  html body :is(.section, .featured-section, .directory-browser, .directory-method) {
+    border-radius: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body *, html body *::before, html body *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

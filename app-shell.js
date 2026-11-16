@@ -7,6 +7,41 @@
   "use strict";
   if (window.__asyutShell) return;
   window.__asyutShell = true;
+  // Load shared type and visual layers on public pages that use the app shell.
+  const fontHosts = [
+    ["https://fonts.googleapis.com", false],
+    ["https://fonts.gstatic.com", true]
+  ];
+  fontHosts.forEach(([href, crossOrigin]) => {
+    if (document.querySelector('link[rel="preconnect"][href="' + href + '"]')) return;
+    const link = document.createElement("link");
+    link.rel = "preconnect";
+    link.href = href;
+    if (crossOrigin) link.crossOrigin = "anonymous";
+    document.head.appendChild(link);
+  });
+  if (!document.querySelector('link[data-asyut-font="ibm-plex-arabic"]')) {
+    const font = document.createElement("link");
+    font.rel = "stylesheet";
+    font.href = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap";
+    font.dataset.asyutFont = "ibm-plex-arabic";
+    document.head.appendChild(font);
+  }
+  if (!document.querySelector('link[data-asyut-typography="global"]')) {
+    const type = document.createElement("link");
+    type.rel = "stylesheet";
+    type.href = "/assets/theme/sitewide-typography.css?v=20261116-1";
+    type.dataset.asyutTypography = "global";
+    document.head.appendChild(type);
+  }
+  if (!document.querySelector('link[data-asyut-visual="global"]')) {
+    const visual = document.createElement("link");
+    visual.rel = "stylesheet";
+    visual.href = "/assets/theme/visual-refresh.css?v=20261116-1";
+    visual.dataset.asyutVisual = "global";
+    document.head.appendChild(visual);
+  }
+
 
   const ITEMS = [
     { href: "./", match: /^\/?(index\.html)?$/, icon: "⌂", label: "الرئيسية" },
