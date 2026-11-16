@@ -58,6 +58,15 @@
     document.head.appendChild(photoOrigin);
   }
 
+  // Site-wide warmer, brighter brown palette and lighter surfaces.
+  if (!document.querySelector('link[data-asyut-light-theme="global"]')) {
+    const lightTheme = document.createElement("link");
+    lightTheme.rel = "stylesheet";
+    lightTheme.href = "/assets/theme/warm-light-theme.css?v=20261116-1";
+    lightTheme.dataset.asyutLightTheme = "global";
+    document.head.appendChild(lightTheme);
+  }
+
 
   const ITEMS = [
     { href: "./", match: /^\/?(index\.html)?$/, icon: "⌂", label: "الرئيسية" },
