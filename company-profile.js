@@ -102,10 +102,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const entity=Array.isArray(rows)?rows[0]:null;
   if(!entity){renderError("هذا السجل غير متاح للعامة أو لم يعد منشورًا في الدليل.");return;}
   const serviceCategoryCode=String(entity.service_category||"");
-  const isRealEstateCompany=["real_estate_development","real_estate_sales"].includes(serviceCategoryCode)
-   || ["developer","sales_office"].includes(String(entity.entity_type||""));
-  const isServiceProvider=(Boolean(serviceCategoryCode)&&!isRealEstateCompany)
-   || ["contractor","marketing","brokerage","consultant"].includes(String(entity.entity_type||""));
+  const isRealEstateCompany=["real_estate_development","real_estate_sales","real_estate_marketing","real_estate_brokerage"].includes(serviceCategoryCode)
+   || ["developer","sales_office","marketing","brokerage"].includes(String(entity.entity_type||""));
+  const isServiceProvider=!isRealEstateCompany&&(
+   Boolean(serviceCategoryCode)||["contractor","consultant"].includes(String(entity.entity_type||""))
+  );
   const profileSubject=isServiceProvider?"مقدم الخدمة":isRealEstateCompany?"الشركة":"الجهة";
   const profileRepresentative=isServiceProvider?"ممثل مقدم الخدمة":isRealEstateCompany?"ممثل الشركة":"ممثل الجهة";
   const name=entity.name_ar||entity.name_en||"جهة عقارية";
