@@ -1,0 +1,47 @@
+/* ASYUT AQAR — site-wide Arabic typography system (2026-11-16)
+   One readable type family across public pages; visual-only, no layout or behaviour changes. */
+:root {
+  --aa-font-ar: "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif;
+  --aa-font-size-body: 16px;
+  --aa-line-body: 1.75;
+}
+html body {
+  font-family: var(--aa-font-ar);
+  font-size: var(--aa-font-size-body);
+  line-height: var(--aa-line-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+html body :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--aa-font-ar);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+html body :is(p, li, a, label, small, strong, b, em, blockquote, figcaption,
+  summary, dt, dd, th, td, legend, caption, .eyebrow, .section-heading,
+  .topbar nav, .brand small, .btn, button, input, select, textarea,
+  .offer-price-main, .details-price-highlight, .status-message, .form-note) {
+  font-family: var(--aa-font-ar);
+  letter-spacing: normal;
+}
+html body :is(button, .btn, input, select, textarea) {
+  font-weight: 500;
+}
+html body :is(input, select, textarea) {
+  line-height: 1.5;
+}
+html body :is(.topbar nav, .brand small, .eyebrow, .offer-type, .featured-badge) {
+  font-weight: 600;
+}
+html body :is(.offer-price-main, .details-price-highlight, .brand strong) {
+  font-weight: 700;
+}
+html body :is(p, li, .description, .muted, .listing-body p, .company-description) {
+  line-height: 1.8;
+}
+@media (max-width: 600px) {
+  html body { font-size: 15px; line-height: 1.75; }
+  html body :is(h1, h2, h3, h4, h5, h6) { line-height: 1.45; }
+  html body :is(input, select, textarea, button, .btn) { font-size: 14px; }
+}

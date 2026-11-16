@@ -5,6 +5,37 @@
 //    then moves the menu to its own row under the logo and buttons.
 (function () {
   "use strict";
+  // ---------- 0) unified typography on every page using the shared navigation script ----------
+  const fontPreconnect = "https://fonts.googleapis.com";
+  const fontOrigin = "https://fonts.gstatic.com";
+  if (!document.querySelector('link[rel="preconnect"][href="' + fontPreconnect + '"]')) {
+    const preconnect = document.createElement("link");
+    preconnect.rel = "preconnect";
+    preconnect.href = fontPreconnect;
+    document.head.appendChild(preconnect);
+  }
+  if (!document.querySelector('link[rel="preconnect"][href="' + fontOrigin + '"]')) {
+    const preconnect = document.createElement("link");
+    preconnect.rel = "preconnect";
+    preconnect.href = fontOrigin;
+    preconnect.crossOrigin = "anonymous";
+    document.head.appendChild(preconnect);
+  }
+  if (!document.querySelector('link[data-asyut-font="ibm-plex-arabic"]')) {
+    const font = document.createElement("link");
+    font.rel = "stylesheet";
+    font.href = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap";
+    font.dataset.asyutFont = "ibm-plex-arabic";
+    document.head.appendChild(font);
+  }
+  if (!document.querySelector('link[data-asyut-typography="global"]')) {
+    const typography = document.createElement("link");
+    typography.rel = "stylesheet";
+    typography.href = "/assets/theme/sitewide-typography.css?v=20261116-1";
+    typography.dataset.asyutTypography = "global";
+    document.head.appendChild(typography);
+  }
+
   const header = document.querySelector("header.topbar");
   if (!header) return;
   const nav = header.querySelector("nav");
