@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v176-photo-covers-20261116";
+const CACHE_NAME = "asyut-aqar-shell-v178-brighter-warm-theme-20261116";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -44,6 +44,7 @@ const APP_SHELL = [
   "./assets/theme/sitewide-typography.css?v=20261116-1",
   "./assets/theme/visual-refresh.css?v=20261116-1",
   "./assets/theme/photo-covers.css?v=20261116-1",
+  "./assets/theme/warm-light-theme.css?v=20261116-2",
   "./buyer.css",
   "./sponsor.css",
   "./ai.css",
