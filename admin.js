@@ -515,6 +515,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return false;
       }
 
+      let adminRole = "unknown";
+      try {
+        adminRole = await request("/rest/v1/rpc/layan_admin_whoami", { method: "POST", body: "{}" });
+      } catch (_) { /* Keep the main admin panel available if the role-label RPC is temporarily unavailable. */ }
+
       const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
       const supplierCountEl = document.getElementById("statPendingSupplierAds");
       if (supplierCountEl) supplierCountEl.textContent = String(Array.isArray(rows) ? rows.length : 0);
@@ -532,9 +537,14 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadAdminUsers();
       showState(true);
       // admin-console.js (users, activity, admins, exports) starts once the admin check passed.
-      window.AsyutAdmin = { request, setStatus, esc, reloadStats: loadAdminStats, reload: () => document.getElementById("reloadPending")?.click() };
+      window.AsyutAdmin = { request, setStatus, esc, role: adminRole, reloadStats: loadAdminStats, reload: () => document.getElementById("reloadPending")?.click() };
       window.dispatchEvent(new CustomEvent("asyut:admin-ready"));
-      setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
+      const roleLabel = adminRole === "owner"
+        ? "حساب مدير أساسي — التعديلات المباشرة متاحة."
+        : adminRole === "admin"
+          ? "حساب مشرف — التعديلات تُرسل للمدير للاعتماد."
+          : "تعذر تحديد مستوى الصلاحية الحالي.";
+      setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات. " + roleLabel);
       return true;
     } catch (error) {
       showState(false);
