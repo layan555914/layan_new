@@ -195,6 +195,56 @@
     if (!session?.access_token) throw new Error("لم يرجع النظام جلسة دخول. راجع إعدادات تأكيد البريد في Supabase.");
     return session.user;
   }
+
+  async function requestEmailOtp(email, options = {}) {
+    const cleanEmail = normalizeEmail(email);
+    if (!cleanEmail) throw new Error("اكتب بريدك الإلكتروني بصورة صحيحة.");
+    const payload = {
+      email: cleanEmail,
+      // Login must not create an account accidentally; signup opts in explicitly.
+      create_user: options.shouldCreateUser === true
+    };
+    if (options.data && typeof options.data === "object") {
+      payload.data = {
+        full_name: String(options.data.full_name || "").trim().replace(/\\s+/g, " ").slice(0, 80),
+        phone: String(options.data.phone || "").replace(/[^0-9+]/g, "").slice(0, 20),
+        account_type: String(options.data.account_type || "").slice(0, 40),
+        email_notifications: options.data.email_notifications === true
+      };
+    }
+    return authRequest("otp", payload);
+  }
+
+  async function verifyEmailOtp(email, token) {
+    const cleanEmail = normalizeEmail(email);
+    const cleanToken = String(token || "").trim()
+      .replace(/[٠-٩]/g, digit => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+      .replace(/[۰-۹]/g, digit => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
+    if (!cleanEmail) throw new Error("اكتب بريدك الإلكتروني بصورة صحيحة.");
+    if (!/^\\d{6}$/.test(cleanToken)) throw new Error("اكتب كود التحقق المكوّن من 6 أرقام.");
+    const data = await authRequest("verify", { email: cleanEmail, token: cleanToken, type: "email" });
+    normalizeSession(data);
+    if (!session?.access_token || !session?.user?.id) {
+      throw new Error("تم التحقق من الكود، لكن لم تصل جلسة دخول صالحة. حاول مرة أخرى.");
+    }
+    return session.user;
+  }
+
+  async function syncEmailNotificationSubscription(enabled) {
+    if (!session?.access_token || !session?.user?.id) return null;
+    const action = typeof enabled === "boolean" ? "set_subscription" : "sync_subscription";
+    const response = await fetch(url + "/functions/v1/email-notifications", {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: "Bearer " + session.access_token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(action === "set_subscription" ? { action, enabled } : { action })
+    });
+    return readResponse(response);
+  }
+
   async function signOut() {
     if (session?.access_token) {
       const response = await fetch(url + "/auth/v1/logout", { method: "POST", headers: authHeaders() });
@@ -730,6 +780,6 @@
   }
 
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
+  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
