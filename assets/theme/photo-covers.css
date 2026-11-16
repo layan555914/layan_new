@@ -2,12 +2,12 @@
    These are decorative section photographs only, not photos of listed homes,
    verified company premises, developments, or sponsor campaigns. */
 
-/* Home: replace the legacy Layan promotional poster with a clean residential scene. */
+/* Home: retain the approved ASYUT AQAR villa hero image used by the platform. */
 html body .hero.design-hero {
   background-color: #2B302D;
   background-image:
     linear-gradient(270deg, rgba(31, 35, 32, .94) 0%, rgba(31, 35, 32, .78) 42%, rgba(31, 35, 32, .18) 100%),
-    url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800");
+    url("../demo/hero-villa.webp?v=20261116-home-villa-restore-1");
   background-position: center 52%;
   background-size: cover;
   background-repeat: no-repeat;
@@ -18,7 +18,7 @@ html body .hero.design-hero::after { display: none !important; }
   html body .hero.design-hero {
     background-image:
       linear-gradient(180deg, rgba(31, 35, 32, .72) 0%, rgba(31, 35, 32, .84) 52%, rgba(31, 35, 32, .96) 100%),
-      url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1100");
+      url("../demo/hero-villa.webp?v=20261116-home-villa-restore-1");
     background-position: center 48%;
   }
 }
