@@ -110,11 +110,7 @@ html body .companies-page .companies-hero {
     linear-gradient(270deg, rgba(48, 43, 38, .84) 0%, rgba(48, 43, 38, .67) 56%, rgba(48, 43, 38, .25) 100%),
     url("https://images.pexels.com/photos/7534234/pexels-photo-7534234.jpeg?auto=compress&cs=tinysrgb&w=1600");
 }
-html body main.marketplace-page > .hero {
-  background-image:
-    linear-gradient(270deg, rgba(43, 46, 40, .85) 0%, rgba(43, 46, 40, .68) 54%, rgba(43, 46, 40, .22) 100%),
-    url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1500");
-}
+/* Marketplace hero uses the shared section-cover treatment from asyut-premium.css. */
 html body .directory-main .directory-hero {
   background-image:
     linear-gradient(270deg, rgba(46, 43, 38, .84) 0%, rgba(46, 43, 38, .68) 60%, rgba(46, 43, 38, .32) 100%),
@@ -323,11 +319,7 @@ html body .companies-page .companies-hero {
     linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .62) 56%, rgba(48, 43, 37, .12) 100%),
     url("https://images.pexels.com/photos/7534234/pexels-photo-7534234.jpeg?auto=compress&cs=tinysrgb&w=1600");
 }
-html body main.marketplace-page > .hero {
-  background-image:
-    linear-gradient(270deg, rgba(43, 46, 40, .70) 0%, rgba(43, 46, 40, .62) 54%, rgba(43, 46, 40, .12) 100%),
-    url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1500");
-}
+/* Marketplace hero uses the shared section-cover treatment from asyut-premium.css. */
 html body.directory-page .directory-hero {
   background-image:
     linear-gradient(270deg, rgba(48, 43, 37, .71) 0%, rgba(48, 43, 37, .62) 60%, rgba(48, 43, 37, .16) 100%),
@@ -459,112 +451,127 @@ html body.page-home .category-tile-icon {
   color: #A96043 !important;
 }
 
-/* SERVICES — neutralize the page's standalone legacy brown surfaces. */
+/* SERVICES — use the same shared page, surface, control and card system as the rest of ASYUT AQAR. */
 html body main.marketplace-page {
-  color: #47382F;
-  background: #FCFBF9;
-  padding-top: 28px;
-}
-html body main.marketplace-page > .hero {
-  color: #FFFFFF !important;
-  background-color: #705B4C !important;
-  background-image:
-    linear-gradient(270deg, rgba(54, 43, 35, .70) 0%, rgba(54, 43, 35, .55) 52%, rgba(54, 43, 35, .12) 100%),
-    url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1500") !important;
-  background-position: center 44% !important;
-  background-size: cover !important;
-  border: 0 !important;
-  border-radius: 18px !important;
-  box-shadow: 0 10px 28px rgba(66, 48, 36, .10) !important;
-}
-html body main.marketplace-page > .hero :is(h1, p, .eyebrow) { color: #FFFFFF !important; }
-html body main.marketplace-page > .hero .eyebrow { color: #F3D4BD !important; }
-html body main.marketplace-page > .hero .btn-gold {
-  background: #A96043 !important;
-  border: 1px solid #A96043 !important;
-  color: #FFFFFF !important;
+  color: var(--aa-ink);
+  background: transparent;
 }
 html body main.marketplace-page > .section {
-  background: #FFFFFF !important;
-  border: 1px solid #ECE4DC !important;
-  border-radius: 16px !important;
-  box-shadow: 0 5px 20px rgba(70, 52, 39, .045);
+  background: var(--aa-surface);
+  border: 1px solid var(--aa-line);
+  border-radius: var(--aa-radius);
+  box-shadow: var(--aa-shadow);
 }
 html body main.marketplace-page .section h2,
-html body main.marketplace-page .heading-row h2 { color: #574438 !important; }
+html body main.marketplace-page .heading-row h2 {
+  color: var(--aa-ink);
+}
 html body main.marketplace-page :is(.mk-filters, .mk-directory-block, .marketplace-location-coordinates, .category-fields) {
-  background: #FBF8F4 !important;
-  border-color: #EAE1D8 !important;
-  color: #574438 !important;
+  background: var(--aa-surface-soft);
+  border-color: var(--aa-line);
+  color: var(--aa-ink);
 }
-html body main.marketplace-page .category-grid { gap: 13px; }
+html body main.marketplace-page .mk-chip {
+  background: var(--aa-surface-soft);
+  border-color: var(--aa-line);
+  color: var(--aa-muted);
+}
+html body main.marketplace-page .mk-chip.is-active {
+  background: var(--aa-brand);
+  border-color: var(--aa-brand);
+  color: #FFFFFF;
+}
 html body main.marketplace-page .category-tile {
-  background: #FFFFFF !important;
-  color: #47382F !important;
-  border: 1px solid #EAE2D9 !important;
-  border-radius: 13px !important;
-  box-shadow: 0 3px 12px rgba(70, 52, 39, .04);
+  background: var(--aa-surface);
+  color: var(--aa-ink);
+  border-color: var(--aa-line);
+  border-radius: 14px;
+  box-shadow: var(--aa-shadow);
 }
-html body main.marketplace-page .category-tile strong { color: #574438 !important; }
-html body main.marketplace-page .category-tile span { color: #786B61 !important; }
+html body main.marketplace-page .category-tile strong {
+  color: var(--aa-ink);
+}
+html body main.marketplace-page .category-tile span {
+  color: var(--aa-muted);
+}
 html body main.marketplace-page .category-tile:hover,
 html body main.marketplace-page .category-tile:focus-visible {
-  background: #FFF9F4 !important;
-  border-color: #D7AD75 !important;
+  background: var(--aa-brand-soft);
+  border-color: var(--aa-copper);
 }
 html body main.marketplace-page :is(input, select, textarea) {
-  background: #FFFFFF !important;
-  color: #47382F !important;
-  border: 1px solid #E6DDD4 !important;
-  border-radius: 10px !important;
+  background: var(--aa-surface);
+  color: var(--aa-ink);
+  border-color: var(--aa-line);
+  border-radius: 11px;
 }
 html body main.marketplace-page :is(input, select, textarea):focus-visible {
-  border-color: #A96043 !important;
-  outline: 3px solid rgba(169, 96, 67, .16) !important;
+  border-color: var(--aa-copper);
+  outline: 3px solid rgba(163, 90, 62, .18);
 }
 html body main.marketplace-page .listing-card,
 html body main.marketplace-page .mk-profile-card {
-  background: #FFFFFF !important;
-  color: #47382F !important;
-  border: 1px solid #ECE4DC !important;
-  border-radius: 14px !important;
-  box-shadow: 0 5px 18px rgba(70, 52, 39, .055);
+  background: var(--aa-surface);
+  color: var(--aa-ink);
+  border: 1px solid var(--aa-line);
+  border-radius: var(--aa-radius);
+  box-shadow: var(--aa-shadow);
 }
-html body main.marketplace-page :is(.listing-body h3, .mk-profile-content strong) { color: #574438 !important; }
-html body main.marketplace-page :is(.listing-body p, .listing-meta, .mk-profile-content span) { color: #786B61 !important; }
-html body main.marketplace-page .listing-meta { border-color: #EEE6DE !important; }
-html body main.marketplace-page .listing-meta strong { color: #A96043 !important; }
+html body main.marketplace-page :is(.listing-body h3, .mk-profile-content strong) {
+  color: var(--aa-ink);
+}
+html body main.marketplace-page :is(.listing-body p, .listing-meta, .mk-profile-content span) {
+  color: var(--aa-muted);
+}
+html body main.marketplace-page .listing-meta {
+  border-color: var(--aa-line);
+}
+html body main.marketplace-page .listing-meta strong,
+html body main.marketplace-page .mk-profile-content small,
+html body main.marketplace-page .mk-directory-note a {
+  color: var(--aa-brand);
+}
 html body main.marketplace-page .mk-profile-logo {
-  background: #F8EEE7 !important;
-  color: #A96043 !important;
+  background: var(--aa-brand-soft);
+  color: var(--aa-brand);
 }
 html body main.marketplace-page .mk-featured-label {
-  background: #FFF5E8 !important;
-  border-color: #E8C99D !important;
-  color: #80552B !important;
+  background: var(--aa-brand-soft);
+  border-color: var(--aa-line);
+  color: var(--aa-brand);
 }
 html body main.marketplace-page .marketplace-pagination button {
-  border-color: #A96043 !important;
-  color: #A96043 !important;
+  border-color: var(--aa-brand);
+  color: var(--aa-brand);
+  background: var(--aa-surface);
 }
-html body main.marketplace-page .marketplace-pagination button:disabled { opacity: .45; }
-html body main.marketplace-page .marketplace-pagination span { color: #786B61 !important; }
+html body main.marketplace-page .marketplace-pagination button:disabled {
+  opacity: .45;
+}
+html body main.marketplace-page .marketplace-pagination span {
+  color: var(--aa-muted);
+}
 html body main.marketplace-page dialog,
-html body main.marketplace-page .dialog-inner { background: #FFFFFF !important; color: #47382F !important; }
-html body main.marketplace-page .dialog-head { border-color: #EEE6DE !important; }
-html body main.marketplace-page .dialog-head h2 { color: #574438 !important; }
-html body main.marketplace-page .close-btn { background: #F8F3EE !important; color: #574438 !important; }
+html body main.marketplace-page .dialog-inner {
+  background: var(--aa-surface);
+  color: var(--aa-ink);
+}
+html body main.marketplace-page .dialog-head {
+  border-color: var(--aa-line);
+}
+html body main.marketplace-page .dialog-head h2 {
+  color: var(--aa-ink);
+}
+html body main.marketplace-page .close-btn {
+  background: var(--aa-surface-soft);
+  color: var(--aa-ink);
+}
 html body main.marketplace-page .notice,
 html body main.marketplace-page .mk-form-note {
-  background: #FBF6F0 !important;
-  border-color: #E9DCCE !important;
-  color: #574438 !important;
+  background: var(--aa-surface-warm);
+  border-color: var(--aa-line);
+  color: var(--aa-ink);
 }
-html body main.marketplace-page footer {
-  background: #5B4638 !important;
-  color: #FFF9F3 !important;
-}
-html body main.marketplace-page footer a { color: #F3D4BD !important; }
 
 @media (max-width: 760px) {
   html body.page-home .hero.design-hero::before {
