@@ -79,6 +79,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return rows[0];
   }
+  async function sendEmailAnnouncement(recordType, recordId) {
+    await ensureFreshSession();
+    const response = await fetch(base + "/functions/v1/email-notifications", {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: "Bearer " + session.access_token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "dispatch",
+        record_type: recordType,
+        record_id: String(recordId)
+      })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "تعذر إرسال تنبيه البريد.");
+    return data;
+  }
+  function emailDispatchMessage(result) {
+    if (!result) return "";
+    if (result.sent > 0) {
+      return " تم إرسال إشعار البريد إلى " + result.sent + " مشترك" +
+        (result.failed ? "، وتعذر الإرسال إلى " + result.failed : "") + ".";
+    }
+    if (result.failed > 0) return " تعذر إرسال إشعار البريد إلى " + result.failed + " مشترك.";
+    return " لا يوجد مشترك مفعّل بإشعارات البريد لهذا التحديث.";
+  }
+  async function tryEmailAnnouncement(recordType, recordId) {
+    try { return emailDispatchMessage(await sendEmailAnnouncement(recordType, recordId)); }
+    catch (error) {
+      console.warn("ASYUT AQAR email announcement failed:", recordType, recordId, error);
+      return " تعذر إرسال إشعار البريد، لكن تم حفظ النشر أو التفعيل.";
+    }
+  }
+
   function showState(isLoggedIn) {
     authPanel.hidden = isLoggedIn;
     reviewPanel.hidden = !isLoggedIn;
@@ -600,7 +636,8 @@ document.addEventListener("DOMContentLoaded", () => {
           p_verification_note: verificationNote
         })
       });
-      setStatus(action === "approve" ? (isNewProfile ? "تم التحقق من ممثل الشركة واعتماد ملفها ونشره." : "تم اعتماد تحديث ملف الشركة.") : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.");
+      const emailMessage = action === "approve" ? await tryEmailAnnouncement("company_profile", id) : "";
+      setStatus((action === "approve" ? (isNewProfile ? "تم التحقق من ممثل الشركة واعتماد ملفها ونشره." : "تم اعتماد تحديث ملف الشركة.") : action === "request_changes" ? "تم إرسال طلب استكمال البيانات إلى الشركة." : "تم رفض طلب ملف الشركة.") + emailMessage);
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة ملف الشركة."); }
     finally { button.disabled = false; }
@@ -717,7 +754,8 @@ document.addEventListener("DOMContentLoaded", () => {
           pushStatus = " تعذر إرسال إشعارات الهاتف، لكن تم نشر الإعلان بنجاح.";
         }
       }
-      setStatus(action === "approve" ? "تم اعتماد الإعلان ونشره." + pushStatus : "تم رفض الإعلان وتسجيل السبب.");
+      const emailStatus = action === "approve" ? await tryEmailAnnouncement("property_offer", Number(card.dataset.propertyOfferId)) : "";
+      setStatus(action === "approve" ? "تم اعتماد الإعلان ونشره." + pushStatus + emailStatus : "تم رفض الإعلان وتسجيل السبب.");
       await loadPending();
     } catch (error) {
       setStatus(error.message || "تعذر تنفيذ مراجعة الإعلان.");
@@ -734,7 +772,8 @@ document.addEventListener("DOMContentLoaded", () => {
     button.disabled = true;
     try {
       await requestOneRow("/rest/v1/marketplace_listings?id=eq." + encodeURIComponent(card.dataset.marketplaceId) + "&status=eq.pending", {method:"PATCH",body:JSON.stringify({status:action==="approve"?"approved":"rejected",admin_notes:action==="approve"?null:notes,reviewed_at:new Date().toISOString(),reviewed_by:session.user.id})});
-      setStatus(action==="approve"?"تم اعتماد إعلان سوق الخدمات ونشره.":"تم رفض إعلان سوق الخدمات.");
+      const emailStatus = action === "approve" ? await tryEmailAnnouncement("marketplace_listing", card.dataset.marketplaceId) : "";
+      setStatus((action==="approve"?"تم اعتماد إعلان سوق الخدمات ونشره.":"تم رفض إعلان سوق الخدمات.") + emailStatus);
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث حالة الإعلان."); }
     finally { button.disabled = false; }
@@ -755,7 +794,8 @@ document.addEventListener("DOMContentLoaded", () => {
       await requestOneRow("/rest/v1/company_property_ads?id=eq." + encodeURIComponent(card.dataset.companyAdId) + "&status=eq.pending", {
         method: "PATCH", body: JSON.stringify(patch)
       });
-      setStatus(action === "activate" ? "تم تفعيل إعلان الشركة لمدة 30 يومًا." : "تم رفض طلب إعلان الشركة.");
+      const emailStatus = action === "activate" ? await tryEmailAnnouncement("company_ad", card.dataset.companyAdId) : "";
+      setStatus((action === "activate" ? "تم تفعيل إعلان الشركة لمدة 30 يومًا." : "تم رفض طلب إعلان الشركة.") + emailStatus);
       await loadPending();
     } catch (error) { setStatus(error.message || "تعذر تحديث إعلان الشركة."); }
     finally { button.disabled = false; }
@@ -795,7 +835,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (!window.confirm("تأكيد تفعيل الإعلان لمدة " + days + " يومًا بالسعر المتفق عليه " + price + " جنيه؟")) return;
         await request("/rest/v1/rpc/layan_activate_supplier_ad", {method:"POST",body:JSON.stringify({p_ad_id:id,p_days:days,p_price:price})});
-        setStatus("تم تفعيل الإعلان بعد تسجيل السعر والمدة المتفق عليهما.");
+        const emailStatus = await tryEmailAnnouncement("supplier_ad", id);
+        setStatus("تم تفعيل الإعلان بعد تسجيل السعر والمدة المتفق عليهما." + emailStatus);
       } else {
         const reason = window.prompt("اكتب سبب رفض الطلب (3 أحرف على الأقل):");
         if (reason === null) return;
