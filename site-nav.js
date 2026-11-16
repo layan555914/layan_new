@@ -59,6 +59,15 @@
     document.head.appendChild(photoOrigin);
   }
 
+  // Temporary approved homepage-villa fallback for empty brown image slots only.
+  if (!document.querySelector('link[data-asyut-empty-photo-fallback="global"]')) {
+    const emptyPhotoFallback = document.createElement("link");
+    emptyPhotoFallback.rel = "stylesheet";
+    emptyPhotoFallback.href = "/assets/theme/empty-image-villa-fallback.css?v=20261116-1";
+    emptyPhotoFallback.dataset.asyutEmptyPhotoFallback = "global";
+    document.head.appendChild(emptyPhotoFallback);
+  }
+
   // Site-wide warmer, brighter brown palette and lighter surfaces.
   if (!document.querySelector('link[data-asyut-light-theme="global"]')) {
     const lightTheme = document.createElement("link");
