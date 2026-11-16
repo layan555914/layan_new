@@ -149,7 +149,7 @@ test("added admin requests sponsored-ad edits and cannot upload an image before 
   await expect.poll(() => state.changes.length).toBe(1);
   expect(state.patches).toHaveLength(0);
   expect(state.changes[0].p_payload).toMatchObject({ method: "PATCH" });
-  await expect(page.locator("#adminStatus")).toContainText("تم إرسال طلب التغيير إلى المدير للاعتماد");
+  await expect(page.locator("#adminStatus")).toContainText("تم إرسال طلبك إلى المدير للاعتماد");
 
   await page.locator("[data-ad-id='a1'] [data-ad='edit']").click();
   const secondDlg = page.locator(".as-dialog[open]");
