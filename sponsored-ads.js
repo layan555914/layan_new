@@ -18,16 +18,33 @@
   function renderAd(ad, options = {}) {
     const image = httpUrl(ad.image_url);
     const target = httpUrl(ad.target_url);
-    const phone = String(ad.contact_phone || "").replace(/[^+0-9]/g, "");
-    const wa = waNumber(ad.contact_phone);
+    const phoneNumbers = String(ad.contact_phone || "")
+      .split(/[\\/،,;|\\n]+/)
+      .map(value => value.trim())
+      .filter(Boolean)
+      .map(value => ({
+        label: value,
+        tel: value.replace(/[^+0-9]/g, ""),
+        wa: waNumber(value)
+      }))
+      .filter(value => value.tel.length >= 10);
     const name = ad.business_name || ad.title || "إعلان ممول";
     const media = image
       ? '<img src="' + esc(image) + '" alt="' + esc(name) + '" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" decoding="async">'
       : '<div class="sp-ad-monogram" aria-hidden="true"><span>' + esc(initial(name)) + '</span><small>' + esc(name) + '</small></div>';
+    const contactActions = phoneNumbers.flatMap((number, index) => {
+      const label = esc(number.label);
+      const links = [
+        '<a class="sp-ad-btn" href="tel:' + esc(number.tel) + '" data-listing-id="ad-' + esc(ad.id) + '" aria-label="اتصال ' + label + '">اتصال ' + label + '</a>'
+      ];
+      if (number.wa) {
+        links.push('<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + number.wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || name) + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + label + '">واتساب ' + label + '</a>');
+      }
+      return links;
+    });
     const actions = [
       target ? '<a class="sp-ad-btn sp-ad-btn-primary" href="' + esc(target) + '" target="_blank" rel="noopener noreferrer sponsored">اعرف التفاصيل</a>' : "",
-      phone ? '<a class="sp-ad-btn" href="tel:' + esc(phone) + '" data-listing-id="ad-' + esc(ad.id) + '">اتصل بالمعلن</a>' : "",
-      wa ? '<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || name) + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + esc(name) + '">واتساب</a>' : ""
+      ...contactActions
     ].filter(Boolean).join("");
     const extraClass = options.className ? " " + options.className : "";
     const extraAttr = options.attr ? " " + options.attr : "";
