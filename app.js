@@ -582,6 +582,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function friendlyAuthError(message) {
     const text = String(message || "");
+    if (/otp_expired|token has expired|invalid.*token|token.*invalid/i.test(text)) return "كود التحقق غير صحيح أو انتهت صلاحيته. اطلب كودًا جديدًا وحاول مرة أخرى.";
+    if (/user not found|user does not exist|unable to find user/i.test(text)) return "هذا البريد غير مسجل. اختر «إنشاء حساب جديد» لإتمام التسجيل.";
     if (/Invalid login credentials/i.test(text)) return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
     if (/already registered|User already registered/i.test(text)) return "هذا البريد مسجّل بالفعل. سجّل الدخول بدلًا من إنشاء حساب جديد.";
     if (/Password should be at least|weak password/i.test(text)) return "كلمة المرور ضعيفة؛ استخدم 6 أحرف على الأقل.";
@@ -1829,6 +1831,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function handleAuthCallback(event) {
     if (event.detail?.success) {
+      window.LAYAN_SUPABASE?.syncEmailNotificationSubscription?.().catch(error => console.warn("Email notification callback sync failed:", error));
       updateAuthButton();
       if (continueCompanyRegistration()) return;
       setStatus("تم تأكيد البريد الإلكتروني وتسجيل الدخول بنجاح. أهلًا بك في أسيوط عقار.");
