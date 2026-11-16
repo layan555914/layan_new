@@ -385,20 +385,6 @@ html body :is(button, a, summary, [role="button"]):focus-visible {
    ===================================================================== */
 
 /* HOME — replace the old espresso pseudo-image/veil, not just the element background. */
-html body.page-home .hero.design-hero {
-  background: #705B4C !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-html body.page-home .hero.design-hero::before {
-  background: url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800") center 52% / cover no-repeat !important;
-  background-image: url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800") !important;
-  opacity: 1 !important;
-}
-html body.page-home .hero.design-hero::after {
-  display: block !important;
-  background: linear-gradient(270deg, rgba(54, 43, 35, .72) 0%, rgba(54, 43, 35, .56) 43%, rgba(54, 43, 35, .08) 100%) !important;
-}
 html body.page-home .hero.design-hero :is(h1, p, .eyebrow) { color: #FFFDF9 !important; }
 html body.page-home .hero.design-hero h1 span { color: #F1D0B7 !important; }
 html body.page-home .hero.design-hero .design-hero-search {
@@ -567,12 +553,6 @@ html body main.marketplace-page footer {
 html body main.marketplace-page footer a { color: #F3D4BD !important; }
 
 @media (max-width: 760px) {
-  html body.page-home .hero.design-hero::before {
-    background-position: center 48% !important;
-  }
-  html body.page-home .hero.design-hero::after {
-    background: linear-gradient(180deg, rgba(54, 43, 35, .16) 0%, rgba(54, 43, 35, .56) 52%, rgba(54, 43, 35, .86) 100%) !important;
-  }
   html body.page-home .design-benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   html body.page-home .design-benefits > div { padding: 10px 6px !important; }
   html body main.marketplace-page > .hero { background-position: center !important; }
