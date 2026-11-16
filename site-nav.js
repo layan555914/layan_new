@@ -35,6 +35,13 @@
     typography.dataset.asyutTypography = "global";
     document.head.appendChild(typography);
   }
+  if (!document.querySelector('link[data-asyut-visual="global"]')) {
+    const visual = document.createElement("link");
+    visual.rel = "stylesheet";
+    visual.href = "/assets/theme/visual-refresh.css?v=20261116-1";
+    visual.dataset.asyutVisual = "global";
+    document.head.appendChild(visual);
+  }
 
   const header = document.querySelector("header.topbar");
   if (!header) return;
