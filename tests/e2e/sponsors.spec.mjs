@@ -51,7 +51,7 @@ test("home page shows the sponsors and the premium sponsored ad from the databas
   await expect(section.locator(".os-partner")).toContainText("Nile Tiles");
   const ad = page.locator(".sp-ad").first();
   await expect(ad).toContainText("معرض سيراميك asuit");
-  await expect(ad.locator(".sp-ad-badge")).toContainText("إعلان ممول");
+  await expect(ad.locator(".sp-ad-badge")).toContainText("إعلان مميز");
   await expect(ad.locator(".sp-ad-monogram")).toBeVisible();
   await expect(ad.locator("a[href^='tel:']")).toBeVisible();
 });
