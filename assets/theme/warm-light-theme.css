@@ -179,7 +179,7 @@ html body :is(button, a, summary, [role="button"]):focus-visible {
   --aa-ink: #47382F;
   --aa-muted: #786B61;
   --aa-line: #ECE3DA;
-  --aa-brand: #A96043;
+  --aa-brand: #9C523A;
   --aa-brand-hover: #914D36;
   --aa-brand-soft: #F8EEE7;
   --aa-copper: #D3A080;
@@ -310,37 +310,37 @@ html body :is(.company-profile-hero, .directory-footer, .know-footer, footer.foo
 /* Brighter photography with a softer veil. Keep a controlled text-safe area. */
 html body .hero.design-hero {
   background-image:
-    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .48) 42%, rgba(48, 43, 37, .08) 100%),
+    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .64) 42%, rgba(48, 43, 37, .08) 100%),
     url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800");
 }
 html body main > .page-hero[aria-labelledby="offersPageTitle"] {
   background-image:
-    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .48) 54%, rgba(48, 43, 37, .12) 100%),
+    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .62) 54%, rgba(48, 43, 37, .12) 100%),
     url("https://images.pexels.com/photos/6238614/pexels-photo-6238614.jpeg?auto=compress&cs=tinysrgb&w=1600");
 }
 html body .companies-page .companies-hero {
   background-image:
-    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .47) 56%, rgba(48, 43, 37, .12) 100%),
+    linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .62) 56%, rgba(48, 43, 37, .12) 100%),
     url("https://images.pexels.com/photos/7534234/pexels-photo-7534234.jpeg?auto=compress&cs=tinysrgb&w=1600");
 }
 html body main.marketplace-page > .hero {
   background-image:
-    linear-gradient(270deg, rgba(43, 46, 40, .70) 0%, rgba(43, 46, 40, .48) 54%, rgba(43, 46, 40, .12) 100%),
+    linear-gradient(270deg, rgba(43, 46, 40, .70) 0%, rgba(43, 46, 40, .62) 54%, rgba(43, 46, 40, .12) 100%),
     url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1500");
 }
 html body.directory-page .directory-hero {
   background-image:
-    linear-gradient(270deg, rgba(48, 43, 37, .71) 0%, rgba(48, 43, 37, .50) 60%, rgba(48, 43, 37, .16) 100%),
+    linear-gradient(270deg, rgba(48, 43, 37, .71) 0%, rgba(48, 43, 37, .62) 60%, rgba(48, 43, 37, .16) 100%),
     url("https://images.pexels.com/photos/5033768/pexels-photo-5033768.jpeg?auto=compress&cs=tinysrgb&w=1600");
 }
 html body .featured-main .featured-hero {
   background-image:
-    linear-gradient(270deg, rgba(48, 43, 37, .69) 0%, rgba(48, 43, 37, .46) 60%, rgba(48, 43, 37, .10) 100%),
+    linear-gradient(270deg, rgba(48, 43, 37, .69) 0%, rgba(48, 43, 37, .60) 60%, rgba(48, 43, 37, .10) 100%),
     url("https://images.pexels.com/photos/6438746/pexels-photo-6438746.jpeg?auto=compress&cs=tinysrgb&w=1600");
 }
 html body.know-page .know-hero {
   background-image:
-    linear-gradient(270deg, rgba(43, 46, 40, .70) 0%, rgba(43, 46, 40, .47) 56%, rgba(43, 46, 40, .12) 100%),
+    linear-gradient(270deg, rgba(43, 46, 40, .70) 0%, rgba(43, 46, 40, .62) 56%, rgba(43, 46, 40, .12) 100%),
     url("https://images.pexels.com/photos/5691545/pexels-photo-5691545.jpeg?auto=compress&cs=tinysrgb&w=1500");
 }
 @media (max-width: 760px) {
