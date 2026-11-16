@@ -261,6 +261,9 @@
     if (target && !httpUrl(target)) { status.textContent = "رابط النشاط غير صحيح."; return; }
     btn.disabled = true;
     try {
+      if (pendingAdFile && A?.role !== "owner") {
+        throw new Error("رفع صورة الإعلان يحتاج جلسة المدير الأساسي حتى لا تُرفع صورة قبل اعتماد التعديل. يمكنك إرسال باقي البيانات للموافقة.");
+      }
       let image = aForm.image_url.value.trim();
       if (pendingAdFile) { status.textContent = "جارٍ رفع الصورة..."; image = await uploadImage(pendingAdFile, "sponsored-ad"); }
       if (image && !httpUrl(image)) throw new Error("رابط الصورة غير صحيح.");
