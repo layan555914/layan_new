@@ -68,6 +68,16 @@
     document.head.appendChild(lightTheme);
   }
 
+  // Final shared component layer: load after page CSS and the global light theme so every
+  // public section receives the same design tokens and component refinements.
+  if (!document.querySelector('link[data-asyut-design-foundation="global"]')) {
+    const designSystem = document.createElement("link");
+    designSystem.rel = "stylesheet";
+    designSystem.href = "/assets/theme/design-system.css?v=20261116-foundation-2";
+    designSystem.dataset.asyutDesignFoundation = "global";
+    document.head.appendChild(designSystem);
+  }
+
   const header = document.querySelector("header.topbar");
   if (!header) return;
   const nav = header.querySelector("nav");
