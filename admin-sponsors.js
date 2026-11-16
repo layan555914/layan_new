@@ -207,7 +207,7 @@
       const order = { active: 0, pending: 1, paused: 2, expired: 3, rejected: 4 };
       ads.sort((x, y) => (order[adState(x)] ?? 9) - (order[adState(y)] ?? 9));
       box.innerHTML = ads.length ? ads.map(adRow).join("") : '<p class="admin-empty">لا توجد إعلانات ممولة بعد. أضف إعلانًا من الزر أعلاه.</p>';
-      if (typeof A?.reloadStats === "function") await A.reloadStats();
+      try { if (typeof A?.reloadStats === "function") await A.reloadStats(); } catch (_) { /* Keep the ad list usable if a separate dashboard counter fails. */ }
     } catch (e) { box.innerHTML = '<p class="admin-empty">' + esc(e.message) + "</p>"; }
   }
 
@@ -291,7 +291,7 @@
       await loadAds();
     } catch (err) {
       if (err?.code === "PENDING_APPROVAL") {
-        status.textContent = "تم إرسال طلبك إلى المدير للاعتماد. لن يتغير الإعلان قبل الموافقة.";
+        say("تم إرسال طلبك إلى المدير للاعتماد. لن يتغير الإعلان قبل الموافقة.");
         adDialog.close();
         await loadAds();
       } else status.textContent = err.message || "تعذر الحفظ.";
