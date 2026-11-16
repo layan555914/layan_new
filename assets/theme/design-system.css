@@ -1,0 +1,131 @@
+/* ASYUT AQAR — shared design-system foundation
+   Version: 2026-11-16-foundation-1
+   Purpose: shared warm/light tokens and safe base component defaults.
+   This layer intentionally does not set hero backgrounds or alter page structure,
+   the approved homepage villa image, application logic, or data behaviour. */
+
+:root {
+  color-scheme: light;
+
+  /* Shared brand palette — warm, bright, and readable (not navy-led). */
+  --aa-page: #FAF8F5;
+  --aa-surface: #FFFFFF;
+  --aa-surface-soft: #F5F2ED;
+  --aa-surface-warm: #FCF6F0;
+  --aa-ink: #40362F;
+  --aa-muted: #786C62;
+  --aa-line: #EAE2D9;
+  --aa-brand: #A35A3E;
+  --aa-brand-hover: #8D4B35;
+  --aa-brand-soft: #F8EEE8;
+  --aa-accent: #C9916F;
+  --aa-accent-soft: #F3E3D7;
+  --aa-danger: #A95136;
+
+  /* Shape and elevation tokens. */
+  --aa-radius-sm: 10px;
+  --aa-radius: 16px;
+  --aa-radius-lg: 22px;
+  --aa-shadow: 0 8px 24px rgba(64, 54, 47, .07);
+  --aa-shadow-hover: 0 14px 30px rgba(64, 54, 47, .11);
+  --aa-font-ar: "Readex Pro", "Alexandria", Tahoma, Arial, sans-serif;
+
+  /* Compatibility aliases for existing page styles. */
+  --navy: #514237;
+  --blue: #685446;
+  --gold: #C9916F;
+  --gold-light: #F3E3D7;
+  --red: #A95136;
+  --bg: #FAF8F5;
+  --text: #40362F;
+  --muted: #786C62;
+  --border: #EAE2D9;
+  --paper: #FCFAF7;
+  --line: #EEE6DE;
+  --ink: #40362F;
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+html body {
+  background-color: var(--aa-page);
+  color: var(--aa-ink);
+  font-family: var(--aa-font-ar);
+}
+
+html body :is(p, li, dd, dt, figcaption) {
+  line-height: 1.85;
+}
+
+html body main :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--aa-font-ar);
+  color: var(--aa-ink);
+  letter-spacing: 0;
+  text-wrap: pretty;
+}
+
+html body main h1 {
+  font-size: clamp(1.75rem, 3vw, 2.55rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+html body main h2 {
+  font-size: clamp(1.3rem, 2.2vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+html body main h3 {
+  font-size: clamp(1.05rem, 1.5vw, 1.28rem);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Shared content surfaces; hero and image-cover sections are deliberately excluded. */
+html body :is(
+  .offer-card,
+  .listing-card,
+  .company-directory-card,
+  .directory-card,
+  .featured-card,
+  .mk-profile-card,
+  .know-card,
+  .section,
+  .directory-browser,
+  .directory-method,
+  .company-map-panel,
+  .directory-map-panel
+) {
+  border-color: var(--aa-line);
+  border-radius: var(--aa-radius);
+  box-shadow: var(--aa-shadow);
+}
+
+/* Consistent form controls without changing their dimensions or behaviour. */
+html body :is(input, select, textarea) {
+  border-color: var(--aa-line);
+  border-radius: var(--aa-radius-sm);
+  color: var(--aa-ink);
+  font-family: var(--aa-font-ar);
+}
+
+html body :is(input, select, textarea):focus-visible {
+  outline: 2px solid var(--aa-accent);
+  outline-offset: 2px;
+}
+
+/* Shared button shape only; existing page colours and actions remain in control. */
+html body :is(.btn, .favorite-button, .marketplace-pagination button) {
+  border-radius: 11px;
+  font-family: var(--aa-font-ar);
+}
+
+@media (max-width: 640px) {
+  html body main :is(h1, h2, h3) {
+    text-wrap: balance;
+  }
+}
