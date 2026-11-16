@@ -43,6 +43,22 @@
     document.head.appendChild(visual);
   }
 
+  // Shared licensed stock-photo covers (decorative only; never used as listing/company proof photos).
+  if (!document.querySelector('link[data-asyut-photos="covers"]')) {
+    const photos = document.createElement("link");
+    photos.rel = "stylesheet";
+    photos.href = "/assets/theme/photo-covers.css?v=20261116-1";
+    photos.dataset.asyutPhotos = "covers";
+    document.head.appendChild(photos);
+  }
+  if (!document.querySelector('link[rel="preconnect"][href="https://images.pexels.com"]')) {
+    const photoOrigin = document.createElement("link");
+    photoOrigin.rel = "preconnect";
+    photoOrigin.href = "https://images.pexels.com";
+    photoOrigin.crossOrigin = "anonymous";
+    document.head.appendChild(photoOrigin);
+  }
+
   const header = document.querySelector("header.topbar");
   if (!header) return;
   const nav = header.querySelector("nav");
