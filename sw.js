@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v180-preserve-home-background-20261116";
+const CACHE_NAME = "asyut-aqar-shell-v181-home-consistent-system-20261116";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -44,7 +44,7 @@ const APP_SHELL = [
   "./assets/theme/sitewide-typography.css?v=20261116-1",
   "./assets/theme/visual-refresh.css?v=20261116-1",
   "./assets/theme/photo-covers.css?v=20261116-1",
-  "./assets/theme/warm-light-theme.css?v=20261116-4",
+  "./assets/theme/warm-light-theme.css?v=20261116-5",
   "./buyer.css",
   "./sponsor.css",
   "./ai.css",
