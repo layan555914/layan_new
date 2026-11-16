@@ -1,0 +1,25 @@
+/* ASYUT AQAR — temporary photo fallback for genuinely empty image slots.
+   Uses the exact approved homepage villa photograph. Existing uploaded images
+   are never replaced; this only applies when a media slot has no img/picture. */
+html body :is(
+  .offer-image-placeholder,
+  .partner-ad-art,
+  .sp-ad-media,
+  .company-card-cover,
+  .mk-profile-logo,
+  .ps-media,
+  .os-partner-logo
+):not(:has(img, picture)) {
+  background-color: #6B5544 !important;
+  background-image:
+    linear-gradient(rgba(49, 38, 30, .22), rgba(49, 38, 30, .22)),
+    url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1") !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Keep placeholder labels/icons legible over the temporary photo. */
+html body :is(.offer-image-placeholder, .partner-ad-art, .sp-ad-media, .company-card-cover, .mk-profile-logo, .ps-media, .os-partner-logo):not(:has(img, picture))::before {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .45);
+}
