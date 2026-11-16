@@ -210,3 +210,59 @@ test("static provider profile uses the shared profile layout and styled branch a
   await expect(page.locator(".branch .phone").first()).toHaveCSS("display", "flex");
   await expect(page.getByRole("link", { name: /اتصال: 01012588382/ })).toBeVisible();
 });
+
+
+test("marketing and brokerage directory profiles are presented as companies", async ({ page }) => {
+  const profiles = [
+    {
+      ...publicDirectoryEntity,
+      id: "d4444444-4444-4444-8444-444444444444",
+      name_ar: "شركة تسويق اختبارية",
+      entity_type: "marketing",
+      service_category: "real_estate_marketing",
+      public_phone: null,
+      public_email: null,
+      public_address: null,
+      public_whatsapp: null,
+      public_services: [],
+      public_gallery_urls: [],
+      public_coverage_areas: []
+    },
+    {
+      ...publicDirectoryEntity,
+      id: "d5555555-5555-4555-8555-555555555555",
+      name_ar: "مكتب وساطة اختباري",
+      entity_type: "brokerage",
+      service_category: "real_estate_brokerage",
+      public_phone: null,
+      public_email: null,
+      public_address: null,
+      public_whatsapp: null,
+      public_services: [],
+      public_gallery_urls: [],
+      public_coverage_areas: []
+    }
+  ];
+
+  await page.route(SUPABASE + "/rest/v1/directory_entities**", async route => {
+    const url = new URL(route.request().url());
+    const requestedId = (url.searchParams.get("id") || "").replace(/^eq\./, "");
+    const profile = profiles.find(item => item.id === requestedId);
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(profile ? [profile] : [])
+    });
+  });
+  await page.route(SUPABASE + "/rest/v1/directory_entity_sources**", async route => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+  });
+
+  for (const profile of profiles) {
+    await page.goto("/company.html?entity_id=" + profile.id);
+    await expect(page.locator("#companyProfileRoot h1")).toHaveText(profile.name_ar);
+    await expect(page.locator(".company-contact-details")).toContainText("بيانات التواصل ومقر الشركة");
+    await expect(page.locator(".company-claim-panel")).toContainText("ممثل الشركة؟");
+    await expect(page.locator(".company-contact-details")).not.toContainText("مقدم الخدمة");
+  }
+});
