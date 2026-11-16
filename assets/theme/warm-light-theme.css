@@ -98,7 +98,7 @@ html body :is(.category, .detail-chip, .directory-tag, .company-service-list li)
 html body .hero.design-hero {
   background-image:
     linear-gradient(270deg, rgba(45, 43, 38, .86) 0%, rgba(45, 43, 38, .69) 42%, rgba(45, 43, 38, .12) 100%),
-    url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800");
+    url("../demo/hero-villa.webp?v=20261116-home-villa-restore-1");
 }
 html body main > .page-hero[aria-labelledby="offersPageTitle"] {
   background-image:
@@ -135,7 +135,7 @@ html body.know-page .know-hero {
   html body .hero.design-hero {
     background-image:
       linear-gradient(180deg, rgba(43, 46, 40, .66) 0%, rgba(43, 46, 40, .80) 52%, rgba(43, 46, 40, .92) 100%),
-      url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1100");
+      url("../demo/hero-villa.webp?v=20261116-home-villa-restore-1");
   }
 }
 @media (max-width: 640px) {
@@ -311,7 +311,7 @@ html body :is(.company-profile-hero, .directory-footer, .know-footer, footer.foo
 html body .hero.design-hero {
   background-image:
     linear-gradient(270deg, rgba(48, 43, 37, .70) 0%, rgba(48, 43, 37, .64) 42%, rgba(48, 43, 37, .08) 100%),
-    url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800");
+    url("../demo/hero-villa.webp?v=20261116-home-villa-restore-1");
 }
 html body main > .page-hero[aria-labelledby="offersPageTitle"] {
   background-image:
@@ -347,7 +347,7 @@ html body.know-page .know-hero {
   html body .hero.design-hero {
     background-image:
       linear-gradient(180deg, rgba(43, 46, 40, .24) 0%, rgba(43, 46, 40, .60) 48%, rgba(43, 46, 40, .86) 100%),
-      url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1100");
+      url("../demo/hero-villa.webp?v=20261116-home-villa-restore-1");
   }
 }
 
@@ -391,8 +391,8 @@ html body.page-home .hero.design-hero {
   box-shadow: none !important;
 }
 html body.page-home .hero.design-hero::before {
-  background: url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800") center 52% / cover no-repeat !important;
-  background-image: url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800") !important;
+  background: url("../demo/hero-villa.webp?v=20261116-home-villa-restore-1") center 52% / cover no-repeat !important;
+  background-image: url("../demo/hero-villa.webp?v=20261116-home-villa-restore-1") !important;
   opacity: 1 !important;
 }
 html body.page-home .hero.design-hero::after {

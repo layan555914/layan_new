@@ -47,7 +47,7 @@
   if (!document.querySelector('link[data-asyut-photos="covers"]')) {
     const photos = document.createElement("link");
     photos.rel = "stylesheet";
-    photos.href = "/assets/theme/photo-covers.css?v=20261116-1";
+    photos.href = "/assets/theme/photo-covers.css?v=20261116-2";
     photos.dataset.asyutPhotos = "covers";
     document.head.appendChild(photos);
   }
@@ -63,7 +63,7 @@
   if (!document.querySelector('link[data-asyut-light-theme="global"]')) {
     const lightTheme = document.createElement("link");
     lightTheme.rel = "stylesheet";
-    lightTheme.href = "/assets/theme/warm-light-theme.css?v=20261116-3";
+    lightTheme.href = "/assets/theme/warm-light-theme.css?v=20261116-4";
     lightTheme.dataset.asyutLightTheme = "global";
     document.head.appendChild(lightTheme);
   }
