@@ -87,7 +87,7 @@ test("marketplace displays approved service provider profiles separately from su
   const ads = page.locator("#marketplaceListings .mk-card");
   await expect(profiles).toHaveCount(1);
   await expect(profiles).toContainText(ENTITY.name_ar);
-  await expect(profiles).toContainText("ملف تعريفي مجاني");
+  await expect(profiles).toContainText("مقدم خدمة");
   await expect(profiles).toHaveAttribute("href", "./company.html?entity_id=" + ENTITY_ID);
   await expect(ads).toHaveCount(1);
   await expect(ads).toContainText(serviceAd.title);

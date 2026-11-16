@@ -20,6 +20,14 @@ const PRIME = {
   marketplace_category: "الشركات والمكاتب العقارية",
   website_url: "https://www.primedev-eg.com/Arabic/", public_logo_url: null
 };
+const DEVELOPER = {
+  ...ENTITY, id: "d4444444-4444-4444-8444-444444444444",
+  name_ar: "شركة اختبار التطوير العقاري",
+  entity_type: "developer", service_category: "real_estate_development",
+  marketplace_category: "المشروعات والمطورون العقاريون",
+  website_url: "https://developer-test.example",
+  public_logo_url: "https://assets.example.invalid/developer-logo.png"
+};
 const OWNER_PROFILE = {
   id: "b2222222-2222-4222-8222-222222222222",
   company_name: "شركة ملف مقدم من المالك", category: "شركات عقارية",
@@ -32,36 +40,43 @@ const reply = (route, body, status = 200) => route.fulfill({
   status, contentType: "application/json", body: JSON.stringify(body)
 });
 
-test("companies section uses shared logo cards and the exact official Prime website fallback", async ({ page }) => {
+test("company directory separates company logos from service-provider profiles", async ({ page }) => {
   await page.route(SUPABASE + "/rest/v1/**", async route => {
     const table = new URL(route.request().url()).pathname.split("/").pop();
     if (table === "company_profiles_public") return reply(route, [OWNER_PROFILE]);
-    if (table === "directory_entities") return reply(route, [ENTITY, PRIME]);
+    if (table === "directory_entities") return reply(route, [ENTITY, PRIME, DEVELOPER]);
     return reply(route, []);
   });
   await page.goto("/companies.html");
-  const ownerCard = page.locator("#companyDirectoryGrid .company-directory-card--owner");
-  const entityCard = page.locator("#companyDirectoryGrid .company-directory-card--directory").filter({ hasText: ENTITY.name_ar });
-  const primeCard = page.locator("#companyDirectoryGrid .company-directory-card--directory").filter({ hasText: PRIME.name_ar });
+  const marketing = page.locator("#marketingCompaniesGrid");
+  const developers = page.locator("#developmentCompaniesGrid");
+  const ownerCard = marketing.locator(".company-directory-card--owner");
+  const primeCard = developers.locator(".company-directory-card--directory").filter({ hasText: PRIME.name_ar });
+  const developerCard = developers.locator(".company-directory-card--directory").filter({ hasText: DEVELOPER.name_ar });
   await expect(ownerCard.locator(".aq-entity-brand img")).toHaveAttribute("src", OWNER_PROFILE.logo_url);
-  await expect(entityCard.locator(".aq-entity-brand img")).toHaveAttribute("src", ENTITY.public_logo_url);
   await expect(primeCard.locator(".aq-entity-brand img")).toHaveAttribute("src", PRIME_LOGO);
+  await expect(developerCard.locator(".aq-entity-brand img")).toHaveAttribute("src", DEVELOPER.public_logo_url);
+  await expect(marketing).not.toContainText(ENTITY.name_ar);
+  await expect(developers).not.toContainText(ENTITY.name_ar);
+  await expect(marketing).not.toContainText(DEVELOPER.name_ar);
+  await expect(marketing).not.toContainText(PRIME.name_ar);
   await expect(ownerCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
+  await expect(developerCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
 });
 
 test("services marketplace shows provider and official Prime logos in the shared frame", async ({ page }) => {
   await page.route(SUPABASE + "/rest/v1/**", async route => {
     const table = new URL(route.request().url()).pathname.split("/").pop();
-    if (table === "directory_entities") return reply(route, [ENTITY, PRIME]);
+    if (table === "directory_entities") return reply(route, [ENTITY, PRIME, DEVELOPER]);
     return reply(route, []);
   });
   await page.goto("/marketplace.html");
   const cards = page.locator("#marketplaceServiceProfiles .mk-profile-card");
   const entityCard = cards.filter({ hasText: ENTITY.name_ar });
-  const primeCard = cards.filter({ hasText: PRIME.name_ar });
-  await expect(cards).toHaveCount(2);
+  await expect(cards).toHaveCount(1);
   await expect(entityCard.locator(".aq-entity-brand img")).toHaveAttribute("src", ENTITY.public_logo_url);
-  await expect(primeCard.locator(".aq-entity-brand img")).toHaveAttribute("src", PRIME_LOGO);
+  await expect(cards).not.toContainText(PRIME.name_ar);
+  await expect(cards).not.toContainText(DEVELOPER.name_ar);
   await expect(entityCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
 });
 

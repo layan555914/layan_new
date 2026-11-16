@@ -51,7 +51,7 @@ test("company directory continues to render approved profiles from the public vi
   await mockApprovedCompanyView(page);
   await page.goto("/companies.html");
 
-  const companyCard = page.locator("#companyDirectoryGrid .company-directory-card").filter({ hasText: approvedCompany.company_name });
+  const companyCard = page.locator("#marketingCompaniesGrid .company-directory-card").filter({ hasText: approvedCompany.company_name });
   await expect(companyCard).toHaveCount(1);
   await expect(companyCard).toContainText(approvedCompany.company_name);
   await expect(page.locator("#companyDirectoryCount")).toContainText("1 ملفًا متاحًا");

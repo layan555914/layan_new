@@ -17,7 +17,7 @@
     ["", "الرئيسية", ["", "index.html"]],
     ["offers.html", "العقارات", ["offers.html", "property.html"]],
     ["marketplace.html", "سوق الخدمات", ["marketplace.html"]],
-    ["companies.html", "الشركات", ["companies.html", "company.html"]],
+    ["companies.html", "الشركات العقارية", ["companies.html", "company.html"]],
     ["featured.html", "الإعلانات المميزة", ["featured.html"]],
     ["directory.html", "الدليل العقاري", ["directory.html"]],
     ["know-more.html", "اعرف أكثر", ["know-more.html"]],
