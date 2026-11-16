@@ -561,3 +561,212 @@ html body main.marketplace-page footer a { color: #F3D4BD !important; }
 @media (max-width: 380px) {
   html body.page-home .design-benefits { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* =====================================================================
+   HOMEPAGE CONSISTENCY PASS — align layout and components with inner pages.
+   Preserve the existing design-hero background image and its source.
+   Visual-only rules; no content, form IDs, links, or behaviour are changed.
+   ===================================================================== */
+html body.page-home {
+  background: #FAFAF8;
+  color: #39332E;
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+}
+
+/* Keep the homepage header identical to the shared warm-brown site header. */
+html body.page-home header.topbar {
+  background: #5B4638;
+  color: #FFF9F3;
+  border-bottom: 2px solid #D7AD75;
+  box-shadow: 0 5px 18px rgba(76, 55, 40, .12);
+}
+html body.page-home header.topbar .brand,
+html body.page-home header.topbar .brand strong,
+html body.page-home header.topbar nav a {
+  color: #FFF9F3;
+}
+html body.page-home header.topbar .brand small { color: #F3DCC5; }
+html body.page-home header.topbar nav a {
+  border-radius: 9px;
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+  font-weight: 600;
+  transition: color .18s ease, background-color .18s ease;
+}
+html body.page-home header.topbar nav a:hover,
+html body.page-home header.topbar nav a.active,
+html body.page-home header.topbar nav a[aria-current="page"] {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, .14);
+}
+html body.page-home header.topbar .btn-outline {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, .65);
+  background: rgba(255, 255, 255, .06);
+}
+html body.page-home header.topbar .btn-gold {
+  color: #47382F;
+  background: #E4C18F;
+  border-color: #E4C18F;
+}
+
+/* Shared page rhythm: centered content panels, consistent gutters and corners. */
+html body.page-home main > section.design-benefits,
+html body.page-home main > section.home-areas,
+html body.page-home main > section.home-partners,
+html body.page-home main > section.home-hub {
+  width: min(1180px, calc(100% - 32px));
+  margin: 24px auto;
+  padding: clamp(22px, 3.2vw, 34px);
+  background: #FFFFFF;
+  border: 1px solid #ECE4DC;
+  border-radius: 18px;
+  box-shadow: 0 5px 20px rgba(70, 52, 39, .045);
+}
+
+/* Benefits use the same white-card language as directory and listing pages. */
+html body.page-home main > section.design-benefits {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+html body.page-home .design-benefits > div {
+  min-width: 0;
+  padding: 16px 14px;
+  border: 1px solid #EEE6DE;
+  border-radius: 13px;
+  background: #FCFAF7;
+}
+html body.page-home .design-benefits > div:last-child { border-left: 1px solid #EEE6DE; }
+html body.page-home .design-benefits > div > span {
+  background: #F8EEE7;
+  color: #A35A3E;
+  border: 1px solid #EBD9CC;
+}
+html body.page-home .design-benefits strong { color: #47382F; }
+html body.page-home .design-benefits small { color: #786B61; }
+
+/* Make section titles, explanatory text and links follow the shared hierarchy. */
+html body.page-home main .section-heading h2,
+html body.page-home main .ab-head h2,
+html body.page-home main .hw-head h2 {
+  color: #39332E;
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+  font-size: clamp(1.3rem, 2.2vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.42;
+  letter-spacing: 0;
+}
+html body.page-home main .section-heading p,
+html body.page-home main .ab-head p,
+html body.page-home main .hw-head p {
+  color: #766D66;
+  font-size: 14px;
+  line-height: 1.85;
+}
+html body.page-home .area-chip {
+  padding: 10px 17px;
+  border-radius: 999px;
+  border: 1px solid #EAE4DD;
+  background: #FFFFFF;
+  color: #574438;
+  box-shadow: none;
+}
+html body.page-home .area-chip:hover {
+  background: #A35A3E;
+  color: #FFFFFF;
+  border-color: #A35A3E;
+}
+
+/* Homepage property preview uses the same card treatment as the full listings page. */
+html body.page-home main > section.offers-section.offers-preview {
+  width: min(1180px, calc(100% - 32px));
+  margin: 24px auto;
+  padding: clamp(22px, 3.2vw, 34px);
+  background: #FFFFFF;
+  border: 1px solid #ECE4DC;
+  border-radius: 18px;
+  box-shadow: 0 5px 20px rgba(70, 52, 39, .045);
+}
+html body.page-home .offers-preview .offer-card {
+  border: 1px solid #ECE4DC;
+  border-radius: 16px;
+  background: #FFFFFF;
+  box-shadow: 0 5px 18px rgba(70, 52, 39, .055);
+}
+html body.page-home .offers-preview .offer-card h3 { color: #574438; }
+html body.page-home .offers-preview .offer-card .offer-type {
+  background: #F8EEE7;
+  color: #8D4B35;
+  border-radius: 999px;
+}
+html body.page-home .offers-preview .offer-card .btn-dark {
+  background: #5B4638;
+  border-color: #5B4638;
+  color: #FFFFFF;
+}
+
+/* Partner and hub tiles share the same neutral surfaces and gentle elevation. */
+html body.page-home .home-partners-grid .sponsor-card,
+html body.page-home .home-hub-card,
+html body.page-home .ab-card,
+html body.page-home .hw-step,
+html body.page-home .steps article {
+  background: #FFFFFF;
+  border-color: #ECE4DC;
+  border-radius: 15px;
+  box-shadow: 0 5px 18px rgba(70, 52, 39, .05);
+}
+html body.page-home .home-hub-card {
+  color: #47382F;
+  padding: 20px;
+}
+html body.page-home .home-hub-card b { color: #574438; }
+html body.page-home .home-hub-card small { color: #766D66; }
+html body.page-home .home-hub-icon {
+  background: #F8EEE7;
+  color: #A35A3E;
+}
+
+/* Keep the campaign panel as an intentional accent, but align its shape and rhythm. */
+html body.page-home main > section.launch-campaign {
+  width: min(1180px, calc(100% - 32px));
+  margin: 32px auto;
+  border-radius: 20px;
+}
+
+@media (max-width: 900px) {
+  html body.page-home main > section.design-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+}
+@media (max-width: 600px) {
+  html body.page-home main > section.design-benefits,
+  html body.page-home main > section.home-areas,
+  html body.page-home main > section.home-partners,
+  html body.page-home main > section.home-hub,
+  html body.page-home main > section.offers-section.offers-preview {
+    width: calc(100% - 24px);
+    margin: 14px auto;
+    padding: 16px;
+    border-radius: 15px;
+  }
+  html body.page-home main > section.design-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  html body.page-home .design-benefits > div {
+    grid-template-columns: 36px minmax(0, 1fr);
+    padding: 11px 9px;
+  }
+  html body.page-home .design-benefits > div > span {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+  html body.page-home .home-hub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 380px) {
+  html body.page-home main > section.design-benefits { grid-template-columns: minmax(0, 1fr); }
+  html body.page-home .home-hub-grid { grid-template-columns: minmax(0, 1fr); }
+}
