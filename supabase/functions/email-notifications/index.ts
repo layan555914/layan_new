@@ -413,7 +413,7 @@ Deno.serve(async (req: Request) => {
       const type = String(body?.record_type || "");
       const id = String(body?.record_id || "").trim();
       if (!SUPPORTED_RECORD_TYPES.has(type) || !id || id.length > 80 ||
-          (type === "property_offer" && !/^\\d+$/.test(id))) {
+          (type === "property_offer" && !/^\d+$/.test(id))) {
         return json({ error: "نوع الإعلان أو معرّفه غير مدعوم." }, 400, origin);
       }
       return json({ ok: true, ...(await dispatchAnnouncement(admin, type, id)) }, 200, origin);
