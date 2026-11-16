@@ -1,0 +1,156 @@
+/* ASYUT AQAR — site-wide warm/light refinement.
+   Lift dark brown surfaces by one grade and brighten neutral surfaces,
+   while preserving text contrast, brand warmth, and the property-photo treatment. */
+
+:root {
+  /* Legacy tokens retained for pages that have not yet migrated to the shared system. */
+  --navy: #3B3028;
+  --blue: #514338;
+  --gold: #D39A73;
+  --gold-light: #F2DDCA;
+  --red: #A95136;
+  --bg: #FAF8F5;
+  --text: #40362F;
+  --muted: #786C62;
+  --border: #EAE2D9;
+  --paper: #FCFAF7;
+  --line: #EEE6DE;
+  --ink: #40362F;
+
+  /* Shared ASYUT AQAR visual-system tokens. */
+  --aa-page: #FAFAF8;
+  --aa-surface: #FFFFFF;
+  --aa-surface-soft: #F5F6F3;
+  --aa-surface-warm: #FFF8F2;
+  --aa-ink: #39332E;
+  --aa-muted: #766D66;
+  --aa-line: #EAE4DD;
+  --aa-brand: #A35A3E;
+  --aa-brand-hover: #8D4B35;
+  --aa-brand-soft: #F8EEE8;
+  --aa-copper: #D09A7B;
+
+  /* Other existing page-level tokens. */
+  --kp-ink: #40362F;
+}
+
+html body {
+  background-color: var(--aa-page);
+  color: var(--aa-ink);
+}
+
+/* Lift the dark brown used by shared footer and profile surfaces. */
+html body :is(.directory-footer, .know-page .know-footer) {
+  background-color: #3B3028;
+  color: #F8F1EA;
+}
+html body .company-profile-hero {
+  background: linear-gradient(125deg, #3B3028 0%, #685342 100%);
+  color: #FFF9F3;
+}
+html body .company-card-cover {
+  background: linear-gradient(135deg, #493A30 0%, #78604D 100%);
+  color: #F8E9DA;
+}
+html body footer.footer.footer-pro {
+  background: radial-gradient(1200px 300px at 85% 0%, rgba(211, 154, 115, .14), transparent 60%), #3B3028 !important;
+  color: #F8F1EA !important;
+}
+html body footer:not(.footer-pro) {
+  background-color: #3B3028;
+  color: #F8F1EA;
+}
+
+/* The whole reading canvas becomes a little brighter, not stark white. */
+html body .directory-page { background-color: #FAF8F5; color: #40362F; }
+html body.know-page { background-color: #FAF8F5; color: #40362F; }
+html body .know-page .know-band { background-color: #FCF8F3; }
+html body .know-page .know-card,
+html body :is(.section, .directory-browser, .directory-method, .company-map-panel, .directory-map-panel) {
+  background-color: #FFFFFF;
+  border-color: #EEE6DE;
+}
+html body .company-join {
+  background-color: #FCF8F3;
+  border-color: #E8D8C9;
+}
+html body :is(.offer-card, .listing-card, .company-directory-card, .directory-card, .featured-card, .mk-profile-card) {
+  background-color: #FFFFFF;
+  border-color: #EEE6DE;
+}
+
+/* Soften dusty brown surfaces and muted text without reducing readability. */
+html body :is(.notice, .status-message, .know-note, .company-review-note, .directory-results-note, .mk-directory-block) {
+  background-color: #FBF7F2;
+  border-color: #E8DCCE;
+  color: #5B4D42;
+}
+html body :is(.directory-tabs button.is-active, .category.active, .mk-chip.is-active, .mk-chip[aria-pressed="true"]) {
+  background-color: #A35A3E;
+  border-color: #A35A3E;
+}
+html body :is(.category, .detail-chip, .directory-tag, .company-service-list li) {
+  background-color: #F8F5F1;
+  border-color: #EAE2D9;
+}
+
+/* Slightly brighter photo overlays across all section covers, while maintaining text contrast. */
+html body .hero.design-hero {
+  background-image:
+    linear-gradient(270deg, rgba(45, 43, 38, .86) 0%, rgba(45, 43, 38, .69) 42%, rgba(45, 43, 38, .12) 100%),
+    url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1800");
+}
+html body main > .page-hero[aria-labelledby="offersPageTitle"] {
+  background-image:
+    linear-gradient(270deg, rgba(46, 43, 38, .84) 0%, rgba(46, 43, 38, .66) 54%, rgba(46, 43, 38, .20) 100%),
+    url("https://images.pexels.com/photos/6238614/pexels-photo-6238614.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+html body .companies-page .companies-hero {
+  background-image:
+    linear-gradient(270deg, rgba(48, 43, 38, .84) 0%, rgba(48, 43, 38, .67) 56%, rgba(48, 43, 38, .25) 100%),
+    url("https://images.pexels.com/photos/7534234/pexels-photo-7534234.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+html body main.marketplace-page > .hero {
+  background-image:
+    linear-gradient(270deg, rgba(43, 46, 40, .85) 0%, rgba(43, 46, 40, .68) 54%, rgba(43, 46, 40, .22) 100%),
+    url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1500");
+}
+html body .directory-main .directory-hero {
+  background-image:
+    linear-gradient(270deg, rgba(46, 43, 38, .84) 0%, rgba(46, 43, 38, .68) 60%, rgba(46, 43, 38, .32) 100%),
+    url("https://images.pexels.com/photos/5033768/pexels-photo-5033768.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+html body .featured-main .featured-hero {
+  background-image:
+    linear-gradient(270deg, rgba(46, 43, 38, .83) 0%, rgba(46, 43, 38, .65) 60%, rgba(46, 43, 38, .18) 100%),
+    url("https://images.pexels.com/photos/6438746/pexels-photo-6438746.jpeg?auto=compress&cs=tinysrgb&w=1600");
+}
+html body.know-page .know-hero {
+  background-image:
+    linear-gradient(270deg, rgba(43, 46, 40, .84) 0%, rgba(43, 46, 40, .67) 56%, rgba(43, 46, 40, .22) 100%),
+    url("https://images.pexels.com/photos/5691545/pexels-photo-5691545.jpeg?auto=compress&cs=tinysrgb&w=1500");
+}
+
+@media (max-width: 760px) {
+  html body .hero.design-hero {
+    background-image:
+      linear-gradient(180deg, rgba(43, 46, 40, .66) 0%, rgba(43, 46, 40, .80) 52%, rgba(43, 46, 40, .92) 100%),
+      url("https://images.pexels.com/photos/36355688/pexels-photo-36355688.jpeg?auto=compress&cs=tinysrgb&w=1100");
+  }
+}
+@media (max-width: 640px) {
+  html body main > .page-hero[aria-labelledby="offersPageTitle"],
+  html body .companies-page .companies-hero,
+  html body main.marketplace-page > .hero,
+  html body .directory-main .directory-hero,
+  html body .featured-main .featured-hero,
+  html body.know-page .know-hero {
+    background-position: center;
+  }
+}
+
+/* Preserve clear keyboard focus and readable disabled states. */
+html body :is(input, select, textarea):focus-visible,
+html body :is(button, a, summary, [role="button"]):focus-visible {
+  outline-color: rgba(163, 90, 62, .30);
+}
