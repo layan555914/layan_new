@@ -32,10 +32,10 @@
     const extraClass = options.className ? " " + options.className : "";
     const extraAttr = options.attr ? " " + options.attr : "";
     return '<article class="offer-card sponsor-card sp-ad' + extraClass + '" data-sponsor-card="' + esc(ad.id) + '"' + extraAttr + '>' +
-      '<div class="sp-ad-media">' + media + '<span class="sp-ad-badge"><i aria-hidden="true">★</i> إعلان ممول</span></div>' +
+      '<div class="sp-ad-media">' + media + '<span class="sp-ad-badge"><i aria-hidden="true">★</i> إعلان مميز</span></div>' +
       '<div class="sp-ad-body">' +
         '<div class="sp-ad-brand"><span class="sp-ad-avatar" aria-hidden="true">' + esc(initial(name)) + '</span>' +
-          '<div><strong>' + esc(name) + '</strong><small>' + esc(ad.category || "شريك أسيوط عقار") + ' · <b>شريك مميز</b></small></div></div>' +
+          '<div><strong>' + esc(name) + '</strong><small>' + esc(ad.category || "إعلانات الأنشطة") + ' · <b>مساحة إعلانية</b></small></div></div>' +
         '<h3>' + esc(ad.title || name) + '</h3>' +
         (ad.description ? '<p class="sp-ad-desc">' + esc(ad.description) + '</p>' : "") +
         '<div class="sp-ad-actions">' + (actions || '<a class="sp-ad-btn sp-ad-btn-primary" href="./advertise.html">تفاصيل الإعلان</a>') + '</div>' +
