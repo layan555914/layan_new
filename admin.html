@@ -75,6 +75,19 @@
           <button type="button" class="admin-stat adm-todo-item is-info" data-goto="published"><strong data-published-total>—</strong><span>منشور للزوار (عقارات + خدمات + شركات)</span><i hidden id="statApprovedMarketplace"></i></button>
         </div>
       </section>
+      <section class="adm-card" id="adminSupplierAdStats" hidden aria-label="إحصاءات الإعلانات المميزة">
+        <h2 class="adm-card-title">إحصاءات الإعلانات المميزة</h2>
+        <p class="adm-card-lead">ملخص حالة الإعلانات التي تديرها المنصة. اضغط على أي رقم لفتح قائمة الإعلانات.</p>
+        <div class="adm-todo">
+          <button type="button" class="admin-stat adm-todo-item" data-goto="sponsors"><strong id="statSupplierAdsTotal">—</strong><span>إجمالي الإعلانات</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="sponsors"><strong id="statSupplierAdsActive">—</strong><span>نشط ومنشور</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="sponsors"><strong id="statSupplierAdsPending">—</strong><span>قيد المراجعة</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="sponsors"><strong id="statSupplierAdsPaused">—</strong><span>موقوف / مرفوض</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="sponsors"><strong id="statSupplierAdsExpired">—</strong><span>منتهي</span></button>
+          <button type="button" class="admin-stat adm-todo-item" data-goto="sponsors"><strong id="statSupplierAdsScheduled">—</strong><span>مجدول للنشر</span></button>
+        </div>
+        <p class="adm-card-lead" id="supplierAdStatsStatus" role="status"></p>
+      </section>
       <section class="adm-card adm-quick-card" aria-label="اختصارات التشغيل">
         <h2 class="adm-card-title">اختصارات التشغيل</h2>
         <div class="adm-quicklinks">
@@ -147,7 +160,7 @@
   </div>
 </div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261114-service-profiles-1"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261114-verified-representatives-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261114-service-profiles-1"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261114-service-profiles-1"></script><script src="./gubabase.js?v=20261110-2"></script><script src="./admin.js?v=20261116-sponsored-ads-stats-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261114-service-profiles-1"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261116-sponsored-ads-stats-1"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>

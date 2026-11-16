@@ -22,8 +22,11 @@
     const cfg = window.LAYAN_CONFIG || {}, auth = window.LAYAN_SUPABASE;
     const session = auth?.getSession?.();
     if (!session?.access_token || !session?.user?.id) throw new Error("انتهت جلسة الدخول. سجّل الدخول مرة أخرى.");
-    if (file.size > 10 * 1024 * 1024) throw new Error("حجم الصورة يجب ألا يتجاوز 10 ميجابايت.");
+    const maxInputBytes = 10 * 1024 * 1024;
+    const maxStoredBytes = 5 * 1024 * 1024;
+    if (file.size > maxInputBytes) throw new Error("حجم الصورة الأصلية يجب ألا يتجاوز 10 ميجابايت.");
     const jpg = typeof window.LAYAN_TO_JPEG === "function" ? await window.LAYAN_TO_JPEG(file) : file;
+    if (jpg.size > maxStoredBytes) throw new Error("الصورة بعد الضغط يجب ألا تتجاوز 5 ميجابايت حسب مساحة التخزين.");
     if (jpg.type !== "image/jpeg") throw new Error("تعذر تحويل الصورة إلى JPG. جرّب صورة أخرى.");
     const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
     const id = (crypto.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2));
@@ -205,6 +208,7 @@
       const order = { active: 0, pending: 1, paused: 2, expired: 3, rejected: 4 };
       ads.sort((x, y) => (order[adState(x)] ?? 9) - (order[adState(y)] ?? 9));
       box.innerHTML = ads.length ? ads.map(adRow).join("") : '<p class="admin-empty">لا توجد إعلانات ممولة بعد. أضف إعلانًا من الزر أعلاه.</p>';
+      try { if (typeof A?.reloadStats === "function") await A.reloadStats(); } catch (_) { /* Keep the ad list usable if a separate dashboard counter fails. */ }
     } catch (e) { box.innerHTML = '<p class="admin-empty">' + esc(e.message) + "</p>"; }
   }
 
@@ -258,6 +262,9 @@
     if (target && !httpUrl(target)) { status.textContent = "رابط النشاط غير صحيح."; return; }
     btn.disabled = true;
     try {
+      if (pendingAdFile && A?.role !== "owner") {
+        throw new Error("رفع صورة الإعلان يحتاج جلسة المدير الأساسي حتى لا تُرفع صورة قبل اعتماد التعديل. يمكنك إرسال باقي البيانات للموافقة.");
+      }
       let image = aForm.image_url.value.trim();
       if (pendingAdFile) { status.textContent = "جارٍ رفع الصورة..."; image = await uploadImage(pendingAdFile, "sponsored-ad"); }
       if (image && !httpUrl(image)) throw new Error("رابط الصورة غير صحيح.");
@@ -285,8 +292,14 @@
         }
       }
       adDialog.close();
-      loadAds();
-    } catch (err) { status.textContent = err.message || "تعذر الحفظ."; }
+      await loadAds();
+    } catch (err) {
+      if (err?.code === "PENDING_APPROVAL") {
+        say("تم إرسال طلبك إلى المدير للاعتماد. لن يتغير الإعلان قبل الموافقة.");
+        adDialog.close();
+        await loadAds();
+      } else status.textContent = err.message || "تعذر الحفظ.";
+    }
     finally { btn.disabled = false; }
   });
 
@@ -325,7 +338,12 @@
       }
       await loadAds();
     } catch (err) {
-      say(/Could not find|PGRST202/.test(err.message || "") ? "تحتاج هذه الخاصية تطبيق تحديث قاعدة البيانات (20261110120000)." : (err.message || "تعذر تنفيذ الإجراء."));
+      if (err?.code === "PENDING_APPROVAL") {
+        say("تم إرسال طلب التغيير إلى المدير للاعتماد. سيظل الإعلان بحالته الحالية حتى الموافقة.");
+        await loadAds();
+      } else {
+        say(/Could not find|PGRST202/.test(err.message || "") ? "تحتاج هذه الخاصية تطبيق تحديث قاعدة البيانات (20261110120000)." : (err.message || "تعذر تنفيذ الإجراء."));
+      }
     } finally { btn.disabled = false; }
   }
 
