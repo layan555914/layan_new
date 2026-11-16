@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v174-sitewide-typography-20261116";
+const CACHE_NAME = "asyut-aqar-shell-v175-visual-refresh-20261116";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -42,6 +42,7 @@ const APP_SHELL = [
   "./company-profile.js?v=20261115-verified-company-brand-1",
   "./styles.css",
   "./assets/theme/sitewide-typography.css?v=20261116-1",
+  "./assets/theme/visual-refresh.css?v=20261116-1",
   "./buyer.css",
   "./sponsor.css",
   "./ai.css",
