@@ -129,3 +129,471 @@ html body :is(.btn, .favorite-button, .marketplace-pagination button) {
     text-wrap: balance;
   }
 }
+
+
+/* --------------------------------------------------------------------------
+   Foundation v2 — page components and shared visual rhythm.
+   This stylesheet is loaded last by site-nav.js on public pages.
+   Deliberately does not change HTML structure, content, JavaScript hooks,
+   application data, or any hero background image (including the home villa).
+   -------------------------------------------------------------------------- */
+
+:root {
+  --aa-page: #FAF9F6;
+  --aa-surface: #FFFFFF;
+  --aa-surface-soft: #F6F2ED;
+  --aa-surface-warm: #FCF6F0;
+  --aa-ink: #40362F;
+  --aa-muted: #786C62;
+  --aa-line: #EAE2D9;
+  --aa-brand: #A35A3E;
+  --aa-brand-hover: #8D4B35;
+  --aa-brand-soft: #F8EEE8;
+  --aa-accent: #C9916F;
+  --aa-accent-soft: #F3E3D7;
+  --aa-danger: #A95136;
+  --aa-espresso: #514237;
+  --aa-espresso-2: #685446;
+  --aa-sand: #F3ECE4;
+  --aa-cream: #FFF9F3;
+  --aa-peach: #EBD0BC;
+  --aa-copper: #C9916F;
+  --aa-radius-sm: 10px;
+  --aa-radius: 16px;
+  --aa-radius-lg: 22px;
+  --aa-shadow: 0 8px 24px rgba(64, 54, 47, .07);
+  --aa-shadow-hover: 0 14px 30px rgba(64, 54, 47, .11);
+  --navy: #514237;
+  --blue: #685446;
+  --gold: #C9916F;
+  --gold-light: #EBD0BC;
+  --red: #A95136;
+  --bg: #FAF9F6;
+  --text: #40362F;
+  --muted: #786C62;
+  --border: #EAE2D9;
+  --paper: #FCFAF7;
+  --line: #EEE6DE;
+  --ink: #40362F;
+}
+
+html body {
+  background-color: var(--aa-page);
+  color: var(--aa-ink);
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+}
+
+/* One consistent warm-brown navigation treatment across public pages. */
+html body header.topbar {
+  background: linear-gradient(110deg, #705847 0%, #654F40 58%, #5B473B 100%);
+  color: #FFF9F3;
+  border-bottom: 2px solid #D8B28B;
+  box-shadow: 0 5px 18px rgba(64, 49, 39, .12);
+}
+html body header.topbar .brand strong,
+html body header.topbar nav a {
+  color: #FFF9F3;
+}
+html body header.topbar .brand small {
+  color: #F1D8C2;
+}
+html body header.topbar nav a {
+  border-radius: 9px;
+  padding: 8px 10px;
+}
+html body header.topbar nav a:hover,
+html body header.topbar nav a.active,
+html body header.topbar nav a[aria-current="page"] {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, .14);
+}
+html body header.topbar .btn-outline {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, .06);
+  border-color: rgba(255, 255, 255, .58);
+}
+html body header.topbar .btn-gold {
+  color: #47372D;
+  background: #E8C79F;
+  border-color: #E8C79F;
+}
+
+/* Consistent page width, section spacing and section headings. */
+html body main > :is(section, .section),
+html body main .offers-section,
+html body main .company-directory-section,
+html body main .directory-browser,
+html body main .directory-method {
+  scroll-margin-top: 24px;
+}
+html body main > :is(section, .section) {
+  border-color: var(--aa-line);
+}
+html body main :is(.section-heading, .directory-section-heading, .company-directory-group-heading) {
+  gap: 14px;
+}
+html body main :is(.section-heading p, .directory-section-heading p, .company-directory-group-heading p) {
+  color: var(--aa-muted);
+}
+
+/* Search areas: clear hierarchy, comfortable controls, consistent spacing. */
+html body :is(.design-hero-search, .filters, .search-panel, .company-search-tools, .directory-filters, .mk-filters) {
+  border-color: var(--aa-line);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(64, 54, 47, .075);
+}
+html body :is(.design-hero-search, .filters, .search-panel, .company-search-tools, .directory-filters) {
+  background-color: #FFFFFF;
+}
+html body :is(.design-hero-search, .filters, .search-panel, .company-search-tools, .directory-filters, .mk-filters) label {
+  color: #5D5148;
+  font-weight: 600;
+}
+html body :is(input, select, textarea) {
+  border-color: #E5DCD2;
+  border-radius: 10px;
+  color: var(--aa-ink);
+}
+html body :is(input, select, textarea)::placeholder {
+  color: #9A8E83;
+}
+html body :is(input, select, textarea):focus-visible {
+  border-color: var(--aa-accent);
+  outline-color: rgba(201, 145, 111, .3);
+}
+
+/* Main property discovery cards — preserve the existing data and actions. */
+html body #offersGrid,
+html body .offers-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+html body #offersGrid .listing-card,
+html body .offers-grid .listing-card {
+  min-width: 0;
+  border-color: var(--aa-line);
+  border-radius: 18px;
+  background: var(--aa-surface);
+  box-shadow: var(--aa-shadow);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+html body #offersGrid .listing-card:hover,
+html body .offers-grid .listing-card:hover {
+  transform: translateY(-3px);
+  border-color: #D9B69E;
+  box-shadow: var(--aa-shadow-hover);
+}
+html body .listing-card .offer-card-media {
+  position: relative;
+  height: clamp(205px, 21vw, 250px);
+  min-height: 205px;
+  overflow: hidden;
+  background: #F0EAE3;
+}
+html body .listing-card .offer-media-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+html body .listing-card .offer-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .35s ease;
+}
+html body .listing-card:hover .offer-image {
+  transform: scale(1.025);
+}
+html body .listing-card .offer-card-content {
+  gap: 9px;
+  padding: 18px 18px 17px;
+}
+html body .listing-card .listing-head {
+  align-items: flex-start;
+  gap: 10px;
+}
+html body .listing-card .listing-head h3 {
+  color: var(--aa-ink);
+  font-size: 16px;
+  line-height: 1.55;
+}
+html body .listing-card .listing-price {
+  color: var(--aa-brand);
+  background: var(--aa-surface-warm);
+  border: 1px solid #EEDCCE;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+}
+html body .listing-card .offer-location {
+  color: var(--aa-muted);
+}
+html body .listing-card .listing-specs {
+  color: #5C5148;
+  line-height: 1.8;
+}
+html body .listing-card .listing-finance span {
+  color: #65574C;
+  background: #FBF7F2;
+  border-color: #EEE4DA;
+}
+html body .listing-card .listing-meta {
+  color: #92877D;
+}
+html body .listing-card .listing-footer {
+  border-top-color: var(--aa-line);
+}
+html body .listing-card .listing-advertiser b {
+  color: var(--aa-ink);
+}
+html body .listing-card .details-button {
+  border-radius: 10px;
+  background: var(--aa-brand);
+  color: #FFFFFF;
+}
+
+/* Filter layout scales down deliberately instead of compressing fields. */
+html body .filters {
+  padding: 18px;
+  background: #FFFFFF;
+}
+html body .filters-primary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+html body .filters-primary .filter-search-field {
+  grid-column: span 2;
+}
+html body .filters-actions {
+  gap: 10px;
+  margin-top: 12px;
+}
+html body .filters-toggle {
+  border-color: var(--aa-line);
+  border-radius: 10px;
+  color: var(--aa-brand);
+  background: var(--aa-brand-soft);
+}
+
+/* Services marketplace: same surfaces, cards and typography as the property area. */
+html body main.marketplace-page {
+  color: var(--aa-ink);
+}
+html body main.marketplace-page > .hero {
+  border: 1px solid rgba(201, 145, 111, .22);
+  border-radius: 22px;
+  box-shadow: var(--aa-shadow);
+}
+html body main.marketplace-page .section {
+  border-color: var(--aa-line);
+  border-radius: 18px;
+  background: #FFFFFF;
+  box-shadow: var(--aa-shadow);
+}
+html body main.marketplace-page .category-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+html body main.marketplace-page .category-tile {
+  min-height: 112px;
+  padding: 17px;
+  border-color: var(--aa-line);
+  border-radius: 15px;
+  background: #FFFFFF;
+  box-shadow: 0 5px 16px rgba(64, 54, 47, .045);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+html body main.marketplace-page .category-tile:hover {
+  transform: translateY(-2px);
+  border-color: #D8B28B;
+  box-shadow: var(--aa-shadow);
+}
+html body main.marketplace-page .category-tile strong {
+  color: var(--aa-ink);
+  font-size: 15px;
+}
+html body main.marketplace-page .category-tile span {
+  color: var(--aa-muted);
+  line-height: 1.75;
+}
+
+/* Service and provider cards keep the logo, description and contact actions readable. */
+html body main.marketplace-page .mk-filters {
+  padding: 16px;
+  border-color: var(--aa-line);
+  border-radius: 17px;
+  background: #FFFFFF;
+  box-shadow: var(--aa-shadow);
+}
+html body main.marketplace-page .mk-grid,
+html body main.marketplace-page .listings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+html body main.marketplace-page .mk-card {
+  min-width: 0;
+  border-color: var(--aa-line);
+  border-radius: 18px;
+  background: #FFFFFF;
+  box-shadow: var(--aa-shadow);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+html body main.marketplace-page .mk-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--aa-shadow-hover);
+}
+html body main.marketplace-page .mk-card-media {
+  aspect-ratio: 16 / 10;
+  background: #EEE8E1;
+}
+html body main.marketplace-page .mk-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+html body main.marketplace-page .mk-card-body {
+  gap: 8px;
+  padding: 16px 17px 17px;
+}
+html body main.marketplace-page .mk-card-body h3 {
+  color: var(--aa-ink);
+  font-size: 17px;
+}
+html body main.marketplace-page .mk-card-desc,
+html body main.marketplace-page .mk-card-place {
+  color: var(--aa-muted);
+  line-height: 1.8;
+}
+html body main.marketplace-page .mk-card-actions {
+  gap: 8px;
+  padding-top: 12px;
+}
+html body main.marketplace-page .mk-btn {
+  border-radius: 10px;
+  font-weight: 600;
+}
+html body main.marketplace-page .mk-profile-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+html body main.marketplace-page .mk-profile-card {
+  min-width: 0;
+  gap: 14px;
+  padding: 15px;
+  border-color: var(--aa-line);
+  border-radius: 16px;
+  background: #FFFFFF;
+  box-shadow: 0 5px 18px rgba(64, 54, 47, .055);
+}
+html body main.marketplace-page .mk-profile-content strong {
+  color: var(--aa-ink);
+  font-size: 15px;
+}
+html body main.marketplace-page .mk-profile-content span {
+  color: var(--aa-muted);
+}
+
+/* Company and directory pages: more consistent card proportions and breathing room. */
+html body .company-directory-groups .company-directory-grid,
+html body .company-directory-section .company-directory-grid,
+html body .directory-results {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+html body .company-directory-card,
+html body .directory-card {
+  min-width: 0;
+  border-color: var(--aa-line);
+  border-radius: 17px;
+  background: #FFFFFF;
+  box-shadow: 0 7px 20px rgba(64, 54, 47, .055);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+html body .company-directory-card:hover,
+html body .directory-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--aa-shadow-hover);
+}
+html body .company-directory-card h3,
+html body .directory-card h3 {
+  color: var(--aa-ink);
+}
+html body .company-directory-card p,
+html body .directory-card p {
+  color: var(--aa-muted);
+}
+html body .company-directory-group {
+  border-color: var(--aa-line);
+  border-radius: 18px;
+  background: #FFFFFF;
+}
+
+/* Responsive rules: 3 columns desktop, 2 tablets, 1 on narrow phones. */
+@media (max-width: 980px) {
+  html body #offersGrid,
+  html body .offers-grid,
+  html body main.marketplace-page .mk-grid,
+  html body main.marketplace-page .listings-grid,
+  html body main.marketplace-page .mk-profile-grid,
+  html body .company-directory-groups .company-directory-grid,
+  html body .company-directory-section .company-directory-grid,
+  html body .directory-results {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  html body .filters-primary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  html body .filters-primary .filter-search-field {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 640px) {
+  html body #offersGrid,
+  html body .offers-grid,
+  html body main.marketplace-page .mk-grid,
+  html body main.marketplace-page .listings-grid,
+  html body main.marketplace-page .mk-profile-grid,
+  html body .company-directory-groups .company-directory-grid,
+  html body .company-directory-section .company-directory-grid,
+  html body .directory-results,
+  html body .filters-primary,
+  html body main.marketplace-page .category-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .filters-primary .filter-search-field {
+    grid-column: auto;
+  }
+  html body .filters {
+    padding: 13px;
+    border-radius: 15px;
+  }
+  html body .listing-card .offer-card-media {
+    height: 220px;
+    min-height: 190px;
+  }
+  html body .listing-card .listing-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  html body .listing-card .listing-price {
+    align-self: flex-start;
+  }
+  html body main.marketplace-page .category-tile {
+    min-height: 82px;
+  }
+  html body main.marketplace-page .mk-profile-card {
+    padding: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body .listing-card,
+  html body .mk-card,
+  html body .category-tile,
+  html body .company-directory-card,
+  html body .directory-card {
+    transition: none;
+  }
+}
