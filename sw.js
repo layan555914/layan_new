@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v182-services-palette-20261116";
+const CACHE_NAME = "asyut-aqar-shell-v183-services-tone-match-20261116";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -44,7 +44,7 @@ const APP_SHELL = [
   "./assets/theme/sitewide-typography.css?v=20261116-1",
   "./assets/theme/visual-refresh.css?v=20261116-1",
   "./assets/theme/photo-covers.css?v=20261116-1",
-  "./assets/theme/warm-light-theme.css?v=20261116-6",
+  "./assets/theme/warm-light-theme.css?v=20261116-7",
   "./buyer.css",
   "./sponsor.css",
   "./ai.css",
