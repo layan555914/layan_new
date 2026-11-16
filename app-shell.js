@@ -62,7 +62,7 @@
   if (!document.querySelector('link[data-asyut-light-theme="global"]')) {
     const lightTheme = document.createElement("link");
     lightTheme.rel = "stylesheet";
-    lightTheme.href = "/assets/theme/warm-light-theme.css?v=20261116-1";
+    lightTheme.href = "/assets/theme/warm-light-theme.css?v=20261116-2";
     lightTheme.dataset.asyutLightTheme = "global";
     document.head.appendChild(lightTheme);
   }
