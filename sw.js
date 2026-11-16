@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v173-company-type-separation-20261115";
+const CACHE_NAME = "asyut-aqar-shell-v174-marketing-company-labels-20261116";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -39,7 +39,7 @@ const APP_SHELL = [
   "./assets/theme/companies-directory-bridge.css?v=20261115-verified-company-brand-1",
   "./assets/theme/entity-brand-cards.css?v=20261115-unified-entity-brand-1",
   "./companies.js?v=20261115-company-types-1",
-  "./company-profile.js?v=20261115-verified-company-brand-1",
+  "./company-profile.js?v=20261116-marketing-company-labels-1",
   "./styles.css",
   "./buyer.css",
   "./sponsor.css",
