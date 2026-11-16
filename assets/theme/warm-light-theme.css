@@ -853,3 +853,96 @@ html body:has(main.marketplace-page) dialog::backdrop {
       url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1100") !important;
   }
 }
+
+
+/* SERVICES — deeper warm surfaces to match the rest of ASYUT AQAR.
+   The previous local rules made this page noticeably paler than the platform.
+   Keep the hero image, shared header, typography, data, forms and interactions unchanged. */
+html body:has(main.marketplace-page) {
+  background-color: #F2EEE8 !important;
+  color: #47382F !important;
+}
+html body main.marketplace-page {
+  background: #F4F0EA !important;
+  color: #47382F !important;
+}
+html body main.marketplace-page > .section {
+  background: #F7F3ED !important;
+  border-color: #E2D8CE !important;
+  box-shadow: 0 5px 20px rgba(70, 52, 39, .055) !important;
+}
+html body main.marketplace-page .mk-directory-block,
+html body main.marketplace-page :is(.mk-filters, .marketplace-location-coordinates, .category-fields) {
+  background: #EEE8E0 !important;
+  border-color: #DED2C6 !important;
+  color: #574438 !important;
+}
+html body main.marketplace-page .mk-chips .mk-chip {
+  background: #EEE8E0 !important;
+  border-color: #DED2C6 !important;
+  color: #5B4638 !important;
+}
+html body main.marketplace-page .mk-chips .mk-chip.is-active,
+html body main.marketplace-page .mk-chips .mk-chip[aria-pressed="true"] {
+  background: #A96043 !important;
+  border-color: #A96043 !important;
+  color: #FFFFFF !important;
+}
+html body main.marketplace-page .category-tile {
+  background: #FDFBF8 !important;
+  border-color: #E4DACE !important;
+  color: #47382F !important;
+  box-shadow: 0 3px 12px rgba(70, 52, 39, .055) !important;
+}
+html body main.marketplace-page .category-tile:hover,
+html body main.marketplace-page .category-tile:focus-visible {
+  background: #F5EEE5 !important;
+  border-color: #D7AD75 !important;
+}
+html body main.marketplace-page .listing-card,
+html body main.marketplace-page .mk-profile-card {
+  background: #FBF8F3 !important;
+  border-color: #E2D8CE !important;
+  color: #47382F !important;
+  box-shadow: 0 5px 18px rgba(70, 52, 39, .065) !important;
+}
+html body main.marketplace-page :is(input, select, textarea) {
+  background: #FDFBF8 !important;
+  border-color: #DED3C8 !important;
+  color: #47382F !important;
+}
+html body main.marketplace-page :is(input, select, textarea):focus-visible {
+  background: #FFFFFF !important;
+  border-color: #A96043 !important;
+}
+html body main.marketplace-page .notice,
+html body main.marketplace-page .mk-form-note {
+  background: #EFE7DE !important;
+  border-color: #DCCABD !important;
+  color: #574438 !important;
+}
+html body main.marketplace-page dialog,
+html body main.marketplace-page .dialog-inner {
+  background: #F8F4EE !important;
+  color: #47382F !important;
+}
+html body main.marketplace-page .close-btn {
+  background: #EEE7DE !important;
+  color: #574438 !important;
+}
+html body main.marketplace-page .mk-profile-logo {
+  background: #F1E7DC !important;
+  color: #A96043 !important;
+}
+html body main.marketplace-page .listing-meta {
+  border-color: #E7DDD2 !important;
+}
+html body main.marketplace-page footer {
+  background: #5B4638 !important;
+  color: #FFF9F3 !important;
+}
+@media (max-width: 760px) {
+  html body main.marketplace-page > .section {
+    background: #F7F3ED !important;
+  }
+}
