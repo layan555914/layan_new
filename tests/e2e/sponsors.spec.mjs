@@ -21,6 +21,7 @@ async function mock(page) {
     if (path.startsWith("/rest/v1/rpc/")) {
       const name = path.split("/").pop(); const body = req.postDataJSON?.() || {}; state.rpc.push({ name, body });
       if (name === "layan_is_admin") return reply(route, true);
+      if (name === "layan_admin_whoami") return reply(route, "owner");
       if (name === "layan_admin_delete_sponsor") { state.sponsors = state.sponsors.filter(s => s.id !== body.p_id); return reply(route, "done"); }
       if (name === "layan_activate_supplier_ad") { const ad = state.ads.find(a => a.id === body.p_ad_id); if (ad) ad.status = "active"; return reply(route, { success: true }); }
       return reply(route, null);
@@ -91,4 +92,42 @@ test("admin adds, hides and deletes sponsors and publishes a sponsored ad", asyn
   await ad.locator("button[type='submit']").click();
   await expect.poll(() => state.rpc.find(r => r.name === "layan_activate_supplier_ad")?.body.p_days).toBe(15);
   expect(state.ads.at(-1)).toMatchObject({ business_name: "مصنع النيل", status: "active", owner_id: USER_ID });
+});
+
+test("admin dashboard shows sponsored-ad counts and the verified owner role", async ({ page }) => {
+  await mock(page);
+  await page.goto("/admin.html");
+  await page.locator("#adminEmail").fill("sponsor-admin@example.invalid");
+  await page.locator("#adminPassword").fill("Test-Only-Password-123!");
+  await page.locator("#adminLogin button[type='submit']").click();
+
+  await expect(page.locator("#adminStatus")).toContainText("حساب مدير أساسي");
+  await expect(page.locator("#adminSupplierAdStats")).toBeVisible();
+  await expect(page.locator("#statSupplierAdsTotal")).toHaveText("1");
+  await expect(page.locator("#statSupplierAdsActive")).toHaveText("1");
+  await expect(page.locator("#statSupplierAdsPending")).toHaveText("0");
+});
+
+test("sponsored-ad image upload rejects files larger than the storage bucket limit", async ({ page }) => {
+  await mock(page);
+  await page.goto("/admin.html");
+  await page.locator("#adminEmail").fill("sponsor-admin@example.invalid");
+  await page.locator("#adminPassword").fill("Test-Only-Password-123!");
+  await page.locator("#adminLogin button[type='submit']").click();
+  await page.locator("[data-view='sponsors']").click();
+  await page.locator("#addSponsoredAdBtn").click();
+
+  const dlg = page.locator(".as-dialog[open]");
+  await dlg.locator("[name='business_name']").fill("مصنع النيل");
+  await dlg.locator("[name='title']").fill("إعلان اختبار");
+  await dlg.locator("[name='description']").fill("وصف إعلان اختبار أكبر من الحد المسموح للصورة.");
+  await dlg.locator("[name='contact_phone']").fill("01098765432");
+  await dlg.locator("[data-ad-file]").setInputFiles({
+    name: "oversized.jpg",
+    mimeType: "image/jpeg",
+    buffer: Buffer.alloc(5 * 1024 * 1024 + 1)
+  });
+  await dlg.locator("button[type='submit']").click();
+  await expect(dlg.locator("[data-status]")).toContainText("5 ميجابايت");
+  await expect(dlg).toBeVisible();
 });
