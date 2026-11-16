@@ -5,17 +5,17 @@
   --asyut-empty-photo: url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1");
 }
 
-/* Property photo placeholders and explicit company-logo fallbacks. */
+/* Property image placeholders and confirmed logo/media fallbacks. */
 html body .offer-image-placeholder,
 html body .details-placeholder,
-html body .company-logo-fallback,
+html body .company-profile-logo .company-logo-fallback,
+html body .company-directory-entity-monogram .company-logo-fallback,
 html body .aq-entity-brand__fallback:not([hidden]),
 html body .os-partner-logo:not(:has(img[src]:not([src=""]))),
 html body .official-sponsor-monogram,
 html body .sp-ad-monogram,
 html body .company-card-cover:has(.company-logo-fallback):not(:has(img[src]:not([src=""]))),
-html body .company-card-cover--directory:has(> span.company-logo-fallback):not(:has(img[src]:not([src=""]))),
-html body .official-sponsor-logo-wrap:has(.official-sponsor-monogram):not(:has(img[src]:not([src=""]))) {
+html body .company-card-cover--directory:has(> span.company-logo-fallback):not(:has(img[src]:not([src=""]))) {
   background-color: #6B5544;
   background-image:
     linear-gradient(rgba(49, 38, 30, .18), rgba(49, 38, 30, .18)),
@@ -28,7 +28,8 @@ html body .official-sponsor-logo-wrap:has(.official-sponsor-monogram):not(:has(i
 /* Keep fallback initials and labels readable over the temporary photo. */
 html body .offer-image-placeholder,
 html body .details-placeholder,
-html body .company-logo-fallback,
+html body .company-profile-logo .company-logo-fallback,
+html body .company-directory-entity-monogram .company-logo-fallback,
 html body .aq-entity-brand__fallback:not([hidden]),
 html body .os-partner-logo:not(:has(img[src]:not([src=""]))),
 html body .official-sponsor-monogram,
