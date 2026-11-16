@@ -22,7 +22,7 @@
     const wa = waNumber(ad.contact_phone);
     const name = ad.business_name || ad.title || "إعلان ممول";
     const media = image
-      ? '<img src="' + esc(image) + '" alt="' + esc(name) + '" loading="lazy" referrerpolicy="no-referrer">'
+      ? '<img src="' + esc(image) + '" alt="' + esc(name) + '" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" decoding="async">'
       : '<div class="sp-ad-monogram" aria-hidden="true"><span>' + esc(initial(name)) + '</span><small>' + esc(name) + '</small></div>';
     const actions = [
       target ? '<a class="sp-ad-btn sp-ad-btn-primary" href="' + esc(target) + '" target="_blank" rel="noopener noreferrer sponsored">اعرف التفاصيل</a>' : "",
