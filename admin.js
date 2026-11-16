@@ -65,7 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.status === 400 && path.startsWith("/auth/v1/token")) {
         throw new Error(detail || "بيانات الدخول غير صحيحة أو لم يتم تفعيل تأكيد البريد في حساب Supabase.");
       }
-      throw new Error(detail || ("تعذر تنفيذ الطلب (HTTP " + response.status + ")."));
+      const requestError = new Error(detail || ("تعذر تنفيذ الطلب (HTTP " + response.status + ")."));
+      requestError.code = data?.code || data?.error_code || null;
+      requestError.status = response.status;
+      throw requestError;
     }
     return data;
   }
@@ -449,6 +452,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadAdminStats() {
     const panel=document.getElementById("adminStats");
+    const adPanel=document.getElementById("adminSupplierAdStats");
     const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value);};
     const [properties,marketPending,companyPending,marketApproved]=await Promise.all([
       request("/rest/v1/property_offers?select=id&status=eq.pending"),
@@ -461,6 +465,34 @@ document.addEventListener("DOMContentLoaded", () => {
     set("statPendingCompanies",Number(companyPending)||0);
     set("statApprovedMarketplace",Array.isArray(marketApproved)?marketApproved.length:0);
     if(panel)panel.hidden=false;
+
+    try {
+      const ads=await request("/rest/v1/supplier_ads?select=id,status,starts_at,ends_at");
+      if(!Array.isArray(ads)) throw new Error("استجابة إحصاءات الإعلانات غير صحيحة.");
+      const now=Date.now();
+      const counts={total:ads.length,active:0,pending:0,paused:0,expired:0,scheduled:0};
+      ads.forEach(ad=>{
+        const start=ad.starts_at ? Date.parse(ad.starts_at) : null;
+        const end=ad.ends_at ? Date.parse(ad.ends_at) : null;
+        if(ad.status==="pending") counts.pending++;
+        else if(ad.status==="paused" || ad.status==="rejected") counts.paused++;
+        else if(ad.status==="expired" || (ad.status==="active" && end!==null && end<=now)) counts.expired++;
+        else if(ad.status==="active" && start!==null && start>now) counts.scheduled++;
+        else if(ad.status==="active") counts.active++;
+      });
+      set("statSupplierAdsTotal",counts.total);
+      set("statSupplierAdsActive",counts.active);
+      set("statSupplierAdsPending",counts.pending);
+      set("statSupplierAdsPaused",counts.paused);
+      set("statSupplierAdsExpired",counts.expired);
+      set("statSupplierAdsScheduled",counts.scheduled);
+      set("supplierAdStatsStatus","");
+      if(adPanel)adPanel.hidden=false;
+    } catch(error) {
+      ["statSupplierAdsTotal","statSupplierAdsActive","statSupplierAdsPending","statSupplierAdsPaused","statSupplierAdsExpired","statSupplierAdsScheduled"].forEach(id=>set(id,"—"));
+      set("supplierAdStatsStatus","تعذر تحميل إحصاءات الإعلانات المميزة: "+(error.message||"تحقق من صلاحية عرض الإعلانات."));
+      if(adPanel)adPanel.hidden=false;
+    }
   }
 
   async function loadPending() {
@@ -500,7 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await loadAdminUsers();
       showState(true);
       // admin-console.js (users, activity, admins, exports) starts once the admin check passed.
-      window.AsyutAdmin = { request, setStatus, esc, reload: () => document.getElementById("reloadPending")?.click() };
+      window.AsyutAdmin = { request, setStatus, esc, reloadStats: loadAdminStats, reload: () => document.getElementById("reloadPending")?.click() };
       window.dispatchEvent(new CustomEvent("asyut:admin-ready"));
       setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
       return true;
