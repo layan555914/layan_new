@@ -4,13 +4,13 @@ import { test, expect } from "@playwright/test";
 const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 const USER_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 
-async function mock(page) {
+async function mock(page, { role = "owner" } = {}) {
   const state = { sponsors: [
     { id: "s1", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
     { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
   ], ads: [
     { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
-  ], rpc: [], patches: [], posts: [] };
+  ], rpc: [], patches: [], posts: [], changes: [] };
   const user = { id: USER_ID, email: "sponsor-admin@example.invalid", email_confirmed_at: "2026-11-01T00:00:00Z", app_metadata: {}, user_metadata: {} };
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
   await page.route(SUPABASE + "/**", async route => {
@@ -21,7 +21,8 @@ async function mock(page) {
     if (path.startsWith("/rest/v1/rpc/")) {
       const name = path.split("/").pop(); const body = req.postDataJSON?.() || {}; state.rpc.push({ name, body });
       if (name === "layan_is_admin") return reply(route, true);
-      if (name === "layan_admin_whoami") return reply(route, "owner");
+      if (name === "layan_admin_whoami") return reply(route, role);
+      if (name === "layan_admin_request_change") { state.changes.push(body); return reply(route, "pending"); }
       if (name === "layan_admin_delete_sponsor") { state.sponsors = state.sponsors.filter(s => s.id !== body.p_id); return reply(route, "done"); }
       if (name === "layan_activate_supplier_ad") { const ad = state.ads.find(a => a.id === body.p_ad_id); if (ad) ad.status = "active"; return reply(route, { success: true }); }
       return reply(route, null);
@@ -130,4 +131,35 @@ test("sponsored-ad image upload rejects files larger than the storage bucket lim
   await dlg.locator("button[type='submit']").click();
   await expect(dlg.locator("[data-status]")).toContainText("5 ميجابايت");
   await expect(dlg).toBeVisible();
+});
+
+test("added admin requests sponsored-ad edits and cannot upload an image before approval", async ({ page }) => {
+  const state = await mock(page, { role: "admin" });
+  await page.goto("/admin.html");
+  await page.locator("#adminEmail").fill("sponsor-admin@example.invalid");
+  await page.locator("#adminPassword").fill("Test-Only-Password-123!");
+  await page.locator("#adminLogin button[type='submit']").click();
+  await page.locator("[data-view='sponsors']").click();
+
+  await page.locator("[data-ad-id='a1'] [data-ad='edit']").click();
+  const dlg = page.locator(".as-dialog[open]");
+  await dlg.locator("[name='description']").fill("وصف معدل ينتظر موافقة المدير.");
+  await dlg.locator("button[type='submit']").click();
+
+  await expect.poll(() => state.changes.length).toBe(1);
+  expect(state.patches).toHaveLength(0);
+  expect(state.changes[0].p_payload).toMatchObject({ method: "PATCH" });
+  await expect(page.locator("#adminStatus")).toContainText("تم إرسال طلب التغيير إلى المدير للاعتماد");
+
+  await page.locator("[data-ad-id='a1'] [data-ad='edit']").click();
+  const secondDlg = page.locator(".as-dialog[open]");
+  await secondDlg.locator("[data-ad-file]").setInputFiles({
+    name: "pending.jpg",
+    mimeType: "image/jpeg",
+    buffer: Buffer.from("test image bytes")
+  });
+  await secondDlg.locator("button[type='submit']").click();
+  await expect(secondDlg.locator("[data-status]")).toContainText("المدير الأساسي");
+  expect(state.changes).toHaveLength(1);
+  expect(state.patches).toHaveLength(0);
 });
