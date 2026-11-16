@@ -770,3 +770,86 @@ html body.page-home main > section.launch-campaign {
   html body.page-home main > section.design-benefits { grid-template-columns: minmax(0, 1fr); }
   html body.page-home .home-hub-grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* SERVICES PALETTE FINISH — match the warm/light system used across the platform.
+   Scoped to marketplace only; do not alter the existing hero photograph or content. */
+html body:has(main.marketplace-page) {
+  background: #FCFBF9 !important;
+  color: #47382F !important;
+}
+html body:has(main.marketplace-page) header.topbar {
+  background: #5B4638 !important;
+  color: #FFF9F3 !important;
+  border-bottom: 2px solid #D7AD75 !important;
+}
+html body:has(main.marketplace-page) header.topbar nav a {
+  color: #FFF9F3 !important;
+}
+html body:has(main.marketplace-page) header.topbar nav a:hover,
+html body:has(main.marketplace-page) header.topbar nav a.active,
+html body:has(main.marketplace-page) header.topbar nav a[aria-current="page"] {
+  color: #FFFFFF !important;
+  background: rgba(255,255,255,.14) !important;
+}
+html body:has(main.marketplace-page) header.topbar .btn-gold {
+  background: #E4C18F !important;
+  border-color: #E4C18F !important;
+  color: #47382F !important;
+}
+html body main.marketplace-page {
+  background: #FCFBF9 !important;
+  color: #47382F !important;
+}
+html body main.marketplace-page > .hero {
+  background-color: #78604D !important;
+  background-image:
+    linear-gradient(270deg, rgba(62,48,38,.64) 0%, rgba(62,48,38,.48) 52%, rgba(62,48,38,.10) 100%),
+    url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1500") !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 28px rgba(76,55,40,.10) !important;
+}
+html body main.marketplace-page > .hero .eyebrow { color: #F3DCC5 !important; }
+html body main.marketplace-page > .hero .btn-gold {
+  background: #A96043 !important;
+  border-color: #A96043 !important;
+  color: #FFFFFF !important;
+}
+html body main.marketplace-page .mk-chips .mk-chip {
+  background: #F8F5F1 !important;
+  color: #665346 !important;
+  border: 1px solid #EAE2D9 !important;
+}
+html body main.marketplace-page .mk-chips .mk-chip.is-active,
+html body main.marketplace-page .mk-chips .mk-chip[aria-pressed="true"] {
+  background: #A96043 !important;
+  border-color: #A96043 !important;
+  color: #FFFFFF !important;
+}
+html body main.marketplace-page .mk-property-note a,
+html body main.marketplace-page .mk-directory-note a,
+html body main.marketplace-page .mk-form-note a,
+html body main.marketplace-page .link-btn {
+  color: #A96043 !important;
+}
+html body main.marketplace-page .marketplace-pagination button:not(:disabled):hover {
+  background: #A96043 !important;
+  border-color: #A96043 !important;
+  color: #FFFFFF !important;
+}
+html body:has(main.marketplace-page) > footer {
+  background: #5B4638 !important;
+  color: #FFF9F3 !important;
+  border-top: 2px solid #D7AD75 !important;
+}
+html body:has(main.marketplace-page) > footer a { color: #F3DCC5 !important; }
+html body:has(main.marketplace-page) dialog::backdrop {
+  background: rgba(47,37,30,.58) !important;
+}
+@media (max-width: 760px) {
+  html body main.marketplace-page > .hero {
+    background-image:
+      linear-gradient(180deg, rgba(62,48,38,.28) 0%, rgba(62,48,38,.66) 52%, rgba(62,48,38,.82) 100%),
+      url("https://images.pexels.com/photos/5493654/pexels-photo-5493654.jpeg?auto=compress&cs=tinysrgb&w=1100") !important;
+  }
+}
