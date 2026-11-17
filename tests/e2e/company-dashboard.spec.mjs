@@ -3,6 +3,7 @@ import { test, expect } from "@playwright/test";
 const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 const USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const COMPANY_PROFILE_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+const MEMBER_COMPANY_PROFILE_ID = "abababab-abab-4bab-8bab-abababababab";
 const ENTITY_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 const PROJECT_ID = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
 
@@ -60,8 +61,11 @@ async function installDashboardMocks(page, scenario = "populated") {
     if (path === "company_entity_managers") {
       return json([{ directory_entity_id: ENTITY_ID, verified_at: "2026-11-17T10:00:00Z", representative_role: "المالك" }]);
     }
-    if (path === "company_entity_manager_members" || path === "company_profile_manager_members") {
+    if (path === "company_entity_manager_members") {
       return json(empty);
+    }
+    if (path === "company_profile_manager_members") {
+      return json([{ company_profile_id: MEMBER_COMPANY_PROFILE_ID, member_role: "editor" }]);
     }
     if (path === "property_offers") {
       return json([
@@ -96,7 +100,16 @@ async function installDashboardMocks(page, scenario = "populated") {
         verification_status: "published"
       }]);
     }
-    if (path === "company_profiles_public") return json(empty);
+    if (path === "company_profiles_public") {
+      return json([{
+        id: MEMBER_COMPANY_PROFILE_ID,
+        company_name: "شركة عضو مفوض",
+        category: "شركات التسويق العقاري",
+        city: "أسيوط",
+        logo_url: null,
+        representative_verified_at: "2026-11-17T10:00:00Z"
+      }]);
+    }
 
     if (path === "rpc/company_profile_manager_member_list") return json(companyMembers);
     if (path === "rpc/company_entity_manager_member_list") return json(entityMembers);
@@ -132,7 +145,8 @@ test("dashboard displays only current account profiles, published project links 
   await expect(page.locator("#cdConnectionMessage")).toContainText("تم تحميل ملفاتك");
   await expect(page.locator("#cdCompanyProfiles")).toContainText("شركة أسيوط للاختبار");
   await expect(page.locator("#cdCompanyProfiles")).toContainText("وكالة أسيوط للتسويق");
-  await expect(page.locator("#cdCountProfiles")).toHaveText("2");
+  await expect(page.locator("#cdCompanyProfiles")).toContainText("شركة عضو مفوض");
+  await expect(page.locator("#cdCountProfiles")).toHaveText("3");
   await expect(page.locator("#cdCountProjects")).toHaveText("1");
   await expect(page.locator("#cdCountListings")).toHaveText("2");
   await expect(page.locator("#cdCountReviews")).toHaveText("1");
