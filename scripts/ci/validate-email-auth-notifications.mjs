@@ -58,6 +58,8 @@ assert.match(edge, /user\.rpc\("layan_is_admin"\)/, "dispatch must be restricted
 assert.match(edge, /RESEND_API_KEY/, "email provider key must be read only by the server function");
 assert.match(edge, /email_notification_deliveries/, "email dispatch must keep an idempotent delivery ledger");
 assert.match(edge, /unsubscribe_token/, "every subscription must support self-service unsubscribe");
+assert.match(edge, /const enabled = action === "set_subscription"[\\s\\S]*?body\\?\\.enabled === true[\\s\\S]*?: true;/, "newly confirmed accounts must be subscribed by default");
+assert.match(edge, /if \(action === "sync_subscription" && existing\)/, "existing subscription state, including an unsubscribe, must be preserved");
 assert.match(edge, /status", "available"/, "property announcement must re-check published status");
 assert.match(edge, /status", "approved"/, "service announcement must re-check approved status");
 assert.match(edge, /status", "active"/, "commercial announcement must re-check active status");
