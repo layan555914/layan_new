@@ -69,7 +69,7 @@ function clients(authorization?: string) {
   return { admin, user };
 }
 
-async function requireAccount(req: Request, userClient: ReturnType<typeof createClient>) {
+async function requireAccount(req: Request, userClient: any) {
   const header = req.headers.get("Authorization") || "";
   if (!header.startsWith("Bearer ")) throw new Error("يلزم تسجيل الدخول.");
   const token = header.slice(7);
@@ -101,7 +101,7 @@ async function sendEmail(
   return String(data.id || "");
 }
 
-async function sendWelcome(admin: ReturnType<typeof createClient>, userId: string, email: string, token: string) {
+async function sendWelcome(admin: any, userId: string, email: string, token: string) {
   const apiKey = Deno.env.get("RESEND_API_KEY") || "";
   const from = Deno.env.get("EMAIL_FROM") || "";
   if (!apiKey || !from) return false;
@@ -131,7 +131,7 @@ async function sendWelcome(admin: ReturnType<typeof createClient>, userId: strin
   return Boolean(id);
 }
 
-async function loadAnnouncement(admin: ReturnType<typeof createClient>, type: string, id: string): Promise<Announcement | null> {
+async function loadAnnouncement(admin: any, type: string, id: string): Promise<Announcement | null> {
   if (type === "property_offer") {
     const { data, error } = await admin.from("property_offers")
       .select("id,title,city,area,property_type,total_price,price_on_request,status")
@@ -207,7 +207,7 @@ async function loadAnnouncement(admin: ReturnType<typeof createClient>, type: st
   throw new Error("نوع الإعلان غير مدعوم.");
 }
 
-async function dispatchAnnouncement(admin: ReturnType<typeof createClient>, type: string, id: string) {
+async function dispatchAnnouncement(admin: any, type: string, id: string) {
   const announcement = await loadAnnouncement(admin, type, id);
   if (!announcement) throw new Error("العرض غير موجود أو لم يحصل على اعتماد الإدارة والنشر.");
 
