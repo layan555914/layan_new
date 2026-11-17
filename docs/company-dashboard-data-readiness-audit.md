@@ -31,6 +31,18 @@
 4. يحتوي `company_profiles` على `projects` من نوع JSONB، وهو محتوى وصفي/سابق أعمال وليس سجلات مشاريع مستقلة.
 5. لا توجد علاقة مباشرة ظاهرة بين `company_profiles` و`directory_projects`. مسار علاقات المشروعات الحالي يعتمد على كيانات الدليل `directory_entities`.
 
+### وظائف إدارة الشركة الموجودة بالفعل
+
+يوجد في قاعدة الإنتاج عدد من واجهات RPC العامة التي تغلف إجراءات خاصة لإدارة ملفات الشركات، ومنها:
+
+- `layan_company_owner_profile` لقراءة ملف الشركة المرتبط بالحساب.
+- `company_entity_profile_update_submit` و`company_entity_profile_update_direct` لتحديث ملف كيان الدليل وفق مسار المراجعة والصلاحية.
+- `company_entity_manager_invite` و`company_entity_manager_member_list` و`company_entity_manager_revoke` لإدارة فريق ملف كيان الدليل.
+- `company_profile_sensitive_update_submit` و`company_profile_update_direct` لتحديث ملف الشركة المملوك.
+- `company_profile_manager_invite` و`company_profile_manager_member_list` و`company_profile_manager_revoke` لإدارة فريق ملف الشركة المملوك.
+
+هذه الوظائف تتيح أساسًا لربط أقسام بيانات الشركة وفريق العمل في اللوحة، لكنها لا توفر حاليًا واجهة معتمدة لإدارة سجلات المشروعات أو ربط الوحدات بها. يجب مراجعة تعريفات الدوال وشروطها واختبارها قبل استدعائها من الواجهة؛ لا يكفي الاعتماد على اسم الدالة.
+
 ### حدود الصلاحيات الحالية
 
 - جداول `directory_projects` تسمح بالقراءة العامة للسجلات المنشورة والظاهرة فقط.
