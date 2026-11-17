@@ -219,7 +219,7 @@ SELECT set_config('request.jwt.claim.sub','$ADMIN_ID',true);
 DO \$admin_approve\$
 DECLARE v_request uuid; v_project uuid;
 BEGIN
-  SELECT id INTO v_request FROM private.company_project_requests
+  SELECT request_id INTO v_request FROM public.company_project_request_admin_list()
   WHERE project_payload->>'name_ar'='مشروع تجريبي يضاف من الشركة' AND status='pending';
   IF v_request IS NULL THEN RAISE EXCEPTION 'New project request not found for administrator review'; END IF;
   v_project := public.company_project_request_admin_review(v_request,'approve','تمت مراجعة صفة الشركة والطلب');
@@ -260,10 +260,10 @@ SELECT set_config('request.jwt.claim.sub','$ADMIN_ID',true);
 DO \$review\$
 DECLARE v_link uuid; v_changes uuid;
 BEGIN
-  SELECT id INTO v_link FROM private.company_project_requests
+  SELECT request_id INTO v_link FROM public.company_project_request_admin_list()
   WHERE request_type='link_project' AND status='pending';
   PERFORM public.company_project_request_admin_review(v_link,'approve',NULL);
-  SELECT id INTO v_changes FROM private.company_project_requests
+  SELECT request_id INTO v_changes FROM public.company_project_request_admin_list()
   WHERE project_payload->>'name_ar'='مشروع يحتاج استكمال' AND status='pending';
   PERFORM public.company_project_request_admin_review(v_changes,'needs_changes','أرفق مستندًا أوضح يثبت علاقة الشركة بالمشروع');
 END
