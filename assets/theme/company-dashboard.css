@@ -278,7 +278,7 @@ a{color:inherit}
   --cd-green:#35664A;
   --cd-shadow:0 10px 28px rgba(53,43,35,.065);
 }
-html{scroll-padding-top:20px;scroll-padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+html{scroll-padding-top:20px}
 body.company-dashboard-page{background:var(--cd-canvas);color:var(--cd-ink)}
 body.company-dashboard-page :is(p,small){color:var(--cd-muted)}
 .cd-topbar{
@@ -463,7 +463,7 @@ body.company-dashboard-page :is(p,small){color:var(--cd-muted)}
   outline:3px solid rgba(163,90,62,.30);
   outline-offset:3px;
 }
-.cd-team-form button[type="submit"]{scroll-margin-block:20px 118px}
+.cd-team-form button[type="submit"]{scroll-margin-block:16px}
 @media(max-width:1024px){
   .cd-sidebar{box-shadow:none}
   .cd-nav{
@@ -515,9 +515,4 @@ body.company-dashboard-page :is(p,small){color:var(--cd-muted)}
 }
 
 
-/* Keep team controls comfortably above the persistent app navigation on phones. */
-@media(max-width:760px){
-  body.company-dashboard-page.has-appnav{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
-  body.company-dashboard-page.has-appnav .cd-main{padding-bottom:calc(190px + env(safe-area-inset-bottom))}
-  .cd-team-panel,.cd-team-form,.cd-team-form button[type="submit"]{scroll-margin-block:24px 190px}
-}
+/* The dashboard uses its own section navigation, so no app-bar scroll reserve is needed. */
