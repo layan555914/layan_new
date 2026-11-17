@@ -145,7 +145,8 @@
         ...(profile && typeof profile === "object" ? { data: {
           full_name: String(profile.full_name || "").slice(0, 80),
           phone: String(profile.phone || "").slice(0, 20),
-          account_type: String(profile.account_type || "").slice(0, 20)
+          account_type: String(profile.account_type || "").slice(0, 40),
+          email_notifications: profile.email_notifications === true
         } } : {}),
         ...(pkce.codeChallenge ? { code_challenge: pkce.codeChallenge, code_challenge_method: "s256" } : {})
       });
@@ -195,6 +196,84 @@
     if (!session?.access_token) throw new Error("لم يرجع النظام جلسة دخول. راجع إعدادات تأكيد البريد في Supabase.");
     return session.user;
   }
+
+  async function requestEmailOtp(email, options = {}) {
+    const cleanEmail = normalizeEmail(email);
+    if (!cleanEmail) throw new Error("اكتب بريدك الإلكتروني بصورة صحيحة.");
+    const payload = {
+      email: cleanEmail,
+      // Login must not create an account accidentally; signup opts in explicitly.
+      create_user: options.shouldCreateUser === true
+    };
+    return authRequest("otp", payload);
+  }
+
+  async function verifyEmailOtp(email, token) {
+    const cleanEmail = normalizeEmail(email);
+    const cleanToken = String(token || "").trim()
+      .replace(/[٠-٩]/g, digit => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+      .replace(/[۰-۹]/g, digit => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)));
+    if (!cleanEmail) throw new Error("اكتب بريدك الإلكتروني بصورة صحيحة.");
+    if (!/^\d{6}$/.test(cleanToken)) throw new Error("اكتب كود التحقق المكوّن من 6 أرقام.");
+    const data = await authRequest("verify", { email: cleanEmail, token: cleanToken, type: "email" });
+    normalizeSession(data);
+    if (!session?.access_token || !session?.user?.id) {
+      throw new Error("تم التحقق من الكود، لكن لم تصل جلسة دخول صالحة. حاول مرة أخرى.");
+    }
+    return session.user;
+  }
+
+  async function updateUserMetadata(profile = {}) {
+    if (!session?.access_token || !session?.user?.id) {
+      throw new Error("سجّل الدخول أولًا لاستكمال بيانات حسابك.");
+    }
+    const current = session.user.user_metadata && typeof session.user.user_metadata === "object"
+      ? session.user.user_metadata : {};
+    const fullName = String(profile.full_name || "").trim().replace(/\s+/g, " ").slice(0, 80);
+    const phone = String(profile.phone || "").replace(/[^0-9]/g, "").slice(0, 20);
+    const accountType = String(profile.account_type || "").slice(0, 40);
+    if (!fullName || !phone || !accountType) {
+      throw new Error("أكمل الاسم ورقم الموبايل ونوع الحساب.");
+    }
+    const response = await fetch(url + "/auth/v1/user", {
+      method: "PUT",
+      headers: { ...authHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify({ data: { ...current, full_name: fullName, phone, account_type: accountType } })
+    });
+    const user = await readResponse(response);
+    if (!user?.id || user.id !== session.user.id) {
+      throw new Error("تعذر تأكيد حفظ بيانات الحساب. حاول مرة أخرى.");
+    }
+    saveSession({ ...session, user });
+    return user;
+  }
+
+  function markNewAccountProfilePending() {
+    const userId = session?.user?.id;
+    if (!userId) return false;
+    try {
+      localStorage.setItem("asyutAqarNewAccount:" + userId, String(Date.now()));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  async function syncEmailNotificationSubscription(enabled) {
+    if (!session?.access_token || !session?.user?.id) return null;
+    const action = typeof enabled === "boolean" ? "set_subscription" : "sync_subscription";
+    const response = await fetch(url + "/functions/v1/email-notifications", {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: "Bearer " + session.access_token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(action === "set_subscription" ? { action, enabled } : { action })
+    });
+    return readResponse(response);
+  }
+
   async function signOut() {
     if (session?.access_token) {
       const response = await fetch(url + "/auth/v1/logout", { method: "POST", headers: authHeaders() });
@@ -730,6 +809,6 @@
   }
 
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
+  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, markNewAccountProfilePending, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
