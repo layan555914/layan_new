@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const root = $("cdCompanyProfiles");
   const projectsRoot = $("cdProjectsList");
   const listingsRoot = $("cdListingsList");
+  const requestsRoot = $("cdRequestsList");
   const message = $("cdConnectionMessage");
   const counts = {
     profiles: $("cdCountProfiles"),
@@ -679,6 +680,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     projectsRoot.replaceChildren();
     listingsRoot.replaceChildren();
+    if (requestsRoot) renderEmpty(requestsRoot, "سجّل الدخول لعرض طلباتك", "بعد تسجيل الدخول ستظهر طلبات استلام الملف وتحديث البيانات الخاصة بحسابك.");
     ["profiles", "projects", "listings", "reviews"].forEach(key => setStat(key, "—"));
   }
 });
