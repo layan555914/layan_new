@@ -519,8 +519,18 @@
       "listing_purpose","city","area","property_type","total_price",
       "price_on_request","area_m2","status","title","description"
     ].join(",");
-    const rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
-    return Array.isArray(rows) ? rows : [];
+    const pageSize = 500;
+    const allRows = [];
+    for (let offset = 0; ; offset += pageSize) {
+      const rows = await request(
+        "property_offers?select=" + fields +
+        "&status=eq.available&order=id.asc&limit=" + pageSize + "&offset=" + offset
+      );
+      if (!Array.isArray(rows)) throw new Error("استجابة غير صحيحة لبيانات دليل الأسعار.");
+      allRows.push(...rows);
+      if (rows.length < pageSize) break;
+    }
+    return allRows;
   }
   async function getMyOffers() {
     if (!isAuthenticated()) return [];
