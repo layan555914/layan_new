@@ -35,7 +35,7 @@ async function installAuthMocks(page) {
     });
   });
   await page.route(SUPABASE + "/auth/v1/user", async route => {
-    const body = route.request().postDataJSON();
+    const body = route.request().postDataJSON() || {};
     state.profileUpdates.push({ method: route.request().method(), body });
     await reply(route, { id: USER_ID, email: "signup@example.invalid", user_metadata: body.data || {} });
   });
@@ -68,7 +68,7 @@ test("main public login requests and verifies an email OTP without creating a us
   expect(state.syncRequests).toEqual([{ action: "sync_subscription" }]);
 });
 
-test("email OTP session persists when the app is reopened in a fresh page", async ({ page }) => {
+test("email OTP session persists when the app is reopened in a fresh browser context", async ({ page, browser }) => {
   const state = await installAuthMocks(page);
   await page.goto("/");
   await page.locator("#loginBtn").click();
@@ -85,14 +85,16 @@ test("email OTP session persists when the app is reopened in a fresh page", asyn
     user: { id: USER_ID, email: "existing@example.invalid" }
   });
 
-  // A second page has its own sessionStorage but shares the same persistent localStorage.
-  const reopened = await page.context().newPage();
-  await reopened.route(SUPABASE + "/rest/v1/**", route => reply(route, []));
-  await reopened.goto("http://127.0.0.1:4173/");
+  // Playwright storageState carries localStorage but deliberately excludes sessionStorage.
+  // A clean browser context therefore models closing and reopening the installed app.
+  const reopenedContext = await browser.newContext({ storageState: await page.context().storageState() });
+  const reopened = await reopenedContext.newPage();
+  await installAuthMocks(reopened);
+  await reopened.goto("/");
   await reopened.waitForFunction(() => window.LAYAN_SUPABASE?.isAuthenticated());
   expect(await reopened.evaluate(() => window.LAYAN_SUPABASE.getUser()?.email)).toBe("existing@example.invalid");
   expect(state.otpRequests).toHaveLength(1);
-  await reopened.close();
+  await reopenedContext.close();
 });
 
 test("a legacy tab-only session is migrated to persistent storage", async ({ page }) => {
