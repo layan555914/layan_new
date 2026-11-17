@@ -199,13 +199,51 @@ test("verified profile owners can invite a team member through existing RPC cont
   await expect(companySubmit).toBeVisible();
   const hitTest = await companySubmit.evaluate(button => {
     const rect = button.getBoundingClientRect();
-    const x = Math.max(0, Math.min(window.innerWidth - 1, rect.left + rect.width / 2));
-    const y = Math.max(0, Math.min(window.innerHeight - 1, rect.top + rect.height / 2));
-    const target = document.elementFromPoint(x, y);
+    const y = rect.top + rect.height / 2;
+    const targetAt = ratio => {
+      const x = rect.left + rect.width * ratio;
+      const target = x >= 0 && x < window.innerWidth && y >= 0 && y < window.innerHeight
+        ? document.elementFromPoint(x, y)
+        : null;
+      return {
+        ratio,
+        x,
+        target: target ? target.tagName + (target.id ? "#" + target.id : "") + (typeof target.className === "string" && target.className ? "." + target.className.trim().replace(/\\s+/g, ".") : "") : null
+      };
+    };
+    const ancestors = [];
+    for (let node = button; node && node !== document.documentElement; node = node.parentElement) {
+      const box = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      ancestors.push({
+        tag: node.tagName,
+        className: typeof node.className === "string" ? node.className : "",
+        x: box.x,
+        width: box.width,
+        minWidth: style.minWidth,
+        cssWidth: style.width,
+        overflowX: style.overflowX
+      });
+      if (node.classList?.contains("cd-company-card--live")) break;
+    }
+    const visual = window.visualViewport;
     return {
-      viewport: { width: window.innerWidth, height: window.innerHeight },
+      viewport: {
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+        clientWidth: document.documentElement.clientWidth,
+        clientHeight: document.documentElement.clientHeight,
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height,
+        devicePixelRatio: window.devicePixelRatio,
+        mobileMedia: window.matchMedia("(max-width: 560px)").matches,
+        visualWidth: visual?.width,
+        visualHeight: visual?.height,
+        visualScale: visual?.scale
+      },
       button: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-      hitTarget: target ? target.tagName + (target.id ? "#" + target.id : "") + (target.className && typeof target.className === "string" ? "." + target.className.trim().replace(/\\s+/g, ".") : "") : null,
+      hitTargets: [0.1, 0.5, 0.9].map(targetAt),
+      ancestors,
       bodyPointerEvents: getComputedStyle(document.body).pointerEvents,
       htmlPointerEvents: getComputedStyle(document.documentElement).pointerEvents
     };
