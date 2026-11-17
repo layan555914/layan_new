@@ -447,7 +447,7 @@ body.page-home main :is(.section-heading h2, .ab-head h2, .hw-head h2),
 body.page-marketplace main .mk-heading h2 {
   margin-block: 0;
   font-size: clamp(1.4rem, 2.15vw, 1.8rem);
-  font-weight: 750;
+  font-weight: 700;
   line-height: 1.45;
   text-wrap: balance;
 }
