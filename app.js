@@ -253,6 +253,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         purpose === "تنازل" ? "أقصى قيمة معلنة (جنيه)" :
         purpose === "بيع" ? "أقصى سعر بيع (جنيه)" : "أقصى سعر معلن (جنيه)";
     }
+    const sortFilter = $("sortFilter");
+    sortFilter?.querySelectorAll('option[value="paid-asc"], option[value="monthly-asc"]').forEach(option => {
+      option.hidden = !assignmentOnly;
+      option.disabled = !assignmentOnly;
+    });
+    if (!assignmentOnly && ["paid-asc", "monthly-asc"].includes(sortFilter?.value)) {
+      sortFilter.value = "newest";
+    }
     document.querySelectorAll("[data-purpose-tab]").forEach(button => {
       const value = button.dataset.purposeTab === "all" ? "" : button.dataset.purposeTab;
       const active = value === purpose;
@@ -1400,6 +1408,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = "＋ فلاتر إضافية"; }
     activeKind = "";
     activeDealKind = "";
+    syncPurposeFilterControls();
     document.querySelectorAll("[data-category-kind]").forEach(tile => {
       tile.classList.remove("active");
       tile.setAttribute("aria-pressed", "false");
