@@ -4,22 +4,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#2B211B">
-  <meta name="description" content="معاينة تصميم لوحة إدارة الشركة على منصة أسيوط عقار.">
-  <title>لوحة إدارة الشركة | أسيوط عقار</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="مساحة خاصة لإدارة ملفات الشركات العقارية وصلاحياتها على منصة أسيوط عقار.">
+  <title>مساحة الشركة | أسيوط عقار</title>
   <link rel="icon" href="./icon.svg?v=20261105-2" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/theme/company-dashboard.css?v=20261117-design-1">
 </head>
-<body class="company-dashboard-preview">
+<body class="company-dashboard-page">
   <header class="cd-topbar">
     <a class="cd-brand" href="./" aria-label="العودة إلى أسيوط عقار">
       <img src="./icon.svg?v=20261105-2" alt="شعار أسيوط عقار">
       <span><strong>ASYUT AQAR</strong><small>أسيوط عقار</small></span>
     </a>
     <div class="cd-top-actions">
-      <span class="cd-private-label"><span aria-hidden="true">✦</span> تصميم مساحة الشركة</span>
+      <span class="cd-private-label"><span aria-hidden="true">✦</span> مساحة خاصة بالحساب</span>
       <a class="cd-top-link" href="./companies.html">دليل الشركات</a>
       <a class="cd-primary-link" href="./">العودة للمنصة</a>
     </div>
@@ -47,9 +48,9 @@
     </aside>
 
     <main class="cd-main">
-      <div class="cd-preview-note" role="note">
+      <div class="cd-preview-note" id="cdConnectionMessage" role="status" aria-live="polite">
         <span class="cd-preview-dot" aria-hidden="true"></span>
-        معاينة تصميم أولية — لا تقرأ بيانات حقيقية ولا تحفظ تعديلات
+        جارٍ التحقق من الحساب وتحميل ملفاته وصلاحياته...
       </div>
 
       <section class="cd-welcome" id="overview">
@@ -66,37 +67,27 @@
         </div>
       </section>
 
-      <section class="cd-company-card" id="company-data" aria-labelledby="cdCompanyTitle">
-        <div class="cd-company-identity">
-          <div class="cd-company-logo" aria-hidden="true">ش</div>
-          <div class="cd-company-info">
-            <span class="cd-eyebrow">ملف الشركة</span>
-            <h2 id="cdCompanyTitle">اسم شركتك يظهر هنا بعد اعتماد الملف</h2>
-            <p>نوع الشركة · المدينة أو نطاق العمل</p>
-          </div>
-        </div>
-        <div class="cd-company-state">
-          <span class="cd-status-pill">حالة الاعتماد تظهر هنا</span>
-          <a href="#company-data" class="cd-text-link">مراجعة بيانات الملف <span aria-hidden="true">←</span></a>
-        </div>
+      <section class="cd-section" id="company-data" aria-labelledby="cdCompanyTitle">
+        <div class="cd-section-heading"><div><span class="cd-eyebrow">ملفاتك وصلاحياتك</span><h2 id="cdCompanyTitle">ملفات الشركات المرتبطة بحسابك</h2></div><a class="cd-text-link" href="./companies.html">دليل الشركات ←</a></div>
+        <div id="cdCompanyProfiles" class="cd-company-profiles" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل ملفات الشركة...</p></div>
       </section>
 
       <section class="cd-stats" aria-label="ملخص الإدارة">
         <article class="cd-stat-card">
           <span class="cd-stat-icon cd-icon-warm" aria-hidden="true">▤</span>
-          <div><strong>—</strong><span>المشروعات</span><small>كل مشروع له صفحة مستقلة</small></div>
+          <div><strong id="cdCountProjects">—</strong><span>المشروعات المنشورة المرتبطة</span><small>من علاقات موثقة في الدليل</small></div>
         </article>
         <article class="cd-stat-card">
           <span class="cd-stat-icon cd-icon-sand" aria-hidden="true">⌂</span>
-          <div><strong>—</strong><span>الوحدات والإعلانات</span><small>بيع · إيجار · تنازل</small></div>
+          <div><strong id="cdCountListings">—</strong><span>إعلانات حسابك</span><small>لا تُنسب للشركة تلقائيًا</small></div>
         </article>
         <article class="cd-stat-card">
           <span class="cd-stat-icon cd-icon-soft" aria-hidden="true">◷</span>
-          <div><strong>—</strong><span>طلبات المراجعة</span><small>حالة كل طلب بوضوح</small></div>
+          <div><strong id="cdCountReviews">—</strong><span>طلبات قيد المراجعة</span><small>من الملفات والإعلانات المقروءة</small></div>
         </article>
         <article class="cd-stat-card">
           <span class="cd-stat-icon cd-icon-gold" aria-hidden="true">▣</span>
-          <div><strong>—</strong><span>اكتمال ملف الشركة</span><small>بيانات الهوية والتواصل</small></div>
+          <div><strong id="cdCountProfiles">—</strong><span>ملفات تديرها أو تشارك فيها</span><small>بعد التحقق من صلاحيات الحساب</small></div>
         </article>
       </section>
 
@@ -108,19 +99,19 @@
         <div class="cd-quick-grid">
           <a class="cd-quick-card" href="#company-data">
             <span class="cd-quick-icon" aria-hidden="true">▣</span>
-            <span><strong>بيانات الشركة</strong><small>النبذة، الشعار، التواصل، الفروع والخدمات</small></span>
+            <span><strong>بيانات الشركة</strong><small>افتح ملف الشركة لتحديث البيانات المسموح بها</small></span>
             <span class="cd-arrow" aria-hidden="true">←</span>
           </a>
-          <article class="cd-quick-card cd-quick-card--planned">
+          <a class="cd-quick-card" href="#projects">
             <span class="cd-quick-icon" aria-hidden="true">▤</span>
-            <span><strong>المشروعات والارتباطات</strong><small>للمطور: إدارة مشروعاته؛ وللتسويق: ربط الشركة كمُسوّق أو وكيل مبيعات بتفويض</small><em>المرحلة التالية</em></span>
-            <span class="cd-arrow" aria-hidden="true">＋</span>
-          </article>
-          <article class="cd-quick-card cd-quick-card--planned">
+            <span><strong>مشروعات الشركة</strong><small>المشروعات المنشورة المرتبطة بدور موثق</small></span>
+            <span class="cd-arrow" aria-hidden="true">←</span>
+          </a>
+          <a class="cd-quick-card" href="./offers.html">
             <span class="cd-quick-icon" aria-hidden="true">⌂</span>
-            <span><strong>إضافة وحدة أو إعلان</strong><small>ربط الوحدة بمشروع أو نشرها كإعلان مستقل</small><em>بعد تجهيز إدارة المشروعات</em></span>
-            <span class="cd-arrow" aria-hidden="true">＋</span>
-          </article>
+            <span><strong>العقارات والإعلانات</strong><small>افتح قسم العقارات لإضافة إعلان مستقل حسب الصلاحيات الحالية</small></span>
+            <span class="cd-arrow" aria-hidden="true">←</span>
+          </a>
         </div>
       </section>
 
@@ -129,14 +120,7 @@
           <div><span class="cd-eyebrow">ملف الشركة</span><h2 id="cdProjectsTitle">المشروعات والارتباطات</h2></div>
           <span class="cd-section-count">ملخص المشروعات يظهر هنا</span>
         </div>
-        <div class="cd-empty-panel">
-          <span class="cd-empty-icon" aria-hidden="true">▤</span>
-          <div>
-            <h3>كل مشروع له صفحة مستقلة</h3>
-            <p>سيظهر هنا ملخص مشروعات الشركة أو المشروعات المرتبطة بها بصفتها التسويقية، مع بيان دور الشركة وحالة كل ارتباط ورابط صفحة المشروع.</p>
-          </div>
-          <span class="cd-coming-soon">إدارة المشروعات قيد التجهيز</span>
-        </div>
+        <div id="cdProjectsList" class="cd-projects-list" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل المشروعات المرتبطة...</p></div>
         <div class="cd-project-flow" aria-label="ترتيب البيانات">
           <div><span>1</span><strong>ملف الشركة</strong><small>الهوية والخدمات والفروع</small></div>
           <i aria-hidden="true">←</i>
@@ -151,12 +135,8 @@
           <div><span class="cd-eyebrow">العروض العقارية</span><h2 id="cdListingsTitle">الوحدات والإعلانات</h2></div>
           <span class="cd-section-count">لا توجد أرقام تجريبية في المعاينة</span>
         </div>
-        <div class="cd-listing-types">
-          <div><span class="cd-listing-symbol">↗</span><strong>بيع</strong><small>سعر البيع وتفاصيل الوحدة</small></div>
-          <div><span class="cd-listing-symbol">⌂</span><strong>إيجار</strong><small>القيمة الدورية ومدة الإيجار</small></div>
-          <div><span class="cd-listing-symbol">⇄</span><strong>تنازل</strong><small>المقدم والمدفوع والمتبقي والأقساط</small></div>
-        </div>
-        <p class="cd-helper-line">الوحدة إعلان مستقل، وليست مشروعًا. والوحدة المرتبطة بمشروع تظهر أيضًا داخل صفحة المشروع، دون تكرار بياناتها.</p>
+        <div id="cdListingsList" class="cd-account-listings" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل إعلانات الحساب...</p></div>
+        <p class="cd-helper-line">المعروض هنا إعلانات الحساب المسجل فقط. لا نعتبر الإعلان تابعًا للشركة أو لمشروع بعينه إلا بعد وجود علاقة موثقة في النظام.</p>
       </section>
 
       <section class="cd-section" id="team" aria-labelledby="cdTeamTitle">
@@ -176,9 +156,9 @@
           <div><span class="cd-eyebrow">وضوح الإجراءات</span><h2 id="cdReviewsTitle">المراجعات وطلبات الإدارة</h2></div>
         </div>
         <div class="cd-review-list">
-          <div><span class="cd-review-mark cd-mark-pending" aria-hidden="true">◷</span><div><strong>قيد المراجعة</strong><p>تم استلام الطلب، ولم يُنشر التغيير بعد.</p></div></div>
-          <div><span class="cd-review-mark cd-mark-approved" aria-hidden="true">✓</span><div><strong>تم الاعتماد</strong><p>وافقت الإدارة على البيانات ويمكن إظهارها حسب نوع الطلب.</p></div></div>
-          <div><span class="cd-review-mark cd-mark-action" aria-hidden="true">!</span><div><strong>مطلوب استكمال</strong><p>تظهر ملاحظات الإدارة ويستطيع الممثل إعادة الإرسال.</p></div></div>
+          <div><span class="cd-review-mark cd-mark-pending" aria-hidden="true">◷</span><div><strong>قيد المراجعة</strong><p>التغيير لم يُنشر بعد. يظهر تنبيه الطلب في بطاقة ملف الشركة.</p></div></div>
+          <div><span class="cd-review-mark cd-mark-approved" aria-hidden="true">✓</span><div><strong>تم الاعتماد</strong><p>تظهر البيانات بعد موافقة الإدارة وفق نوع التغيير.</p></div></div>
+          <div><span class="cd-review-mark cd-mark-action" aria-hidden="true">!</span><div><strong>مطلوب استكمال</strong><p>اقرأ ملاحظة الإدارة في ملفك ثم أعد إرسال المطلوب.</p></div></div>
         </div>
       </section>
 
@@ -188,5 +168,10 @@
       </footer>
     </main>
   </div>
+  <script src="./config.js?v=20261105-7"></script>
+  <script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script>
+  <script src="./company-dashboard.js?v=20261117-live-dashboard-1" defer></script>
+  <script src="./app-shell.js?v=20261117-persistent-auth-session-1" defer></script>
+  <script src="./site-nav.js?v=20261117-persistent-auth-session-1" defer></script>
 </body>
 </html>
