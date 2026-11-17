@@ -37,7 +37,7 @@ assert.match(marketplace, /syncEmailNotificationSubscription/, "services marketp
 assert.doesNotMatch(marketplaceHtml, /marketplaceEmailOptIn|type="password"|name="password"/, "marketplace auth must not request extra fields");
 const accountProfile = read("account-profile.js");
 assert.match(accountProfile, /استكمل بيانات حسابك/, "profile reminder must be separate from signup");
-assert.match(accountProfile, /REMIND_AGAIN_AFTER_MS = 7 \\* 24 \\* 60 \\* 60 \\* 1000/, "profile reminder must be periodic");
+assert.ok(accountProfile.includes("REMIND_AGAIN_AFTER_MS = 7 * 24 * 60 * 60 * 1000"), "profile reminder must be periodic");
 
 assert.match(template, /\{\{ \.Token \}\}/, "Magic Link template must render the six-digit OTP");
 assert.doesNotMatch(template, /\{\{ \.ConfirmationURL \}\}/, "OTP template must not expose a link-only confirmation URL");
