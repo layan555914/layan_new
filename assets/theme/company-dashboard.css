@@ -513,3 +513,11 @@ body.company-dashboard-page :is(p,small){color:var(--cd-muted)}
 @media(prefers-reduced-motion:reduce){
   .cd-stat-card,.cd-quick-card{transition:none}
 }
+
+
+/* Keep team controls comfortably above the persistent app navigation on phones. */
+@media(max-width:760px){
+  body.company-dashboard-page.has-appnav{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+  body.company-dashboard-page.has-appnav .cd-main{padding-bottom:calc(190px + env(safe-area-inset-bottom))}
+  .cd-team-panel,.cd-team-form,.cd-team-form button[type="submit"]{scroll-margin-block:24px 190px}
+}
