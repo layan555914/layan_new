@@ -123,14 +123,24 @@ test("verified company owner can submit a new project for review without publish
 });
 
 test("verified manager can submit a project request, but an editor cannot", async ({ page }) => {
-  await installDashboardMocks(page, "manager");
+  const managerMocks = await installDashboardMocks(page, "manager");
   await page.goto("/company-dashboard.html");
-  await expect(page.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(2);
+  const forms = page.locator("#cdProjectManagementRoot .cd-project-request-form");
+  await expect(forms).toHaveCount(2);
+
+  const linkForm = forms.nth(1);
+  await linkForm.getByLabel("ملف الشركة المخوّل").selectOption(ENTITY_ID);
+  await linkForm.getByLabel("المشروع المنشور").selectOption(PROJECT_ID);
+  await linkForm.getByLabel("صفة الشركة داخل المشروع").selectOption("marketing_agent");
+  await linkForm.getByLabel("وصف دليل العلاقة (مطلوب عند عدم وجود رابط)").fill("تفويض الشركة بتسويق المشروع");
+  await linkForm.locator('button[type="submit"]').click();
+  await expect(page.locator("#cdProjectRequestsList")).toContainText("طلب ربط بمشروع منشور");
+  expect(managerMocks.getSubmittedBody().p_request_type).toBe("link_project");
 
   await page.unrouteAll();
   await installDashboardMocks(page, "editor");
   await page.goto("/company-dashboard.html");
-  await expect(page.locator("#cdProjectManagementRoot")).toContainText("المحرر يستطيع تحديث البيانات التشغيلية");
+  await expect(page.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد");
   await expect(page.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
 });
 
