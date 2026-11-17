@@ -10,7 +10,7 @@ const reply = (route, body, status = 200) => route.fulfill({
 });
 
 async function installAuthMocks(page) {
-  const state = { otpRequests: [], syncRequests: [], verifyRequests: 0 };
+  const state = { otpRequests: [], syncRequests: [], verifyRequests: 0, profileUpdates: [] };
   await page.route(SUPABASE + "/rest/v1/**", route => reply(route, []));
   await page.route(SUPABASE + "/auth/v1/otp", async route => {
     state.otpRequests.push(route.request().postDataJSON());
@@ -32,6 +32,11 @@ async function installAuthMocks(page) {
       expires_in: 3600,
       user
     });
+  });
+  await page.route(SUPABASE + "/auth/v1/user", async route => {
+    const body = route.request().postDataJSON();
+    state.profileUpdates.push({ method: route.request().method(), body });
+    await reply(route, { id: USER_ID, email: "signup@example.invalid", user_metadata: body.data || {} });
   });
   await page.route(SUPABASE + "/functions/v1/email-notifications", async route => {
     const body = route.request().postDataJSON();
@@ -61,37 +66,37 @@ test("main public login requests and verifies an email OTP without creating a us
   expect(state.syncRequests).toEqual([{ action: "sync_subscription" }]);
 });
 
-test("new company account signup keeps profile fields and email opt-in in OTP metadata", async ({ page }) => {
+test("new accounts use email + OTP only; optional profile completion is separate", async ({ page }) => {
   const state = await installAuthMocks(page);
   await page.goto("/");
   await page.locator("#loginBtn").click();
   await page.locator("#authToggle").click();
-  await page.locator("#authEmail").fill("company@example.invalid");
-  await page.locator("#authFullName").fill("شركة اختبار أسيوط");
-  await page.locator("#authPhone").fill("01012345678");
-  await page.locator('input[name="authAccountType"][value="company"]').check();
-  await page.locator("#authTerms").check();
-  await page.locator("#authEmailAnnouncements").check();
-  await page.locator("#authSubmit").click();
-
+  await expect(page.locator("#authEmail")).toBeVisible();
   await expect(page.locator("#authOtpCode")).toBeVisible();
-  expect(state.otpRequests[0]).toEqual({
-    email: "company@example.invalid",
-    create_user: true,
-    data: {
-      full_name: "شركة اختبار أسيوط",
-      phone: "01012345678",
-      account_type: "company",
-      email_notifications: true
-    }
-  });
+  await expect(page.locator("#authOtpCode")).toBeDisabled();
+  await expect(page.locator("#authFullName")).toHaveCount(0);
+  await expect(page.locator("#authPhone")).toHaveCount(0);
+  await expect(page.locator("#authTerms")).toHaveCount(0);
+  await page.locator("#authEmail").fill("signup@example.invalid");
+  await page.locator("#authSubmit").click();
+  await expect(page.locator("#authOtpCode")).toBeEnabled();
+  expect(state.otpRequests[0]).toEqual({ email: "signup@example.invalid", create_user: true });
 
   await page.locator("#authOtpCode").fill("654321");
   await page.locator("#authVerifyOtpBtn").click();
   await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
-  expect(state.syncRequests).toEqual([{ action: "set_subscription", enabled: true }]);
+  await expect(page.locator("#asyutProfileReminder")).toBeVisible();
+  await page.locator("#asyutProfileStart").click();
+  await page.locator("#asyutProfileName").fill("مستخدم اختبار");
+  await page.locator("#asyutProfilePhone").fill("01012345678");
+  await page.locator("#asyutProfileType").selectOption("company");
+  await page.locator("#asyutProfileSave").click();
+  await expect.poll(() => state.profileUpdates.length).toBe(1);
+  expect(state.profileUpdates[0]).toMatchObject({
+    method: "PUT",
+    body: { data: { full_name: "مستخدم اختبار", phone: "01012345678", account_type: "company" } }
+  });
 });
-
 test("services marketplace login uses the same email OTP and notification preference service", async ({ page }) => {
   const state = await installAuthMocks(page);
   await page.goto("/marketplace.html");
@@ -105,11 +110,10 @@ test("services marketplace login uses the same email OTP and notification prefer
     create_user: false
   });
 
-  await page.locator("#marketplaceEmailOptIn").check();
   await page.locator("#marketplaceOtpInput").fill("112233");
   await page.locator("#marketplaceOtpVerify").click();
   await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
-  expect(state.syncRequests).toEqual([{ action: "set_subscription", enabled: true }]);
+  expect(state.syncRequests).toEqual([{ action: "sync_subscription" }]);
 });
 
 test("all public account access is email OTP only with no password or recovery controls", async ({ page }) => {
@@ -117,11 +121,28 @@ test("all public account access is email OTP only with no password or recovery c
   await page.goto("/");
   await page.locator("#loginBtn").click();
   await expect(page.locator("#authEmail")).toBeVisible();
+  await expect(page.locator("#authOtpCode")).toBeVisible();
+  await expect(page.locator("#authOtpCode")).toBeDisabled();
+  await expect(page.locator("#authToggle")).toBeVisible();
   await expect(page.locator("#authPassword")).toHaveCount(0);
   await expect(page.locator("#forgotPasswordBtn")).toHaveCount(0);
   await expect(page.locator("#authSubmit")).toHaveText("إرسال كود الدخول");
   await page.goto("/marketplace.html");
   await page.locator("#authOpen").click();
   await expect(page.locator('#authForm input[name="password"]')).toHaveCount(0);
+  await expect(page.locator("#marketplaceOtpInput")).toBeVisible();
+  await expect(page.locator("#marketplaceOtpInput")).toBeDisabled();
+  await expect(page.locator("#switchAuth")).toBeVisible();
   await expect(page.locator("#forgotPassword")).toHaveCount(0);
+});
+
+test("marketplace can create an account with email + OTP only", async ({ page }) => {
+  const state = await installAuthMocks(page);
+  await page.goto("/marketplace.html");
+  await page.locator("#authOpen").click();
+  await page.locator("#switchAuth").click();
+  await page.locator('#authForm input[name="email"]').fill("new-provider@example.invalid");
+  await page.locator("#authSubmit").click();
+  await expect(page.locator("#marketplaceOtpInput")).toBeEnabled();
+  expect(state.otpRequests[0]).toEqual({ email: "new-provider@example.invalid", create_user: true });
 });

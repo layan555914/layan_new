@@ -17,12 +17,13 @@ assert.match(client, /async function requestEmailOtp\(/, "shared Auth client mus
 assert.match(client, /create_user: options\.shouldCreateUser === true/, "normal sign-in must not create a new user by default");
 assert.match(client, /async function verifyEmailOtp\(/, "shared Auth client must verify six-digit email OTPs");
 assert.match(client, /async function syncEmailNotificationSubscription\(/, "shared Auth client must sync email subscription preferences");
-assert.match(client, /email_notifications: profile\.email_notifications === true/, "legacy sign-up must preserve the opt-in choice");
+assert.match(client, /async function updateUserMetadata\(/, "profile data must be saved separately after account creation");
+assert.doesNotMatch(client, /payload\.data\s*=/, "OTP signup must not send profile metadata");
 
 assert.match(app, /authOtpCodeField/, "main platform dialog must include the OTP verification field");
 assert.match(app, /requestEmailOtp\(email, options\)/, "main platform dialog must call shared OTP");
-assert.match(app, /account_type: accountType/, "new main-platform users must retain their account type");
-assert.match(app, /email_notifications: emailOptIn\.checked === true/, "new main-platform users must preserve email opt-in");
+assert.match(app, /shouldCreateUser: mode === "signup"/, "main signup must create an account with email OTP only");
+assert.doesNotMatch(app, /authFullName|authPhone|authTerms|authEmailAnnouncements|authAccountType/, "main account creation must not request extra fields");
 assert.match(app, /api\.syncEmailNotificationSubscription/, "main platform must sync email preferences after authentication");
 assert.doesNotMatch(app, /authPassword|authShowPassword|forgotPasswordBtn|resendConfirmationBtn|كلمة المرور القديمة/, "public main-platform auth must not expose password login or recovery");
 assert.doesNotMatch(marketplace, /elements\.password|كلمة المرور القديمة|forgotPassword|signIn\(email/, "services marketplace must not expose password login or recovery");
@@ -31,7 +32,12 @@ assert.doesNotMatch(marketplaceHtml, /name="password"|type="password"|استعا
 
 assert.match(marketplace, /requestEmailOtp\(email,options\)/, "services marketplace must use OTP login");
 assert.match(marketplace, /verifyEmailOtp\(pendingMarketplaceOtp\.email/, "services marketplace must verify OTP");
-assert.match(marketplace, /syncEmailNotificationSubscription/, "services marketplace must sync email preferences");
+assert.match(marketplace, /shouldCreateUser:authMode==="signup"/, "marketplace signup must create an account with email OTP only");
+assert.match(marketplace, /syncEmailNotificationSubscription/, "services marketplace must preserve existing preference synchronization");
+assert.doesNotMatch(marketplaceHtml, /marketplaceEmailOptIn|type="password"|name="password"/, "marketplace auth must not request extra fields");
+const accountProfile = read("account-profile.js");
+assert.match(accountProfile, /استكمل بيانات حسابك/, "profile reminder must be separate from signup");
+assert.match(accountProfile, /REMIND_AGAIN_AFTER_MS = 7 \\* 24 \\* 60 \\* 60 \\* 1000/, "profile reminder must be periodic");
 
 assert.match(template, /\{\{ \.Token \}\}/, "Magic Link template must render the six-digit OTP");
 assert.doesNotMatch(template, /\{\{ \.ConfirmationURL \}\}/, "OTP template must not expose a link-only confirmation URL");

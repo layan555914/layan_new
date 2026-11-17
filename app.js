@@ -290,28 +290,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     authDialog.innerHTML = `
       <div class="details-dialog-header auth-brand-head"><span class="auth-brand"><img src="./icon.svg" alt="" width="30" height="30">أسيوط عقار</span><button type="button" id="closeAuthDialog" aria-label="إغلاق">×</button></div>
       <h2 id="authTitle" class="auth-title">تسجيل الدخول إلى أسيوط عقار</h2>
-      <p class="auth-intro" id="authIntro">اكتب بريدك الإلكتروني وسنرسل لك كود تحقق من 6 أرقام.</p>
+      <p class="auth-intro" id="authIntro">اكتب بريدك الإلكتروني، ثم أدخل كود التحقق المكوّن من 6 أرقام.</p>
       <form id="authForm" class="auth-form">
-        <fieldset class="auth-signup-only auth-account-types" hidden>
-          <legend>نوع الحساب</legend>
-          <label class="auth-type"><input type="radio" name="authAccountType" value="seeker"><span><i aria-hidden="true">⌕</i>باحث عن عقار</span></label>
-          <label class="auth-type"><input type="radio" name="authAccountType" value="owner"><span><i aria-hidden="true">⌂</i>مالك عقار</span></label>
-          <label class="auth-type"><input type="radio" name="authAccountType" value="broker"><span><i aria-hidden="true">☺</i>وسيط عقاري</span></label>
-          <label class="auth-type"><input type="radio" name="authAccountType" value="company"><span><i aria-hidden="true">▦</i>شركة عقارية</span></label>
-        </fieldset>
-        <label class="auth-signup-only" hidden>الاسم الكامل<input id="authFullName" type="text" autocomplete="name" maxlength="80" placeholder="الاسم كما سيظهر للإدارة"></label>
-        <label class="auth-signup-only" hidden>رقم الموبايل<span class="auth-phone"><span dir="ltr">+20</span><input id="authPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" maxlength="13" placeholder="01xxxxxxxxx"></span></label>
         <label>البريد الإلكتروني<input id="authEmail" type="email" autocomplete="email" required placeholder="name@example.com"></label>
-        <label class="auth-email-optin"><input id="authEmailAnnouncements" type="checkbox"> أرغب في استقبال إشعارات البريد عند اعتماد ونشر عقارات وخدمات وشركات جديدة. يمكنني إلغاء الاشتراك في أي وقت.</label>
-        <label class="auth-signup-only auth-terms" hidden><input id="authTerms" type="checkbox"> أوافق على <a href="./terms.html" target="_blank" rel="noopener">الشروط</a> و<a href="./privacy.html" target="_blank" rel="noopener">سياسة الخصوصية</a></label>
-        <label id="authOtpCodeField" class="auth-otp-only" hidden>كود التحقق المكوّن من 6 أرقام<input id="authOtpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" dir="ltr"></label>
+        <label id="authOtpCodeField" class="auth-otp-only">كود التحقق المكوّن من 6 أرقام<input id="authOtpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000" dir="ltr" disabled></label>
         <p id="authStatus" role="status" aria-live="polite"></p>
         <button class="btn btn-gold" id="authSubmit" type="submit">إرسال كود الدخول</button>
         <button class="btn btn-outline-dark" id="authVerifyOtpBtn" type="button" hidden>تأكيد الكود والدخول</button>
         <button class="btn btn-outline-dark" id="authResendOtpBtn" type="button" hidden disabled>إعادة إرسال الكود بعد دقيقة</button>
         <button class="btn btn-outline-dark" id="authBackOtpBtn" type="button" hidden>تغيير البريد الإلكتروني</button>
-        <button class="btn btn-outline-dark" id="authToggle" type="button">إنشاء حساب جديد</button>
+        <button class="btn btn-outline-dark" id="authToggle" type="button">مستخدم جديد؟ إنشاء حساب جديد</button>
       </form>`;
+    document.body.appendChild(authDialog);
     document.body.appendChild(authDialog);
     let mode = "login";
     let pendingOtp = null;
@@ -325,20 +315,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const otpVerifyButton = authDialog.querySelector("#authVerifyOtpBtn");
     const otpResendButton = authDialog.querySelector("#authResendOtpBtn");
     const otpBackButton = authDialog.querySelector("#authBackOtpBtn");
-    const signupOnly = [...authDialog.querySelectorAll(".auth-signup-only")];
-    const fullName = authDialog.querySelector("#authFullName");
-    const phone = authDialog.querySelector("#authPhone");
-    const terms = authDialog.querySelector("#authTerms");
     const intro = authDialog.querySelector("#authIntro");
     const emailInput = authDialog.querySelector("#authEmail");
-    const emailOptIn = authDialog.querySelector("#authEmailAnnouncements");
 
     function clearOtpFlow() {
       pendingOtp = null;
       if (resendTimer) window.clearTimeout(resendTimer);
       resendTimer = null;
       emailInput.readOnly = false;
-      otpCodeField.hidden = true;
+      otpCodeField.hidden = false;
+      otpCode.disabled = true;
       otpCode.value = "";
       otpVerifyButton.hidden = true;
       otpResendButton.hidden = true;
@@ -360,14 +346,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     function paintMode() {
       clearOtpFlow();
-      signupOnly.forEach(node => { node.hidden = mode !== "signup"; });
-      fullName.required = phone.required = terms.required = mode === "signup";
       intro.textContent = mode === "login"
-        ? "اكتب بريدك الإلكتروني وسنرسل لك كود تحقق من 6 أرقام."
-        : "أنشئ حسابك بكود البريد الإلكتروني. اكتب بياناتك الأساسية حتى نحفظ نوع حسابك وبيانات التواصل.";
+        ? "اكتب بريدك الإلكتروني، ثم أدخل كود التحقق المكوّن من 6 أرقام."
+        : "إنشاء الحساب يتم بالبريد الإلكتروني وكود التحقق فقط.";
       title.textContent = mode === "login" ? "تسجيل الدخول إلى أسيوط عقار" : "إنشاء حساب مجاني";
       submit.textContent = mode === "login" ? "إرسال كود الدخول" : "إرسال كود إنشاء الحساب";
-      toggle.textContent = mode === "login" ? "ليس لديك حساب؟ أنشئ حسابًا" : "لديك حساب بالفعل؟ سجّل الدخول";
+      toggle.textContent = mode === "login" ? "مستخدم جديد؟ إنشاء حساب جديد" : "لديك حساب بالفعل؟ تسجيل الدخول";
       status.textContent = "";
     }
     toggle.addEventListener("click", () => { mode = mode === "login" ? "signup" : "login"; paintMode(); });
@@ -376,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const api = window.LAYAN_SUPABASE;
       if (!api?.syncEmailNotificationSubscription) return;
       try {
-        await api.syncEmailNotificationSubscription(emailOptIn.checked ? true : undefined);
+        await api.syncEmailNotificationSubscription();
       } catch (error) {
         console.warn("Email notification preference sync failed:", error);
         status.textContent += " تعذر حفظ اشتراك الإشعارات الآن؛ يمكنك تفعيله لاحقًا من رابط الاشتراك أو التواصل مع الإدارة.";
@@ -398,6 +382,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearOtpFlow();
         window.setTimeout(() => {
           if (continueCompanyRegistration()) return;
+          const returnTo = new URLSearchParams(window.location.search).get("return");
+          if (returnTo) {
+            try {
+              const target = new URL(returnTo, window.location.origin);
+              if (target.origin === window.location.origin && target.pathname !== "/" && !/\/index\.html$/i.test(target.pathname)) {
+                authDialog.close();
+                window.location.assign(target.pathname + target.search + target.hash);
+                return;
+              }
+            } catch (_) {}
+          }
           authDialog.close();
           setStatus("أهلًا بك في أسيوط عقار. يمكنك الآن متابعة حسابك وإعلاناتك.");
         }, 450);
@@ -412,25 +407,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const email = resend && pendingOtp ? pendingOtp.email : emailInput.value.trim().toLowerCase();
       if (!email) { status.textContent = "اكتب بريدك الإلكتروني أولًا."; emailInput.focus(); return; }
       if (!resend && !emailInput.checkValidity()) { status.textContent = "راجع صيغة البريد الإلكتروني وحاول مرة أخرى."; emailInput.focus(); return; }
-      let options = resend && pendingOtp ? pendingOtp.options : { shouldCreateUser: mode === "signup" };
-      if (!resend && mode === "signup") {
-        const accountType = authDialog.querySelector('input[name="authAccountType"]:checked')?.value || "";
-        const name = fullName.value.trim().replace(/\s+/g, " ");
-        const mobile = phone.value.replace(/[^0-9]/g, "").replace(/^20/, "").replace(/^(?!0)/, "0");
-        if (!accountType) { status.textContent = "اختر نوع الحساب."; return; }
-        if (name.length < 3) { status.textContent = "اكتب الاسم الكامل."; return; }
-        if (!/^01[0125][0-9]{8}$/.test(mobile)) { status.textContent = "اكتب رقم موبايل مصري صحيح مثل 01012345678."; return; }
-        if (!terms.checked) { status.textContent = "يلزم الموافقة على الشروط وسياسة الخصوصية."; return; }
-        options = {
-          shouldCreateUser: true,
-          data: {
-            full_name: name,
-            phone: mobile,
-            account_type: accountType,
-            email_notifications: emailOptIn.checked === true
-          }
-        };
-      }
+      const options = resend && pendingOtp ? pendingOtp.options : { shouldCreateUser: mode === "signup" };
       const button = resend ? otpResendButton : submit;
       button.disabled = true;
       status.textContent = resend ? "جارٍ إرسال كود جديد..." : "جارٍ إرسال كود التحقق إلى بريدك...";
@@ -439,7 +416,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         pendingOtp = { email, options, mode };
         emailInput.readOnly = true;
         otpCodeField.hidden = false;
-        otpCodeField.querySelector("input").focus();
+        otpCode.disabled = false;
+        otpCode.focus();
         submit.hidden = true;
         otpVerifyButton.hidden = false;
         otpVerifyButton.disabled = false;

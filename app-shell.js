@@ -110,6 +110,58 @@
     }).catch(() => {});
   }
 
+  function rootPrefix() { return /\/(?:areas|ads)\//i.test(location.pathname) ? "../" : "./"; }
+  function currentReturnPath() {
+    if (location.pathname === "/" || /\/index\.html$/i.test(location.pathname)) return "";
+    return location.pathname + location.search + location.hash;
+  }
+  function authEntryUrl(mode) {
+    const returnPath = currentReturnPath();
+    return rootPrefix() + "index.html?auth=" + mode + (returnPath ? "&return=" + encodeURIComponent(returnPath) : "");
+  }
+  function loadAccountScript(src, ready) {
+    if (ready()) return Promise.resolve();
+    return new Promise(resolve => {
+      const script = document.createElement("script");
+      script.src = src; script.onload = resolve; script.onerror = resolve; document.head.appendChild(script);
+    });
+  }
+  function ensureAccountProfile() {
+    if (window.__asyutAccountProfilePromise) return window.__asyutAccountProfilePromise;
+    window.__asyutAccountProfilePromise = (async () => {
+      const prefix = rootPrefix();
+      if (!window.LAYAN_CONFIG) await loadAccountScript(prefix + "config.js", () => Boolean(window.LAYAN_CONFIG));
+      if (!window.LAYAN_SUPABASE) await loadAccountScript(prefix + "gubabase.js", () => Boolean(window.LAYAN_SUPABASE));
+      if (!window.__asyutAccountProfile) await loadAccountScript(prefix + "account-profile.js", () => Boolean(window.__asyutAccountProfile));
+    })().catch(error => console.warn("Account profile reminder unavailable:", error));
+    return window.__asyutAccountProfilePromise;
+  }
+  function authSession() {
+    try { return window.LAYAN_SUPABASE?.getSession?.() || JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null"); }
+    catch (_) { return null; }
+  }
+  function mountAuthEntry() {
+    const header = document.querySelector("header.topbar");
+    if (!header) return;
+    let actions = header.querySelector(".top-actions");
+    if (!actions) { actions = document.createElement("div"); actions.className = "top-actions aa-auth-actions"; header.appendChild(actions); }
+    if (!document.querySelector("#loginBtn, #authOpen") && !actions.querySelector("[data-asyut-auth-login]")) {
+      const login = document.createElement("a");
+      login.className = "btn btn-outline"; login.dataset.asyutAuthLogin = "1"; login.textContent = "تسجيل الدخول";
+      actions.appendChild(login);
+    }
+    if (!actions.querySelector("[data-asyut-auth-signup]")) {
+      const signup = document.createElement("a");
+      signup.className = "btn btn-gold"; signup.dataset.asyutAuthSignup = "1"; signup.textContent = "إنشاء حساب جديد";
+      actions.appendChild(signup);
+    }
+    const loggedIn = Boolean(authSession()?.access_token);
+    const login = actions.querySelector("[data-asyut-auth-login]");
+    const signup = actions.querySelector("[data-asyut-auth-signup]");
+    if (login) { login.textContent = loggedIn ? "حسابي" : "تسجيل الدخول"; login.href = loggedIn ? rootPrefix() + "my-listings.html" : authEntryUrl("login"); }
+    if (signup) { signup.href = authEntryUrl("signup"); signup.hidden = loggedIn; }
+  }
+
   // «إعلاناتي» beside the top menu for signed-in users (index.html has its own button).
   function signedIn() {
     try {
@@ -134,6 +186,12 @@
     link.hidden = false;
   }
 
-  const start = () => { mountNav(); keepUpdated(); mountMyListings(); window.addEventListener("layan:auth-ready", mountMyListings); window.addEventListener("layan-auth-state-changed", mountMyListings); window.addEventListener("focus", mountMyListings); };
+  const start = () => {
+    mountNav(); keepUpdated(); mountMyListings(); mountAuthEntry(); ensureAccountProfile();
+    const refresh = () => { mountMyListings(); mountAuthEntry(); };
+    window.addEventListener("layan:auth-ready", refresh);
+    window.addEventListener("layan-auth-state-changed", refresh);
+    window.addEventListener("focus", refresh);
+  };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
