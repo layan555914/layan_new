@@ -425,3 +425,99 @@ body.page-marketplace .mobile-nav .aa-appnav-add {
     animation-iteration-count: 1;
   }
 }
+
+ 
+/* Unified headings and section rhythm — typography and spacing only.
+   Existing color, background, border and brand rules are intentionally untouched. */
+body.page-home main .section-heading,
+body.page-marketplace main .mk-heading {
+  align-items: flex-end;
+  column-gap: clamp(14px, 2vw, 24px);
+  row-gap: 10px;
+  margin-block-end: clamp(18px, 2.4vw, 26px);
+}
+
+body.page-home main .section-heading > div,
+body.page-marketplace main .mk-heading > div {
+  min-width: 0;
+  max-width: 72ch;
+}
+
+body.page-home main :is(.section-heading h2, .ab-head h2, .hw-head h2),
+body.page-marketplace main .mk-heading h2 {
+  margin-block: 0;
+  font-size: clamp(1.4rem, 2.15vw, 1.8rem);
+  font-weight: 750;
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+body.page-home main :is(.section-heading p, .ab-head p, .hw-head p),
+body.page-marketplace main .mk-heading p {
+  max-width: 70ch;
+  margin-block: 0.45rem 0;
+  font-size: 0.92rem;
+  line-height: 1.85;
+}
+
+body.page-home main :is(.section-heading .eyebrow, .ab-head .eyebrow, .hw-head .eyebrow),
+body.page-marketplace main .mk-heading .eyebrow {
+  display: inline-block;
+  margin-block-end: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+body.page-home main :is(.ab-mission-copy h3, .ab-title, .hw-step h3, .home-hub-card > b) {
+  font-size: clamp(1rem, 1.35vw, 1.15rem);
+  font-weight: 700;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+body.page-home main .home-hub-card > b {
+  display: block;
+  margin-block: 0.15rem 0.3rem;
+}
+
+body.page-home main .launch-campaign-copy h2 {
+  max-width: 24ch;
+  margin-block: 0.65rem 0.8rem;
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+body.page-home main .osx-copy h2 {
+  margin-block: 0.35rem 0.5rem;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+body.page-marketplace main .mk-profile-content strong {
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  body.page-home main .section-heading,
+  body.page-marketplace main .mk-heading {
+    align-items: flex-start;
+    row-gap: 8px;
+    margin-block-end: 17px;
+  }
+
+  body.page-home main :is(.section-heading h2, .ab-head h2, .hw-head h2),
+  body.page-marketplace main .mk-heading h2 {
+    font-size: clamp(1.28rem, 5vw, 1.5rem);
+    line-height: 1.5;
+  }
+
+  body.page-home main :is(.section-heading p, .ab-head p, .hw-head p),
+  body.page-marketplace main .mk-heading p {
+    font-size: 0.88rem;
+    line-height: 1.8;
+  }
+}
+
