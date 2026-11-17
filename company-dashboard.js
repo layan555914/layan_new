@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     other: "جهة مرتبطة"
   };
 
+  const projectStatusLabels = {
+    announced: "معلن عنه", planned: "مخطط", under_construction: "تحت التنفيذ",
+    partially_delivered: "تسليم مرحلي", completed: "مكتمل", operating: "يعمل", stalled: "متوقف", unknown: "الحالة غير محددة"
+  };
+
   const statusLabels = {
     pending: "قيد مراجعة الإدارة",
     active: "ملف معتمد",
@@ -170,7 +175,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else if (profile.kind === "directory_entity") {
       actionRow.append(link("فتح ملف الشركة وإدارته", "./company.html?entity_id=" + encodeURIComponent(profile.id), "cd-live-action"));
     } else if (profile.kind === "company_profile_member") {
-      actionRow.append(link("عرض ملف الشركة", "./companies.html", "cd-live-action cd-live-action--secondary"));
+      actionRow.append(link("عرض ملف الشركة", "./company.html?id=" + encodeURIComponent(profile.id), "cd-live-action cd-live-action--secondary"));
     }
     state.append(actionRow);
     card.append(identity, state);
@@ -355,7 +360,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         card.append(
           el("span", project.relationLabel, "cd-project-role"),
           el("h3", project.name_ar || "مشروع عقاري"),
-          el("p", project.project_status || "الحالة غير محددة")
+          el("p", projectStatusLabels[project.project_status] || "الحالة غير محددة")
         );
         card.append(link("فتح صفحة المشروع", "./project.html?id=" + encodeURIComponent(project.id), "cd-project-link"));
         projectsRoot.append(card);
@@ -410,6 +415,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!auth || typeof auth.requireAuthenticated !== "function") {
       throw new Error("نظام تسجيل الدخول غير متاح على هذه الصفحة.");
     }
+    if (!base) throw new Error("إعدادات الاتصال غير متاحة. حدّث الصفحة وحاول مرة أخرى.");
     const session = await auth.requireAuthenticated();
     const userId = session && session.user && session.user.id;
     if (!userId) throw new Error("تعذر التحقق من حسابك. سجّل الدخول مرة أخرى.");
@@ -559,7 +565,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         errors.push(error.message);
       }
     }
-    const uniqueProjects = [...new Map(projectRows.map(row => [row.id, row])).values()];
+    const groupedProjects = new Map();
+    projectRows.forEach(row => {
+      const existing = groupedProjects.get(row.id);
+      if (existing) {
+        if (!existing.roles.includes(row.relationLabel)) existing.roles.push(row.relationLabel);
+      } else {
+        groupedProjects.set(row.id, { ...row, roles: [row.relationLabel] });
+      }
+    });
+    const uniqueProjects = [...groupedProjects.values()].map(row => ({
+      ...row,
+      relationLabel: row.roles.join(" · ")
+    }));
     const previousWork = profiles
       .filter(profile => profile.kind === "company_profile")
       .flatMap(profile => profile.previousWork || []);
