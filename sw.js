@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v181-persistent-auth-session-20261117";
+const CACHE_NAME = "asyut-aqar-shell-v182-warm-bright-visual-polish-20261117";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -45,6 +45,7 @@ const APP_SHELL = [
   "./assets/theme/visual-refresh.css?v=20261116-1",
   "./assets/theme/photo-covers.css?v=20261116-2",
   "./assets/theme/warm-light-theme.css?v=20261116-4",
+  "./assets/theme/visual-polish.css?v=20261117-warm-bright-1",
   "./assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1",
   "./buyer.css",
   "./sponsor.css",
