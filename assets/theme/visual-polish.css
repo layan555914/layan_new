@@ -521,3 +521,13 @@ body.page-marketplace main .mk-profile-content strong {
   }
 }
 
+/* Homepage benefits strip: darken only the band immediately below the villa hero. */
+body.page-home .design-benefits {
+  background: var(--aa-polish-line);
+}
+
+@media (max-width: 760px) {
+  body.page-home .design-benefits {
+    background: var(--aa-polish-line);
+  }
+}
