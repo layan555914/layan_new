@@ -97,7 +97,7 @@ test("email confirmation PKCE code creates a session and completes the signup ca
     auth_code: "single-use-signup-fixture-code",
     code_verifier: verifier
   });
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL("http://127.0.0.1:4173/");
   const callback = await page.evaluate(() => window.LAYAN_AUTH_CALLBACK_RESULT);
   expect(callback).toMatchObject({ success: true, type: "signup" });
   const sessionSnapshot = await page.evaluate(() => ({
