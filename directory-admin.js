@@ -99,6 +99,33 @@ document.addEventListener("DOMContentLoaded", () => {
     return data;
   }
 
+  async function tryEmailAnnouncement(recordType, recordId) {
+    try {
+      await fresh();
+      const response = await fetch(base + "/functions/v1/email-notifications", {
+        method: "POST",
+        headers: {
+          apikey: key,
+          Authorization: "Bearer " + session.access_token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "dispatch",
+          record_type: recordType,
+          record_id: String(recordId)
+        })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "تعذر إرسال إشعار البريد.");
+      if (data.sent > 0) return " تم إرسال إشعار البريد إلى " + data.sent + " مشترك.";
+      if (data.failed > 0) return " تعذر إرسال إشعار البريد إلى " + data.failed + " مشترك.";
+      return " لا يوجد مشترك مفعّل بإشعارات البريد لهذا التحديث.";
+    } catch (error) {
+      console.warn("ASYUT AQAR directory email announcement failed:", recordType, recordId, error);
+      return " تعذر إرسال إشعار البريد، لكن تم نشر السجل بنجاح.";
+    }
+  }
+
   async function requireAdmin() {
     await fresh();
     const result = await api("/rest/v1/rpc/layan_is_admin", {
@@ -617,7 +644,13 @@ document.addEventListener("DOMContentLoaded", () => {
             patch.next_review_at = next.toISOString().slice(0, 10);
           }
           await updateRecord(type, recordId, patch, auditReason || "اعتماد ونشر سجل بعد المراجعة");
-          say("تم اعتماد السجل ونشره وتسجيل قرار الاعتماد.");
+          const emailType = ({
+            entities: "directory_entity",
+            projects: "directory_project",
+            opportunities: "directory_opportunity"
+          })[type];
+          const emailStatus = emailType ? await tryEmailAnnouncement(emailType, recordId) : "";
+          say("تم اعتماد السجل ونشره وتسجيل قرار الاعتماد." + emailStatus);
         } else if (button.hasAttribute("data-unpublish")) {
           if (!window.confirm("إخفاء السجل وإعادته إلى حالة قيد المراجعة؟")) return;
           patch.verification_status = "needs_review";
