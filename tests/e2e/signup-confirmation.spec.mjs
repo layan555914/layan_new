@@ -214,7 +214,7 @@ test("legacy implicit email-confirmation callbacks remain supported", async ({ p
     window.LAYAN_AUTH_CALLBACK_RESULT?.type === "legacy" &&
     window.LAYAN_SUPABASE?.getSession?.()?.access_token === "legacy-confirmation-access"
   );
-  await expect(page).toHaveURL(/\\/$/);
+  await expect(page).toHaveURL("http://127.0.0.1:4173/");
   expect(callbackRequests.some(request => request.method === "GET")).toBe(true);
   const sessionSnapshot = await page.evaluate(() => ({
     clientSession: window.LAYAN_SUPABASE.getSession(),
