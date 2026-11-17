@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "id","title","governorate","listing_purpose","land_ownership_authority",
     "land_permit_details","land_utilities","land_zoning","city","area","area_m2",
     "bedrooms","bathrooms","monthly_installment","property_type","description",
-    "total_price","down_payment","paid_amount","remaining_amount","assignment_fee",
+    "total_price","price_on_request","down_payment","paid_amount","remaining_amount","assignment_fee",
     "assignment_fee_percentage","discount_amount","discount_percent","developer_name",
     "project_name","image_urls","is_featured","featured_until","contact_phone",
     "latitude","longitude","created_at","updated_at"
