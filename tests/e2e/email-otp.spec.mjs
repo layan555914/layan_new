@@ -37,16 +37,13 @@ async function installAuthMocks(page) {
   await page.route(SUPABASE + "/auth/v1/user", async route => {
     const body = route.request().postDataJSON() || {};
     const method = route.request().method();
+    const authorization = route.request().headers().authorization || "";
     state.profileUpdates.push({ method, body });
-    const stored = await page.evaluate(() => {
-      try { return JSON.parse(localStorage.getItem("layanSupabaseSession") || "null"); }
-      catch { return null; }
-    }).catch(() => null);
-    const currentUser = stored?.user || {
-      id: USER_ID,
-      email: state.otpRequests.at(-1)?.email || "signup@example.invalid",
-      user_metadata: {}
-    };
+    const email = authorization.includes("legacy-access-token")
+      ? "legacy@example.invalid"
+      : (state.otpRequests.at(-1)?.email ||
+        (authorization.includes("otp-test-access-token") ? "existing@example.invalid" : "signup@example.invalid"));
+    const currentUser = { id: USER_ID, email, user_metadata: {} };
     await reply(route, {
       ...currentUser,
       user_metadata: { ...(currentUser.user_metadata || {}), ...(body.data || {}) }
