@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v180-home-villa-hero-20261116";
+const CACHE_NAME = "asyut-aqar-shell-v181-design-system-integration-20261117";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -44,7 +44,9 @@ const APP_SHELL = [
   "./assets/theme/sitewide-typography.css?v=20261116-1",
   "./assets/theme/visual-refresh.css?v=20261116-1",
   "./assets/theme/photo-covers.css?v=20261116-2",
-  "./assets/theme/warm-light-theme.css?v=20261116-4",
+  "./assets/theme/warm-light-theme.css?v=20261116-5",
+  "./assets/theme/empty-image-villa-fallback.css?v=20261116-1",
+  "./assets/theme/design-system.css?v=20261117-foundation-1",
   "./assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1",
   "./buyer.css",
   "./sponsor.css",
