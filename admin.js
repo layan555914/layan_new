@@ -705,9 +705,12 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         body: JSON.stringify({ p_id: card.dataset.companyEntityUpdateId, p_action: action, p_note: note })
       });
-      setStatus(action === "approve" ? "تم اعتماد تعديلات الملف وتسجيلها في سجل المراجعة."
+      const emailStatus = action === "approve"
+        ? await tryEmailAnnouncement("directory_entity_update", card.dataset.companyEntityUpdateId)
+        : "";
+      setStatus((action === "approve" ? "تم اعتماد تعديلات الملف وتسجيلها في سجل المراجعة."
         : action === "request_changes" ? "تم طلب استكمال تعديلات الملف."
-        : "تم رفض تعديلات الملف وتسجيل السبب.");
+        : "تم رفض تعديلات الملف وتسجيل السبب.") + emailStatus);
       await loadPendingCompanyEntityUpdates();
     } catch (error) {
       setStatus(error.message || "تعذر تنفيذ مراجعة تعديل الملف.");
