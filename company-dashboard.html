@@ -122,6 +122,13 @@
           <span class="cd-section-count">ملخص المشروعات يظهر هنا</span>
         </div>
         <div id="cdProjectsList" class="cd-projects-list" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل المشروعات المرتبطة...</p></div>
+        <div id="cdProjectManagementRoot" class="cd-project-management" aria-live="polite">
+          <p class="cd-live-loading">جارٍ تحميل أدوات طلب إدارة المشروعات...</p>
+        </div>
+        <section class="cd-project-requests" aria-labelledby="cdProjectRequestsTitle">
+          <div class="cd-section-heading"><div><span class="cd-eyebrow">متابعة الإدارة</span><h3 id="cdProjectRequestsTitle">طلبات المشروعات</h3></div><span class="cd-section-count">طلبات الحسابات المخوّلة فقط</span></div>
+          <div id="cdProjectRequestsList" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل طلبات المشروعات...</p></div>
+        </section>
         <div class="cd-project-flow" aria-label="ترتيب البيانات">
           <div><span>1</span><strong>ملف الشركة</strong><small>الهوية والخدمات والفروع</small></div>
           <i aria-hidden="true">←</i>
@@ -180,6 +187,7 @@
   <script src="./config.js?v=20261105-7"></script>
   <script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script>
   <script src="./company-dashboard.js?v=20261117-live-dashboard-1" defer></script>
+  <script src="./company-project-management.js?v=20261118-phase3-1" defer></script>
   <script src="./app-shell.js?v=20261117-persistent-auth-session-1" defer></script>
   <script src="./site-nav.js?v=20261117-persistent-auth-session-1" defer></script>
 </body>
