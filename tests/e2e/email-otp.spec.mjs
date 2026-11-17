@@ -36,8 +36,21 @@ async function installAuthMocks(page) {
   });
   await page.route(SUPABASE + "/auth/v1/user", async route => {
     const body = route.request().postDataJSON() || {};
-    state.profileUpdates.push({ method: route.request().method(), body });
-    await reply(route, { id: USER_ID, email: "signup@example.invalid", user_metadata: body.data || {} });
+    const method = route.request().method();
+    state.profileUpdates.push({ method, body });
+    const stored = await page.evaluate(() => {
+      try { return JSON.parse(localStorage.getItem("layanSupabaseSession") || "null"); }
+      catch { return null; }
+    }).catch(() => null);
+    const currentUser = stored?.user || {
+      id: USER_ID,
+      email: state.otpRequests.at(-1)?.email || "signup@example.invalid",
+      user_metadata: {}
+    };
+    await reply(route, {
+      ...currentUser,
+      user_metadata: { ...(currentUser.user_metadata || {}), ...(body.data || {}) }
+    });
   });
   await page.route(SUPABASE + "/functions/v1/email-notifications", async route => {
     const body = route.request().postDataJSON();
