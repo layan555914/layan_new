@@ -141,18 +141,42 @@
     catch (_) { return null; }
   }
   function mountAuthEntry() {
-    const header = document.querySelector("header.topbar");
-    if (!header) return;
-    let actions = header.querySelector(".top-actions");
-    if (!actions) { actions = document.createElement("div"); actions.className = "top-actions aa-auth-actions"; header.appendChild(actions); }
+    let header = document.querySelector("header.topbar");
+    if (!header) header = document.querySelector("header");
+    let actions = header?.querySelector(".top-actions");
+    if (!actions && header) {
+      actions = document.createElement("div");
+      actions.className = "top-actions aa-auth-actions";
+      header.appendChild(actions);
+    }
+    if (!actions) {
+      let fallback = document.querySelector(".aa-auth-fallback");
+      if (!fallback) {
+        fallback = document.createElement("div");
+        fallback.className = "aa-auth-fallback";
+        fallback.setAttribute("dir", "rtl");
+        document.body.insertBefore(fallback, document.body.firstChild);
+      }
+      actions = fallback;
+    }
+    if (!document.getElementById("aaAuthFallbackStyle")) {
+      const style = document.createElement("style");
+      style.id = "aaAuthFallbackStyle";
+      style.textContent = ".aa-auth-fallback{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;max-width:1200px;margin:0 auto;padding:10px 16px}.aa-auth-fallback .btn{min-height:40px;padding:8px 14px;border-radius:9px;font:inherit;text-decoration:none;font-weight:700}";
+      document.head.appendChild(style);
+    }
     if (!document.querySelector("#loginBtn, #authOpen") && !actions.querySelector("[data-asyut-auth-login]")) {
       const login = document.createElement("a");
-      login.className = "btn btn-outline"; login.dataset.asyutAuthLogin = "1"; login.textContent = "تسجيل الدخول";
+      login.className = "btn btn-outline";
+      login.dataset.asyutAuthLogin = "1";
+      login.textContent = "تسجيل الدخول";
       actions.appendChild(login);
     }
     if (!actions.querySelector("[data-asyut-auth-signup]")) {
       const signup = document.createElement("a");
-      signup.className = "btn btn-gold"; signup.dataset.asyutAuthSignup = "1"; signup.textContent = "إنشاء حساب جديد";
+      signup.className = "btn btn-gold";
+      signup.dataset.asyutAuthSignup = "1";
+      signup.textContent = "إنشاء حساب جديد";
       actions.appendChild(signup);
     }
     const loggedIn = Boolean(authSession()?.access_token);
