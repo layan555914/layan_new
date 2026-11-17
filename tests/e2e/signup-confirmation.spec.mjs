@@ -97,7 +97,8 @@ test("email confirmation PKCE code creates a session and completes the signup ca
     auth_code: "single-use-signup-fixture-code",
     code_verifier: verifier
   });
-  await expect(page).toHaveURL(/\/$/);
+  // The test server URL is fixed in playwright.config.mjs.
+  await expect(page).toHaveURL("http://127.0.0.1:4173/");
   const callback = await page.evaluate(() => window.LAYAN_AUTH_CALLBACK_RESULT);
   expect(callback).toMatchObject({ success: true, type: "signup" });
   const sessionSnapshot = await page.evaluate(() => ({
@@ -174,11 +175,31 @@ test("early auth callback results are replayed when the main UI attaches", async
 });
 
 test("legacy implicit email-confirmation callbacks remain supported", async ({ page }) => {
+  const callbackRequests = [];
   await page.route(SUPABASE + "/auth/v1/user", async route => {
-    expect(route.request().headers().authorization).toBe("Bearer legacy-confirmation-access");
+    const request = route.request();
+    const headers = request.headers();
+    callbackRequests.push({ method: request.method(), authorization: headers.authorization || null });
+
+    // A cross-origin GET carrying Authorization may be preceded by a CORS preflight.
+    // Handle OPTIONS explicitly so the test mock behaves consistently in desktop and mobile Chromium.
+    const origin = headers.origin || "http://127.0.0.1:4173";
+    const corsHeaders = {
+      "access-control-allow-origin": origin,
+      "access-control-allow-methods": "GET, OPTIONS",
+      "access-control-allow-headers": headers["access-control-request-headers"] || "apikey, authorization",
+      "access-control-max-age": "600"
+    };
+    if (request.method() === "OPTIONS") {
+      await route.fulfill({ status: 204, headers: corsHeaders });
+      return;
+    }
+
+    expect(request.method()).toBe("GET");
+    expect(headers.authorization).toBe("Bearer legacy-confirmation-access");
     await route.fulfill({
       status: 200,
-      contentType: "application/json",
+      headers: { ...corsHeaders, "content-type": "application/json" },
       body: JSON.stringify({
         id: "22222222-2222-4222-8222-222222222222",
         email: "legacy-test@example.invalid",
@@ -193,7 +214,8 @@ test("legacy implicit email-confirmation callbacks remain supported", async ({ p
     window.LAYAN_AUTH_CALLBACK_RESULT?.type === "legacy" &&
     window.LAYAN_SUPABASE?.getSession?.()?.access_token === "legacy-confirmation-access"
   );
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL("http://127.0.0.1:4173/");
+  expect(callbackRequests.some(request => request.method === "GET")).toBe(true);
   const sessionSnapshot = await page.evaluate(() => ({
     clientSession: window.LAYAN_SUPABASE.getSession(),
     storedSession: sessionStorage.getItem("layanSupabaseSession"),
