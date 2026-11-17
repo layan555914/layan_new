@@ -195,8 +195,22 @@ test("verified profile owners can invite a team member through existing RPC cont
   // Center the control in the viewport so the fixed app bar and floating helpers
   // cannot cover its tap target on a phone-sized screen.
   const companySubmit = companyForm.locator('button[type="submit"]');
-  await companySubmit.evaluate(element => element.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
+  await companySubmit.scrollIntoViewIfNeeded();
   await expect(companySubmit).toBeVisible();
+  const hitTest = await companySubmit.evaluate(button => {
+    const rect = button.getBoundingClientRect();
+    const x = Math.max(0, Math.min(window.innerWidth - 1, rect.left + rect.width / 2));
+    const y = Math.max(0, Math.min(window.innerHeight - 1, rect.top + rect.height / 2));
+    const target = document.elementFromPoint(x, y);
+    return {
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      button: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+      hitTarget: target ? target.tagName + (target.id ? "#" + target.id : "") + (target.className && typeof target.className === "string" ? "." + target.className.trim().replace(/\\s+/g, ".") : "") : null,
+      bodyPointerEvents: getComputedStyle(document.body).pointerEvents,
+      htmlPointerEvents: getComputedStyle(document.documentElement).pointerEvents
+    };
+  });
+  console.log("[company-dashboard team button hit test]", JSON.stringify(hitTest));
   await companySubmit.click({ timeout: 12000 });
   await expect(page.locator("#cdCompanyProfiles")).toContainText("new.editor@company.test");
 
