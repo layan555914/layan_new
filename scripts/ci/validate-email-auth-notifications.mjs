@@ -37,7 +37,7 @@ assert.match(template, /\{\{ \.Token \}\}/, "Magic Link template must render the
 assert.doesNotMatch(template, /\{\{ \.ConfirmationURL \}\}/, "OTP template must not expose a link-only confirmation URL");
 
 assert.match(edge, /SUPPORTED_RECORD_TYPES/, "email function must enforce an explicit record-type allowlist");
-assert.ok(edge.includes("layannew-git-[a-z0-9-]+-mostafa-6511") && edge.includes("layan-[a-z0-9-]+-mostafa-6511"), "email function must allow this project's Git-branch alias and canonical preview host");
+assert.ok(edge.includes("layannew-git-[a-z0-9-]+|layan-[a-z0-9-]+") && edge.includes("-mostafa-6511\\.vercel\\.app"), "email function must allow this project's Git-branch alias and canonical preview host");
 assert.match(edge, /siteUrlForOrigin\(origin\)/, "preview email and unsubscribe links must stay on the originating preview host");
 assert.match(admin, /tryEmailAnnouncement\("directory_entity_update"/, "approved directory profile updates must dispatch an email announcement");
 assert.match(directoryAdmin, /tryEmailAnnouncement\(emailType, recordId\)/, "new directory records must dispatch email announcements");
