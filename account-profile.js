@@ -7,6 +7,7 @@
   const FIRST_REMINDER_AFTER_MS = 24 * 60 * 60 * 1000;
   const REMIND_AGAIN_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
   const KEY_PREFIX = "asyutAqarProfileReminder:";
+  const NEW_ACCOUNT_KEY_PREFIX = "asyutAqarNewAccount:";
   const TYPE_OPTIONS = [["seeker","باحث عن عقار"],["owner","مالك عقار"],["broker","وسيط عقاري"],["company","شركة عقارية"]];
   let dialog = null;
   const styles = `
@@ -112,6 +113,7 @@
       try {
         await api.updateUserMetadata({ full_name: name, phone, account_type: type });
         try { localStorage.removeItem(reminderKey(user.id)); } catch (_) {}
+        try { localStorage.removeItem(NEW_ACCOUNT_KEY_PREFIX + user.id); } catch (_) {}
         status.textContent = "تم حفظ بيانات حسابك بنجاح.";
         dialog.close();
       } catch (error) {
@@ -123,8 +125,11 @@
   function checkAndRemind() {
     const user = userFromSession();
     if (!user?.id || profileComplete(user) || wasRemindedRecently(user.id)) return;
-    const createdAt = Date.parse(user.created_at || "");
-    if (!Number.isFinite(createdAt) || Date.now() - createdAt < FIRST_REMINDER_AFTER_MS) return;
+    let createdAt = 0;
+    try { createdAt = Number(localStorage.getItem(NEW_ACCOUNT_KEY_PREFIX + user.id) || 0); } catch (_) {}
+    // Only accounts created through the new email-OTP signup are eligible for this optional reminder.
+    // Legacy users are intentionally left undisturbed.
+    if (!createdAt || !Number.isFinite(createdAt) || Date.now() - createdAt < FIRST_REMINDER_AFTER_MS) return;
     const modal = ensureDialog();
     if (!modal.open) window.setTimeout(() => {
       const latest = userFromSession();

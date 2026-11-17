@@ -86,6 +86,11 @@ test("new accounts use email + OTP only; optional profile completion is separate
   await page.locator("#authOtpCode").fill("654321");
   await page.locator("#authVerifyOtpBtn").click();
   await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
+  await expect(page.locator("#asyutProfileReminder")).toHaveCount(0);
+  await page.evaluate(userId => {
+    localStorage.setItem("asyutAqarNewAccount:" + userId, String(Date.now() - 25 * 60 * 60 * 1000));
+    window.dispatchEvent(new CustomEvent("layan-auth-state-changed"));
+  }, "9a9a9a9a-9a9a-49a9-89a9-9a9a9a9a9a9a");
   await expect(page.locator("#asyutProfileReminder")).toBeVisible();
   await page.locator("#asyutProfileStart").click();
   await page.locator("#asyutProfileName").fill("مستخدم اختبار");
@@ -146,4 +151,17 @@ test("marketplace can create an account with email + OTP only", async ({ page })
   await page.locator("#authSubmit").click();
   await expect(page.locator("#marketplaceOtpInput")).toBeEnabled();
   expect(state.otpRequests[0]).toEqual({ email: "new-provider@example.invalid", create_user: true });
+});
+
+test("legacy accounts without the new-signup marker are never interrupted by the profile reminder", async ({ page }) => {
+  await installAuthMocks(page);
+  await page.goto("/");
+  await page.locator("#loginBtn").click();
+  await page.locator("#authEmail").fill("legacy@example.invalid");
+  await page.locator("#authSubmit").click();
+  await page.locator("#authOtpCode").fill("123456");
+  await page.locator("#authVerifyOtpBtn").click();
+  await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
+  await expect(page.locator("#asyutProfileReminder")).toHaveCount(0);
+  expect(await page.evaluate(() => Object.keys(localStorage).some(key => key.startsWith("asyutAqarNewAccount:")))).toBe(false);
 });

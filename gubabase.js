@@ -248,6 +248,17 @@
     return user;
   }
 
+  function markNewAccountProfilePending() {
+    const userId = session?.user?.id;
+    if (!userId) return false;
+    try {
+      localStorage.setItem("asyutAqarNewAccount:" + userId, String(Date.now()));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   async function syncEmailNotificationSubscription(enabled) {
     if (!session?.access_token || !session?.user?.id) return null;
     const action = typeof enabled === "boolean" ? "set_subscription" : "sync_subscription";
@@ -798,6 +809,6 @@
   }
 
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
+  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, markNewAccountProfilePending, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();

@@ -18,6 +18,7 @@ assert.match(client, /create_user: options\.shouldCreateUser === true/, "normal 
 assert.match(client, /async function verifyEmailOtp\(/, "shared Auth client must verify six-digit email OTPs");
 assert.match(client, /async function syncEmailNotificationSubscription\(/, "shared Auth client must sync email subscription preferences");
 assert.match(client, /async function updateUserMetadata\(/, "profile data must be saved separately after account creation");
+assert.match(client, /function markNewAccountProfilePending\(/, "only new OTP signups should be marked for optional profile completion");
 assert.doesNotMatch(client, /payload\.data\s*=/, "OTP signup must not send profile metadata");
 
 assert.match(app, /authOtpCodeField/, "main platform dialog must include the OTP verification field");
@@ -37,6 +38,8 @@ assert.match(marketplace, /syncEmailNotificationSubscription/, "services marketp
 assert.doesNotMatch(marketplaceHtml, /marketplaceEmailOptIn|type="password"|name="password"/, "marketplace auth must not request extra fields");
 const accountProfile = read("account-profile.js");
 assert.match(accountProfile, /استكمل بيانات حسابك/, "profile reminder must be separate from signup");
+assert.match(accountProfile, /NEW_ACCOUNT_KEY_PREFIX/, "profile reminder must target only accounts created through the new OTP signup");
+assert.match(accountProfile, /Legacy users are intentionally left undisturbed/, "legacy accounts must not be interrupted by the new profile reminder");
 assert.ok(accountProfile.includes("REMIND_AGAIN_AFTER_MS = 7 * 24 * 60 * 60 * 1000"), "profile reminder must be periodic");
 
 assert.match(template, /\{\{ \.Token \}\}/, "Magic Link template must render the six-digit OTP");

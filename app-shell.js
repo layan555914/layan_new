@@ -131,8 +131,8 @@
     window.__asyutAccountProfilePromise = (async () => {
       const prefix = rootPrefix();
       if (!window.LAYAN_CONFIG) await loadAccountScript(prefix + "config.js", () => Boolean(window.LAYAN_CONFIG));
-      if (!window.LAYAN_SUPABASE) await loadAccountScript(prefix + "gubabase.js?v=20261117-email-otp-unified-2", () => Boolean(window.LAYAN_SUPABASE));
-      if (!window.__asyutAccountProfile) await loadAccountScript(prefix + "account-profile.js?v=20261117-email-otp-unified-2", () => Boolean(window.__asyutAccountProfile));
+      if (!window.LAYAN_SUPABASE) await loadAccountScript(prefix + "gubabase.js?v=20261117-email-otp-unified-3", () => Boolean(window.LAYAN_SUPABASE));
+      if (!window.__asyutAccountProfile) await loadAccountScript(prefix + "account-profile.js?v=20261117-email-otp-unified-3", () => Boolean(window.__asyutAccountProfile));
     })().catch(error => console.warn("Account profile reminder unavailable:", error));
     return window.__asyutAccountProfilePromise;
   }

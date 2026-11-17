@@ -373,6 +373,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       status.textContent = "جارٍ التحقق من الكود...";
       try {
         await api.verifyEmailOtp(pendingOtp.email, otpCode.value);
+        if (mode === "signup") api.markNewAccountProfilePending?.();
         await syncEmailPreference();
         window.dispatchEvent(new CustomEvent("layan-auth-state-changed", { detail: { authenticated: true } }));
         updateAuthButton();
