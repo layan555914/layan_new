@@ -117,7 +117,7 @@
   }
   function authEntryUrl(mode) {
     const returnPath = currentReturnPath();
-    return rootPrefix() + "index.html?auth=" + mode + (returnPath ? "&return=" + encodeURIComponent(returnPath) : "");
+    return "/index.html?auth=" + mode + (returnPath ? "&return=" + encodeURIComponent(returnPath) : "");
   }
   function loadAccountScript(src, ready) {
     if (ready()) return Promise.resolve();
@@ -132,7 +132,7 @@
       const prefix = rootPrefix();
       if (!window.LAYAN_CONFIG) await loadAccountScript(prefix + "config.js", () => Boolean(window.LAYAN_CONFIG));
       if (!window.LAYAN_SUPABASE) await loadAccountScript(prefix + "gubabase.js", () => Boolean(window.LAYAN_SUPABASE));
-      if (!window.__asyutAccountProfile) await loadAccountScript(prefix + "account-profile.js", () => Boolean(window.__asyutAccountProfile));
+      if (!window.__asyutAccountProfile) await loadAccountScript(prefix + "account-profile.js?v=20261117-1", () => Boolean(window.__asyutAccountProfile));
     })().catch(error => console.warn("Account profile reminder unavailable:", error));
     return window.__asyutAccountProfilePromise;
   }
@@ -158,7 +158,7 @@
     const loggedIn = Boolean(authSession()?.access_token);
     const login = actions.querySelector("[data-asyut-auth-login]");
     const signup = actions.querySelector("[data-asyut-auth-signup]");
-    if (login) { login.textContent = loggedIn ? "حسابي" : "تسجيل الدخول"; login.href = loggedIn ? rootPrefix() + "my-listings.html" : authEntryUrl("login"); }
+    if (login) { login.textContent = loggedIn ? "حسابي" : "تسجيل الدخول"; login.href = loggedIn ? "/my-listings.html" : authEntryUrl("login"); }
     if (signup) { signup.href = authEntryUrl("signup"); signup.hidden = loggedIn; }
   }
 

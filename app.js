@@ -302,7 +302,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         <button class="btn btn-outline-dark" id="authToggle" type="button">مستخدم جديد؟ إنشاء حساب جديد</button>
       </form>`;
     document.body.appendChild(authDialog);
-    document.body.appendChild(authDialog);
     let mode = "login";
     let pendingOtp = null;
     let resendTimer = null;
