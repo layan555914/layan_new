@@ -23,6 +23,10 @@ assert.match(app, /requestEmailOtp\(email, options\)/, "main platform dialog mus
 assert.match(app, /account_type: accountType/, "new main-platform users must retain their account type");
 assert.match(app, /email_notifications: emailOptIn\.checked === true/, "new main-platform users must preserve email opt-in");
 assert.match(app, /api\.syncEmailNotificationSubscription/, "main platform must sync email preferences after authentication");
+assert.doesNotMatch(app, /authPassword|authShowPassword|forgotPasswordBtn|resendConfirmationBtn|كلمة المرور القديمة/, "public main-platform auth must not expose password login or recovery");
+assert.doesNotMatch(marketplace, /elements\.password|كلمة المرور القديمة|forgotPassword|signIn\(email/, "services marketplace must not expose password login or recovery");
+const marketplaceHtml = read("marketplace.html");
+assert.doesNotMatch(marketplaceHtml, /name="password"|type="password"|استعادة كلمة المرور القديمة/, "services marketplace HTML must be email OTP only");
 
 assert.match(marketplace, /requestEmailOtp\(email,options\)/, "services marketplace must use OTP login");
 assert.match(marketplace, /verifyEmailOtp\(pendingMarketplaceOtp\.email/, "services marketplace must verify OTP");
