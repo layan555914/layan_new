@@ -32,6 +32,8 @@ assert.match(template, /\{\{ \.Token \}\}/, "Magic Link template must render the
 assert.doesNotMatch(template, /\{\{ \.ConfirmationURL \}\}/, "OTP template must not expose a link-only confirmation URL");
 
 assert.match(edge, /SUPPORTED_RECORD_TYPES/, "email function must enforce an explicit record-type allowlist");
+assert.match(edge, /layan-\[a-z0-9-\]\+-mostafa-6511\\.vercel\\.app/, "email function must allow only this project's isolated Vercel preview origin pattern");
+assert.match(edge, /siteUrlForOrigin\(origin\)/, "preview email and unsubscribe links must stay on the originating preview host");
 assert.match(edge, /user\.rpc\("layan_is_admin"\)/, "dispatch must be restricted to platform admins");
 assert.match(edge, /RESEND_API_KEY/, "email provider key must be read only by the server function");
 assert.match(edge, /email_notification_deliveries/, "email dispatch must keep an idempotent delivery ledger");
