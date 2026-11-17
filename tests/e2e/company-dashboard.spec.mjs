@@ -73,6 +73,24 @@ async function installDashboardMocks(page, scenario = "populated") {
         { id: 702, title: "محل اختبار للتنازل", status: "pending", listing_purpose: "تنازل" }
       ]);
     }
+    if (path === "company_claim_requests") {
+      return json([{
+        id: "77777777-7777-4777-8777-777777777777",
+        directory_entity_id: ENTITY_ID,
+        status: "pending",
+        admin_notes: null,
+        created_at: "2026-11-17T11:00:00Z"
+      }]);
+    }
+    if (path === "company_entity_profile_update_requests") {
+      return json([{
+        id: "88888888-8888-4888-8888-888888888888",
+        directory_entity_id: ENTITY_ID,
+        status: "needs_changes",
+        admin_notes: "يرجى استكمال بيانات العنوان.",
+        created_at: "2026-11-17T12:00:00Z"
+      }]);
+    }
     if (path === "directory_entities") {
       return json([{
         id: ENTITY_ID,
@@ -149,12 +167,15 @@ test("dashboard displays only current account profiles, published project links 
   await expect(page.locator("#cdCountProfiles")).toHaveText("3");
   await expect(page.locator("#cdCountProjects")).toHaveText("1");
   await expect(page.locator("#cdCountListings")).toHaveText("2");
-  await expect(page.locator("#cdCountReviews")).toHaveText("1");
+  await expect(page.locator("#cdCountReviews")).toHaveText("3");
   await expect(page.locator("#cdProjectsList")).toContainText("مشروع تجريبي مستقل");
   await expect(page.locator("#cdProjectsList")).toContainText("وكيل تسويق");
   await expect(page.locator("#cdProjectsList a")).toHaveAttribute("href", "./project.html?id=" + PROJECT_ID);
   await expect(page.locator("#cdListingsList")).toContainText("شقة اختبار للبيع");
   await expect(page.locator("#cdListingsList")).toContainText("محل اختبار للتنازل");
+  await expect(page.locator("#cdRequestsList")).toContainText("طلب استلام ملف شركة");
+  await expect(page.locator("#cdRequestsList")).toContainText("قيد مراجعة الإدارة");
+  await expect(page.locator("#cdRequestsList")).toContainText("يرجى استكمال بيانات العنوان.");
   await expect(page.locator("#cdCompanyProfiles")).toContainText("أعمال سابقة مدخلة في ملف الشركة");
   await expect(page.locator("#cdCompanyProfiles")).toContainText("ليست سجلات مشروعات مستقلة");
 });
