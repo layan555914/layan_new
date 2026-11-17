@@ -935,7 +935,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="offer-card-content">
             <div class="listing-head">
               <h3><a href="${detailsHref}">${esc(o.title)}</a></h3>
-              <strong class="listing-price">${o.price_on_request ? "السعر عند التواصل" : money2(o.total_price)}${!o.price_on_request && isRent ? " / شهر" : ""}</strong>
+              <strong class="listing-price" aria-label="${priceLabel}">${o.price_on_request ? "السعر عند التواصل" : money2(o.total_price)}${!o.price_on_request && isRent ? " / شهر" : ""}</strong>
             </div>
             <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join("، ") || "أسيوط")}</p>
             ${specs.length ? `<p class="listing-specs">${specs.join(" <i>•</i> ")}</p>` : ""}
