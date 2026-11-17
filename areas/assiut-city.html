@@ -38,6 +38,7 @@
   <meta name="twitter:image" content="https://www.asyutq.com/assets/brand/og-image.jpg?v=20261108-asyutq">
   <link rel="stylesheet" href="./assets/theme/sponsors-premium.css?v=20261110-3">
   <link rel="stylesheet" href="./assets/theme/mobile-app.css?v=20261111-1">
+  <link rel="stylesheet" href="./assets/theme/transaction-separation.css?v=20261117-1">
   <script>window.ASYUT_PRESET_FILTERS = {"city":"مدينة أسيوط"};</script>
 </head>
 <body class="page-offers">
@@ -64,6 +65,7 @@
       <a href="./companies.html">الشركات</a>
       <a href="./featured.html">الإعلانات المميزة</a>
       <a href="./directory.html">الدليل العقاري</a>
+      <a href="./price-guide.html">دليل الأسعار</a>
       <a href="./favorites.html">المفضلة</a>
     </nav>
 
@@ -98,6 +100,12 @@
         </div>
       </div>
 
+      <div class="deal-type-tabs" role="group" aria-label="اختيار نوع المعاملة">
+        <button type="button" data-purpose-tab="all" aria-pressed="true">كل المعاملات</button>
+        <button type="button" data-purpose-tab="بيع" aria-pressed="false">بيع</button>
+        <button type="button" data-purpose-tab="إيجار" aria-pressed="false">إيجار</button>
+        <button type="button" data-purpose-tab="تنازل" aria-pressed="false">تنازل</button>
+      </div>
       <div class="filters" id="propertySearchFilters">
         <div class="filters-primary">
           <label class="filter-search-field">ابحث عن عقار أو منطقة أو مشروع
@@ -131,7 +139,7 @@
               <option value="">كل مدن ومراكز أسيوط</option>
             </select>
           </label>
-          <label>أقصى سعر معلن (جنيه)
+          <label><span id="maxPriceFilterLabel">أقصى سعر معلن (جنيه)</span>
             <input id="totalPriceMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 1500000" aria-label="أقصى سعر معلن بالجنيه">
           </label>
         </div>
@@ -149,10 +157,10 @@
               <option value="الهضبة">الهضبة</option>
             </select>
           </label>
-          <label>أقصى مقدم (جنيه)
+          <label data-filter-purpose="assignment">أقصى مقدم (جنيه)
             <input id="downPaymentMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 300000" aria-label="أقصى مقدم بالجنيه">
           </label>
-          <label>أقصى قسط شهري (جنيه)
+          <label data-filter-purpose="assignment">أقصى قسط شهري (جنيه)
             <input id="monthlyMaxFilter" type="number" min="0" inputmode="numeric" placeholder="مثال: 10000" aria-label="أقصى قسط شهري بالجنيه">
           </label>
           <label>أقل عدد غرف نوم
@@ -365,7 +373,7 @@
         <input name="title" type="text" required>
       </label>
 
-      <label>نوع الإعلان<select name="listing_purpose" id="listingPurpose" required><option value="تنازل">تنازل عقاري</option><option value="بيع">بيع مباشر</option><option value="إيجار">إيجار</option></select></label>
+      <label>نوع المعاملة<select name="listing_purpose" id="listingPurpose" required><option value="" disabled selected>اختر نوع المعاملة</option><option value="بيع">بيع مباشر</option><option value="إيجار">إيجار</option><option value="تنازل">تنازل عقاري</option></select></label>
       <label>
         نوع العقار
         <select name="property_type" required>
@@ -434,29 +442,32 @@
 
       <label class="consent-line price-request-choice">
         <input name="price_on_request" type="checkbox" value="true">
-        أفضل عرض السعر عند التواصل بدلًا من كتابة مبلغ.
+        <span data-price-request-label>أفضل عرض السعر عند التواصل بدلًا من كتابة مبلغ.</span>
       </label>
       <small>عند اختيار هذا الخيار سيظهر للزوار «السعر عند التواصل» بدلًا من عرض صفر جنيه.</small>
 
-      <label>المقدم المدفوع عند التعاقد<input name="down_payment" type="number" min="0"><small>قيمة الدفعة الأولى التي دفعها المالك عند الحجز أو التعاقد.</small></label>
+      <fieldset id="assignmentFields" class="transaction-fields" hidden>
+        <legend>تفاصيل التنازل</legend>
+        <label>المقدم عند التعاقد<input name="down_payment" type="number" min="0"><small>قيمة الدفعة الأولى التي دفعها المالك عند الحجز أو التعاقد.</small></label>
 
-      <label>إجمالي المدفوع حتى الآن (شامل المقدم)<input name="paid_amount" type="number" min="0"><small>إجمالي ما سدده المالك للمطور حتى اليوم، ويشمل المقدم أعلاه.</small></label>
+        <label>إجمالي المدفوع حتى الآن (شامل المقدم)<input name="paid_amount" type="number" min="0"><small>إجمالي ما سدده المالك الحالي للمطور أو الجهة المالكة حتى الآن، ويشمل المقدم أعلاه.</small></label>
 
-      <label>
-        المبلغ المتبقي
-        <input name="remaining_installments" type="number" min="0" step="0.01" inputmode="decimal">
-        <small>راجع أن مجموع المبلغ المدفوع والمتبقي لا يتجاوز إجمالي السعر.</small>
-      </label>
+        <label>
+          المبلغ المتبقي
+          <input name="remaining_installments" type="number" min="0" step="0.01" inputmode="decimal">
+          <small>راجع أن مجموع المدفوع والمتبقي لا يتجاوز القيمة الإجمالية المعلنة للتنازل.</small>
+        </label>
 
-      <label>
-        القسط الشهري (إن وجد)
-        <input name="monthly_installment" type="number" min="0" step="0.01" inputmode="decimal">
-      </label>
+        <label>
+          القسط الشهري (إن وجد)
+          <input name="monthly_installment" type="number" min="0" step="0.01" inputmode="decimal">
+        </label>
 
-      <label>
-        رسوم التنازل
-        <input name="transfer_fee" type="number" min="0">
-      </label>
+        <label>
+          رسوم التنازل
+          <input name="transfer_fee" type="number" min="0">
+        </label>
+      </fieldset>
 
       <label>
         قيمة الخصم بالجنيه (إن وجدت)
