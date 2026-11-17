@@ -110,56 +110,6 @@
   });
   nav.replaceChildren(frag);
 
-  function currentReturnPath() {
-    if (location.pathname === "/" || /\/index\.html$/i.test(location.pathname)) return "";
-    return location.pathname + location.search + location.hash;
-  }
-  function authEntryUrl(mode) {
-    const returnPath = currentReturnPath();
-    return "/index.html?auth=" + mode + (returnPath ? "&return=" + encodeURIComponent(returnPath) : "");
-  }
-  function authSession() {
-    try { return window.LAYAN_SUPABASE?.getSession?.() || JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null"); }
-    catch (_) { return null; }
-  }
-  function mountAuthEntry() {
-    let actions = header.querySelector(".top-actions");
-    if (!actions) { actions = document.createElement("div"); actions.className = "top-actions aa-auth-actions"; nav.insertAdjacentElement("afterend", actions); }
-    if (!document.querySelector("#loginBtn, #authOpen") && !actions.querySelector("[data-asyut-auth-login]")) {
-      const login = document.createElement("a");
-      login.className = "btn btn-outline"; login.dataset.asyutAuthLogin = "1"; login.textContent = "تسجيل الدخول";
-      actions.appendChild(login);
-    }
-    if (!actions.querySelector("[data-asyut-auth-signup]")) {
-      const signup = document.createElement("a");
-      signup.className = "btn btn-gold"; signup.dataset.asyutAuthSignup = "1"; signup.textContent = "إنشاء حساب جديد";
-      actions.appendChild(signup);
-    }
-    const loggedIn = Boolean(authSession()?.access_token);
-    const login = actions.querySelector("[data-asyut-auth-login]");
-    const signup = actions.querySelector("[data-asyut-auth-signup]");
-    if (login) { login.textContent = loggedIn ? "حسابي" : "تسجيل الدخول"; login.href = loggedIn ? "/my-listings.html" : authEntryUrl("login"); }
-    if (signup) { signup.href = authEntryUrl("signup"); signup.hidden = loggedIn; }
-  }
-  mountAuthEntry();
-  window.addEventListener("layan:auth-ready", mountAuthEntry);
-  window.addEventListener("layan-auth-state-changed", mountAuthEntry);
-
-  function ensureAccountProfile() {
-    if (window.__asyutAccountProfilePromise) return window.__asyutAccountProfilePromise;
-    window.__asyutAccountProfilePromise = (async () => {
-      const add = (src, ready) => ready() ? Promise.resolve() : new Promise(resolve => {
-        const script = document.createElement("script");
-        script.src = src; script.onload = resolve; script.onerror = resolve; document.head.appendChild(script);
-      });
-      if (!window.LAYAN_CONFIG) await add(prefix + "config.js", () => Boolean(window.LAYAN_CONFIG));
-      if (!window.LAYAN_SUPABASE) await add(prefix + "gubabase.js", () => Boolean(window.LAYAN_SUPABASE));
-      if (!window.__asyutAccountProfile) await add(prefix + "account-profile.js?v=20261117-1", () => Boolean(window.__asyutAccountProfile));
-    })().catch(error => console.warn("Account profile reminder unavailable:", error));
-    return window.__asyutAccountProfilePromise;
-  }
-  ensureAccountProfile();
-
   // ---------- 2) admin entry at the start of the main menu ----------
   let admin = document.getElementById("adminDashboardLink");
   if (!admin) {

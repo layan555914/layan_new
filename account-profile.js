@@ -124,7 +124,7 @@
     const user = userFromSession();
     if (!user?.id || profileComplete(user) || wasRemindedRecently(user.id)) return;
     const createdAt = Date.parse(user.created_at || "");
-    if (Number.isFinite(createdAt) && Date.now() - createdAt < FIRST_REMINDER_AFTER_MS) return;
+    if (!Number.isFinite(createdAt) || Date.now() - createdAt < FIRST_REMINDER_AFTER_MS) return;
     const modal = ensureDialog();
     if (!modal.open) window.setTimeout(() => {
       const latest = userFromSession();

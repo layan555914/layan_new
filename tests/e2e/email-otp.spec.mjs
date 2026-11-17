@@ -23,6 +23,7 @@ async function installAuthMocks(page) {
       id: USER_ID,
       email: body.email,
       email_confirmed_at: "2026-11-16T10:00:00.000Z",
+      created_at: state.otpRequests.at(-1)?.create_user ? "2026-11-15T10:00:00.000Z" : "2026-11-16T10:00:00.000Z",
       user_metadata: state.otpRequests.at(-1)?.data || {}
     };
     await reply(route, {
