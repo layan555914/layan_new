@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v186-heading-system-20261117";
+const CACHE_NAME = "asyut-aqar-shell-v187-home-benefits-tone-20261117";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -45,7 +45,7 @@ const APP_SHELL = [
   "./assets/theme/visual-refresh.css?v=20261116-1",
   "./assets/theme/photo-covers.css?v=20261116-2",
   "./assets/theme/warm-light-theme.css?v=20261116-4",
-  "./assets/theme/visual-polish.css?v=20261117-heading-system-1",
+  "./assets/theme/visual-polish.css?v=20261117-hero-benefits-tone-1",
   "./assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1",
   "./buyer.css",
   "./sponsor.css",
