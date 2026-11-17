@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const priceLabel = form?.querySelector("[data-price-label]");
   const priceRequestLabel = form?.querySelector("[data-price-request-label]");
   const isAssignmentFormSelection = () => listingPurposeInput?.value === "تنازل";
-  const financeFields = ["total_price", "paid_amount", "remaining_installments"].map(name => form?.querySelector('[name="' + name + '"]')).filter(Boolean);
+  const financeFields = ["total_price", "down_payment", "paid_amount", "remaining_installments"].map(name => form?.querySelector('[name="' + name + '"]')).filter(Boolean);
   const formatFinance = value => new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 0 }).format(value) + " جنيه";
   function updateFinanceCheck() {
     if (!financeNote || !form) return;
