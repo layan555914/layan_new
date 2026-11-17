@@ -433,6 +433,10 @@ BEGIN
     v_project_id := v_request.project_id;
 
   ELSIF v_request.request_type = 'new_project' THEN
+    -- Serialize approvals for the same normalized project name across different companies.
+    PERFORM pg_advisory_xact_lock(
+      hashtextextended(lower(btrim(v_request.project_payload->>'name_ar')), 32)
+    );
     IF EXISTS (
       SELECT 1 FROM public.directory_projects p
       WHERE lower(btrim(p.name_ar)) = lower(btrim(v_request.project_payload->>'name_ar'))
