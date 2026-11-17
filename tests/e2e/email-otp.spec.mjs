@@ -1,12 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-import fs from "node:fs";
-import { fileURLToPath } from "node:url";
-
-const configSource = fs.readFileSync(fileURLToPath(new URL("../../config.js", import.meta.url)), "utf8");
-const configuredUrl = configSource.match(/SUPABASE_URL\\s*:\\s*["']([^"']+)["']/)?.[1];
-if (!configuredUrl) throw new Error("Could not determine the configured Supabase URL for safe auth mocks.");
-const SUPABASE = configuredUrl.replace(/\\/$/, "");
+const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 const USER_ID = "9a9a9a9a-9a9a-49a9-89a9-9a9a9a9a9a9a";
 
 const reply = (route, body, status = 200) => route.fulfill({
