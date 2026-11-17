@@ -523,3 +523,39 @@ body.page-home main > .hero.design-hero .hero-actions .btn-gold {
     color: #786D63 !important;
   }
 }
+
+
+/* Tone down the homepage hero text surface so it matches the warmer page palette. */
+body.page-home main > .hero.design-hero {
+  background-color: #F0E6DA !important;
+  border-bottom-color: #E2D5C8 !important;
+}
+
+body.page-home main > .hero.design-hero::after {
+  background: linear-gradient(
+    270deg,
+    #F0E6DA 0%,
+    #F0E6DA 32%,
+    rgba(240, 230, 218, .97) 43%,
+    rgba(240, 230, 218, .84) 55%,
+    rgba(240, 230, 218, .34) 72%,
+    rgba(240, 230, 218, 0) 88%
+  ) !important;
+}
+
+@media (max-width: 760px) {
+  body.page-home main > .hero.design-hero {
+    background: #F0E6DA !important;
+  }
+
+  body.page-home main > .hero.design-hero::after {
+    background: linear-gradient(
+      180deg,
+      rgba(240, 230, 218, 0) 0,
+      rgba(240, 230, 218, .08) 118px,
+      rgba(240, 230, 218, .78) 205px,
+      #F0E6DA 278px,
+      #F0E6DA 100%
+    ) !important;
+  }
+}
