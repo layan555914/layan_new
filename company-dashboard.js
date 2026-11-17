@@ -517,7 +517,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const profileMemberIds = [...new Set((Array.isArray(profileMemberships) ? profileMemberships : []).map(row => row.company_profile_id).filter(Boolean))];
     if (profileMemberIds.length) {
       const rows = await query("company_profiles_public", {
-        select: "id,company_name,category,city,logo_url,verified_at",
+        select: "id,company_name,category,city,logo_url,representative_verified_at",
         id: "in.(" + profileMemberIds.join(",") + ")"
       }).catch(error => { errors.push(error.message); return []; });
       (Array.isArray(rows) ? rows : []).forEach(profile => {
