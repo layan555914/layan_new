@@ -681,7 +681,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const samePurpose = selected.every(o => String(o.listing_purpose || "تنازل") === String(selected[0].listing_purpose || "تنازل"));
     const comparisonPurpose = String(selected[0].listing_purpose || "تنازل");
     const rows=[["نوع المعاملة",o=>compareValue(o.listing_purpose||"تنازل")],["نوع العقار",o=>compareValue(o.property_type)],["المدينة / المركز",o=>compareValue(o.city)],["الحي / المنطقة",o=>compareValue(o.area)],["القيمة المعلنة",o=>o.price_on_request ? "السعر عند التواصل" : compareValue(o.total_price,"money")],["المساحة",o=>compareValue(o.area_m2,"area")],["غرف النوم",o=>showsBedrooms(o)?compareValue(o.bedrooms,"count"):"—"],["الحمامات",o=>compareValue(o.bathrooms,"count")]];
-    if (samePurpose && comparisonPurpose === "تنازل") rows.push(["المقدم عند التعاقد",o=>compareValue(o.down_payment,"money")],["إجمالي المدفوع",o=>compareValue(o.paid_amount,"money")],["المبلغ المتبقي",o=>compareValue(o.remaining_amount,"money")],["القسط الشهري",o=>compareValue(o.monthly_installment,"money")],["رسوم التنازل",o=>compareValue(o.assignment_fee,"money")]);
+    if (samePurpose && comparisonPurpose === "تنازل") rows.push(["المقدم عند التعاقد",o=>compareValue(o.down_payment,"money")],["إجمالي المدفوع (شامل المقدم)",o=>compareValue(o.paid_amount,"money")],["المبلغ المتبقي",o=>compareValue(o.remaining_amount,"money")],["القسط الشهري",o=>compareValue(o.monthly_installment,"money")],["رسوم التنازل",o=>compareValue(o.assignment_fee,"money")]);
     rows.push(["المطور / الشركة",o=>compareValue(o.developer_name)],["كود الإعلان",o=>compareValue(offerCode(o))]);
     const wrap=$("compareTableWrap"); if(!wrap)return;
     const head="<table class=compare-table><thead><tr><th>بيانات المقارنة</th>"+selected.map(o=>"<th><div class=compare-property-head><strong>"+esc(o.title)+"</strong><small>"+esc(offerCode(o))+"</small><button type=button data-remove-compare="+esc(o.id)+">إزالة</button></div></th>").join("")+"</tr></thead><tbody>";
@@ -910,7 +910,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const money2 = value => num(value) > 1 ? Math.round(num(value)).toLocaleString("en-US") + " ج.م" : "السعر غير معلن";
       const finance = isAssignment ? [
         num(o.down_payment) > 0 ? `<span>مقدم عند التعاقد <b>${money2(o.down_payment)}</b></span>` : "",
-        num(o.paid_amount) > 0 ? `<span>مدفوع <b>${money2(o.paid_amount)}</b></span>` : "",
+        num(o.paid_amount) > 0 ? `<span>إجمالي المدفوع (شامل المقدم) <b>${money2(o.paid_amount)}</b></span>` : "",
         num(o.remaining_amount) > 0 ? `<span>متبقي <b>${money2(o.remaining_amount)}</b></span>` : "",
         num(o.monthly_installment) > 0 ? `<span>قسط <b>${money2(o.monthly_installment)}</b>/شهر</span>` : "",
         num(o.assignment_fee) > 0 ? `<span>رسوم التنازل <b>${money2(o.assignment_fee)}</b></span>` : ""
@@ -1110,7 +1110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p><span>${displayedPriceLabel}</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price) + (isRent ? " / شهر" : "")}</strong></p>
         ${isAssignment ? `
           ${num(o.down_payment) > 0 ? `<p><span>المقدم عند التعاقد</span><strong>${money(o.down_payment)}</strong></p>` : ""}
-          ${num(o.paid_amount) > 0 ? `<p><span>إجمالي المدفوع حتى الآن</span><strong>${money(o.paid_amount)}</strong></p>` : ""}
+          ${num(o.paid_amount) > 0 ? `<p><span>إجمالي المدفوع حتى الآن (شامل المقدم)</span><strong>${money(o.paid_amount)}</strong></p>` : ""}
           ${num(o.remaining_amount) > 0 ? `<p><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></p>` : ""}
           ${num(o.monthly_installment) > 0 ? `<p><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></p>` : ""}
           ${num(o.assignment_fee) > 0 ? `<p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>` : ""}
