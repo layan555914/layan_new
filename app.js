@@ -14,6 +14,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   "use strict";
   const kindOf = type => window.LAYAN_PROPERTY_KIND(type);
   const showsBedrooms = o => kindOf(o?.property_type) === "residential";
+  const normalizeListingPurpose = value => {
+    const purpose = String(value || "").trim();
+    return ["بيع", "إيجار", "تنازل"].includes(purpose) ? purpose : "غير محدد";
+  };
 
   // Strip campaign tags from outbound share links only; keep inbound analytics intact.
   const cleanShareUrl = value => {
@@ -142,13 +146,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
     financeNote.hidden = false;
+    const raw = name => String(form.querySelector('[name="' + name + '"]')?.value || "").trim();
+    const read = name => Number(raw(name) || 0);
+    const total = read("total_price"), down = read("down_payment"), paid = read("paid_amount"), remaining = read("remaining_installments");
+    if (raw("down_payment") !== "" && raw("paid_amount") !== "" && paid + 0.01 < down) {
+      financeNote.textContent = "تنبيه: إجمالي المدفوع (شامل المقدم) لا يمكن أن يكون أقل من المقدم.";
+      financeNote.dataset.state = "warning";
+      return;
+    }
     if (priceOnRequestToggle?.checked) {
       financeNote.textContent = "قيمة العرض عند التواصل؛ أدخل تفاصيل المقدم والمدفوع والمتبقي فقط إذا كانت متاحة لديك.";
       financeNote.dataset.state = "neutral";
       return;
     }
-    const read = name => Number(form.querySelector('[name="' + name + '"]')?.value || 0);
-    const total = read("total_price"), paid = read("paid_amount"), remaining = read("remaining_installments");
     const entered = paid + remaining;
     if (!total && !paid && !remaining) {
       financeNote.textContent = "أدخل إجمالي القيمة والمدفوع والمتبقي لمراجعة توافق الأرقام.";
@@ -678,9 +688,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   function openPropertyComparison() {
     const selected=compareIds().map(id=>offers.find(o=>String(o.id)===id)).filter(Boolean); if(selected.length<2)return;
-    const samePurpose = selected.every(o => String(o.listing_purpose || "تنازل") === String(selected[0].listing_purpose || "تنازل"));
-    const comparisonPurpose = String(selected[0].listing_purpose || "تنازل");
-    const rows=[["نوع المعاملة",o=>compareValue(o.listing_purpose||"تنازل")],["نوع العقار",o=>compareValue(o.property_type)],["المدينة / المركز",o=>compareValue(o.city)],["الحي / المنطقة",o=>compareValue(o.area)],["القيمة المعلنة",o=>o.price_on_request ? "السعر عند التواصل" : compareValue(o.total_price,"money")],["المساحة",o=>compareValue(o.area_m2,"area")],["غرف النوم",o=>showsBedrooms(o)?compareValue(o.bedrooms,"count"):"—"],["الحمامات",o=>compareValue(o.bathrooms,"count")]];
+    const samePurpose = selected.every(o => normalizeListingPurpose(o.listing_purpose) === normalizeListingPurpose(selected[0].listing_purpose));
+    const comparisonPurpose = normalizeListingPurpose(selected[0].listing_purpose);
+    const rows=[["نوع المعاملة",o=>compareValue(normalizeListingPurpose(o.listing_purpose))],["نوع العقار",o=>compareValue(o.property_type)],["المدينة / المركز",o=>compareValue(o.city)],["الحي / المنطقة",o=>compareValue(o.area)],["القيمة المعلنة",o=>o.price_on_request ? "السعر عند التواصل" : compareValue(o.total_price,"money")],["المساحة",o=>compareValue(o.area_m2,"area")],["غرف النوم",o=>showsBedrooms(o)?compareValue(o.bedrooms,"count"):"—"],["الحمامات",o=>compareValue(o.bathrooms,"count")]];
     if (samePurpose && comparisonPurpose === "تنازل") rows.push(["المقدم عند التعاقد",o=>compareValue(o.down_payment,"money")],["إجمالي المدفوع (شامل المقدم)",o=>compareValue(o.paid_amount,"money")],["المبلغ المتبقي",o=>compareValue(o.remaining_amount,"money")],["القسط الشهري",o=>compareValue(o.monthly_installment,"money")],["رسوم التنازل",o=>compareValue(o.assignment_fee,"money")]);
     rows.push(["المطور / الشركة",o=>compareValue(o.developer_name)],["كود الإعلان",o=>compareValue(offerCode(o))]);
     const wrap=$("compareTableWrap"); if(!wrap)return;
@@ -723,7 +733,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return {
       ...row,
       title: row.title || "عرض عقاري",
-      listing_purpose: row.listing_purpose || "تنازل",
+      listing_purpose: normalizeListingPurpose(row.listing_purpose),
       land_ownership_authority: row.land_ownership_authority || "",
       land_permit_details: row.land_permit_details || "",
       land_utilities: row.land_utilities || "",
@@ -823,14 +833,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       return (!search || normalizedText.includes(search)) &&
         (!companyQuery || normalizeSearch(o.developer_name).includes(companyQuery)) &&
         (!type || normalizeSearch(o.property_type) === type) &&
-        (!purpose || normalizeSearch(o.listing_purpose || "تنازل") === purpose) &&
+        (!purpose || normalizeSearch(o.listing_purpose) === purpose) &&
         (!city || normalizeSearch(o.city) === city) &&
         (!area || normalizeSearch(o.area) === area) &&
         (totalPriceMax === null || (!o.price_on_request && num(o.total_price) <= totalPriceMax)) &&
         (purpose === "تنازل" ? (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) : true) &&
         (purpose === "تنازل" ? (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) : true) &&
         (minBedrooms === null || num(o.bedrooms) >= minBedrooms) &&
-        (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || normalizeSearch(o.listing_purpose || "تنازل") === normalizeSearch(dealKind));
+        (!activeKind || categoryMatches(o, activeKind)) && (!dealKind || normalizeSearch(o.listing_purpose) === normalizeSearch(dealKind));
     });
 
     window.LAYAN_FILTERED_PROPERTY_OFFERS = filtered;
@@ -890,19 +900,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     grid.innerHTML = pageRows.map((o) => {
       const image = o.image_urls[0];
       const favorite = favorites.has(String(o.id));
-      const isAssignment = String(o.listing_purpose || "تنازل").includes("تنازل");
+      const purposeText = normalizeListingPurpose(o.listing_purpose);
+      const isAssignment = purposeText === "تنازل";
       const isFeatured = o.is_featured && (!o.featured_until || new Date(o.featured_until) > new Date());
       const photoCount = o.image_urls.length;
-      const priceLabel = String(o.listing_purpose || "").includes("إيجار") ? "الإيجار الشهري المعلن" :
-        String(o.listing_purpose || "").includes("تنازل") ? "القيمة المعلنة للتنازل" : "سعر البيع المعلن";
+      const priceLabel = purposeText === "إيجار" ? "الإيجار الشهري المعلن" :
+        purposeText === "تنازل" ? "القيمة المعلنة للتنازل" :
+        purposeText === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
 
-      const purposeText = String(o.listing_purpose || "تنازل");
       const typeText = String(o.property_type || "عقار");
-      const dealLabel = /تنازل/.test(typeText) ? typeText
-        : purposeText.includes("إيجار") ? typeText + " للإيجار"
-        : purposeText.includes("تنازل") ? typeText + " للتنازل"
+      const dealLabel = purposeText === "غير محدد" ? typeText + " · نوع المعاملة غير محدد" :
+        /تنازل/.test(typeText) ? typeText
+        : purposeText === "إيجار" ? typeText + " للإيجار"
+        : purposeText === "تنازل" ? typeText + " للتنازل"
         : typeText + " للبيع";
-      const isRent = purposeText.includes("إيجار");
+      const isRent = purposeText === "إيجار";
       const advertiser = String(o.contact_name || o.developer_name || "").trim() || "معلن على أسيوط عقار";
       const isCompany = Boolean(o.company_ad_id || o.trust_badge === "company" || /شركة|مكتب|للتطوير|العقارية/.test(advertiser));
       const initial = advertiser.replace(/^(ال)/, "").trim().charAt(0) || "أ";
@@ -1065,9 +1077,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const content = $("detailsContent");
     const galleryImages = Array.isArray(o.image_urls) ? o.image_urls.filter(Boolean) : [];
-    const isAssignment = String(o.listing_purpose || "تنازل") === "تنازل";
-    const isRent = String(o.listing_purpose || "") === "إيجار";
-    const displayedPriceLabel = isRent ? "الإيجار الشهري المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : "سعر البيع المعلن";
+    const purposeText = normalizeListingPurpose(o.listing_purpose);
+    const isAssignment = purposeText === "تنازل";
+    const isRent = purposeText === "إيجار";
+    const displayedPriceLabel = isRent ? "الإيجار الشهري المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : purposeText === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
     const galleryMarkup = galleryImages.length
       ? `
         <div class="details-gallery" aria-label="معرض صور الوحدة">
@@ -1582,6 +1595,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (!offer.price_on_request && offer.total_price <= 0) {
       setStatus("اكتب إجمالي سعر صحيحًا أكبر من صفر.");
+      return;
+    }
+    if (offer.listing_purpose === "تنازل" && value("down_payment") !== "" && value("paid_amount") !== "" && offer.paid_amount + 0.01 < offer.down_payment) {
+      setStatus("إجمالي المدفوع (شامل المقدم) لا يمكن أن يكون أقل من المقدم. راجع القيم قبل الإرسال.");
+      form.querySelector('[name="paid_amount"]')?.focus();
       return;
     }
     if (offer.listing_purpose === "تنازل" && !offer.price_on_request && (offer.down_payment < 0 || offer.down_payment > offer.total_price)) {
