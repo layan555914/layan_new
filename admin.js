@@ -17,9 +17,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const status = document.getElementById("adminStatus");
   const login = document.getElementById("adminLogin");
   const email = document.getElementById("adminEmail");
-  const password = document.getElementById("adminPassword");
   const authPanel = document.getElementById("authPanel");
+  const adminConsole = document.getElementById("adminConsole");
   const reviewPanel = document.getElementById("reviewPanel");
+  const otpField = document.getElementById("adminOtpField");
+  const otpCode = document.getElementById("adminOtpCode");
+  const otpHint = document.getElementById("adminOtpHint");
+  const resendOtp = document.getElementById("adminResendOtp");
+  const changeEmail = document.getElementById("adminChangeEmail");
+  const loginSubmit = login?.querySelector("#adminLoginSubmit");
+  let otpRequested = false;
   // The admin page uses the same verified Supabase session as every other platform page.
   const auth = window.LAYAN_SUPABASE;
   let session = auth?.getSession?.() || null;
@@ -115,9 +122,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function setAdminOtpStep(showCode) {
+    otpRequested = Boolean(showCode);
+    if (otpField) otpField.hidden = !otpRequested;
+    if (otpHint) otpHint.hidden = !otpRequested;
+    if (otpCode) {
+      otpCode.required = otpRequested;
+      otpCode.value = "";
+    }
+    if (email) email.readOnly = otpRequested;
+    if (resendOtp) resendOtp.hidden = !otpRequested;
+    if (changeEmail) changeEmail.hidden = !otpRequested;
+    if (loginSubmit) loginSubmit.textContent = otpRequested ? "تأكيد الكود والدخول" : "إرسال كود الدخول";
+  }
+
   function showState(isLoggedIn) {
     authPanel.hidden = isLoggedIn;
+    if (adminConsole) adminConsole.hidden = !isLoggedIn;
     reviewPanel.hidden = !isLoggedIn;
+    if (!isLoggedIn) setAdminOtpStep(false);
   }
   function esc(value) {
     return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch]);
@@ -553,44 +576,65 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     }
   }
-  const forgotPassword = document.getElementById("adminForgotPassword");
-  forgotPassword?.addEventListener("click", async event => {
-    event.preventDefault();
-    const recoveryEmail = email.value.trim();
-    if (!recoveryEmail) {
-      setStatus("اكتب بريدك الإلكتروني أولًا، ثم اضغط «نسيت كلمة المرور؟».");
-      email.focus();
-      return;
+  async function sendAdminOtp() {
+    const cleanEmail = String(email?.value || "").trim();
+    if (!cleanEmail) throw new Error("اكتب البريد الإلكتروني لحساب الإدارة.");
+    if (!auth?.requestEmailOtp) throw new Error("خدمة كود التحقق بالبريد غير جاهزة.");
+    await auth.requestEmailOtp(cleanEmail, { shouldCreateUser: false });
+    setAdminOtpStep(true);
+    setStatus("لو البريد مسجل ومصرح له بالإدارة، سيصلك كود من 6 أرقام. أدخله لإكمال الدخول.");
+    otpCode?.focus();
+  }
+
+  async function verifyAdminOtp() {
+    const cleanEmail = String(email?.value || "").trim();
+    const cleanCode = String(otpCode?.value || "").trim();
+    if (!cleanCode) throw new Error("اكتب كود التحقق المكوّن من 6 أرقام.");
+    if (!auth?.verifyEmailOtp) throw new Error("خدمة التحقق من الكود غير جاهزة.");
+    await auth.verifyEmailOtp(cleanEmail, cleanCode);
+    session = auth.getSession?.() || null;
+    if (!session?.access_token || !session?.user?.id) {
+      throw new Error("تم التحقق من الكود، لكن لم يتم إنشاء جلسة دخول صالحة.");
     }
-    const link = forgotPassword;
-    link.style.pointerEvents = "none";
-    setStatus("جارٍ إرسال رابط استعادة كلمة المرور إلى بريدك...");
-    try {
-      if (!auth?.resetPasswordForEmail) throw new Error("خدمة استعادة كلمة المرور غير جاهزة.");
-      await auth.resetPasswordForEmail(recoveryEmail);
-      setStatus("لو البريد مسجل في المنصة، ستصلك رسالة استعادة. افتح أحدث رسالة من Supabase واضغط الرابط، ثم عيّن كلمة مرور جديدة. راجع الرسائل غير المرغوب فيها أيضًا.");
-    } catch (error) {
-      setStatus("تعذر إرسال رابط الاستعادة: " + error.message + " إذا ظهر خطأ في الرابط المسموح، يلزم إضافة https://www.asyutq.com/reset-password.html إلى قائمة Redirect URLs في Supabase Auth. أضف رابط الإنتاج ورابط المعاينة الذي تستخدمه.");
-    } finally {
-      link.style.pointerEvents = "";
-    }
-  });
+    setStatus("تم التحقق من الكود. جارٍ فحص صلاحية حساب الإدارة...");
+    await loadPending();
+  }
+
   login.addEventListener("submit", async event => {
     event.preventDefault();
-    const button = login.querySelector('button[type="submit"]');
-    button.disabled = true;
-    setStatus("جارٍ تسجيل الدخول...");
+    if (loginSubmit) loginSubmit.disabled = true;
+    setStatus(otpRequested ? "جارٍ التحقق من كود الدخول..." : "جارٍ إرسال كود الدخول...");
     try {
-      if (!auth?.signIn) throw new Error("خدمة تسجيل الدخول غير جاهزة.");
-      await auth.signIn(email.value.trim(), password.value);
-      session = auth.getSession?.() || null;
-      if (!session?.access_token || !session?.user?.id) throw new Error("لم يتم إنشاء جلسة دخول صالحة.");
-      showState(false);
-      await loadPending();
+      if (otpRequested) await verifyAdminOtp();
+      else await sendAdminOtp();
     } catch (error) {
-      setStatus("تعذر تسجيل الدخول: " + error.message);
-    } finally { button.disabled = false; }
+      setStatus("تعذر تسجيل الدخول: " + (error.message || "حدث خطأ غير متوقع."));
+    } finally {
+      if (loginSubmit) loginSubmit.disabled = false;
+    }
   });
+
+  resendOtp?.addEventListener("click", async () => {
+    resendOtp.disabled = true;
+    try {
+      const cleanEmail = String(email?.value || "").trim();
+      await auth.requestEmailOtp(cleanEmail, { shouldCreateUser: false });
+      if (otpCode) otpCode.value = "";
+      setStatus("تم إرسال كود جديد إلى البريد. استخدم أحدث كود وصلك.");
+      otpCode?.focus();
+    } catch (error) {
+      setStatus("تعذر إعادة إرسال الكود: " + (error.message || "حدث خطأ غير متوقع."));
+    } finally {
+      resendOtp.disabled = false;
+    }
+  });
+
+  changeEmail?.addEventListener("click", () => {
+    setAdminOtpStep(false);
+    setStatus("اكتب البريد الإلكتروني الصحيح ثم اطلب كود دخول جديد.");
+    email?.focus();
+  });
+
   companyProfilesList?.addEventListener("click", async event => {
     const button = event.target.closest("button[data-company-action]");
     const card = event.target.closest("[data-company-profile-id]");
