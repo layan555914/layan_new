@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("المساحة", row.area_m2 ? row.area_m2 + " م²" : ""),
       makeFact("غرف النوم", /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(String(row.property_type || "")) ? row.bedrooms : ""),
       makeFact("الحمامات", /أرض|ارض|مشروع/.test(String(row.property_type || "")) ? "" : row.bathrooms),
-      makeFact("المقدم المطلوب", isAssignment && Number(row.down_payment) > 0 ? money(row.down_payment) : ""),
+      makeFact("المقدم عند التعاقد", isAssignment && Number(row.down_payment) > 0 ? money(row.down_payment) : ""),
       makeFact("إجمالي المدفوع", isAssignment && Number(row.paid_amount) > 0 ? money(row.paid_amount) : ""),
       makeFact("المبلغ المتبقي", isAssignment && Number(row.remaining_amount) > 0 ? money(row.remaining_amount) : ""),
       makeFact("القسط الشهري", isAssignment && Number(row.monthly_installment) > 0 ? money(row.monthly_installment) : ""),
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <p class="property-location">⌖ ${escapeHTML(locationText)} ${mapURL ? ' · <a href="' + escapeHTML(mapURL) + '" target="_blank" rel="noopener noreferrer">عرض الموقع</a>' : ""}</p>
           <div class="property-price-highlight"><span>${displayedPriceLabel}</span><strong>${row.price_on_request === true ? "السعر عند التواصل" : money(row.total_price) + (isRent ? " / شهر" : "")}</strong></div>
           ${isAssignment && (Number(row.down_payment) > 0 || Number(row.remaining_amount) > 0) ? `<div class="property-key-figures">
-            ${Number(row.down_payment) > 0 ? `<div class="property-key-figure"><span>المقدم المطلوب</span><strong>${money(row.down_payment)}</strong></div>` : ""}
+            ${Number(row.down_payment) > 0 ? `<div class="property-key-figure"><span>المقدم عند التعاقد</span><strong>${money(row.down_payment)}</strong></div>` : ""}
             ${Number(row.remaining_amount) > 0 ? `<div class="property-key-figure"><span>المبلغ المتبقي</span><strong>${money(row.remaining_amount)}</strong></div>` : ""}
           </div>` : ""}
           ${contactActions}
