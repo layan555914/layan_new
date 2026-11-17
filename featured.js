@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const actions = (target ? '<a href="' + esc(target) + '" target="_blank" rel="noopener noreferrer">اعرف التفاصيل</a>' : "") +
       (phone ? '<a class="secondary" href="tel:' + esc(phone) + '">اتصال</a>' : "");
     const imageHtml = image
-      ? '<img src="' + esc(image) + '" alt="' + esc(item.business_name || item.title || "إعلان ممول") + '" loading="lazy" referrerpolicy="no-referrer">'
+      ? '<img src="' + esc(image) + '" alt="' + esc(item.business_name || item.title || "إعلان ممول") + '" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" decoding="async">'
       : '<div class="featured-card-placeholder">' + esc(item.business_name || "إعلان تجاري") + '</div>';
     return '<article class="featured-card"><div class="featured-card-media">' + imageHtml +
       '<span class="featured-card-badge">إعلان ممول</span></div><div class="featured-card-body">' +
