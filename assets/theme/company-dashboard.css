@@ -538,3 +538,71 @@ body.company-dashboard-page :is(p,small){color:var(--cd-muted)}
   .cd-team-form select{min-width:0;width:100%;max-width:100%}
   .cd-team-form .cd-live-action{width:100%;max-width:100%}
 }
+
+
+/* Final mobile containment: prevent live profile cards and team forms from
+   expanding the document's layout viewport beyond the device width. */
+@media(max-width:560px){
+  html,
+  body.company-dashboard-page{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow-x:hidden;
+  }
+  .company-dashboard-page .cd-layout,
+  .company-dashboard-page .cd-main,
+  .company-dashboard-page .cd-section,
+  .company-dashboard-page .cd-company-profiles{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+  .company-dashboard-page .cd-layout{
+    display:block;
+    overflow-x:clip;
+  }
+  .company-dashboard-page .cd-company-card--live{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    overflow:hidden;
+  }
+  .company-dashboard-page .cd-company-card--live .cd-company-identity,
+  .company-dashboard-page .cd-company-card--live .cd-company-state{
+    flex:0 1 auto;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+  }
+  .company-dashboard-page .cd-team-panel{
+    flex:0 1 auto;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+  .company-dashboard-page .cd-team-form{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    width:100%;
+    min-width:0;
+    max-width:100%;
+  }
+  .company-dashboard-page .cd-team-form>*,
+  .company-dashboard-page .cd-team-form label{
+    min-width:0;
+    max-width:100%;
+  }
+  .company-dashboard-page .cd-team-form input,
+  .company-dashboard-page .cd-team-form select,
+  .company-dashboard-page .cd-team-form .cd-live-action{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+}
