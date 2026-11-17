@@ -224,18 +224,25 @@ BEGIN
   IF v_request IS NULL THEN RAISE EXCEPTION 'New project request not found for administrator review'; END IF;
   v_project := public.company_project_request_admin_review(v_request,'approve','تمت مراجعة صفة الشركة والطلب');
   IF v_project IS NULL THEN RAISE EXCEPTION 'Approval did not return the newly created internal project id'; END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM public.directory_projects
-    WHERE id=v_project AND verification_status='needs_review' AND public_visible=false
-  ) THEN RAISE EXCEPTION 'Company approval must not publish the new project'; END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM public.directory_project_entities
-    WHERE project_id=v_project AND entity_id='$ENTITY_ID' AND relation_type='developer'
-  ) THEN RAISE EXCEPTION 'Approved new project must have its reviewed company relationship';
-  END IF;
+  -- Preserve the generated id for checks performed after the authenticated role is reset.
+  PERFORM set_config('test.company_project_management_new_project_id',v_project::text,false);
 END
 \$admin_approve\$;
 COMMIT;
+
+DO \$approved_project_check\$
+DECLARE v_project uuid := nullif(current_setting('test.company_project_management_new_project_id',true),'')::uuid;
+BEGIN
+  IF v_project IS NULL OR NOT EXISTS (
+    SELECT 1 FROM public.directory_projects
+    WHERE id=v_project AND verification_status='needs_review' AND public_visible=false
+  ) THEN RAISE EXCEPTION 'Company approval must create an internal project without publishing it'; END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM public.directory_project_entities
+    WHERE project_id=v_project AND entity_id='$ENTITY_ID' AND relation_type='developer'
+  ) THEN RAISE EXCEPTION 'Approved new project must have its reviewed company relationship'; END IF;
+END
+\$approved_project_check\$;
 SQL
 
 echo "Approving an existing published-project link and testing the needs-changes decision..."
