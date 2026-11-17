@@ -64,6 +64,7 @@ test("main public login requests and verifies an email OTP without creating a us
   await page.locator("#authVerifyOtpBtn").click();
   await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
   expect(state.verifyRequests).toBe(1);
+  await expect.poll(() => state.syncRequests.length).toBe(1);
   expect(state.syncRequests).toEqual([{ action: "sync_subscription" }]);
 });
 
@@ -119,6 +120,7 @@ test("services marketplace login uses the same email OTP and notification prefer
   await page.locator("#marketplaceOtpInput").fill("112233");
   await page.locator("#marketplaceOtpVerify").click();
   await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
+  await expect.poll(() => state.syncRequests.length).toBe(1);
   expect(state.syncRequests).toEqual([{ action: "sync_subscription" }]);
 });
 
