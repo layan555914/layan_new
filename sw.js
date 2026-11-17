@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v182-transaction-split-price-guide-20261117";
+const CACHE_NAME = "asyut-aqar-shell-v183-transaction-price-guide-styles-20261117";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -17,6 +17,7 @@ const APP_SHELL = [
   "./price-guide.html",
   "./price-guide.css?v=20261117-1",
   "./price-guide.js?v=20261117-1",
+  "./assets/theme/transaction-separation.css?v=20261117-1",
   "./know-more.html",
   "./directory-admin.html",
   "./directory-admin.js?v=20261114-service-profiles-1",
