@@ -227,6 +227,9 @@ test("verified profile owners can invite a team member through existing RPC cont
       if (node.classList?.contains("cd-company-card--live")) break;
     }
     const visual = window.visualViewport;
+    const bodyRect = document.body.getBoundingClientRect();
+    const mainRect = document.querySelector(".cd-main")?.getBoundingClientRect();
+    const profilesRect = document.querySelector("#cdCompanyProfiles")?.getBoundingClientRect();
     return {
       viewport: {
         innerWidth: window.innerWidth,
@@ -236,13 +239,18 @@ test("verified profile owners can invite a team member through existing RPC cont
         screenWidth: window.screen.width,
         screenHeight: window.screen.height,
         devicePixelRatio: window.devicePixelRatio,
+        scrollX: window.scrollX,
+        scrollY: window.scrollY,
         mobileMedia: window.matchMedia("(max-width: 560px)").matches,
         visualWidth: visual?.width,
         visualHeight: visual?.height,
         visualScale: visual?.scale
       },
+      body: { x: bodyRect.x, width: bodyRect.width },
+      main: mainRect ? { x: mainRect.x, width: mainRect.width } : null,
+      profiles: profilesRect ? { x: profilesRect.x, width: profilesRect.width } : null,
       button: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-      hitTargets: [0.1, 0.5, 0.9].map(targetAt),
+      hitTargets: [0.25, 0.5, 0.666, 0.75, 0.9].map(targetAt),
       ancestors,
       bodyPointerEvents: getComputedStyle(document.body).pointerEvents,
       htmlPointerEvents: getComputedStyle(document.documentElement).pointerEvents
