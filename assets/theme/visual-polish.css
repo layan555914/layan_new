@@ -1,0 +1,427 @@
+/* ASYUT AQAR — warm, bright visual polish for home and marketplace.
+   Presentation only: no content, forms, IDs, application logic, or data behavior changed. */
+
+:root {
+  /* Legacy theme tokens, re-aligned to a brighter warm palette. */
+  --navy: #5B4638;
+  --blue: #705747;
+  --gold: #D5A675;
+  --gold-light: #F3E2CB;
+  --red: #A6503A;
+  --bg: #FAF8F4;
+  --text: #40372F;
+  --muted: #786D63;
+  --border: #E9E0D8;
+  --white: #FFFFFF;
+
+  /* Existing premium-layer tokens used by the hero and shared controls. */
+  --aa-espresso: #40372F;
+  --aa-espresso-2: #5B4638;
+  --aa-sand: #FAF7F1;
+  --aa-cream: #FFFCF8;
+  --aa-terracotta: #A6503A;
+  --aa-terracotta-dark: #88432F;
+  --aa-peach: #EACBA7;
+  --aa-copper: #D5A675;
+  --aa-line: #E9E0D8;
+
+  --aa-polish-page: #FAF8F4;
+  --aa-polish-surface: #FFFFFF;
+  --aa-polish-soft: #F7F2EC;
+  --aa-polish-warm: #FFF8F0;
+  --aa-polish-ink: #40372F;
+  --aa-polish-muted: #786D63;
+  --aa-polish-line: #E9E0D8;
+  --aa-polish-brand: #A6503A;
+  --aa-polish-brand-hover: #88432F;
+  --aa-polish-shadow: 0 10px 28px rgba(74, 54, 39, .075);
+}
+
+html {
+  color-scheme: light;
+  scroll-padding-top: 92px;
+}
+
+body.page-home,
+body.page-marketplace {
+  background: var(--aa-polish-page);
+  color: var(--aa-polish-ink);
+  font-family: "Readex Pro", "Alexandria", Tahoma, Arial, sans-serif;
+}
+
+/* A single warm-brown navigation anchor, lighter than the former near-black. */
+body.page-home > .topbar,
+body.page-marketplace > .topbar {
+  background: #5B4638;
+  color: #FFFCF8;
+  border-bottom: 3px solid var(--gold);
+  box-shadow: 0 5px 20px rgba(65, 48, 35, .13);
+}
+
+body.page-home .topbar .brand strong,
+body.page-marketplace .topbar .brand strong {
+  color: #FFFCF8;
+  font-weight: 700;
+}
+
+body.page-home .topbar .brand small,
+body.page-marketplace .topbar .brand small {
+  color: #F3DDBF;
+}
+
+body.page-home .topbar nav a,
+body.page-marketplace .topbar nav a {
+  color: #F8EEE3;
+  border-radius: 9px;
+  transition: color .18s ease, background-color .18s ease;
+}
+
+body.page-home .topbar nav a:hover,
+body.page-home .topbar nav a.active,
+body.page-home .topbar nav a[aria-current="page"],
+body.page-marketplace .topbar nav a:hover,
+body.page-marketplace .topbar nav a.active,
+body.page-marketplace .topbar nav a[aria-current="page"] {
+  color: #F3D7B0;
+  background: rgba(255, 255, 255, .11);
+}
+
+body.page-home .topbar .btn-outline,
+body.page-marketplace .topbar .btn-outline {
+  color: #FFFCF8;
+  border-color: rgba(255, 248, 238, .58);
+  background: rgba(255, 255, 255, .06);
+}
+
+body.page-home .topbar .btn-outline:hover,
+body.page-marketplace .topbar .btn-outline:hover {
+  color: #40372F;
+  background: #F3E2CB;
+  border-color: #F3E2CB;
+}
+
+/* Clear Arabic type hierarchy, shared by the two first-pass sections. */
+body.page-home main :is(h1, h2, h3, h4),
+body.page-marketplace main :is(h1, h2, h3, h4) {
+  font-family: "Alexandria", "Readex Pro", Tahoma, Arial, sans-serif;
+  letter-spacing: 0;
+  text-wrap: pretty;
+}
+
+body.page-home main h1,
+body.page-marketplace main h1 {
+  font-size: clamp(1.8rem, 3.2vw, 2.55rem);
+  font-weight: 800;
+  line-height: 1.38;
+}
+
+body.page-home main h2,
+body.page-marketplace main h2 {
+  color: var(--aa-polish-ink);
+  font-size: clamp(1.28rem, 2.2vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+body.page-home main h3,
+body.page-marketplace main h3 {
+  color: var(--aa-polish-ink);
+  font-size: clamp(1.02rem, 1.5vw, 1.22rem);
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+body.page-home :is(.eyebrow, .section-heading .eyebrow),
+body.page-marketplace :is(.eyebrow, .mk-heading .eyebrow) {
+  color: var(--aa-polish-brand);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+body.page-home .section-heading h2,
+body.page-marketplace .mk-heading h2 {
+  margin-block: 0 8px;
+  padding-inline-start: 13px;
+  border-inline-start: 3px solid var(--gold);
+}
+
+body.page-home .section-heading p,
+body.page-marketplace .mk-heading p {
+  color: var(--aa-polish-muted);
+  line-height: 1.85;
+}
+
+/* Keep the original villa photograph and page composition; soften only its dark wash. */
+body.page-home .hero.design-hero {
+  background-color: var(--aa-espresso);
+  border-bottom-color: var(--gold);
+}
+
+body.page-home .hero.design-hero h1,
+body.page-home .hero.design-hero .design-hero-lead {
+  color: #FFFCF8;
+}
+
+body.page-home .hero.design-hero h1 span {
+  color: #F0C995;
+}
+
+body.page-home .hero.design-hero .eyebrow {
+  color: #F0C995;
+}
+
+body.page-home .hero.design-hero .design-hero-sub {
+  color: #F7EEE4;
+}
+
+body.page-home .hero.design-hero .hero-actions .btn-outline {
+  color: #FFFCF8;
+  border-color: rgba(255, 248, 238, .65);
+  background: rgba(255, 255, 255, .07);
+}
+
+body.page-home .design-hero-search {
+  background: #FFFFFF;
+  border-color: #E8DED4;
+  box-shadow: 0 15px 34px rgba(62, 45, 32, .14);
+}
+
+body.page-home .design-hero-search label {
+  color: #51443A;
+}
+
+body.page-home .design-hero-search :is(input, select) {
+  background: #FFFFFF;
+  border-color: #E4D9CF;
+  color: var(--aa-polish-ink);
+}
+
+body.page-home .design-hero-search :is(input, select):focus-visible {
+  border-color: var(--aa-copper);
+  box-shadow: 0 0 0 3px rgba(213, 166, 117, .2);
+}
+
+/* The quick benefits strip becomes lighter and more legible. */
+body.page-home .design-benefits {
+  background: linear-gradient(180deg, #FFF9F2 0%, #F8F2EA 100%);
+  border-bottom: 1px solid var(--aa-polish-line);
+}
+
+body.page-home .design-benefits > div {
+  border-color: #E9DDD1;
+}
+
+body.page-home .design-benefits > div > span {
+  background: linear-gradient(145deg, #F5E5D0, #EBD2B4);
+  color: #86523A;
+  border: 1px solid #E6CFB5;
+}
+
+body.page-home .design-benefits strong {
+  color: #493B31;
+}
+
+body.page-home .design-benefits small {
+  color: #786D63;
+}
+
+/* Search, filters and fields: clean white surfaces with one consistent focus color. */
+body.page-home :is(.filters, .property-map-toolbar, .property-map-panel),
+body.page-marketplace :is(.mk-filters, .mk-directory-block) {
+  background: var(--aa-polish-surface);
+  border: 1px solid var(--aa-polish-line);
+  border-radius: 16px;
+  box-shadow: 0 7px 22px rgba(74, 54, 39, .055);
+}
+
+body.page-home :is(.filters, .property-map-toolbar, .property-map-panel) {
+  color: var(--aa-polish-ink);
+}
+
+body.page-home :is(.filters label, .design-hero-search label),
+body.page-marketplace .mk-filters label {
+  color: #51463D;
+  font-weight: 600;
+}
+
+body.page-home :is(input, select, textarea),
+body.page-marketplace :is(input, select, textarea) {
+  color: var(--aa-polish-ink);
+  background-color: #FFFFFF;
+  border-color: #E3D9D0;
+  border-radius: 10px;
+}
+
+body.page-home :is(input, select, textarea)::placeholder,
+body.page-marketplace :is(input, select, textarea)::placeholder {
+  color: #92877D;
+  opacity: 1;
+}
+
+body.page-home :is(input, select, textarea):focus-visible,
+body.page-marketplace :is(input, select, textarea):focus-visible {
+  outline: 3px solid rgba(166, 80, 58, .16);
+  outline-offset: 1px;
+  border-color: var(--aa-polish-brand);
+}
+
+/* Area shortcuts and service chips share the same light, calm treatment. */
+body.page-home .area-chip,
+body.page-marketplace .mk-chip {
+  color: #705343;
+  background: #FFFFFF;
+  border: 1px solid #E7DDD3;
+  border-radius: 999px;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+
+body.page-home .area-chip:hover,
+body.page-marketplace .mk-chip:hover {
+  color: var(--aa-polish-brand);
+  background: #FBF2EA;
+  border-color: #D8B49B;
+}
+
+body.page-marketplace .mk-chip.is-active,
+body.page-marketplace .mk-chip[aria-pressed="true"] {
+  color: #FFFFFF;
+  background: var(--aa-polish-brand);
+  border-color: var(--aa-polish-brand);
+}
+
+/* Property and service cards: brighter surfaces, softer borders and depth. */
+body.page-home :is(.offer-card, .listing-card),
+body.page-marketplace :is(.offer-card, .listing-card, .mk-profile-card) {
+  color: var(--aa-polish-ink);
+  background: #FFFFFF;
+  border: 1px solid var(--aa-polish-line);
+  border-radius: 16px;
+  box-shadow: var(--aa-polish-shadow);
+}
+
+body.page-home :is(.offer-card, .listing-card):hover,
+body.page-marketplace :is(.offer-card, .listing-card, .mk-profile-card):hover {
+  border-color: #DCC5B3;
+  box-shadow: 0 14px 30px rgba(74, 54, 39, .11);
+}
+
+body.page-home :is(.offer-card h3, .listing-card h3),
+body.page-marketplace :is(.listing-card h3, .mk-profile-content strong) {
+  color: #46392F;
+}
+
+body.page-home :is(.offer-card p, .listing-card p),
+body.page-marketplace :is(.listing-card p, .mk-profile-content span) {
+  color: var(--aa-polish-muted);
+}
+
+body.page-marketplace .mk-directory-block {
+  background: #FFFEFC;
+}
+
+body.page-marketplace .mk-profile-logo {
+  color: #86523A;
+  background: #F7EEE5;
+  border: 1px solid #EFE1D4;
+}
+
+body.page-marketplace .mk-profile-content small,
+body.page-marketplace .mk-directory-note a,
+body.page-marketplace .mk-property-note a {
+  color: var(--aa-polish-brand);
+}
+
+body.page-marketplace .mk-heading [role="status"] {
+  color: var(--aa-polish-muted);
+}
+
+/* Light, consistent dialogs and notices without altering their behavior. */
+body.page-home :is(dialog, .dialog-inner),
+body.page-marketplace :is(dialog, .dialog-inner) {
+  color: var(--aa-polish-ink);
+  background: #FFFFFF;
+  border-color: var(--aa-polish-line);
+  border-radius: 18px;
+  box-shadow: 0 22px 58px rgba(55, 42, 31, .18);
+}
+
+body.page-home :is(.notice, .status-message, .form-note),
+body.page-marketplace :is(.notice, .mk-form-note, .marketplace-location-coordinates) {
+  color: #665346;
+  background: var(--aa-polish-warm);
+  border-color: #EBDDCF;
+  border-radius: 12px;
+}
+
+body.page-marketplace .marketplace-page > .hero {
+  filter: brightness(1.09);
+}
+
+body.page-marketplace .marketplace-page > .hero .page-hero-copy,
+body.page-marketplace .marketplace-page > .hero .page-hero-cta {
+  filter: none;
+}
+
+/* The bottom mobile navigation uses the same warm-light surfaces. */
+body.page-home .mobile-nav,
+body.page-marketplace .mobile-nav {
+  background: rgba(255, 252, 248, .98);
+  border-top: 1px solid var(--aa-polish-line);
+  box-shadow: 0 -7px 22px rgba(74, 54, 39, .09);
+}
+
+body.page-home .mobile-nav a,
+body.page-home .mobile-nav button,
+body.page-marketplace .mobile-nav a,
+body.page-marketplace .mobile-nav button {
+  color: #74665C;
+}
+
+body.page-home .mobile-nav a.is-current,
+body.page-home .mobile-nav a[aria-current="page"],
+body.page-marketplace .mobile-nav a.is-current,
+body.page-marketplace .mobile-nav a[aria-current="page"] {
+  color: var(--aa-polish-brand);
+}
+
+body.page-home .mobile-nav .aa-appnav-add,
+body.page-marketplace .mobile-nav .aa-appnav-add {
+  color: #FFFFFF;
+  background: var(--aa-polish-brand);
+}
+
+@media (max-width: 760px) {
+  html { scroll-padding-top: 12px; }
+
+  body.page-home .section-heading,
+  body.page-marketplace .mk-heading {
+    gap: 10px;
+  }
+
+  body.page-home .design-benefits {
+    background: #FBF6EF;
+  }
+
+  body.page-home .design-hero-search {
+    border-radius: 14px;
+  }
+
+  body.page-marketplace .marketplace-page > .hero {
+    filter: brightness(1.06);
+  }
+
+  body.page-home .area-chip,
+  body.page-marketplace .mk-chip {
+    min-height: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.page-home *,
+  body.page-marketplace * {
+    scroll-behavior: auto;
+    transition-duration: .01ms;
+    animation-duration: .01ms;
+    animation-iteration-count: 1;
+  }
+}
