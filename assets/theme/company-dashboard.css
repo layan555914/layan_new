@@ -192,3 +192,65 @@ a{color:inherit}
   html{scroll-behavior:auto}
   .cd-nav a{transition:none}
 }
+
+/* Live company dashboard data and controls */
+.cd-company-profiles{display:grid;gap:14px}
+.cd-company-card--live{align-items:flex-start;flex-wrap:wrap}
+.cd-company-card--live .cd-company-identity{flex:1 1 340px}
+.cd-company-card--live .cd-company-state{min-width:190px}
+.cd-company-logo img{display:block;width:100%;height:100%;padding:8px;object-fit:contain}
+.cd-live-status{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border:1px solid #e6d8c8;border-radius:999px;background:#fcf7f1;color:#755b45;font-size:10px;font-weight:800;line-height:1.6}
+.cd-live-status--success{border-color:#c9dfcf;background:#f1f8f2;color:#326344}
+.cd-live-status--warning{border-color:#ead6b8;background:#fff8eb;color:#88632b}
+.cd-live-status--danger{border-color:#e8c8c2;background:#fff3f1;color:#963f32}
+.cd-live-status--neutral{background:#f5f1ec;color:#665347}
+.cd-profile-actions{display:flex;flex-wrap:wrap;gap:7px}
+.cd-live-action{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid #c98a64;border-radius:9px;background:#c98a64;color:#30251e;text-decoration:none;font-size:11px;font-weight:800;cursor:pointer}
+.cd-live-action--secondary{background:#fff;color:#76513a;border-color:#ead6c4}
+.cd-live-button{font:inherit}
+.cd-profile-detail{flex:1 1 100%;margin:5px 0 0;color:var(--cd-muted);font-size:11px;line-height:1.9}
+.cd-admin-note{margin:12px 0 0;padding:11px 13px;border:1px solid #ead7bb;border-radius:10px;background:#fff8eb;color:#795c35;font-size:11px;line-height:1.9}
+.cd-previous-work{display:grid;gap:8px;width:100%;margin-top:14px;padding:13px;border:1px solid var(--cd-line);border-radius:12px;background:#fffcf8}
+.cd-previous-work>strong{font-size:11px}
+.cd-previous-work>p{margin:0;color:var(--cd-muted);font-size:10px;line-height:1.8}
+.cd-previous-work-item{display:grid;gap:3px;padding:9px 10px;border-radius:9px;background:#fff;border:1px solid #efe5da}
+.cd-previous-work-item b{font-size:11px}
+.cd-previous-work-item small{color:var(--cd-muted);font-size:10px;line-height:1.8}
+.cd-team-panel{width:100%;margin-top:15px;padding:15px;border:1px solid var(--cd-line);border-radius:13px;background:#fff}
+.cd-team-heading h3{margin:0 0 5px;font-size:13px}
+.cd-team-heading p{margin:0 0 12px;color:var(--cd-muted);font-size:10px;line-height:1.8}
+.cd-team-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,.55fr) auto;align-items:end;gap:9px}
+.cd-team-form label{display:grid;gap:5px;color:var(--cd-ink-soft);font-size:10px;font-weight:700}
+.cd-team-form input,.cd-team-form select{min-height:40px;padding:8px 10px;border:1px solid var(--cd-line);border-radius:9px;background:#fff;color:var(--cd-ink);font:inherit;font-size:11px}
+.cd-team-form .cd-live-action{min-height:40px;white-space:nowrap}
+.cd-team-feedback{margin:10px 0;color:var(--cd-muted);font-size:10px;line-height:1.8}
+.cd-team-members{display:grid;gap:7px}
+.cd-team-member{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid #efe5da;border-radius:9px;background:#fff}
+.cd-team-member>div{display:grid;gap:3px;min-width:0}
+.cd-team-member strong{font-size:10px;overflow-wrap:anywhere}
+.cd-team-member small{color:var(--cd-muted);font-size:9px}
+.cd-revoke-button{flex:0 0 auto;min-height:32px;padding:6px 9px;border:1px solid #e6c9c1;border-radius:8px;background:#fff6f3;color:#933f31;font-size:10px;font-weight:800;cursor:pointer}
+.cd-revoke-button:disabled,.cd-live-action:disabled{opacity:.6;cursor:wait}
+.cd-team-note{margin:10px 0 0;padding:9px 11px;border-radius:9px;background:#f7f1ea;color:#745e4c;font-size:10px;line-height:1.8}
+.cd-projects-list,.cd-account-listings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cd-project-card,.cd-account-listing{display:grid;align-content:start;gap:7px;min-width:0;padding:14px;border:1px solid var(--cd-line);border-radius:13px;background:#fff}
+.cd-project-role{justify-self:start;padding:4px 8px;border-radius:999px;background:#f7eee5;color:#80583d;font-size:9px;font-weight:800}
+.cd-project-card h3{margin:0;font-size:13px;line-height:1.7}
+.cd-project-card p,.cd-account-listing span{margin:0;color:var(--cd-muted);font-size:10px;line-height:1.8}
+.cd-project-link{justify-self:start;color:var(--cd-accent-dark);font-size:10px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.cd-account-listing strong{font-size:11px;line-height:1.7}
+.cd-empty-panel--live{min-height:100px}
+.cd-live-loading{margin:0;padding:16px;color:var(--cd-muted);font-size:11px;line-height:1.8}
+#cdConnectionMessage[data-state="success"]{border-color:#c9dfcf;background:#f1f8f2;color:#326344}
+#cdConnectionMessage[data-state="warning"]{border-color:#ead6b8;background:#fff8eb;color:#88632b}
+#cdConnectionMessage[data-state="error"]{border-color:#e8c8c2;background:#fff3f1;color:#963f32}
+@media(max-width:760px){
+ .cd-team-form{grid-template-columns:1fr 1fr}
+ .cd-team-form .cd-live-action{grid-column:1/-1;width:100%}
+ .cd-projects-list,.cd-account-listings{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+ .cd-company-card--live .cd-company-state{min-width:0;width:100%;display:grid;justify-items:start}
+ .cd-team-form{grid-template-columns:1fr}
+ .cd-team-member{align-items:flex-start}
+}
