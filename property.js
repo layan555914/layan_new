@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("غرف النوم", /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(String(row.property_type || "")) ? row.bedrooms : ""),
       makeFact("الحمامات", /أرض|ارض|مشروع/.test(String(row.property_type || "")) ? "" : row.bathrooms),
       makeFact("المقدم عند التعاقد", isAssignment && Number(row.down_payment) > 0 ? money(row.down_payment) : ""),
-      makeFact("إجمالي المدفوع", isAssignment && Number(row.paid_amount) > 0 ? money(row.paid_amount) : ""),
+      makeFact("إجمالي المدفوع (شامل المقدم)", isAssignment && Number(row.paid_amount) > 0 ? money(row.paid_amount) : ""),
       makeFact("المبلغ المتبقي", isAssignment && Number(row.remaining_amount) > 0 ? money(row.remaining_amount) : ""),
       makeFact("القسط الشهري", isAssignment && Number(row.monthly_installment) > 0 ? money(row.monthly_installment) : ""),
       makeFact("رسوم التنازل", isAssignment && Number(row.assignment_fee) > 0 ? money(row.assignment_fee) : ""),
