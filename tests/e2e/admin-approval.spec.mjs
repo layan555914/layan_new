@@ -67,7 +67,7 @@ async function login(page, { expectAuthorized = true } = {}) {
   else await expect(page.locator("#adminConsole")).toBeHidden();
 }
 
-test("added admin change goes to the owner, owner approves and it is performed", async ({ page }) => {
+test("added admin change goes to the owner, owner approves and it is performed", async ({ page, browser }) => {
   page.on("dialog", d => d.accept());
   globalThis.__role = "admin";
   const state = await mock(page);
@@ -88,7 +88,9 @@ test("added admin change goes to the owner, owner approves and it is performed",
 
   // Owner approves the same request.
   globalThis.__role = "owner";
-  const page2 = await page.context().newPage();
+  // The owner signs in on a separate browser context, not the helper's saved session.
+  const page2Context = await browser.newContext();
+  const page2 = await page2Context.newPage();
   page2.on("dialog", d => d.accept());
   await mock(page2).then(s2 => { s2.changes.push(...state.changes); Object.assign(state, { owner: s2 }); });
   await login(page2);
@@ -99,6 +101,7 @@ test("added admin change goes to the owner, owner approves and it is performed",
   await expect.poll(() => state.owner.finished.length).toBe(1);
   expect(state.owner.finished[0]).toMatchObject({ p_id: 1, p_ok: true });
   expect(state.owner.patches.find(p => p.id === "s1")).toMatchObject({ is_active: false });
+  await page2Context.close();
 });
 
 
