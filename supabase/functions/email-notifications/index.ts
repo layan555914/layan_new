@@ -1,10 +1,23 @@
 import { createClient } from "npm:@supabase/supabase-js@2.118.0";
 
 const SITE_URL = "https://asyutq.com";
-const ALLOWED_ORIGINS = new Set([
+const PRODUCTION_ORIGINS = new Set([
   "https://asyutq.com",
   "https://www.asyutq.com"
 ]);
+// Only this project's own Vercel preview deployments use the isolated TEST Supabase project.
+const PREVIEW_ORIGIN_PATTERN = /^https:\/\/layan-[a-z0-9-]+-mostafa-6511\.vercel\.app$/i;
+
+function isAllowedOrigin(origin: string | null): origin is string {
+  return Boolean(origin && (
+    PRODUCTION_ORIGINS.has(origin) ||
+    PREVIEW_ORIGIN_PATTERN.test(origin)
+  ));
+}
+
+function siteUrlForOrigin(origin: string | null): string {
+  return isAllowedOrigin(origin) ? origin : SITE_URL;
+}
 const SUPPORTED_RECORD_TYPES = new Set([
   "property_offer",
   "marketplace_listing",
@@ -29,7 +42,7 @@ const json = (body: unknown, status = 200, origin: string | null = null) =>
       "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Vary": "Origin",
-      ...(origin && ALLOWED_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin } : {})
+      ...(isAllowedOrigin(origin) ? { "Access-Control-Allow-Origin": origin } : {})
     }
   });
 
@@ -101,17 +114,17 @@ async function sendEmail(
   return String(data.id || "");
 }
 
-async function sendWelcome(admin: any, userId: string, email: string, token: string) {
+async function sendWelcome(admin: any, userId: string, email: string, token: string, siteUrl: string) {
   const apiKey = Deno.env.get("RESEND_API_KEY") || "";
   const from = Deno.env.get("EMAIL_FROM") || "";
   if (!apiKey || !from) return false;
-  const unsubscribeUrl = SITE_URL + "/email-unsubscribe.html?token=" + encodeURIComponent(token);
+  const unsubscribeUrl = siteUrl + "/email-unsubscribe.html?token=" + encodeURIComponent(token);
   const html = `
     <div dir="rtl" lang="ar" style="font-family:Tahoma,Arial,sans-serif;line-height:1.9;color:#102746;max-width:620px;margin:auto;padding:24px">
       <h2>أهلًا بك في أسيوط عقار</h2>
       <p>تم تفعيل اشتراكك في إشعارات البريد الإلكتروني.</p>
       <p>سنرسل لك رسالة عندما تعتمد الإدارة عقارًا أو خدمة أو شركة جديدة وتنشرها على المنصة.</p>
-      <p><a href="${SITE_URL}">تصفح أسيوط عقار</a></p>
+      <p><a href="${siteUrl}">تصفح أسيوط عقار</a></p>
       <hr>
       <p style="font-size:12px">يمكنك <a href="${unsubscribeUrl}">إلغاء الاشتراك</a> في أي وقت.</p>
     </div>`;
@@ -131,7 +144,7 @@ async function sendWelcome(admin: any, userId: string, email: string, token: str
   return Boolean(id);
 }
 
-async function loadAnnouncement(admin: any, type: string, id: string): Promise<Announcement | null> {
+async function loadAnnouncement(admin: any, type: string, id: string, siteUrl: string): Promise<Announcement | null> {
   if (type === "property_offer") {
     const { data, error } = await admin.from("property_offers")
       .select("id,title,city,area,property_type,total_price,price_on_request,status")
@@ -144,7 +157,7 @@ async function loadAnnouncement(admin: any, type: string, id: string): Promise<A
       description: [data.property_type, data.price_on_request ? "السعر عند التواصل" :
         (data.total_price ? Number(data.total_price).toLocaleString("en-US") + " جنيه" : "")].filter(Boolean).join(" · "),
       location: [data.city || "أسيوط", data.area].filter(Boolean).join(" — "),
-      href: SITE_URL + "/property.html?id=" + encodeURIComponent(String(data.id))
+      href: siteUrl + "/property.html?id=" + encodeURIComponent(String(data.id))
     };
   }
   if (type === "marketplace_listing") {
@@ -158,7 +171,7 @@ async function loadAnnouncement(admin: any, type: string, id: string): Promise<A
       category: "خدمة جديدة · " + String(data.category || "سوق الخدمات"),
       description: String(data.description || "").slice(0, 500),
       location: [data.city || "أسيوط", data.area].filter(Boolean).join(" — "),
-      href: SITE_URL + "/marketplace.html"
+      href: siteUrl + "/marketplace.html"
     };
   }
   if (type === "company_profile") {
@@ -172,7 +185,7 @@ async function loadAnnouncement(admin: any, type: string, id: string): Promise<A
       category: "شركة جديدة · " + String(data.category || "الشركات"),
       description: String(data.description || "").slice(0, 500),
       location: String(data.city || "أسيوط"),
-      href: SITE_URL + "/company.html?id=" + encodeURIComponent(String(data.id))
+      href: siteUrl + "/company.html?id=" + encodeURIComponent(String(data.id))
     };
   }
   if (type === "company_ad") {
@@ -186,7 +199,7 @@ async function loadAnnouncement(admin: any, type: string, id: string): Promise<A
       category: "إعلان شركة معتمد",
       description: "تم اعتماد إعلان الشركة وتفعيله على منصة أسيوط عقار.",
       location: "أسيوط",
-      href: SITE_URL + "/companies.html"
+      href: siteUrl + "/companies.html"
     };
   }
   if (type === "supplier_ad") {
@@ -195,7 +208,7 @@ async function loadAnnouncement(admin: any, type: string, id: string): Promise<A
       .eq("id", id).eq("status", "active").maybeSingle();
     if (error) throw error;
     if (!data) return null;
-    const target = /^https?:\/\//i.test(String(data.target_url || "")) ? String(data.target_url) : SITE_URL + "/";
+    const target = /^https?:\/\//i.test(String(data.target_url || "")) ? String(data.target_url) : siteUrl + "/";
     return {
       title: String(data.title || data.business_name || "إعلان جديد"),
       category: "إعلان ممول · " + String(data.category || "خدمات"),
@@ -207,8 +220,8 @@ async function loadAnnouncement(admin: any, type: string, id: string): Promise<A
   throw new Error("نوع الإعلان غير مدعوم.");
 }
 
-async function dispatchAnnouncement(admin: any, type: string, id: string) {
-  const announcement = await loadAnnouncement(admin, type, id);
+async function dispatchAnnouncement(admin: any, type: string, id: string, siteUrl: string) {
+  const announcement = await loadAnnouncement(admin, type, id, siteUrl);
   if (!announcement) throw new Error("العرض غير موجود أو لم يحصل على اعتماد الإدارة والنشر.");
 
   const subscribers: any[] = [];
@@ -268,7 +281,7 @@ async function dispatchAnnouncement(admin: any, type: string, id: string) {
     const group = work.slice(offset, offset + 10);
     const results = await Promise.all(group.map(async (item: any) => {
       const subscriber = item.subscriber;
-      const unsubscribeUrl = SITE_URL + "/email-unsubscribe.html?token=" +
+      const unsubscribeUrl = siteUrl + "/email-unsubscribe.html?token=" +
         encodeURIComponent(subscriber.unsubscribe_token);
       const html = `
         <div dir="rtl" lang="ar" style="font-family:Tahoma,Arial,sans-serif;line-height:1.9;color:#102746;max-width:620px;margin:auto;padding:24px">
@@ -322,13 +335,14 @@ async function dispatchAnnouncement(admin: any, type: string, id: string) {
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
-    if (origin && !ALLOWED_ORIGINS.has(origin)) return new Response("Origin not allowed", { status: 403 });
+    if (origin && !isAllowedOrigin(origin)) return new Response("Origin not allowed", { status: 403 });
     return json({ ok: true }, 200, origin);
   }
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405, origin);
-  if (origin && !ALLOWED_ORIGINS.has(origin)) return json({ error: "Origin not allowed" }, 403, origin);
+  if (origin && !isAllowedOrigin(origin)) return json({ error: "Origin not allowed" }, 403, origin);
 
   try {
+    const siteUrl = siteUrlForOrigin(origin);
     const body = await req.json().catch(() => ({}));
     const action = String(body?.action || "");
     const authorization = req.headers.get("Authorization") || "";
@@ -372,7 +386,8 @@ Deno.serve(async (req: Request) => {
               admin,
               account.id,
               String(account.email).trim().toLowerCase(),
-              existing.unsubscribe_token
+              existing.unsubscribe_token,
+              siteUrl
             );
           } catch (welcomeError) {
             console.warn("Welcome email retry failed:", welcomeError);
@@ -401,7 +416,7 @@ Deno.serve(async (req: Request) => {
 
       let welcomeSent = false;
       if (enabled && !saved.welcome_sent_at) {
-        try { welcomeSent = await sendWelcome(admin, account.id, email, saved.unsubscribe_token); }
+        try { welcomeSent = await sendWelcome(admin, account.id, email, saved.unsubscribe_token, siteUrl); }
         catch (welcomeError) { console.warn("Welcome email failed:", welcomeError); }
       }
       return json({ ok: true, enabled, welcome_sent: welcomeSent }, 200, origin);
@@ -416,7 +431,7 @@ Deno.serve(async (req: Request) => {
           (type === "property_offer" && !/^\d+$/.test(id))) {
         return json({ error: "نوع الإعلان أو معرّفه غير مدعوم." }, 400, origin);
       }
-      return json({ ok: true, ...(await dispatchAnnouncement(admin, type, id)) }, 200, origin);
+      return json({ ok: true, ...(await dispatchAnnouncement(admin, type, id, siteUrl)) }, 200, origin);
     }
 
     return json({ error: "إجراء غير مدعوم." }, 400, origin);
