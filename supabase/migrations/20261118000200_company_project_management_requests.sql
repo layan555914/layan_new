@@ -80,7 +80,7 @@ BEGIN
   END IF;
 
   v_access := private.company_entity_manager_access(p_directory_entity_id);
-  IF v_access NOT IN ('owner','manager') THEN
+  IF v_access IS NULL OR v_access NOT IN ('owner','manager') THEN
     RAISE EXCEPTION 'إرسال طلبات المشروعات متاح للمالك أو مدير الملف المفوض بعد التحقق فقط' USING ERRCODE='42501';
   END IF;
 
@@ -374,7 +374,7 @@ BEGIN
   IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
     RAISE EXCEPTION 'غير مسموح؛ يلزم حساب إدارة معتمد' USING ERRCODE='42501';
   END IF;
-  IF p_action NOT IN ('approve','needs_changes','reject') THEN
+  IF p_action IS NULL OR p_action NOT IN ('approve','needs_changes','reject') THEN
     RAISE EXCEPTION 'قرار المراجعة غير صحيح' USING ERRCODE='22023';
   END IF;
   IF p_action IN ('needs_changes','reject') AND char_length(coalesce(v_notes,'')) < 3 THEN
