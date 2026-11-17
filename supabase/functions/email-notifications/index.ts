@@ -454,9 +454,11 @@ Deno.serve(async (req: Request) => {
         return json({ ok: true, enabled: existing.is_enabled, already_registered: true, welcome_sent: welcomeSent }, 200, origin);
       }
 
+      // Newly confirmed accounts are subscribed by default. Existing rows are
+      // returned above unchanged, so a user's explicit unsubscribe is respected.
       const enabled = action === "set_subscription"
         ? body?.enabled === true
-        : account.user_metadata?.email_notifications === true;
+        : true;
       const now = new Date().toISOString();
       const email = String(account.email).trim().toLowerCase();
       const { data: saved, error: saveError } = await admin.from("email_notification_subscriptions")
