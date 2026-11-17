@@ -5,7 +5,7 @@ const SUPABASE = "https://wisnmlbefdrkcbbqvdlg.supabase.co";
 const USER_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 
 async function mock(page, { adminAllowed = true } = {}) {
-  const state = { sponsors: [
+  const state = { authRequests: [], sponsors: [
     { id: "s1", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
     { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
   ], ads: [
@@ -15,7 +15,14 @@ async function mock(page, { adminAllowed = true } = {}) {
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
   await page.route(SUPABASE + "/**", async route => {
     const req = route.request(); const url = new URL(req.url()); const path = url.pathname; const method = req.method();
-    if (path === "/auth/v1/token") return reply(route, { access_token: "t", refresh_token: "r", token_type: "bearer", expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user });
+    if (path === "/auth/v1/otp") {
+      state.authRequests.push({ path, body: req.postDataJSON?.() || {} });
+      return reply(route, {});
+    }
+    if (path === "/auth/v1/verify") {
+      state.authRequests.push({ path, body: req.postDataJSON?.() || {} });
+      return reply(route, { access_token: "t", refresh_token: "r", token_type: "bearer", expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user });
+    }
     if (path === "/auth/v1/user") return reply(route, user);
     if (path.startsWith("/auth/v1/")) return reply(route, {});
     if (path.startsWith("/rest/v1/rpc/")) {
@@ -47,11 +54,17 @@ async function mock(page, { adminAllowed = true } = {}) {
 }
 
 
-async function login(page) {
+async function login(page, { expectAuthorized = true } = {}) {
   await page.goto("/admin.html");
+  await expect(page.locator("#adminConsole")).toBeHidden();
+  await expect(page.locator("#adminPassword")).toHaveCount(0);
   await page.locator("#adminEmail").fill("sponsor-admin@example.invalid");
-  await page.locator("#adminPassword").fill("Test-Only-Password-123!");
-  await page.locator("#adminLogin button[type='submit']").click();
+  await page.locator("#adminLoginSubmit").click();
+  await expect(page.locator("#adminOtpCode")).toBeVisible();
+  await page.locator("#adminOtpCode").fill("123456");
+  await page.locator("#adminLoginSubmit").click();
+  if (expectAuthorized) await expect(page.locator("#adminConsole")).toBeVisible();
+  else await expect(page.locator("#adminConsole")).toBeHidden();
 }
 
 test("added admin change goes to the owner, owner approves and it is performed", async ({ page }) => {
@@ -59,6 +72,10 @@ test("added admin change goes to the owner, owner approves and it is performed",
   globalThis.__role = "admin";
   const state = await mock(page);
   await login(page);
+  expect(state.authRequests).toEqual([
+    { path: "/auth/v1/otp", body: { email: "sponsor-admin@example.invalid", create_user: false } },
+    { path: "/auth/v1/verify", body: { email: "sponsor-admin@example.invalid", token: "123456", type: "email" } }
+  ]);
   await page.locator("[data-view='sponsors']").click();
   await expect(page.locator("#adminSponsorsList")).toContainText("Rahma Builders");
   await page.locator("[data-sponsor-id='s1'] [data-sp='toggle']").click();
@@ -87,7 +104,11 @@ test("added admin change goes to the owner, owner approves and it is performed",
 
 test("admin denial feedback stays visible while the admin console remains hidden", async ({ page }) => {
   const state = await mock(page, { adminAllowed: false });
-  await login(page);
+  await login(page, { expectAuthorized: false });
+  expect(state.authRequests[0]).toEqual({
+    path: "/auth/v1/otp",
+    body: { email: "sponsor-admin@example.invalid", create_user: false }
+  });
   await expect(page.locator("#adminStatus")).toBeVisible();
   await expect(page.locator("#adminStatus")).toContainText("غير مخوّل");
   await expect(page.locator("#adminConsole")).toBeHidden();
