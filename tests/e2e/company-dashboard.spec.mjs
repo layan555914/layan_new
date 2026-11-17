@@ -218,7 +218,7 @@ test("verified profile owners can invite a team member through existing RPC cont
   await entityForm.locator('input[name="email"]').fill("new.manager@agency.test");
   await entityForm.locator('select[name="role"]').selectOption("manager");
   const entitySubmit = entityForm.locator('button[type="submit"]');
-  await entitySubmit.evaluate(element => element.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
+  await entitySubmit.scrollIntoViewIfNeeded();
   await expect(entitySubmit).toBeVisible();
   await entitySubmit.click({ timeout: 12000 });
   await expect(page.locator("#cdCompanyProfiles")).toContainText("new.manager@agency.test");
