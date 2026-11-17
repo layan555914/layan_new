@@ -1,20 +1,20 @@
 /* ASYUT AQAR — unified bright clarity layer (review branch)
-   Visual-only overrides. Keeps the existing warm terracotta/copper identity.
-   No selectors are used by application logic; no layout or data behaviour changes. */
+   Visual-only polish: brighter surfaces and clearer contrast.
+   Preserves the existing espresso, terracotta, and copper/champagne palette. */
 :root {
-  --aa-page: #FBFAF8;
+  --aa-page: #FBF8F5;
   --aa-surface: #FFFFFF;
-  --aa-surface-soft: #F7F5F1;
-  --aa-surface-warm: #FFF8F2;
-  --aa-ink: #342E29;
-  --aa-muted: #6F665F;
-  --aa-line: #E9E2DA;
-  --aa-brand: #9C523A;
-  --aa-brand-hover: #85432F;
-  --aa-brand-soft: #F8EEE8;
-  --aa-copper: #D3A080;
-  --aa-shadow: 0 8px 24px rgba(52, 46, 41, .065);
-  --aa-shadow-hover: 0 13px 30px rgba(52, 46, 41, .105);
+  --aa-surface-soft: #FFFDFB;
+  --aa-surface-warm: #FFF8F0;
+  --aa-ink: #2B211B;
+  --aa-muted: #6B5D52;
+  --aa-line: #E6DACB;
+  --aa-brand: #A4472A;
+  --aa-brand-hover: #8C3A21;
+  --aa-brand-soft: #F6E8DE;
+  --aa-copper: #C98A64;
+  --aa-shadow: 0 8px 24px rgba(43, 33, 27, .065);
+  --aa-shadow-hover: 0 13px 30px rgba(43, 33, 27, .105);
 }
 html { color-scheme: light; }
 html body {
@@ -23,10 +23,7 @@ html body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-html body :is(p, li, label, small, .muted, .text-muted, .description) {
-  color: inherit;
-}
-html body :is(.muted, .text-muted, small, .description, .form-note) {
+html body :is(.muted, .text-muted, .description, .form-note) {
   color: var(--aa-muted);
 }
 html body :is(main h1, main h2, main h3, main h4, .section-heading) {
@@ -34,24 +31,27 @@ html body :is(main h1, main h2, main h3, main h4, .section-heading) {
   text-wrap: pretty;
 }
 html body :is(header.topbar, header.info-topbar) {
-  background: rgba(255,255,255,.98);
-  color: var(--aa-ink);
-  border-bottom: 1px solid var(--aa-line);
-  box-shadow: 0 3px 16px rgba(52,46,41,.055);
+  background: linear-gradient(112deg, #1E1712 0%, #2B211B 62%, #3A2D25 100%);
+  color: #F3ECE1;
+  border-bottom: 2px solid var(--aa-copper);
+  box-shadow: 0 6px 22px rgba(43, 33, 27, .12);
 }
 html body header.topbar :is(.brand, .brand strong, nav a),
 html body header.info-topbar :is(.info-brand, nav a) {
-  color: var(--aa-ink);
+  color: #F3ECE1;
 }
 html body header.topbar .brand small,
+html body header.info-topbar .info-brand small,
 html body header.info-topbar nav a:hover,
+html body header.info-topbar nav a.active,
 html body header.topbar nav a:hover,
 html body header.topbar nav a.active,
 html body header.topbar nav a[aria-current="page"] {
-  color: var(--aa-brand);
+  color: #E9B08F;
 }
-html body header.topbar nav a:is(:hover, .active, [aria-current="page"]) {
-  background-color: var(--aa-brand-soft);
+html body header.topbar nav a:is(:hover, .active, [aria-current="page"]),
+html body header.info-topbar nav a:is(:hover, .active, [aria-current="page"]) {
+  background-color: rgba(233, 176, 143, .14);
 }
 html body :is(.section, .directory-browser, .directory-method, .company-map-panel,
   .directory-map-panel, .know-card, .info-card, .info-doc, .info-grid article,
@@ -70,40 +70,27 @@ html body :is(.offer-card, .listing-card, .company-directory-card, .directory-ca
 html body :is(input, select, textarea) {
   color: var(--aa-ink);
   background-color: #FFFFFF;
-  border-color: #DCD3C9;
+  border-color: #D8C8B8;
 }
 html body :is(input, select, textarea)::placeholder {
-  color: #8A8078;
+  color: #82756B;
   opacity: 1;
 }
 html body :is(input, select, textarea):focus {
   border-color: var(--aa-brand);
-  box-shadow: 0 0 0 3px rgba(156,82,58,.12);
-}
-html body :is(.btn-gold, .btn-red, .btn-primary, button.primary, .submit-btn) {
-  background-color: var(--aa-brand);
-  border-color: var(--aa-brand);
-  color: #FFFFFF;
-}
-html body :is(.btn-gold, .btn-red, .btn-primary, button.primary, .submit-btn):hover {
-  background-color: var(--aa-brand-hover);
-  border-color: var(--aa-brand-hover);
-}
-html body :is(.btn-outline, .btn-outline-dark) {
-  border-color: #CDAF9D;
-  color: var(--aa-brand);
+  box-shadow: 0 0 0 3px rgba(164, 71, 42, .14);
 }
 html body :is(.notice, .status-message, .know-note, .company-review-note,
   .directory-results-note, .form-note) {
-  background-color: #FFF8F2;
-  border-color: #EAD8CA;
+  background-color: #FFF8F0;
+  border-color: #EAD6C4;
   color: #5B473B;
 }
 html body :is(.category, .detail-chip, .directory-tag, .company-service-list li,
   .mk-chip, .filter-chip) {
-  background-color: #F8F5F1;
+  background-color: #F8F3EE;
   border-color: var(--aa-line);
-  color: #574A41;
+  color: #524135;
 }
 html body :is(.directory-tabs button.is-active, .category.active,
   .mk-chip.is-active, .mk-chip[aria-pressed="true"]) {
@@ -111,10 +98,10 @@ html body :is(.directory-tabs button.is-active, .category.active,
   border-color: var(--aa-brand);
   color: #FFFFFF;
 }
-html body :is(a, .link) { text-decoration-color: rgba(156,82,58,.35); }
+html body :is(a, .link) { text-decoration-color: rgba(164, 71, 42, .35); }
 html body :is(a, .link):focus-visible,
 html body :is(button, input, select, textarea, summary, [role="button"]):focus-visible {
-  outline: 3px solid rgba(156,82,58,.32);
+  outline: 3px solid rgba(201, 138, 100, .55);
   outline-offset: 2px;
 }
 html body :is(.page-hero:not(.design-hero), .companies-hero, .directory-hero,
