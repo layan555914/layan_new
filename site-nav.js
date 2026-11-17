@@ -77,6 +77,16 @@
     document.head.appendChild(lightTheme);
   }
 
+  // Final shared component layer: load after page CSS and the current warm-light theme.
+  // Keeps the approved empty-photo fallback above while applying the new shared components.
+  if (!document.querySelector('link[data-asyut-design-foundation="global"]')) {
+    const designSystem = document.createElement("link");
+    designSystem.rel = "stylesheet";
+    designSystem.href = "/assets/theme/design-system.css?v=20261117-foundation-1";
+    designSystem.dataset.asyutDesignFoundation = "global";
+    document.head.appendChild(designSystem);
+  }
+
   const header = document.querySelector("header.topbar");
   if (!header) return;
   const nav = header.querySelector("nav");
