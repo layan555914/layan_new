@@ -190,8 +190,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     const api = window.LAYAN_SUPABASE;
-    if (!api?.getOffers) throw new Error("خدمة قراءة الإعلانات غير متاحة حاليًا.");
-    const rows = await api.getOffers();
+    if (!api?.getPriceGuideOffers) throw new Error("خدمة قراءة بيانات دليل الأسعار غير متاحة حاليًا.");
+    const rows = await api.getPriceGuideOffers();
     if (!Array.isArray(rows)) throw new Error("تعذر قراءة بيانات الإعلانات.");
     sourceRows = rows;
     if (updatedAt) updatedAt.textContent = new Intl.DateTimeFormat("ar-EG", {
