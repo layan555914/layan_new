@@ -193,7 +193,7 @@ test("verified profile owners can invite a team member through existing RPC cont
   // Center the control in the viewport so the fixed app bar and floating helpers
   // cannot cover its tap target on a phone-sized screen.
   const companySubmit = companyForm.locator('button[type="submit"]');
-  await companySubmit.evaluate(element => element.scrollIntoView({ block: "center", inline: "nearest", behavior: "auto" }));
+  await companySubmit.evaluate(element => element.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
   await expect(companySubmit).toBeVisible();
   await companySubmit.click({ timeout: 12000 });
   await expect(page.locator("#cdCompanyProfiles")).toContainText("new.editor@company.test");
@@ -202,7 +202,7 @@ test("verified profile owners can invite a team member through existing RPC cont
   await entityForm.locator('input[name="email"]').fill("new.manager@agency.test");
   await entityForm.locator('select[name="role"]').selectOption("manager");
   const entitySubmit = entityForm.locator('button[type="submit"]');
-  await entitySubmit.evaluate(element => element.scrollIntoView({ block: "center", inline: "nearest", behavior: "auto" }));
+  await entitySubmit.evaluate(element => element.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" }));
   await expect(entitySubmit).toBeVisible();
   await entitySubmit.click({ timeout: 12000 });
   await expect(page.locator("#cdCompanyProfiles")).toContainText("new.manager@agency.test");
