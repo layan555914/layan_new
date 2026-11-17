@@ -513,6 +513,15 @@
     }
     return Array.isArray(rows) ? rows : [];
   }
+  async function getPriceGuideOffers() {
+    // Minimal public fields only: never fetch contact details, photos, owner IDs or financial breakdowns for the price guide.
+    const fields = [
+      "listing_purpose","city","area","property_type","total_price",
+      "price_on_request","area_m2","status","title","description"
+    ].join(",");
+    const rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
+    return Array.isArray(rows) ? rows : [];
+  }
   async function getMyOffers() {
     if (!isAuthenticated()) return [];
     const rows = await request("property_offers?select=id,status,title,created_at&owner_id=eq." +
@@ -855,6 +864,6 @@
   }
 
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, markNewAccountProfilePending, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
+  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, markNewAccountProfilePending, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, getPriceGuideOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
