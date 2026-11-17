@@ -103,8 +103,8 @@ test("email confirmation PKCE code creates a session and completes the signup ca
   expect(callback).toMatchObject({ success: true, type: "signup" });
   const sessionSnapshot = await page.evaluate(() => ({
     clientSession: window.LAYAN_SUPABASE.getSession(),
-    storedSession: sessionStorage.getItem("layanSupabaseSession"),
-    sessionKeys: Object.keys(sessionStorage)
+    storedSession: localStorage.getItem("layanSupabaseSession"),
+    sessionKeys: Object.keys(localStorage)
   }));
   expect(sessionSnapshot.clientSession?.access_token, JSON.stringify(sessionSnapshot)).toBe("fixture-signup-access-token");
   expect(sessionSnapshot.clientSession.user.email_confirmed_at).toBeTruthy();
@@ -218,8 +218,8 @@ test("legacy implicit email-confirmation callbacks remain supported", async ({ p
   expect(callbackRequests.some(request => request.method === "GET")).toBe(true);
   const sessionSnapshot = await page.evaluate(() => ({
     clientSession: window.LAYAN_SUPABASE.getSession(),
-    storedSession: sessionStorage.getItem("layanSupabaseSession"),
-    sessionKeys: Object.keys(sessionStorage)
+    storedSession: localStorage.getItem("layanSupabaseSession"),
+    sessionKeys: Object.keys(localStorage)
   }));
   expect(sessionSnapshot.clientSession?.access_token, JSON.stringify(sessionSnapshot)).toBe("legacy-confirmation-access");
   expect(sessionSnapshot.clientSession.refresh_token).toBe("legacy-refresh-token");
