@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#2B211B">
+<title>طلبات إدارة مشروعات الشركات | أسيوط عقار</title>
+<link rel="stylesheet" href="./assets/build/base.min.css?v=fe45b2b02eaa0f7d">
+<link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{background:#faf7f3;color:#372b23;font-family:"Readex Pro",sans-serif}
+.cpr-wrap{width:min(1120px,calc(100% - 24px));margin:22px auto 60px}
+.cpr-head{background:#342922;color:#fff;border-radius:18px;padding:22px;margin-bottom:18px}
+.cpr-head h1{font-size:24px;margin:0 0 8px}.cpr-head p{color:#f4e9dc;line-height:1.9;font-size:13px;margin:0}
+.cpr-head-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.cpr-head-actions a{color:#fff;border:1px solid #d9c7b4;border-radius:24px;padding:8px 13px;text-decoration:none;font-size:12px}
+.cpr-panel{background:#fff;border:1px solid #efe5da;border-radius:15px;padding:18px;margin:14px 0}
+.cpr-login{max-width:480px;display:grid;gap:12px}
+.cpr-login label,.cpr-card label{display:grid;gap:6px;font-size:12px;font-weight:700;color:#746254}
+.cpr-login input,.cpr-card textarea,.cpr-filter select{border:1px solid #e6dbcf;border-radius:9px;padding:11px;font:inherit;width:100%;background:#fff;color:#372b23;min-width:0}
+.cpr-login button{min-height:46px}
+.cpr-status{min-height:40px;padding:10px 12px;border-radius:9px;background:#f8f2eb;color:#746254;font-size:12px;line-height:1.8;margin-top:12px}
+.cpr-toolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.cpr-filter{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}
+.cpr-filter select{width:auto;min-width:180px}
+.cpr-list{display:grid;gap:12px;margin-top:14px}
+.cpr-card{border:1px solid #eee3d7;border-radius:13px;padding:16px;background:#fff;display:grid;gap:10px;min-width:0}
+.cpr-card h2{font-size:17px;margin:0;color:#342922}.cpr-card p{margin:0;color:#756456;font-size:12px;line-height:1.8;overflow-wrap:anywhere}
+.cpr-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.cpr-badge{border-radius:20px;padding:5px 10px;background:#f7efe5;color:#765133;font-size:11px;font-weight:700}
+.cpr-badge.approved{background:#e8f4eb;color:#28613f}.cpr-badge.rejected{background:#faecea;color:#8a332c}
+.cpr-badge.needs_changes{background:#fff3dc;color:#805321}
+.cpr-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background:#fcfaf7;border-radius:10px;padding:11px}
+.cpr-details div{font-size:11px;color:#887669;overflow-wrap:anywhere}.cpr-details strong{display:block;color:#493a2f;margin-top:3px;font-size:12px}
+.cpr-evidence a{color:#8b542f;overflow-wrap:anywhere}
+.cpr-card textarea{min-height:72px;resize:vertical}
+.cpr-actions{display:flex;gap:8px;flex-wrap:wrap}
+.cpr-actions button{flex:1;min-width:130px}
+.cpr-empty{padding:24px;text-align:center;color:#88786c;background:#fcfaf8;border:1px dashed #e9ded2;border-radius:10px}
+[hidden]{display:none!important}
+@media(max-width:600px){.cpr-wrap{width:calc(100% - 16px)}.cpr-panel{padding:13px}.cpr-head{padding:17px}.cpr-details{grid-template-columns:1fr}.cpr-filter{width:100%;align-items:stretch;flex-direction:column}.cpr-filter select{width:100%}.cpr-actions{display:grid;grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="cpr-wrap">
+<header class="cpr-head">
+<h1>طلبات إدارة مشروعات الشركات</h1>
+<p>راجع طلبات مالكي ملفات الشركات والمديرين المفوضين. اعتماد الطلب لا يعني نشر المشروع تلقائيًا؛ المشروع الجديد يُنشأ كسجل داخلي يحتاج إلى مراجعة المصادر والاعتماد من مركز إدارة الدليل.</p>
+<div class="cpr-head-actions">
+<a href="./directory-admin.html">العودة إلى مركز إدارة الدليل</a>
+<a href="./company-dashboard.html">معاينة مساحة الشركة</a>
+</div>
+</header>
+
+<section id="cprLoginPanel" class="cpr-panel">
+<h2>دخول مسؤول الإدارة</h2>
+<p>تسجيل الدخول وحده لا يمنح صلاحية المراجعة؛ يجب أن يكون الحساب معتمدًا كمسؤول في أسيوط عقار.</p>
+<form id="cprLoginForm" class="cpr-login">
+<label>البريد الإلكتروني<input id="cprEmail" type="email" autocomplete="username" required></label>
+<label>كلمة المرور<input id="cprPassword" type="password" autocomplete="current-password" required></label>
+<button class="btn btn-gold" type="submit">تسجيل الدخول والتحقق من الصلاحية</button>
+</form>
+</section>
+
+<section id="cprAdminPanel" hidden>
+<div class="cpr-panel">
+<div class="cpr-toolbar">
+<div><strong>مراجعة الطلبات</strong><p id="cprCount">جارٍ التحميل...</p></div>
+<label class="cpr-filter">عرض الحالة
+<select id="cprStatusFilter">
+<option value="">كل الطلبات</option>
+<option value="pending">قيد المراجعة</option>
+<option value="needs_changes">مطلوب استكمال</option>
+<option value="approved">تم الاعتماد</option>
+<option value="rejected">مرفوض</option>
+</select>
+</label>
+<button id="cprRefresh" class="btn btn-outline-dark" type="button">تحديث القائمة</button>
+<button id="cprLogout" class="btn btn-outline-dark" type="button">تسجيل الخروج</button>
+</div>
+<div id="cprRequestsList" class="cpr-list" aria-live="polite"></div>
+</div>
+</section>
+<p id="cprStatus" class="cpr-status" role="status" aria-live="polite"></p>
+</main>
+<script src="./config.js?v=20261105-7"></script>
+<script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script>
+<script src="./company-project-requests-admin.js?v=20261118-phase3-1" defer></script>
+<footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved</div></footer>
+</body>
+</html>
