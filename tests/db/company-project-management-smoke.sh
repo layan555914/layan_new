@@ -193,7 +193,7 @@ if [[ "$editor_status" -eq 0 ]]; then
   echo "FAIL: an editor was allowed to submit a project request." >&2
   exit 1
 fi
-if ! grep -Eqi 'owner|manager|permission denied|42501' /tmp/company-project-editor-denied.log; then
+if ! grep -Eqi 'المالك|مدير الملف المفوض|permission denied|insufficient privilege|42501' /tmp/company-project-editor-denied.log; then
   cat /tmp/company-project-editor-denied.log >&2
   echo "FAIL: editor denial failed for an unexpected reason." >&2
   exit 1
