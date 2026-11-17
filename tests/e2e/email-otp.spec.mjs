@@ -112,27 +112,16 @@ test("services marketplace login uses the same email OTP and notification prefer
   expect(state.syncRequests).toEqual([{ action: "set_subscription", enabled: true }]);
 });
 
-test("legacy password sign-in remains available as a recovery path for existing accounts", async ({ page }) => {
-  const state = await installAuthMocks(page);
-  await page.route(SUPABASE + "/auth/v1/token?grant_type=password", async route => {
-    await reply(route, {
-      access_token: "legacy-access-token",
-      refresh_token: "legacy-refresh-token",
-      token_type: "bearer",
-      expires_in: 3600,
-      user: {
-        id: USER_ID,
-        email: "legacy@example.invalid",
-        email_confirmed_at: "2026-11-16T10:00:00.000Z",
-        user_metadata: {}
-      }
-    });
-  });
+test("all public account access is email OTP only with no password or recovery controls", async ({ page }) => {
+  await installAuthMocks(page);
   await page.goto("/");
   await page.locator("#loginBtn").click();
-  await page.locator("#authEmail").fill("legacy@example.invalid");
-  await page.locator("#authPassword").fill("Legacy-Password-123!");
-  await page.locator("#authSubmit").click();
-  await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
-  expect(state.otpRequests).toHaveLength(0);
+  await expect(page.locator("#authEmail")).toBeVisible();
+  await expect(page.locator("#authPassword")).toHaveCount(0);
+  await expect(page.locator("#forgotPasswordBtn")).toHaveCount(0);
+  await expect(page.locator("#authSubmit")).toHaveText("إرسال كود الدخول");
+  await page.goto("/marketplace.html");
+  await page.locator("#authOpen").click();
+  await expect(page.locator('#authForm input[name="password"]')).toHaveCount(0);
+  await expect(page.locator("#forgotPassword")).toHaveCount(0);
 });
