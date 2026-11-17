@@ -6,7 +6,7 @@ const PRODUCTION_ORIGINS = new Set([
   "https://www.asyutq.com"
 ]);
 // Only this project's own Vercel preview deployments use the isolated TEST Supabase project.
-const PREVIEW_ORIGIN_PATTERN = /^https:\/\/layan-[a-z0-9-]+-mostafa-6511\.vercel\.app$/i;
+const PREVIEW_ORIGIN_PATTERN = /^https:\/\/(?:layannew-git-[a-z0-9-]+|layan-[a-z0-9-]+)-mostafa-6511\.vercel\.app$/i;
 
 function isAllowedOrigin(origin: string | null): origin is string {
   return Boolean(origin && (
@@ -23,7 +23,11 @@ const SUPPORTED_RECORD_TYPES = new Set([
   "marketplace_listing",
   "company_profile",
   "company_ad",
-  "supplier_ad"
+  "supplier_ad",
+  "directory_entity",
+  "directory_entity_update",
+  "directory_project",
+  "directory_opportunity"
 ]);
 
 type Announcement = {
@@ -144,6 +148,21 @@ async function sendWelcome(admin: any, userId: string, email: string, token: str
   return Boolean(id);
 }
 
+async function loadPublishedDirectoryEntity(admin: any, id: string, siteUrl: string): Promise<Announcement | null> {
+  const { data, error } = await admin.from("directory_entities")
+    .select("id,name_ar,name_en,entity_type,service_category,description,public_address,public_visible,verification_status")
+    .eq("id", id).eq("public_visible", true).eq("verification_status", "published").maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    title: String(data.name_ar || data.name_en || "جهة جديدة في دليل أسيوط العقاري"),
+    category: "جهة جديدة في دليل أسيوط العقاري · " + String(data.service_category || data.entity_type || "دليل الشركات والخدمات"),
+    description: String(data.description || "").slice(0, 500),
+    location: String(data.public_address || "أسيوط"),
+    href: siteUrl + "/company.html?entity_id=" + encodeURIComponent(String(data.id))
+  };
+}
+
 async function loadAnnouncement(admin: any, type: string, id: string, siteUrl: string): Promise<Announcement | null> {
   if (type === "property_offer") {
     const { data, error } = await admin.from("property_offers")
@@ -200,6 +219,45 @@ async function loadAnnouncement(admin: any, type: string, id: string, siteUrl: s
       description: "تم اعتماد إعلان الشركة وتفعيله على منصة أسيوط عقار.",
       location: "أسيوط",
       href: siteUrl + "/companies.html"
+    };
+  }
+  if (type === "directory_entity") {
+    return loadPublishedDirectoryEntity(admin, id, siteUrl);
+  }
+  if (type === "directory_entity_update") {
+    const { data: update, error: updateError } = await admin.from("company_entity_profile_update_requests")
+      .select("id,directory_entity_id,status")
+      .eq("id", id).eq("status", "approved").maybeSingle();
+    if (updateError) throw updateError;
+    if (!update) return null;
+    return loadPublishedDirectoryEntity(admin, String(update.directory_entity_id), siteUrl);
+  }
+  if (type === "directory_project") {
+    const { data, error } = await admin.from("directory_projects")
+      .select("id,name_ar,name_en,project_type,description,location_text,project_status,public_visible,verification_status")
+      .eq("id", id).eq("public_visible", true).eq("verification_status", "published").maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return {
+      title: String(data.name_ar || data.name_en || "مشروع عقاري جديد"),
+      category: "مشروع جديد في دليل أسيوط العقاري · " + String(data.project_type || "مشروعات عقارية"),
+      description: [data.description, data.project_status ? "الحالة: " + data.project_status : ""].filter(Boolean).join(" · ").slice(0, 500),
+      location: String(data.location_text || "أسيوط"),
+      href: siteUrl + "/project.html?id=" + encodeURIComponent(String(data.id))
+    };
+  }
+  if (type === "directory_opportunity") {
+    const { data, error } = await admin.from("directory_opportunities")
+      .select("id,name_ar,city,activity,size_description,terms_as_published,announcement_date,opportunity_type,public_visible,verification_status")
+      .eq("id", id).eq("public_visible", true).eq("verification_status", "published").maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return {
+      title: String(data.name_ar || "فرصة جديدة"),
+      category: "فرصة جديدة في دليل أسيوط العقاري · " + String(data.opportunity_type || "فرص استثمارية"),
+      description: [data.activity, data.size_description, data.terms_as_published].filter(Boolean).join(" · ").slice(0, 500),
+      location: String(data.city || "أسيوط"),
+      href: siteUrl + "/directory.html?view=opportunities"
     };
   }
   if (type === "supplier_ad") {
