@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "dateModified":row.updated_at || undefined,
       "image":images.length ? images : undefined,
       "address":{"@type":"PostalAddress","addressLocality":row.city || "أسيوط","addressRegion":row.governorate || "أسيوط","addressCountry":"EG"},
-      "offers":Number.isFinite(Number(row.total_price)) ? {"@type":"Offer","price":Number(row.total_price),"priceCurrency":"EGP","availability":"https://schema.org/InStock"} : undefined
+      "offers":row.price_on_request !== true && Number.isFinite(Number(row.total_price)) && Number(row.total_price) > 0 ? {"@type":"Offer","price":Number(row.total_price),"priceCurrency":"EGP","availability":"https://schema.org/InStock"} : undefined
     });
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); }
