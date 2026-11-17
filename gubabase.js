@@ -71,16 +71,62 @@
     const result = await createPkceChallenge(RECOVERY_PKCE_STORAGE_KEY, "استعادة كلمة المرور", false);
     return result.codeChallenge;
   }
-  let session = null;
-  try { session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null"); } catch (_) {}
-  if (session?.expires_at && session.expires_at * 1000 < Date.now()) session = null;
+  function clearStoredSession() {
+    try { localStorage.removeItem(SESSION_KEY); } catch (_) {}
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
+  }
+
+  function readStoredSession() {
+    let stored = null;
+    let fromLegacyTabStorage = false;
+    try {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (raw) stored = JSON.parse(raw);
+    } catch (_) {}
+    // Migrate sessions created by older versions, which kept them only for the current tab.
+    if (!stored) {
+      try {
+        const raw = sessionStorage.getItem(SESSION_KEY);
+        if (raw) {
+          stored = JSON.parse(raw);
+          fromLegacyTabStorage = true;
+        }
+      } catch (_) {}
+    }
+    if (!stored || typeof stored !== "object" || !stored.access_token || !stored.user?.id) {
+      clearStoredSession();
+      return null;
+    }
+    const expiresAt = Number(stored.expires_at || 0);
+    // Keep an expired access token when its refresh token is available; ensureFreshSession()
+    // can renew it on the first authenticated request after the app is reopened.
+    if (expiresAt && expiresAt * 1000 <= Date.now() && !stored.refresh_token) {
+      clearStoredSession();
+      return null;
+    }
+    if (fromLegacyTabStorage) {
+      try { localStorage.setItem(SESSION_KEY, JSON.stringify(stored)); } catch (_) {}
+    }
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
+    return stored;
+  }
+
+  let session = readStoredSession();
 
   function saveSession(next) {
     session = next || null;
+    if (!session) {
+      clearStoredSession();
+      return;
+    }
+    const serialized = JSON.stringify(session);
     try {
-      if (session) sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-      else sessionStorage.removeItem(SESSION_KEY);
-    } catch (_) {}
+      localStorage.setItem(SESSION_KEY, serialized);
+      try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
+    } catch (_) {
+      // Preserve the current login if persistent storage is unavailable in this browser.
+      try { sessionStorage.setItem(SESSION_KEY, serialized); } catch (_) {}
+    }
   }
   function authHeaders() {
     return { apikey: key, Authorization: "Bearer " + (session?.access_token || key) };
@@ -435,7 +481,7 @@
         throw new Error("تعذر التحقق من الحساب. سجّل الدخول مرة أخرى.");
       }
       session = { ...session, user };
-      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch (_) {}
+      saveSession(session);
       return session;
     } catch (error) {
       if (/401|403|invalid|expired|JWT/i.test(String(error.message || error))) saveSession(null);

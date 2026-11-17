@@ -13,6 +13,11 @@ const template = read("supabase/email-templates/magic-link.html");
 const unsubscribe = read("email-unsubscribe.html");
 const config = read("supabase/config.toml");
 
+assert.match(client, /function readStoredSession\(/, "Auth must restore the saved browser session on app startup");
+assert.match(client, /localStorage\.getItem\(SESSION_KEY\)/, "Auth sessions must be restored from persistent browser storage");
+assert.match(client, /localStorage\.setItem\(SESSION_KEY, serialized\)/, "successful OTP and refreshed sessions must be persisted");
+assert.match(client, /fromLegacyTabStorage/, "existing tab-only sessions must migrate to persistent storage");
+assert.match(client, /saveSession\(session\)/, "verified user refreshes must use the shared persistent session writer");
 assert.match(client, /async function requestEmailOtp\(/, "shared Auth client must request email OTPs");
 assert.match(client, /create_user: options\.shouldCreateUser === true/, "normal sign-in must not create a new user by default");
 assert.match(client, /async function verifyEmailOtp\(/, "shared Auth client must verify six-digit email OTPs");

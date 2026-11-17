@@ -68,6 +68,59 @@ test("main public login requests and verifies an email OTP without creating a us
   expect(state.syncRequests).toEqual([{ action: "sync_subscription" }]);
 });
 
+test("email OTP session persists when the app is reopened in a fresh page", async ({ page }) => {
+  const state = await installAuthMocks(page);
+  await page.goto("/");
+  await page.locator("#loginBtn").click();
+  await page.locator("#authEmail").fill("existing@example.invalid");
+  await page.locator("#authSubmit").click();
+  await page.locator("#authOtpCode").fill("123456");
+  await page.locator("#authVerifyOtpBtn").click();
+  await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
+
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("layanSupabaseSession") || "null"));
+  expect(saved).toMatchObject({
+    access_token: "otp-test-access-token",
+    refresh_token: "otp-test-refresh-token",
+    user: { id: USER_ID, email: "existing@example.invalid" }
+  });
+
+  // A second page has its own sessionStorage but shares the same persistent localStorage.
+  const reopened = await page.context().newPage();
+  await reopened.route(SUPABASE + "/rest/v1/**", route => reply(route, []));
+  await reopened.goto("http://127.0.0.1:4173/");
+  await reopened.waitForFunction(() => window.LAYAN_SUPABASE?.isAuthenticated());
+  expect(await reopened.evaluate(() => window.LAYAN_SUPABASE.getUser()?.email)).toBe("existing@example.invalid");
+  expect(state.otpRequests).toHaveLength(1);
+  await reopened.close();
+});
+
+test("a legacy tab-only session is migrated to persistent storage", async ({ page }) => {
+  await installAuthMocks(page);
+  await page.goto("/");
+  const legacy = {
+    access_token: "legacy-access-token",
+    refresh_token: "legacy-refresh-token",
+    token_type: "bearer",
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
+    user: { id: USER_ID, email: "legacy@example.invalid" }
+  };
+  await page.evaluate(session => {
+    localStorage.removeItem("layanSupabaseSession");
+    sessionStorage.setItem("layanSupabaseSession", JSON.stringify(session));
+  }, legacy);
+  await page.reload();
+
+  const restored = await page.evaluate(() => ({
+    session: JSON.parse(localStorage.getItem("layanSupabaseSession") || "null"),
+    legacy: sessionStorage.getItem("layanSupabaseSession"),
+    authenticated: window.LAYAN_SUPABASE.isAuthenticated()
+  }));
+  expect(restored.session).toMatchObject(legacy);
+  expect(restored.legacy).toBeNull();
+  expect(restored.authenticated).toBe(true);
+});
+
 test("new accounts use email + OTP only; optional profile completion is separate", async ({ page }) => {
   const state = await installAuthMocks(page);
   await page.goto("/");
