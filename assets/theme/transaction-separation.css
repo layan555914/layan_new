@@ -1,0 +1,10 @@
+/* Transaction-specific controls: keep the existing site palette and only clarify the structure. */
+.deal-type-tabs{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 14px}
+.deal-type-tabs button{min-height:42px;padding:8px 18px;border:1px solid var(--border);border-radius:999px;background:var(--white,#fff);color:var(--navy);font:inherit;font-weight:700;cursor:pointer;transition:background-color .16s ease,border-color .16s ease,color .16s ease}
+.deal-type-tabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:var(--white,#fff)}
+.transaction-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0;padding:16px;border:1px solid var(--border);border-radius:13px;min-width:0}
+.transaction-fields legend{padding:0 8px;font-weight:800;color:var(--navy)}
+.transaction-fields label{min-width:0}
+.transaction-fields[hidden]{display:none}
+.price-request-choice [data-price-request-label]{display:inline}
+@media(max-width:600px){.deal-type-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.deal-type-tabs button{padding-inline:9px}.transaction-fields{grid-template-columns:minmax(0,1fr);padding:12px}}

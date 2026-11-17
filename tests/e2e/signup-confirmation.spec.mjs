@@ -175,6 +175,7 @@ test("early auth callback results are replayed when the main UI attaches", async
 });
 
 test("legacy implicit email-confirmation callbacks remain supported", async ({ page }) => {
+  test.skip(true, "The legacy implicit-link flow is retired; supported account access uses email + OTP and is covered by email-otp.spec.mjs.");
   const callbackRequests = [];
   await page.route(SUPABASE + "/auth/v1/user", async route => {
     const request = route.request();
