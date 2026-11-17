@@ -183,6 +183,8 @@ test("dashboard displays only current account profiles, published project links 
 test("verified profile owners can invite a team member through existing RPC controls", async ({ page }) => {
   await installDashboardMocks(page);
   await page.goto("/company-dashboard.html");
+  // The dashboard has its own section navigation; do not mount the global fixed bottom app bar.
+  await expect(page.locator(".mobile-nav")).toHaveCount(0);
 
   const forms = page.locator(".cd-team-form");
   await expect(forms).toHaveCount(2);
