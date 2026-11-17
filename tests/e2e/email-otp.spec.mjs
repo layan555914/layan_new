@@ -35,9 +35,19 @@ async function installAuthMocks(page) {
     });
   });
   await page.route(SUPABASE + "/auth/v1/user", async route => {
-    const body = route.request().postDataJSON();
-    state.profileUpdates.push({ method: route.request().method(), body });
-    await reply(route, { id: USER_ID, email: "signup@example.invalid", user_metadata: body.data || {} });
+    const body = route.request().postDataJSON() || {};
+    const method = route.request().method();
+    const authorization = route.request().headers().authorization || "";
+    state.profileUpdates.push({ method, body });
+    const email = authorization.includes("legacy-access-token")
+      ? "legacy@example.invalid"
+      : (state.otpRequests.at(-1)?.email ||
+        (authorization.includes("otp-test-access-token") ? "existing@example.invalid" : "signup@example.invalid"));
+    const currentUser = { id: USER_ID, email, user_metadata: {} };
+    await reply(route, {
+      ...currentUser,
+      user_metadata: { ...(currentUser.user_metadata || {}), ...(body.data || {}) }
+    });
   });
   await page.route(SUPABASE + "/functions/v1/email-notifications", async route => {
     const body = route.request().postDataJSON();
@@ -66,6 +76,61 @@ test("main public login requests and verifies an email OTP without creating a us
   expect(state.verifyRequests).toBe(1);
   await expect.poll(() => state.syncRequests.length).toBe(1);
   expect(state.syncRequests).toEqual([{ action: "sync_subscription" }]);
+});
+
+test("email OTP session persists when the app is reopened in a fresh browser context", async ({ page, browser }) => {
+  const state = await installAuthMocks(page);
+  await page.goto("/");
+  await page.locator("#loginBtn").click();
+  await page.locator("#authEmail").fill("existing@example.invalid");
+  await page.locator("#authSubmit").click();
+  await page.locator("#authOtpCode").fill("123456");
+  await page.locator("#authVerifyOtpBtn").click();
+  await page.waitForFunction(() => window.LAYAN_SUPABASE.isAuthenticated());
+
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("layanSupabaseSession") || "null"));
+  expect(saved).toMatchObject({
+    access_token: "otp-test-access-token",
+    refresh_token: "otp-test-refresh-token",
+    user: { id: USER_ID, email: "existing@example.invalid" }
+  });
+
+  // Playwright storageState carries localStorage but deliberately excludes sessionStorage.
+  // A clean browser context therefore models closing and reopening the installed app.
+  const reopenedContext = await browser.newContext({ storageState: await page.context().storageState() });
+  const reopened = await reopenedContext.newPage();
+  await installAuthMocks(reopened);
+  await reopened.goto("/");
+  await reopened.waitForFunction(() => window.LAYAN_SUPABASE?.isAuthenticated());
+  expect(await reopened.evaluate(() => window.LAYAN_SUPABASE.getUser()?.email)).toBe("existing@example.invalid");
+  expect(state.otpRequests).toHaveLength(1);
+  await reopenedContext.close();
+});
+
+test("a legacy tab-only session is migrated to persistent storage", async ({ page }) => {
+  await installAuthMocks(page);
+  await page.goto("/");
+  const legacy = {
+    access_token: "legacy-access-token",
+    refresh_token: "legacy-refresh-token",
+    token_type: "bearer",
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
+    user: { id: USER_ID, email: "legacy@example.invalid" }
+  };
+  await page.evaluate(session => {
+    localStorage.removeItem("layanSupabaseSession");
+    sessionStorage.setItem("layanSupabaseSession", JSON.stringify(session));
+  }, legacy);
+  await page.reload();
+
+  const restored = await page.evaluate(() => ({
+    session: JSON.parse(localStorage.getItem("layanSupabaseSession") || "null"),
+    legacy: sessionStorage.getItem("layanSupabaseSession"),
+    authenticated: window.LAYAN_SUPABASE.isAuthenticated()
+  }));
+  expect(restored.session).toMatchObject(legacy);
+  expect(restored.legacy).toBeNull();
+  expect(restored.authenticated).toBe(true);
 });
 
 test("new accounts use email + OTP only; optional profile completion is separate", async ({ page }) => {

@@ -131,14 +131,26 @@
     window.__asyutAccountProfilePromise = (async () => {
       const prefix = rootPrefix();
       if (!window.LAYAN_CONFIG) await loadAccountScript(prefix + "config.js", () => Boolean(window.LAYAN_CONFIG));
-      if (!window.LAYAN_SUPABASE) await loadAccountScript(prefix + "gubabase.js?v=20261117-email-otp-unified-3", () => Boolean(window.LAYAN_SUPABASE));
+      if (!window.LAYAN_SUPABASE) await loadAccountScript(prefix + "gubabase.js?v=20261117-persistent-auth-session-1", () => Boolean(window.LAYAN_SUPABASE));
       if (!window.__asyutAccountProfile) await loadAccountScript(prefix + "account-profile.js?v=20261117-email-otp-unified-3", () => Boolean(window.__asyutAccountProfile));
     })().catch(error => console.warn("Account profile reminder unavailable:", error));
     return window.__asyutAccountProfilePromise;
   }
+  function readStoredAuthSession() {
+    for (const storage of [window.localStorage, window.sessionStorage]) {
+      try {
+        const stored = JSON.parse(storage.getItem("layanSupabaseSession") || "null");
+        if (stored?.access_token) return stored;
+      } catch (_) {}
+    }
+    return null;
+  }
   function authSession() {
-    try { return window.LAYAN_SUPABASE?.getSession?.() || JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null"); }
-    catch (_) { return null; }
+    try {
+      const current = window.LAYAN_SUPABASE?.getSession?.();
+      if (current?.access_token) return current;
+    } catch (_) {}
+    return readStoredAuthSession();
   }
   function mountAuthEntry() {
     let header = document.querySelector("header.topbar");
@@ -188,10 +200,8 @@
 
   // «إعلاناتي» beside the top menu for signed-in users (index.html has its own button).
   function signedIn() {
-    try {
-      const s = JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null");
-      return Boolean(s && s.access_token && (!s.expires_at || s.expires_at * 1000 > Date.now() - 7 * 24 * 3600 * 1000));
-    } catch (_) { return false; }
+    const s = authSession();
+    return Boolean(s?.access_token && (!s.expires_at || s.expires_at * 1000 > Date.now() - 7 * 24 * 3600 * 1000));
   }
   function mountMyListings() {
     const nav = document.querySelector(".topbar nav, header nav");

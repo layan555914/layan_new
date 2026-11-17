@@ -128,7 +128,9 @@
   const key = cfg.SUPABASE_PUBLISHABLE_KEY || "";
   function readSession() {
     try { const s = window.LAYAN_SUPABASE?.getSession?.(); if (s?.access_token) return s; } catch (_) {}
-    try { const s = JSON.parse(sessionStorage.getItem("layanSupabaseSession") || "null"); if (s?.access_token) return s; } catch (_) {}
+    for (const storage of [window.localStorage, window.sessionStorage]) {
+      try { const s = JSON.parse(storage.getItem("layanSupabaseSession") || "null"); if (s?.access_token) return s; } catch (_) {}
+    }
     return null;
   }
   let checking = null;
