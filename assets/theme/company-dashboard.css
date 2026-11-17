@@ -618,3 +618,28 @@ body.company-dashboard-page :is(p,small){color:var(--cd-muted)}
     box-sizing:border-box;
   }
 }
+
+/* Phase 3: company project requests */
+.cd-project-management{display:grid;gap:12px;margin-top:16px}
+.cd-project-management-card{margin-top:0}
+.cd-project-request-form{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.cd-project-request-form .cd-project-field-wide{grid-column:1/-1}
+.cd-project-request-form textarea{width:100%;min-height:82px;padding:9px 10px;border:1px solid var(--cd-line);border-radius:9px;background:#fff;color:var(--cd-ink);font:inherit;font-size:11px;resize:vertical}
+.cd-project-request-form .cd-live-action{grid-column:1/-1;width:100%}
+.cd-project-requests{margin-top:18px}
+.cd-project-requests .cd-section-heading h3{margin:5px 0 0;font-family:"Alexandria",sans-serif;font-size:16px;line-height:1.7}
+#cdProjectRequestsList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#cdProjectRequestsList .cd-request-card{display:grid;gap:8px;align-content:start;padding:13px;border:1px solid var(--cd-line);border-radius:12px;background:#fff}
+#cdProjectRequestsList .cd-request-card h4{margin:0;font-size:12px;line-height:1.7}
+#cdProjectRequestsList .cd-request-card p{margin:0;color:var(--cd-muted);font-size:10px;line-height:1.8;overflow-wrap:anywhere}
+.cd-live-status{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:9px;font-weight:800;white-space:nowrap}
+.cd-live-status--success{background:#e8f4eb;color:#28613f}
+.cd-live-status--danger{background:#faecea;color:#8a332c}
+.cd-live-status--warning{background:#fff3dc;color:#805321}
+.cd-live-status--neutral{background:#f3eee8;color:#705b49}
+@media(max-width:760px){
+ .cd-project-request-form{grid-template-columns:1fr}
+ .cd-project-request-form .cd-project-field-wide{grid-column:auto}
+ #cdProjectRequestsList{grid-template-columns:1fr}
+}
+
