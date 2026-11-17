@@ -91,11 +91,7 @@ test("email confirmation PKCE code creates a session and completes the signup ca
   }));
 
   await page.goto("/?code=single-use-signup-fixture-code");
-  await page.waitForFunction(() =>
-    window.LAYAN_AUTH_CALLBACK_RESULT?.success === true &&
-    window.LAYAN_AUTH_CALLBACK_RESULT?.type === "legacy" &&
-    window.LAYAN_SUPABASE?.getSession?.()?.access_token === "legacy-confirmation-access"
-  );
+  await page.waitForFunction(() => window.LAYAN_AUTH_CALLBACK_RESULT?.success === true);
 
   expect(exchangeBody).toEqual({
     auth_code: "single-use-signup-fixture-code",
@@ -192,7 +188,11 @@ test("legacy implicit email-confirmation callbacks remain supported", async ({ p
   });
 
   await page.goto("/#access_token=legacy-confirmation-access&refresh_token=legacy-refresh-token&token_type=bearer");
-  await page.waitForFunction(() => window.LAYAN_AUTH_CALLBACK_RESULT?.success === true);
+  await page.waitForFunction(() =>
+    window.LAYAN_AUTH_CALLBACK_RESULT?.success === true &&
+    window.LAYAN_AUTH_CALLBACK_RESULT?.type === "legacy" &&
+    window.LAYAN_SUPABASE?.getSession?.()?.access_token === "legacy-confirmation-access"
+  );
   await expect(page).toHaveURL(/\/$/);
   const sessionSnapshot = await page.evaluate(() => ({
     clientSession: window.LAYAN_SUPABASE.getSession(),
