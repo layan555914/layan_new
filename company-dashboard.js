@@ -387,6 +387,53 @@ document.addEventListener("DOMContentLoaded", async () => {
     return 0;
   }
 
+  function renderRequests(rows) {
+    const target = $("cdRequestsList");
+    if (!target) return;
+    target.replaceChildren();
+    const list = Array.isArray(rows) ? rows : [];
+    if (!list.length) {
+      renderEmpty(
+        target,
+        "لا توجد طلبات استلام أو تحديث مسجلة على حسابك",
+        "عند إرسال طلب استلام ملف شركة أو تحديث بيانات ملف دليل، ستظهر حالته هنا مع ملاحظات الإدارة."
+      );
+      return;
+    }
+    list.forEach(row => {
+      const item = el("article", undefined, "cd-request-card");
+      const heading = el("div", undefined, "cd-request-heading");
+      const title = row.kind === "claim" ? "طلب استلام ملف شركة" : "طلب تحديث بيانات ملف شركة";
+      heading.append(el("strong", title));
+      const kind = row.status === "approved" ? "success"
+        : row.status === "rejected" ? "danger"
+        : row.status === "needs_changes" ? "warning" : "neutral";
+      const statusLabels = {
+        pending: "قيد مراجعة الإدارة",
+        approved: "تم الاعتماد",
+        needs_changes: "مطلوب استكمال",
+        rejected: "لم تتم الموافقة"
+      };
+      heading.append(statusPill(statusLabels[row.status] || "الحالة غير محددة", kind));
+      item.append(heading);
+      if (row.created_at) {
+        const date = new Date(row.created_at);
+        if (!Number.isNaN(date.getTime())) item.append(el("small", "تاريخ الإرسال: " + date.toLocaleDateString("ar-EG")));
+      }
+      if (row.admin_notes) {
+        item.append(el("p", "ملاحظة الإدارة: " + row.admin_notes, "cd-admin-note"));
+      } else if (row.status === "pending") {
+        item.append(el("p", "تم استلام طلبك، وستظهر ملاحظات الإدارة هنا بعد المراجعة.", "cd-request-note"));
+      }
+      if (row.kind === "claim" && row.directory_entity_id) {
+        item.append(link("فتح ملف الشركة", "./company.html?entity_id=" + encodeURIComponent(row.directory_entity_id), "cd-project-link"));
+      } else if (row.kind === "update" && row.directory_entity_id) {
+        item.append(link("فتح ملف الشركة", "./company.html?entity_id=" + encodeURIComponent(row.directory_entity_id), "cd-project-link"));
+      }
+      target.append(item);
+    });
+  }
+
   function renderListings(rows) {
     listingsRoot.replaceChildren();
     const list = Array.isArray(rows) ? rows : [];
@@ -450,7 +497,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-    const [entityOwners, entityMemberships, profileMemberships, accountOffers] = await Promise.all([
+    const [entityOwners, entityMemberships, profileMemberships, accountOffers, claimRequests, profileUpdateRequests] = await Promise.all([
       query("company_entity_managers", {
         select: "directory_entity_id,verified_at,representative_role",
         owner_user_id: "eq." + userId,
@@ -471,6 +518,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         owner_id: "eq." + userId,
         order: "created_at.desc",
         limit: "100"
+      }).catch(error => { errors.push(error.message); return []; }),
+      query("company_claim_requests", {
+        select: "id,directory_entity_id,status,admin_notes,created_at",
+        requester_user_id: "eq." + userId,
+        order: "created_at.desc",
+        limit: "50"
+      }).catch(error => { errors.push(error.message); return []; }),
+      query("company_entity_profile_update_requests", {
+        select: "id,directory_entity_id,status,admin_notes,created_at",
+        requester_user_id: "eq." + userId,
+        order: "created_at.desc",
+        limit: "50"
       }).catch(error => { errors.push(error.message); return []; })
     ]);
 
@@ -583,9 +642,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       .flatMap(profile => profile.previousWork || []);
     const projectCount = renderProjects(uniqueProjects, previousWork);
     renderListings(accountOffers);
+    const accountRequests = [
+      ...(Array.isArray(claimRequests) ? claimRequests : []).map(row => ({ ...row, kind: "claim" })),
+      ...(Array.isArray(profileUpdateRequests) ? profileUpdateRequests : []).map(row => ({ ...row, kind: "update" }))
+    ].sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
+    renderRequests(accountRequests);
 
     const accountReviewCount = (Array.isArray(accountOffers) ? accountOffers : []).filter(row => row.status === "pending").length
-      + profiles.filter(profile => profile.status === "pending" || profile.updateStatus === "pending" || profile.status === "needs_changes").length;
+      + profiles.filter(profile => profile.status === "pending" || profile.updateStatus === "pending" || profile.status === "needs_changes").length
+      + accountRequests.filter(row => row.status === "pending" || row.status === "needs_changes").length;
     setStat("profiles", profiles.length);
     setStat("projects", projectCount);
     setStat("listings", Array.isArray(accountOffers) ? accountOffers.length : 0);
