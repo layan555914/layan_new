@@ -80,10 +80,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderProperty(row) {
     const title = String(row.title || "إعلان عقاري على أسيوط عقار");
-    const purpose = String(row.listing_purpose || "بيع");
+    const rawPurpose = String(row.listing_purpose || "").trim();
+    const purpose = ["بيع", "إيجار", "تنازل"].includes(rawPurpose) ? rawPurpose : "غير محدد";
     const isAssignment = purpose === "تنازل";
     const isRent = purpose === "إيجار";
-    const displayedPriceLabel = isRent ? "الإيجار الشهري المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : "سعر البيع المعلن";
+    const displayedPriceLabel = isRent ? "الإيجار الشهري المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : purpose === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
     const imagesRaw = Array.isArray(row.image_urls) ? row.image_urls : [];
     const images = imagesRaw.map(safeURL).filter(Boolean).slice(0, 20);
     const phone = String(row.contact_phone || "");
