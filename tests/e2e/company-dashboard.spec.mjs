@@ -190,13 +190,19 @@ test("verified profile owners can invite a team member through existing RPC cont
   const companyForm = forms.nth(0);
   await companyForm.locator('input[name="email"]').fill("new.editor@company.test");
   await companyForm.locator('select[name="role"]').selectOption("editor");
-  await companyForm.locator('button[type="submit"]').click();
+  const companySubmit = companyForm.locator('button[type="submit"]');
+  await companySubmit.scrollIntoViewIfNeeded();
+  await expect(companySubmit).toBeVisible();
+  await companySubmit.click({ timeout: 12000 });
   await expect(page.locator("#cdCompanyProfiles")).toContainText("new.editor@company.test");
 
   const entityForm = page.locator(".cd-team-form").nth(1);
   await entityForm.locator('input[name="email"]').fill("new.manager@agency.test");
   await entityForm.locator('select[name="role"]').selectOption("manager");
-  await entityForm.locator('button[type="submit"]').click();
+  const entitySubmit = entityForm.locator('button[type="submit"]');
+  await entitySubmit.scrollIntoViewIfNeeded();
+  await expect(entitySubmit).toBeVisible();
+  await entitySubmit.click({ timeout: 12000 });
   await expect(page.locator("#cdCompanyProfiles")).toContainText("new.manager@agency.test");
 });
 
