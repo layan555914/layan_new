@@ -425,3 +425,101 @@ body.page-marketplace .mobile-nav .aa-appnav-add {
     animation-iteration-count: 1;
   }
 }
+
+
+/* Homepage hero alignment: blend its text area into the same warm-light canvas as the sections below. */
+body.page-home main > .hero.design-hero {
+  background: #FAF8F4 !important;
+  border: 0 !important;
+  border-bottom: 1px solid #E9E0D8 !important;
+  box-shadow: inset 0 0 0 1px rgba(233, 224, 216, .65) !important;
+}
+
+body.page-home main > .hero.design-hero::before {
+  width: 66% !important;
+  background-position: 30% 52% !important;
+}
+
+body.page-home main > .hero.design-hero::after {
+  background: linear-gradient(
+    270deg,
+    #FAF8F4 0%,
+    #FAF8F4 32%,
+    rgba(250, 248, 244, .97) 43%,
+    rgba(250, 248, 244, .82) 55%,
+    rgba(250, 248, 244, .30) 72%,
+    rgba(250, 248, 244, 0) 88%
+  ) !important;
+}
+
+body.page-home main > .hero.design-hero .design-hero-content::before {
+  background: #D5A675;
+}
+
+body.page-home main > .hero.design-hero .eyebrow {
+  color: #A6503A !important;
+  border-color: #E8D8CA !important;
+  background: #FFF8F0 !important;
+}
+
+body.page-home main > .hero.design-hero h1 {
+  color: #40372F !important;
+}
+
+body.page-home main > .hero.design-hero h1 span {
+  color: #A6503A !important;
+}
+
+body.page-home main > .hero.design-hero .design-hero-lead {
+  color: #5B4638 !important;
+}
+
+body.page-home main > .hero.design-hero .design-hero-sub {
+  color: #786D63 !important;
+}
+
+body.page-home main > .hero.design-hero .hero-actions .btn-outline,
+body.page-home main > .hero.design-hero .hero-actions #addOfferBtn {
+  color: #A6503A !important;
+  border-color: #D9BBAA !important;
+  background: #FFFFFF !important;
+}
+
+body.page-home main > .hero.design-hero .hero-actions .btn-gold {
+  color: #FFFFFF !important;
+  background: #A6503A !important;
+  border-color: #A6503A !important;
+}
+
+@media (max-width: 760px) {
+  body.page-home main > .hero.design-hero {
+    background: #FAF8F4 !important;
+    box-shadow: none !important;
+  }
+
+  body.page-home main > .hero.design-hero::before {
+    inset: 0 0 auto 0 !important;
+    width: 100% !important;
+    height: 290px !important;
+    background-position: center 43% !important;
+  }
+
+  body.page-home main > .hero.design-hero::after {
+    background: linear-gradient(
+      180deg,
+      rgba(250, 248, 244, 0) 0,
+      rgba(250, 248, 244, .06) 118px,
+      rgba(250, 248, 244, .76) 205px,
+      #FAF8F4 278px,
+      #FAF8F4 100%
+    ) !important;
+  }
+
+  body.page-home main > .hero.design-hero .design-hero-content {
+    padding-top: 200px !important;
+  }
+
+  body.page-home main > .hero.design-hero .design-hero-sub {
+    color: #786D63 !important;
+  }
+}
