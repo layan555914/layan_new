@@ -190,6 +190,8 @@ test("verified profile owners can invite a team member through existing RPC cont
   const companyForm = forms.nth(0);
   await companyForm.locator('input[name="email"]').fill("new.editor@company.test");
   await companyForm.locator('select[name="role"]').selectOption("editor");
+  // The persistent five-item app bar overlays the viewport bottom on phones.
+  // Scroll the submit target into a safe tap area before exercising the real control.
   const companySubmit = companyForm.locator('button[type="submit"]');
   await companySubmit.scrollIntoViewIfNeeded();
   await expect(companySubmit).toBeVisible();
