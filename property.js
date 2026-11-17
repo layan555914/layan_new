@@ -81,6 +81,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderProperty(row) {
     const title = String(row.title || "إعلان عقاري على أسيوط عقار");
     const purpose = String(row.listing_purpose || "بيع");
+    const isAssignment = purpose === "تنازل";
+    const isRent = purpose === "إيجار";
+    const displayedPriceLabel = isRent ? "الإيجار الشهري المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : "سعر البيع المعلن";
     const imagesRaw = Array.isArray(row.image_urls) ? row.image_urls : [];
     const images = imagesRaw.map(safeURL).filter(Boolean).slice(0, 20);
     const phone = String(row.contact_phone || "");
@@ -147,9 +150,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("المساحة", row.area_m2 ? row.area_m2 + " م²" : ""),
       makeFact("غرف النوم", /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(String(row.property_type || "")) ? row.bedrooms : ""),
       makeFact("الحمامات", /أرض|ارض|مشروع/.test(String(row.property_type || "")) ? "" : row.bathrooms),
-      makeFact("إجمالي المدفوع", Number(row.paid_amount) > 0 ? money(row.paid_amount) : ""),
-      makeFact("القسط الشهري", row.monthly_installment ? money(row.monthly_installment) : ""),
-      makeFact("رسوم التنازل", purpose.includes("تنازل") ? (Number(row.assignment_fee) > 0 ? money(row.assignment_fee) : "تحدد من الجهة المختصة") : ""),
+      makeFact("المقدم المطلوب", isAssignment && Number(row.down_payment) > 0 ? money(row.down_payment) : ""),
+      makeFact("إجمالي المدفوع", isAssignment && Number(row.paid_amount) > 0 ? money(row.paid_amount) : ""),
+      makeFact("المبلغ المتبقي", isAssignment && Number(row.remaining_amount) > 0 ? money(row.remaining_amount) : ""),
+      makeFact("القسط الشهري", isAssignment && Number(row.monthly_installment) > 0 ? money(row.monthly_installment) : ""),
+      makeFact("رسوم التنازل", isAssignment && Number(row.assignment_fee) > 0 ? money(row.assignment_fee) : ""),
       makeFact("قيمة الخصم", Number(row.discount_amount) > 0 ? money(row.discount_amount) : ""),
       makeFact("نسبة الخصم", Number(row.discount_percent) > 0 ? Number(row.discount_percent) + "٪" : ""),
       makeFact("جهة الولاية / التخصيص", row.land_ownership_authority),
@@ -194,9 +199,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${listingDates(row)}
           <h1>${escapeHTML(title)}</h1>
           <p class="property-location">⌖ ${escapeHTML(locationText)} ${mapURL ? ' · <a href="' + escapeHTML(mapURL) + '" target="_blank" rel="noopener noreferrer">عرض الموقع</a>' : ""}</p>
-          <div class="property-price-highlight"><span>${purpose.includes("إيجار") ? "قيمة الإيجار المعلنة" : "السعر المعلن"}</span><strong>${money(row.total_price)}</strong></div>
-          ${(Number(row.down_payment) > 0 || Number(row.remaining_amount) > 0) ? `<div class="property-key-figures">
-            ${Number(row.down_payment) > 0 ? `<div class="property-key-figure"><span>المقدم عند التعاقد</span><strong>${money(row.down_payment)}</strong></div>` : ""}
+          <div class="property-price-highlight"><span>${displayedPriceLabel}</span><strong>${row.price_on_request === true ? "السعر عند التواصل" : money(row.total_price) + (isRent ? " / شهر" : "")}</strong></div>
+          ${isAssignment && (Number(row.down_payment) > 0 || Number(row.remaining_amount) > 0) ? `<div class="property-key-figures">
+            ${Number(row.down_payment) > 0 ? `<div class="property-key-figure"><span>المقدم المطلوب</span><strong>${money(row.down_payment)}</strong></div>` : ""}
             ${Number(row.remaining_amount) > 0 ? `<div class="property-key-figure"><span>المبلغ المتبقي</span><strong>${money(row.remaining_amount)}</strong></div>` : ""}
           </div>` : ""}
           ${contactActions}
