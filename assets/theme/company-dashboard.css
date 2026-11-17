@@ -524,14 +524,26 @@ body.company-dashboard-page :is(p,small){color:var(--cd-muted)}
     min-width:0;
     max-width:100%;
   }
-  .cd-company-card--live{width:100%}
-  .cd-company-card--live .cd-company-identity,
-  .cd-company-card--live .cd-company-state{
+  /* Avoid flex-wrap columns inside a vertically stacked company card on phones. */
+  .cd-company-card--live{
+    display:block;
+    width:100%;
+  }
+  .cd-company-card--live .cd-company-identity{
+    display:flex;
     min-width:0;
     width:100%;
     max-width:100%;
+    margin-bottom:12px;
   }
-  .cd-team-panel{flex:0 1 100%;width:100%}
+  .cd-company-card--live .cd-company-state{
+    display:grid;
+    min-width:0;
+    width:100%;
+    max-width:100%;
+    margin-bottom:10px;
+  }
+  .cd-team-panel{display:block;flex:none;width:100%}
   .cd-team-form{width:100%;grid-template-columns:minmax(0,1fr)}
   .cd-team-form label{min-width:0;width:100%}
   .cd-team-form input,
