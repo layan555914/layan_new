@@ -201,3 +201,9 @@ a.os-partner:hover { transform: translateY(-2px); border-color: #C98A64; box-sha
 .sponsor-card.sp-ad .sp-ad-body > * { margin-block: 0; min-height: 0; }
 .sponsor-card.sp-ad .sp-ad-body h3 { -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
 .sponsor-card.sp-ad .sp-ad-actions { margin-top: auto; }
+
+/* Keep every advertiser phone number on its own clearly separated row. */
+.sp-ad-phone-list { display: grid; flex: 1 0 100%; gap: 7px; width: 100%; min-width: 0; }
+.sp-ad-phone-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .65fr); gap: 8px; width: 100%; min-width: 0; }
+.sp-ad-phone-row .sp-ad-btn { min-width: 0; }
+.sp-ad-phone-row bdi { direction: ltr; unicode-bidi: plaintext; }
