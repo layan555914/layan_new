@@ -144,6 +144,7 @@ USING (
 -- A verified company-file owner or delegated manager can see every offer
 -- associated with their own directory entity, including unpublished items.
 -- Editors can read the unit list but cannot create, change or publish offers.
+DROP POLICY IF EXISTS property_offers_company_file_read ON public.property_offers;
 CREATE POLICY property_offers_company_file_read
 ON public.property_offers
 FOR SELECT
@@ -321,7 +322,16 @@ BEGIN
      OR v_monthly_installment < 0 OR v_assignment_fee < 0
      OR v_discount_amount < 0 OR v_discount_percent < 0
      OR v_discount_percent > 100 OR v_remaining_installments < 0
-     OR v_bedrooms < 0 OR v_bathrooms < 0 THEN
+     OR v_bedrooms < 0 OR v_bathrooms < 0
+     OR v_remaining_installments <> trunc(v_remaining_installments)
+     OR v_bedrooms <> trunc(v_bedrooms)
+     OR v_bathrooms <> trunc(v_bathrooms)
+     OR char_length(coalesce(p_payload->>'description','')) > 3000
+     OR char_length(coalesce(p_payload->>'contact_name','')) > 120
+     OR char_length(coalesce(p_payload->>'land_ownership_authority','')) > 300
+     OR char_length(coalesce(p_payload->>'land_permit_details','')) > 1000
+     OR char_length(coalesce(p_payload->>'land_utilities','')) > 500
+     OR char_length(coalesce(p_payload->>'land_zoning','')) > 500 THEN
     RAISE EXCEPTION 'لا تقبل المساحة أو الأعداد أو المبالغ السالبة'
       USING ERRCODE='22023';
   END IF;
@@ -366,7 +376,11 @@ BEGIN
 
   v_images := coalesce(p_payload->'image_urls','[]'::jsonb);
   IF jsonb_typeof(v_images) IS DISTINCT FROM 'array'
-     OR jsonb_array_length(v_images) > 10 THEN
+     OR jsonb_array_length(v_images) > 10
+     OR EXISTS (
+       SELECT 1 FROM jsonb_array_elements(v_images) AS image(value)
+       WHERE jsonb_typeof(value) IS DISTINCT FROM 'string'
+     ) THEN
     RAISE EXCEPTION 'صور الوحدة غير صالحة أو تجاوزت الحد الأقصى (10 صور)'
       USING ERRCODE='22023';
   END IF;
