@@ -186,7 +186,9 @@ test("verified profile owners can invite a team member through existing RPC cont
   // The dashboard has its own section navigation; do not mount the global fixed bottom app bar.
   await expect(page.locator(".mobile-nav")).toHaveCount(0);
 
-  const forms = page.locator(".cd-team-form");
+  // Scope to the company-profile area: project submission forms share
+  // the visual class but are not team-invitation controls.
+  const forms = page.locator("#cdCompanyProfiles .cd-team-form");
   await expect(forms).toHaveCount(2);
 
   const companyForm = forms.nth(0);
