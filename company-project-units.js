@@ -150,20 +150,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  function buildForm(projects) {
+  function buildForm(projectChoices) {
     const section = el("section", undefined, "cd-team-panel cd-project-management-card");
     const heading = el("div", undefined, "cd-team-heading");
     heading.append(
       el("h3", "إضافة وحدة إلى مشروع"),
-      el("p", "متاح لمالك ملف الشركة المعتمد أو مديره المفوض، بشرط أن يكون ملف الشركة مرتبطًا بالمشروع بصفة المطوّر أو مالك الأرض. لن تظهر الوحدة للعامة قبل مراجعة الإدارة.")
+      el("p", "اختر المشروع وملف الشركة المقصودين معًا. متاح لمالك الملف المعتمد أو مديره المفوض إذا كانت الشركة مرتبطة بالمشروع بصفة المطوّر أو مالك الأرض. لن تظهر الوحدة للعامة قبل مراجعة الإدارة.")
     );
     section.append(heading);
 
     const form = el("form", undefined, "cd-team-form cd-project-unit-form");
-    const project = field(form, "المشروع المنشور", select(
-      projects.map(item => [item.id, item.name_ar]),
-      "اختر مشروعًا مرتبطًا بملف شركتك"
-    ));
+    const projectCompany = field(form, "المشروع وملف الشركة المخوّل *", select(
+      projectChoices.map(item => [item.value, item.label]),
+      "اختر المشروع وملف الشركة"
+    ), true);
     const unitRef = field(form, "كود / وصف يميز الوحدة *", input("text", "مثال: عمارة 2 - الدور 3 - شقة 12", 100, true), true);
     const unitType = field(form, "نوع الوحدة *", select(unitTypes, "اختر نوع الوحدة"));
     const building = field(form, "العمارة / المبنى", input("text", "مثال: العمارة 2", 100));
@@ -208,8 +208,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       submit.disabled = true;
       feedback.textContent = "جارٍ إرسال الوحدة للمراجعة...";
       try {
+        const selectedLink = projectCompany.value.split("|");
+        if (selectedLink.length !== 2 || !selectedLink[0] || !selectedLink[1]) {
+          throw new Error("اختر المشروع وملف الشركة المرتبطين قبل إرسال الوحدة.");
+        }
         await rpc("company_project_unit_request_submit", {
-          p_project_id: project.value,
+          p_project_id: selectedLink[0],
+          p_directory_entity_id: selectedLink[1],
           p_unit_payload: payload,
           p_evidence_url: evidenceUrl.value.trim() || null,
           p_evidence_description: evidenceText.value.trim()
