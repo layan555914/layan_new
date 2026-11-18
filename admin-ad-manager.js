@@ -143,10 +143,18 @@
     if (index < 0) return;
     const path = source.pathname.slice(index + marker.length).split("/").map(decodeURIComponent);
     if (path[0] !== "offers" || path.length < 3) return;
-    const target = base + "/storage/v1/object/layan_real_estat/" + path.map(encodeURIComponent).join("/");
+    const target = base + "/storage/v1/object/layan_real_estat";
+    const options = {
+      method:"DELETE",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ prefixes:[path.join("/")] })
+    };
     const response = typeof auth.authedFetch === "function"
-      ? await auth.authedFetch(target, { method:"DELETE" })
-      : await fetch(target, { method:"DELETE", headers:{ apikey:cfg.SUPABASE_PUBLISHABLE_KEY, Authorization:"Bearer " + session.access_token } });
+      ? await auth.authedFetch(target, options)
+      : await fetch(target, {
+          ...options,
+          headers:{ ...options.headers, apikey:cfg.SUPABASE_PUBLISHABLE_KEY, Authorization:"Bearer " + session.access_token }
+        });
     if (!response.ok && response.status !== 404) throw new Error("تعذر حذف ملف صورة قديم من التخزين.");
   }
 
