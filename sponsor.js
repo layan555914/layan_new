@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Show only the advertiser's own verified image; otherwise render the neutral business-name placeholder.
     const image = safeUrl(ad.image_url);
     const target = safeUrl(ad.target_url);
-    const phones = [...new Set(String(ad.contact_phone || "").split(/[;,،|/\r\n]+/u).map(value => value.trim().replace(/[^+0-9]/g, "")).filter(value => value.replace(/\D/g, "").length >= 10))];
+    const phones = [...new Set(String(ad.contact_phone || "").split(/[;,،|\/\r\n]+/u).map(value => value.trim().replace(/[^+0-9]/g, "")).filter(value => value.replace(/\D/g, "").length >= 10))];
     const phoneLink = phones.map(phone => {
       const digits = phone.replace(/\D/g, "");
       const tel = digits.startsWith("0") && digits.length === 11 ? "+2" + digits : (digits.startsWith("20") ? "+" + digits : digits);
