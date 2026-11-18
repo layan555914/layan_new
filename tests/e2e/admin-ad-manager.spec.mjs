@@ -95,6 +95,7 @@ async function loginAsAdmin(page) {
   await page.locator("#adminOtpCode").fill("123456");
   await page.locator("#adminLoginSubmit").click();
   await expect(page.locator("#adminConsole")).toBeVisible();
+  await page.locator("[data-view='published']").click();
   await expect(page.locator("#adminAdManagerList")).toBeVisible();
 }
 
