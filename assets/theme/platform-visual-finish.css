@@ -4,29 +4,17 @@
    Does not change page structure, copy, data, workflows, authentication or permissions. */
 
 :root {
-  --aa-page: #FBF8F5;
-  --aa-surface: #FFFFFF;
-  --aa-surface-soft: #F7F2EC;
-  --aa-surface-warm: #FFF8F1;
-  --aa-ink: #352A23;
-  --aa-muted: #716258;
-  --aa-line: #E8DCCF;
-  --aa-brand: #A4472A;
-  --aa-brand-hover: #873A24;
-  --aa-brand-soft: #F7EAE2;
-  --aa-accent: #C98A64;
-  --aa-accent-soft: #F2E0D2;
-  --aa-elevation-1: 0 5px 18px rgba(62, 43, 31, .055);
-  --aa-elevation-2: 0 12px 28px rgba(62, 43, 31, .09);
-  --aa-elevation-3: 0 18px 42px rgba(62, 43, 31, .13);
-  --aa-focus: 0 0 0 3px rgba(164, 71, 42, .16);
+  /* Keep the established platform palette; only add non-conflicting finish tokens. */
+  --aa-visual-elevation-1: 0 5px 18px rgba(64, 54, 47, .055);
+  --aa-visual-elevation-2: 0 12px 28px rgba(64, 54, 47, .09);
+  --aa-visual-focus: 0 0 0 3px rgba(166, 92, 64, .16);
 }
 
 /* Consistent reading canvas and Arabic type hierarchy on every page. */
 html body {
   background-color: var(--aa-page);
   color: var(--aa-ink);
-  font-family: "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif;
+  font-family: "Readex Pro", "Alexandria", Tahoma, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -100,7 +88,7 @@ html body :is(
   .my-listing-card, .property-state
 ) {
   border-color: var(--aa-line);
-  box-shadow: var(--aa-elevation-1);
+  box-shadow: var(--aa-visual-elevation-1);
 }
 
 html body :is(
@@ -119,7 +107,7 @@ html body :is(
   .marketplace-card, .category-tile, .know-card, .info-card, .my-listing-card
 ):hover {
   border-color: #D8B99F;
-  box-shadow: var(--aa-elevation-2);
+  box-shadow: var(--aa-visual-elevation-2);
 }
 
 /* Clear form fields and keyboard focus across public and admin screens. */
@@ -138,7 +126,7 @@ html body :is(input, select, textarea)::placeholder {
 html body :is(input, select, textarea):focus,
 html body :is(input, select, textarea):focus-visible {
   border-color: var(--aa-brand);
-  box-shadow: var(--aa-focus);
+  box-shadow: var(--aa-visual-focus);
 }
 
 html body :is(button, a, summary, [role="button"]):focus-visible {
@@ -174,7 +162,15 @@ html body :is(
   .property-gallery-empty,
   .mk-card-placeholder,
   .featured-card-placeholder,
-  .image-load-fallback
+  .image-load-fallback,
+  .company-profile-logo .company-logo-fallback,
+  .company-directory-entity-monogram .company-logo-fallback,
+  .aq-entity-brand__fallback:not([hidden]),
+  .os-partner-logo:not(:has(img[src]:not([src=""]))),
+  .official-sponsor-monogram,
+  .sp-ad-monogram,
+  .company-card-cover:has(.company-logo-fallback):not(:has(img[src]:not([src=""]))),
+  .company-card-cover--directory:has(> span.company-logo-fallback):not(:has(img[src]:not([src=""])))
 ) {
   background-color: #80634D;
   background-image:
