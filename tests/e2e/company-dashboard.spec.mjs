@@ -186,7 +186,7 @@ test("verified profile owners can invite a team member through existing RPC cont
   // The dashboard has its own section navigation; do not mount the global fixed bottom app bar.
   await expect(page.locator(".mobile-nav")).toHaveCount(0);
 
-  const forms = page.locator(".cd-team-form");
+  const forms = page.locator("#cdCompanyProfiles .cd-team-form");
   await expect(forms).toHaveCount(2);
 
   const companyForm = forms.nth(0);
@@ -260,7 +260,7 @@ test("verified profile owners can invite a team member through existing RPC cont
   await companySubmit.click({ timeout: 12000 });
   await expect(page.locator("#cdCompanyProfiles")).toContainText("new.editor@company.test");
 
-  const entityForm = page.locator(".cd-team-form").nth(1);
+  const entityForm = page.locator("#cdCompanyProfiles .cd-team-form").nth(1);
   await entityForm.locator('input[name="email"]').fill("new.manager@agency.test");
   await entityForm.locator('select[name="role"]').selectOption("manager");
   const entitySubmit = entityForm.locator('button[type="submit"]');
