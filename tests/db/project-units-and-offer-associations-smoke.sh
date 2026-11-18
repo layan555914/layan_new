@@ -36,6 +36,14 @@ BEGIN
 END
 \$baseline\$;
 
+-- Match the public-project read boundary needed by the unit visibility policy.
+ALTER TABLE public.directory_projects ENABLE ROW LEVEL SECURITY;
+GRANT SELECT ON TABLE public.directory_projects TO anon,authenticated;
+DROP POLICY IF EXISTS directory_projects_test_public_read ON public.directory_projects;
+CREATE POLICY directory_projects_test_public_read ON public.directory_projects
+FOR SELECT TO anon,authenticated
+USING (public_visible=true AND verification_status='published');
+
 CREATE TABLE IF NOT EXISTS public.property_offers (
   id bigint PRIMARY KEY,
   owner_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
