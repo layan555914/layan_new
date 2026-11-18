@@ -521,13 +521,32 @@ body.page-marketplace main .mk-profile-content strong {
   }
 }
 
-/* Homepage benefits strip: darken only the band immediately below the villa hero. */
+/* Homepage benefits strip: restore clear warm contrast below the hero. */
 body.page-home .design-benefits {
-  background: var(--aa-polish-line);
+  background: linear-gradient(135deg, #EBD2B8 0%, #E2BE9D 100%);
+  border-bottom: 1px solid #CDA783;
+}
+
+body.page-home .design-benefits > div {
+  border-color: #CDA783;
+}
+
+body.page-home .design-benefits > div > span {
+  background: linear-gradient(145deg, #F8E7D5, #E8C6A4);
+  color: #70432F;
+  border-color: #D2AD89;
+}
+
+body.page-home .design-benefits strong {
+  color: #493326;
+}
+
+body.page-home .design-benefits small {
+  color: #624A39;
 }
 
 @media (max-width: 760px) {
   body.page-home .design-benefits {
-    background: var(--aa-polish-line);
+    background: linear-gradient(135deg, #EBD2B8 0%, #E2BE9D 100%);
   }
 }
