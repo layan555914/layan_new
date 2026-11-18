@@ -401,7 +401,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function setStatus(message) {
-    const status = root.querySelector("#cdProjectUnitsStatus");
+    const status = document.getElementById("cdProjectUnitsStatus");
     if (status) status.textContent = message;
   }
 
@@ -419,7 +419,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tone = row.verification_status === "rejected" ? "danger" :
       row.status === "available" ? "success" :
       row.status === "reserved" ? "warning" : "neutral";
-    heading.append(el("span", statusLabels[row.status] || verificationLabels[row.verification_status] || "غير محدد", "cd-live-status cd-live-status--" + tone));
+    const statusText = row.verification_status === "rejected" ? verificationLabels.rejected : row.status === "pending" ? (verificationLabels[row.verification_status] || statusLabels.pending) : (statusLabels[row.status] || "غير محدد");
+    heading.append(el("span", statusText, "cd-live-status cd-live-status--" + tone));
     card.append(heading);
 
     const facts = el("div", undefined, "cd-unit-card-facts");
