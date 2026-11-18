@@ -550,7 +550,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    panel.className="company-profile-section company-manager-panel";
    const rows=value=>Array.isArray(value)?value.join("\n"):"";
    panel.innerHTML=
-    '<span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة بيانات الشركة</h2><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر بيانات تشغيلية")+'. تحديث الوصف والخدمات والصور والمشروعات يظهر مباشرة ويسجل في سجل التغييرات. الاسم والتصنيف ووسائل الاتصال الأساسية تحتاج موافقة الإدارة.</p>'+
+    '<span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة بيانات الشركة</h2><a class="company-contact-secondary" href="./company-dashboard.html?company_id='+encodeURIComponent(company.id)+'#company-data">إدارة المشروعات والوحدات والطلبات</a><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر بيانات تشغيلية")+'. تحديث الوصف والخدمات والصور والمشروعات يظهر مباشرة ويسجل في سجل التغييرات. الاسم والتصنيف ووسائل الاتصال الأساسية تحتاج موافقة الإدارة.</p>'+
     '<p id="companyProfileManagerDirectStatus" role="status" aria-live="polite"></p>'+
     '<form class="company-manager-form" id="companyProfileManagerDirectForm">'+
      '<label class="wide">نبذة الشركة<textarea name="description" rows="3" minlength="20" maxlength="1200" required>'+esc(company.description||"")+'</textarea></label>'+
