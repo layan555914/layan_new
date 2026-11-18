@@ -50,3 +50,18 @@ body.project-profile-page{margin:0;background:var(--project-paper);color:var(--p
 @media(max-width:760px){.project-profile-page .topbar{align-items:flex-start}.project-profile-page .topbar nav{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;gap:15px;padding-bottom:3px}.project-profile-page .top-actions{width:100%}.project-profile-page .top-actions .btn{flex:1}.project-main{width:calc(100% - 22px);margin-top:14px}.project-hero{border-radius:14px;padding:22px 17px}.project-hero p{font-size:12px}.project-section{padding:16px}.project-map-frame iframe{height:230px}.project-footer{justify-content:center;text-align:center}}
 @media(max-width:360px){.project-profile-page .topbar{padding-inline:10px}.project-profile-page .top-actions{display:grid;grid-template-columns:1fr}.project-main{width:calc(100% - 18px)}.project-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.project-fact{padding:11px}}
 .project-profile-page a:focus-visible{outline:3px solid #BF7347;outline-offset:3px}
+
+/* Approved project-linked units */
+.project-units-intro{margin:0 0 12px!important}
+.project-units-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:12px}
+.project-unit-card{display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px;overflow:hidden;min-width:0;padding:10px;border:1px solid var(--project-line);border-radius:12px;background:#FEFDFB}
+.project-unit-image{display:block;min-height:122px;overflow:hidden;border-radius:9px;background:#F1E8DF}
+.project-unit-image img{display:block;width:100%;height:100%;min-height:122px;object-fit:cover}
+.project-unit-copy{display:grid;align-content:start;gap:5px;min-width:0}
+.project-unit-tag{color:#3D7354;font-size:10px;font-weight:800}
+.project-unit-copy h3{margin:0;color:#47372D;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.project-unit-copy p,.project-unit-copy small{margin:0;color:#897668;font-size:10px;line-height:1.7;overflow-wrap:anywhere}
+.project-unit-price{color:#925A38;font-size:13px;line-height:1.7}
+.project-unit-link{display:inline-flex;align-items:center;justify-content:center;min-height:34px;margin-top:4px;padding:6px 9px;border:1px solid #C98A64;border-radius:8px;color:#895536;font-size:10px;font-weight:800;text-decoration:none}
+.project-unit-link:hover{background:#FBF2EA}
+@media(max-width:460px){.project-units-grid{grid-template-columns:1fr}.project-unit-card{grid-template-columns:88px minmax(0,1fr);gap:9px}.project-unit-image,.project-unit-image img{min-height:112px}}
