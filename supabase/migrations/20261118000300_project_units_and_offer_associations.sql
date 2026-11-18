@@ -82,6 +82,9 @@ BEGIN
 END;
 $function$;
 
+-- The guard is invoked by its trigger only, never as a user-callable function.
+REVOKE ALL ON FUNCTION private.guard_property_offer_project_unit_link() FROM PUBLIC,anon,authenticated;
+
 DROP TRIGGER IF EXISTS property_offers_project_unit_link_guard ON public.property_offers;
 CREATE TRIGGER property_offers_project_unit_link_guard
 BEFORE INSERT OR UPDATE OF project_unit_id ON public.property_offers
