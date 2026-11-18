@@ -6,6 +6,7 @@
   let A = null;
   const $ = id => document.getElementById(id);
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[c]);
+  const safeImageUrl = value => { try { const u = new URL(String(value || "")); return ["https:","http:"].includes(u.protocol) ? u.href : ""; } catch (_) { return ""; } };
   const rpc = (name, body = {}) => A.request("/rest/v1/rpc/" + name, { method:"POST", body:JSON.stringify(body) });
   const endpoint = {
     property_offer: "property_offers",
@@ -90,6 +91,7 @@
       '<div class="as-dialog-head"><h2>' + (creating ? "إضافة " + labels[kind] + " لعميل" : "تعديل " + labels[kind]) + '</h2><button type="button" class="as-close" data-close aria-label="إغلاق">×</button></div>' +
       (creating ? '<label class="as-field is-wide">بريد صاحب الإعلان المسجل *<input type="email" name="owner_email" required value="' + esc(ownerEmail) + '" placeholder="name@example.com"><small>سيظل الإعلان مربوطًا بهذا الحساب بعد الحفظ.</small></label>' : '<p class="admin-empty">صاحب الإعلان: ' + esc(row.owner_id || "غير محدد") + ' — لن يتم تغيير ملكية الإعلان.</p>') +
       '<div class="as-grid">' + fields.map(s => inputFor(s, row?.[s[0]] ?? (s[0] === "city" ? "أسيوط" : s[0] === "listing_type" ? "خدمة" : s[0] === "down_payment" ? 0 : ""))).join("") +
+      (kind === "property_offer" && creating ? '<label class="as-check is-wide"><input type="checkbox" name="featured_requested" data-featured-request> طلب إعلان مميز (يظل قيد المراجعة والاتفاق)</label>' : "") +
       (kind !== "company_ad" ? '<div class="as-logo-field is-wide"><div class="as-info"><strong>صور الإعلان</strong><small>JPG فقط بعد التحويل الآمن. الحد الأقصى بعد الضغط 5 ميجابايت للصورة.</small></div><label class="as-upload">إضافة صور<input type="file" accept="image/*" multiple data-image-files></label></div>' : "") +
       (currentImages.length ? '<div class="as-field is-wide"><strong>الصور الحالية — أزل العلامة لإزالة الصورة من الإعلان</strong><div class="adm-edit-imgs">' + currentImages.map((url,i) => '<label><img src="' + esc(url) + '" alt="الصورة ' + (i+1) + '" loading="lazy"><input type="checkbox" data-keep-image value="' + esc(url) + '" checked> الاحتفاظ</label>').join("") + '</div></div>' : "") +
       '<p class="as-status" data-dialog-status role="status"></p><div class="as-foot"><button type="submit" class="btn btn-gold">حفظ التغييرات</button><button type="button" class="btn btn-outline-dark" data-close>إلغاء</button></div></form>';
@@ -129,6 +131,26 @@
     return base + "/storage/v1/object/public/layan_real_estat/" + path;
   }
 
+  async function deleteStoredImage(value) {
+    const auth = window.LAYAN_SUPABASE, cfg = window.LAYAN_CONFIG || {};
+    const session = auth?.getSession?.();
+    if (!session?.access_token) throw new Error("انتهت جلسة الإدارة أثناء حذف الصورة.");
+    const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
+    const source = new URL(String(value));
+    const root = new URL(base);
+    if (source.origin !== root.origin) return;
+    const marker = "/storage/v1/object/public/layan_real_estat/";
+    const index = source.pathname.indexOf(marker);
+    if (index < 0) return;
+    const path = source.pathname.slice(index + marker.length).split("/").map(decodeURIComponent);
+    if (path[0] !== "offers" || path.length < 3) return;
+    const target = base + "/storage/v1/object/layan_real_estat/" + path.map(encodeURIComponent).join("/");
+    const response = typeof auth.authedFetch === "function"
+      ? await auth.authedFetch(target, { method:"DELETE" })
+      : await fetch(target, { method:"DELETE", headers:{ apikey:cfg.SUPABASE_PUBLISHABLE_KEY, Authorization:"Bearer " + session.access_token } });
+    if (!response.ok && response.status !== 404) throw new Error("تعذر حذف ملف صورة قديم من التخزين.");
+  }
+
   function readForm(form, kind, creating) {
     const data = {};
     for (const spec of specs[kind]) {
@@ -142,7 +164,8 @@
       if (kind === "property_offer") Object.assign(data, {
         governorate:"أسيوط", status:"pending", verification_status:"pending", developer_approval_status:"unknown",
         verified_at:null, is_featured:false, featured_requested:false, featured_until:null,
-        promotion_status:"none", image_urls:[], photos:[], document_urls:[]
+        promotion_status:form.querySelector("[data-featured-request]")?.checked ? "requested" : "none",
+        featured_requested:!!form.querySelector("[data-featured-request]")?.checked, image_urls:[], photos:[], document_urls:[]
       });
       if (kind === "marketplace_listing") Object.assign(data, {
         status:"pending", is_featured:false, reviewed_at:null, reviewed_by:null, admin_notes:null, image_urls:[], details:{}
@@ -223,7 +246,7 @@
       : kind === "supplier_ad" ? [row.business_name,row.category].filter(Boolean).join(" · ")
       : row.plan_code || "طلب إعلان شركة";
     const id = row.id;
-    const image = kind === "property_offer" ? row.image_urls?.[0] : kind === "marketplace_listing" ? row.image_urls?.[0] : row.image_url;
+    const image = safeImageUrl(kind === "property_offer" ? row.image_urls?.[0] : kind === "marketplace_listing" ? row.image_urls?.[0] : row.image_url);
     return '<article class="as-item" data-record-kind="' + kind + '" data-record-id="' + esc(id) + '">' +
       '<span class="as-thumb">' + (image ? '<img src="' + esc(image) + '" alt="" loading="lazy">' : esc(labels[kind].slice(0,1))) + '</span>' +
       '<div class="as-info"><strong>' + esc(title) + '</strong><span class="as-chips"><b class="as-chip">' + esc(labels[kind]) + '</b><b class="as-chip">' + esc(displayStatus(row,kind)) + '</b></span>' +
