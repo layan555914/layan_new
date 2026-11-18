@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
   const root = $("cdCompanyProfiles");
   const requestedCompanyId = new URLSearchParams(window.location.search).get("company_id");
+  let requestedCompanyAccessible = !requestedCompanyId;
   const projectsRoot = $("cdProjectsList");
   const listingsRoot = $("cdListingsList");
   const requestsRoot = $("cdRequestsList");
@@ -617,8 +618,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       profiles.forEach(profile => root.append(renderProfileCard(profile)));
       if (requestedCompanyId) {
         const selected = [...root.querySelectorAll("[data-company-id]")].find(card => card.dataset.companyId === requestedCompanyId);
-        if (selected) selected.scrollIntoView({ behavior: "smooth", block: "center" });
-        else message.textContent = "الملف المحدد غير مرتبط بصلاحيات حسابك الحالية. نعرض لك الملفات التي تملك صلاحية إدارتها فقط.";
+        if (selected) {
+          selected.scrollIntoView({ behavior: "smooth", block: "center" });
+          requestedCompanyAccessible = true;
+        } else {
+          requestedCompanyAccessible = false;
+        }
       }
     }
 
@@ -664,7 +669,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     setStat("listings", Array.isArray(accountOffers) ? accountOffers.length : 0);
     setStat("reviews", accountReviewCount);
 
-    if (errors.length) {
+    if (!requestedCompanyAccessible) {
+      message.textContent = "الملف المحدد غير مرتبط بصلاحيات حسابك الحالية. نعرض لك الملفات التي تملك صلاحية إدارتها فقط.";
+      message.dataset.state = "warning";
+    } else if (errors.length) {
       message.textContent = "تم تحميل البيانات المتاحة. بعض الأقسام لم تكتمل قراءتها؛ لن نعرض بيانات غير مؤكدة.";
       message.dataset.state = "warning";
     } else {
