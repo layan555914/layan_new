@@ -8,7 +8,7 @@
     try { const u = new URL(String(value || "")); return ["https:", "http:"].includes(u.protocol) ? u.href : ""; } catch (_) { return ""; }
   };
   const initial = name => (String(name || "").trim().match(/[\p{L}\p{N}]/u) || ["★"])[0].toUpperCase();
-  const phoneNumbers = value => [...new Set(String(value || "").split(/[;,،|/\r\n]+/u)
+  const phoneNumbers = value => [...new Set(String(value || "").split(/[;,،|\/\r\n]+/u)
     .map(phone => phone.trim().replace(/[^+0-9]/g, ""))
     .filter(phone => {
       const digits = phone.replace(/\D/g, "");
@@ -30,7 +30,7 @@
     const target = httpUrl(ad.target_url);
     const phones = phoneNumbers(ad.contact_phone);
     const description = String(ad.description || "")
-      .replace(/\s*(?:للتواصل|للاتصال)\s*[:：]?\s*(?:[+＋]?[\d٠-٩\s().,،;/|-]+)?[.!،]?\s*$/u, "")
+      .replace(/\s*(?:للتواصل|للاتصال)\s*[:：]?\s*(?:[+＋]?[\d٠-٩\s().,،;\/|-]+)?[.!،]?\s*$/u, "")
       .trim();
     const phoneActions = phones.length
       ? '<div class="sp-ad-phone-list" aria-label="أرقام التواصل">' + phones.map(phone => {
@@ -38,7 +38,7 @@
           const wa = waNumber(phone);
           const displayPhone = esc(phone.replace(/[^+0-9]/g, ""));
           const call = tel ? '<a class="sp-ad-btn sp-ad-call-btn" href="tel:' + esc(tel) + '">اتصال <bdi dir="ltr">' + displayPhone + '</bdi></a>' : "";
-          const whatsapp = wa ? '<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || name) + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + esc(ad.business_name || ad.title || "إعلان ممول") + ' — ' + displayPhone + '">واتساب</a>' : "";
+          const whatsapp = wa ? '<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || ad.business_name || "إعلان ممول") + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + esc(ad.business_name || ad.title || "إعلان ممول") + ' — ' + displayPhone + '">واتساب</a>' : "";
           return '<div class="sp-ad-phone-row">' + call + whatsapp + '</div>';
         }).join("") + '</div>'
       : "";
@@ -57,7 +57,7 @@
       '<div class="sp-ad-body">' +
         '<div class="sp-ad-brand"><span class="sp-ad-avatar" aria-hidden="true">' + esc(initial(name)) + '</span>' +
           '<div><strong>' + esc(name) + '</strong><small>' + esc(ad.category || "إعلانات الأنشطة") + ' · <b>مساحة إعلانية</b></small></div></div>' +
-        '<h3>' + esc(ad.title || name) + '</h3>' +
+        '<h3>' + esc(ad.title || ad.business_name || "إعلان ممول") + '</h3>' +
         (description ? '<p class="sp-ad-desc">' + esc(description).replace(/\r?\n/g, "<br>") + '</p>' : "") +
         '<div class="sp-ad-actions">' + (actions || '<a class="sp-ad-btn sp-ad-btn-primary" href="./advertise.html">تفاصيل الإعلان</a>') + '</div>' +
       '</div></article>';
