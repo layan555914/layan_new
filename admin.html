@@ -125,6 +125,34 @@
     <section class="adm-view" data-view-panel="published" hidden>
       <header class="adm-view-head"><span class="adm-kicker">الخطوة 4</span><h1>المنشور والتوثيق</h1><p>كل ما يراه الزوار الآن: احذف المخالف، ووثّق المالك أو الشركة بعد التحقق، وتحكم في المساحات الإعلانية.</p></header>
       <section class="adm-card"><h2 class="adm-card-title">الإعلانات المنشورة</h2><div class="admin-tabpanel" data-admin-panel="listings"></div></section>
+      <section class="adm-card" id="secAdManager">
+        <div class="as-card-head"><div><h2 class="adm-card-title">إدارة إعلانات العملاء</h2><p class="adm-card-lead">إنشاء إعلان باسم العميل من بريده المسجل، وتعديل بيانات الإعلان وصوره مع الحفاظ على ملكيته. الإعلانات الجديدة تدخل المراجعة أولًا.</p></div>
+          <button type="button" class="btn btn-gold" id="adminAdManagerRefresh">↻ تحديث الإعلانات</button>
+        </div>
+        <div class="as-grid">
+          <label>نوع الإعلان الجديد
+            <select id="adminAdCreateType">
+              <option value="property_offer">إعلان عقاري</option>
+              <option value="marketplace_listing">إعلان سوق الخدمات</option>
+              <option value="supplier_ad">إعلان ممول</option>
+              <option value="company_ad">طلب إعلان شركة</option>
+            </select>
+          </label>
+          <label>تصفية الإعلانات
+            <select id="adminAdTypeFilter">
+              <option value="all">كل أنواع الإعلانات</option>
+              <option value="property_offer">العقارات</option>
+              <option value="marketplace_listing">سوق الخدمات</option>
+              <option value="supplier_ad">الإعلانات الممولة</option>
+              <option value="company_ad">طلبات إعلانات الشركات</option>
+            </select>
+          </label>
+          <div class="as-actions"><button type="button" class="btn btn-gold" id="adminAdManagerCreate">＋ إنشاء إعلان لعميل</button></div>
+        </div>
+        <p class="admin-empty" id="adminAdCreateHint">سيُنشأ الإعلان بحالة قيد المراجعة، مع ربطه بالبريد الذي تحدده.</p>
+        <p class="admin-empty">عدد السجلات المعروضة: <strong id="adminAdManagerCount">—</strong></p>
+        <div id="adminAdManagerList" class="as-list"><p class="admin-empty">جارٍ تحميل الإعلانات...</p></div>
+      </section>
       <section class="adm-card"><h2 class="adm-card-title">توثيق المعلنين</h2><p class="adm-card-lead">«مالك موثّق» بعد التحقق من الملكية، أو «شركة موثّقة» بعد التحقق من الشركة. يظهر للزوار على البطاقة وصفحة الإعلان.</p><div id="trustBadgeOffers"><p class="admin-empty">جارٍ التحميل...</p></div></section>
       <section class="adm-card"><h2 class="adm-card-title">المساحات الإعلانية</h2><p class="adm-card-lead">تشغيل أو إيقاف مواضع الإعلانات التجارية على المنصة.</p><div id="pendingAdSlots"><p class="admin-empty">جارٍ التحميل...</p></div></section>
     </section>
@@ -154,7 +182,7 @@
   </div>
 </div>
 </main>
-<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261114-service-profiles-1"></script><script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script><script src="./admin.js?v=20261117-admin-email-otp-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261114-service-profiles-1"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script>
+<script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261114-service-profiles-1"></script><script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script><script src="./admin.js?v=20261117-admin-email-otp-1"></script><script src="./admin-console.js?v=20261110-3"></script><script src="./admin-layout.js?v=20261114-service-profiles-1"></script><script src="./admin-edits.js?v=20261108-1"></script><script src="./admin-logos.js?v=20261110-2"></script><script src="./admin-sponsors.js?v=20261110-3"></script><script src="./admin-ad-manager.js?v=20261118-admin-ad-manager-1"></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 
 </body></html>
