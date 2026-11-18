@@ -174,6 +174,82 @@ test("property owner can request a reviewed association between an available ad 
   expect(submitted.p_evidence_description).toContain("مستندات المالك");
 });
 
+
+test("property owner can resubmit a unit link request after admin asks for changes", async ({ page }) => {
+  let requests = [{
+    request_id:REQUEST_ID,
+    offer_id:OFFER_ID,
+    offer_title:"شقة الاختبار",
+    project_unit_id:UNIT_ID,
+    unit_ref:"عمارة 2 - شقة 12",
+    project_id:PROJECT_ID,
+    project_name:"مشروع النخيل",
+    status:"needs_changes",
+    admin_notes:"يرجى توضيح مستند إثبات العلاقة."
+  }];
+  let submitted = null;
+
+  await installAuth(page);
+  await page.route(SUPABASE + "/rest/v1/**", async route => {
+    const url = new URL(route.request().url());
+    const path = url.pathname.replace("/rest/v1/","");
+    const json = data => route.fulfill({
+      status:200,
+      contentType:"application/json",
+      body:JSON.stringify(data)
+    });
+
+    if (path === "property_offers") {
+      if (url.searchParams.get("select")?.includes("project_unit_id")) return json([]);
+      return json([{
+        id:OFFER_ID,
+        title:"شقة الاختبار",
+        listing_purpose:"بيع",
+        status:"available"
+      }]);
+    }
+    if (path === "directory_project_units") return json([unitRecord()]);
+    if (path === "directory_projects") return json([{
+      id:PROJECT_ID,
+      name_ar:"مشروع النخيل",
+      public_visible:true,
+      verification_status:"published"
+    }]);
+    if (path === "rpc/property_offer_project_unit_requests_mine") return json(requests);
+    if (path === "rpc/property_offer_project_unit_request_submit") {
+      submitted = route.request().postDataJSON();
+      requests = [...requests,{
+        request_id:"88888888-8888-4888-8888-888888888888",
+        offer_id:OFFER_ID,
+        offer_title:"شقة الاختبار",
+        project_unit_id:UNIT_ID,
+        unit_ref:"عمارة 2 - شقة 12",
+        project_id:PROJECT_ID,
+        project_name:"مشروع النخيل",
+        status:"pending"
+      }];
+      return json("88888888-8888-4888-8888-888888888888");
+    }
+    if (path === "rpc/layan_company_owner_profile") return json(null);
+    return json([]);
+  });
+
+  await page.goto("/my-listings.html");
+  await expect(page.locator("#myProjectUnitLinkRequests")).toContainText("مطلوب استكمال");
+  const form = page.locator("#myProjectUnitLinkFormRoot .my-project-unit-link-form");
+  await expect(form).toBeVisible();
+  await form.locator("select").nth(0).selectOption(String(OFFER_ID));
+  await form.locator("select").nth(1).selectOption(UNIT_ID);
+  await form.locator("textarea").fill("تم استكمال توضيح مستند إثبات العلاقة بالوحدة.");
+  await form.locator('button[type="submit"]').click();
+
+  await expect(page.locator("#myProjectUnitLinkRequests")).toContainText("قيد مراجعة الإدارة");
+  expect(submitted.p_offer_id).toBe(OFFER_ID);
+  expect(submitted.p_project_unit_id).toBe(UNIT_ID);
+  expect(submitted.p_evidence_description).toContain("استكمال");
+  await expect(page.locator("#myProjectUnitLinkFormRoot")).toContainText("لا يوجد إعلان عقاري منشور");
+});
+
 test("public project page shows only ads explicitly linked to published units", async ({ page }) => {
   let offerFilter = null;
   await page.route("**/config.js*", route => route.fulfill({
