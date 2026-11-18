@@ -54,7 +54,7 @@ test("public project profile renders approved data, sources, related entity and 
   await expect(page.locator(".project-entity-card")).toContainText("شركة اختبار التطوير");
   await expect(page.locator(".project-entity-card a[href='./company.html?entity_id=entity-1']")).toBeVisible();
   await expect(page.locator("#projectProfileRoot")).toContainText("ليست دبوسًا جغرافيًا مؤكدًا");
-  await expect(page.locator("#projectProfileRoot")).toContainText("لا تعرض هذه الصفحة وحدات");
+  await expect(page.locator("#projectProfileRoot")).toContainText("لا توجد وحدات مسجلة ومعتمدة للعامة بهذا المشروع حتى الآن.");
   await expect(page.locator("#projectProfileRoot a[href='./offers.html']")).toBeVisible();
   const dimensions=await page.evaluate(()=>({clientWidth:document.documentElement.clientWidth,scrollWidth:document.documentElement.scrollWidth}));
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth+1);
