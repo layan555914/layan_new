@@ -34,10 +34,18 @@
       ["title","عنوان الإعلان","text",true],["property_type","نوع العقار","select",true,propertyTypes],
       ["listing_purpose","الغرض","select",true,purposes],["city","المدينة / المركز","text",false],
       ["area","الحي / المنطقة","text",false],["area_m2","المساحة بالمتر","number",false],
-      ["total_price","السعر الإجمالي","number",false],["down_payment","المقدم","number",false],
-      ["paid_amount","المبلغ المدفوع","number",false],["remaining_amount","المتبقي","number",false],
-      ["monthly_installment","القسط الشهري","number",false],["contact_name","اسم المعلن","text",false],
-      ["contact_phone","رقم التواصل","tel",false],["description","الوصف","textarea",false],
+      ["bedrooms","عدد الغرف","number",false],["bathrooms","عدد الحمامات","number",false],
+      ["land_ownership_authority","جهة ملكية الأرض","text",false],["land_permit_details","تفاصيل الترخيص","text",false],
+      ["land_utilities","المرافق","text",false],["land_zoning","الاشتراطات / الاستخدام","text",false],
+      ["total_price","السعر الإجمالي","number",false],["price_on_request","السعر عند التواصل","checkbox",false],
+      ["down_payment","المقدم","number",false],["paid_amount","المبلغ المدفوع","number",false],
+      ["remaining_amount","المتبقي","number",false],["monthly_installment","القسط الشهري","number",false],
+      ["assignment_fee","رسوم التنازل","number",false],["assignment_fee_percentage","نسبة رسوم التنازل","number",false],
+      ["discount_amount","قيمة الخصم","number",false],["discount_percent","نسبة الخصم","number",false],
+      ["developer_name","اسم المطور","text",false],["project_name","اسم المشروع","text",false],
+      ["latitude","خط العرض","number",false],["longitude","خط الطول","number",false],
+      ["contact_name","اسم المعلن","text",false],["contact_phone","رقم التواصل","tel",false],
+      ["description","الوصف","textarea",false]
     ],
     marketplace_listing: [
       ["title","عنوان الإعلان","text",true],["category","القسم","select",true,categories],
@@ -56,7 +64,7 @@
     ],
     company_ad: [
       ["business_name","اسم الشركة / النشاط","text",true],
-      ["plan_code","نوع الطلب","select",true,["trial_30","starter_15","growth_30","partner_90"]]
+      ["plan_code","نوع الطلب","select",true,["trial_30"]]
     ]
   };
   const selectValue = (value, options) => options.map(x => '<option value="' + esc(x) + '"' + (String(value ?? "") === x ? " selected" : "") + '>' + esc(x) + '</option>').join("");
@@ -66,7 +74,10 @@
     const val = value == null ? "" : String(value);
     if (type === "textarea") return '<label class="as-field is-wide">' + esc(label) + '<textarea name="' + key + '" data-field="' + key + '" rows="3"' + req + '>' + esc(val) + '</textarea></label>';
     if (type === "select") return '<label class="as-field">' + esc(label) + '<select name="' + key + '" data-field="' + key + '"' + req + '>' + selectValue(val || options[0], options) + '</select></label>';
-    return '<label class="as-field">' + esc(label) + '<input name="' + key + '" data-field="' + key + '" type="' + type + '"' + (type === "number" ? ' min="0" step="any"' : ' maxlength="1000"') + ' value="' + esc(val) + '"' + req + '></label>';
+    if (type === "checkbox") return '<label class="as-field as-check"><input name="' + key + '" data-field="' + key + '" type="checkbox"' + (value === true || val === "true" ? " checked" : "") + '> ' + esc(label) + '</label>';
+    const numeric = type === "number";
+    const signed = key === "latitude" || key === "longitude";
+    return '<label class="as-field">' + esc(label) + '<input name="' + key + '" data-field="' + key + '" type="' + type + '"' + (numeric ? (signed ? ' step="any"' : ' min="0" step="any"') : ' maxlength="1000"') + ' value="' + esc(val) + '"' + req + '></label>';
   }
   function displayStatus(row, kind) {
     return kind === "property_offer" ? (row.status + " · " + (row.verification_status || "بدون تحقق")) : row.status;
@@ -90,6 +101,7 @@
       '<div class="as-dialog-head"><h2>' + (creating ? "إضافة " + labels[kind] + " لعميل" : "تعديل " + labels[kind]) + '</h2><button type="button" class="as-close" data-close aria-label="إغلاق">×</button></div>' +
       (creating ? '<label class="as-field is-wide">بريد صاحب الإعلان المسجل *<input type="email" name="owner_email" required value="" placeholder="name@example.com"><small>سيظل الإعلان مربوطًا بهذا الحساب بعد الحفظ.</small></label>' : '<p class="admin-empty">صاحب الإعلان: ' + esc(row.owner_id || "غير محدد") + ' — لن يتم تغيير ملكية الإعلان.</p>') +
       '<div class="as-grid">' + fields.map(s => inputFor(s, row?.[s[0]] ?? (s[0] === "city" ? "أسيوط" : s[0] === "listing_type" ? "خدمة" : s[0] === "down_payment" ? 0 : ""))).join("") +
+      (kind === "property_offer" ? '<label class="as-check is-wide"><input type="checkbox" data-contact-consent> تأكدت من موافقة العميل على نشر رقم التواصل إذا تم إدخاله</label>' : "") +
       (kind === "property_offer" && creating ? '<label class="as-check is-wide"><input type="checkbox" name="featured_requested" data-featured-request> طلب إعلان مميز (يظل قيد المراجعة والاتفاق)</label>' : "") +
       (kind !== "company_ad" ? '<div class="as-logo-field is-wide"><div class="as-info"><strong>صور الإعلان</strong><small>JPG فقط بعد التحويل الآمن. الحد الأقصى بعد الضغط 5 ميجابايت للصورة.</small></div><label class="as-upload">إضافة صور<input type="file" accept="image/*" multiple data-image-files></label></div>' : "") +
       (currentImages.length ? '<div class="as-field is-wide"><strong>الصور الحالية — أزل العلامة لإزالة الصورة من الإعلان</strong><div class="adm-edit-imgs">' + currentImages.map((url,i) => '<label><img src="' + esc(url) + '" alt="الصورة ' + (i+1) + '" loading="lazy"><input type="checkbox" data-keep-image value="' + esc(url) + '" checked> الاحتفاظ</label>').join("") + '</div></div>' : "") +
@@ -164,7 +176,8 @@
       const [key,,type] = spec;
       const el = form.querySelector('[data-field="' + key + '"]');
       if (!el) continue;
-      if (type === "number") data[key] = el.value.trim() === "" ? (["down_payment","price","requested_days","requested_price"].includes(key) ? 0 : null) : Number(el.value);
+      if (type === "number") data[key] = el.value.trim() === "" ? (["down_payment","price","requested_days","requested_price","assignment_fee","assignment_fee_percentage","discount_amount","discount_percent"].includes(key) ? 0 : null) : Number(el.value);
+      else if (type === "checkbox") data[key] = el.checked;
       else data[key] = el.value.trim();
     }
     if (creating) {
@@ -206,6 +219,15 @@
       if (kind === "marketplace_listing" && body.description.trim().length < 20) throw new Error("وصف إعلان سوق الخدمات يجب ألا يقل عن 20 حرفًا.");
       if (kind === "supplier_ad" && (body.business_name.trim().length < 2 || body.title.trim().length < 3 || body.description.trim().length < 5 || body.contact_phone.trim().length < 7)) throw new Error("راجع اسم النشاط والعنوان والوصف ورقم التواصل؛ توجد خانات لا تحقق الحد الأدنى المطلوب.");
       if (kind === "company_ad" && body.business_name.trim().length < 2) throw new Error("اسم الشركة يجب ألا يقل عن حرفين.");
+      if (kind === "property_offer") {
+        if (body.price_on_request) body.total_price = null;
+        else if (body.total_price == null || body.total_price <= 0) throw new Error("اكتب سعرًا صحيحًا أو فعّل خيار السعر عند التواصل.");
+        if (body.contact_phone && (creating || body.contact_phone !== row.contact_phone) && !form.querySelector("[data-contact-consent]")?.checked) {
+          throw new Error("أكد موافقة العميل على نشر رقم التواصل قبل حفظ الإعلان.");
+        }
+        if ((body.latitude == null) !== (body.longitude == null)) throw new Error("أدخل خط العرض والطول معًا أو اتركهما فارغين.");
+        if (body.latitude != null && (body.latitude < -90 || body.latitude > 90 || body.longitude < -180 || body.longitude > 180)) throw new Error("إحداثيات الموقع غير صحيحة.");
+      }
       body.owner_id = ownerId;
 
       if (kind === "supplier_ad" && row?.image_url && !form.querySelector("[data-keep-image]:checked") && body.image_url === row.image_url) body.image_url = null;
