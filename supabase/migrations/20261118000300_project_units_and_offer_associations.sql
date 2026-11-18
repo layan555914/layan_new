@@ -145,6 +145,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS property_offer_project_unit_requests_pending_o
 
 CREATE OR REPLACE FUNCTION private.company_project_unit_request_submit(
   p_project_id uuid,
+  p_directory_entity_id uuid,
   p_unit_payload jsonb,
   p_evidence_url text DEFAULT NULL,
   p_evidence_description text DEFAULT NULL
@@ -156,7 +157,7 @@ SET search_path TO ''
 AS $function$
 DECLARE
   v_user_id uuid := auth.uid();
-  v_entity_id uuid;
+  v_entity_id uuid := p_directory_entity_id;
   v_access text;
   v_request_id uuid;
   v_url text := nullif(btrim(coalesce(p_evidence_url,'')),'');
@@ -273,25 +274,29 @@ BEGIN
     RAISE EXCEPTION 'وصف دليل الوحدة أطول من الحد المسموح' USING ERRCODE='22023';
   END IF;
 
-  SELECT pe.entity_id, private.company_entity_manager_access(pe.entity_id)
-  INTO v_entity_id, v_access
-  FROM public.directory_project_entities pe
-  JOIN public.directory_entities e
-    ON e.id = pe.entity_id
-   AND e.public_visible = true
-   AND e.verification_status = 'published'
-  JOIN public.directory_projects p
-    ON p.id = pe.project_id
-   AND p.public_visible = true
-   AND p.verification_status = 'published'
-  WHERE pe.project_id = p_project_id
-    AND pe.relation_type IN ('developer','land_owner')
-    AND private.company_entity_manager_access(pe.entity_id) IN ('owner','manager')
-  ORDER BY CASE WHEN pe.relation_type = 'developer' THEN 0 ELSE 1 END
-  LIMIT 1;
+  -- The requester explicitly selects the company file; never infer it when
+  -- multiple managed companies are attached to the same project.
+  v_access := private.company_entity_manager_access(v_entity_id);
+  IF v_entity_id IS NULL OR v_access IS NULL OR v_access NOT IN ('owner','manager') THEN
+    RAISE EXCEPTION 'يلزم أن تكون مالكًا معتمدًا أو مديرًا مفوضًا لملف الشركة المختار' USING ERRCODE='42501';
+  END IF;
 
-  IF v_entity_id IS NULL OR v_access NOT IN ('owner','manager') THEN
-    RAISE EXCEPTION 'إضافة الوحدات متاحة للمالك المعتمد أو مدير الملف المفوض لشركة مسجلة كمطور أو مالك أرض لهذا المشروع' USING ERRCODE='42501';
+  IF NOT EXISTS (
+    SELECT 1
+    FROM public.directory_project_entities pe
+    JOIN public.directory_entities e
+      ON e.id = pe.entity_id
+     AND e.public_visible = true
+     AND e.verification_status = 'published'
+    JOIN public.directory_projects p
+      ON p.id = pe.project_id
+     AND p.public_visible = true
+     AND p.verification_status = 'published'
+    WHERE pe.project_id = p_project_id
+      AND pe.entity_id = v_entity_id
+      AND pe.relation_type IN ('developer','land_owner')
+  ) THEN
+    RAISE EXCEPTION 'ملف الشركة المختار غير مرتبط بهذا المشروع بصفة المطوّر أو مالك الأرض' USING ERRCODE='42501';
   END IF;
 
   PERFORM pg_advisory_xact_lock(hashtextextended(p_project_id::text, 44));
@@ -718,6 +723,7 @@ $function$;
 -- Public wrappers are SECURITY INVOKER; authorization and privileged writes remain in private functions.
 CREATE OR REPLACE FUNCTION public.company_project_unit_request_submit(
   p_project_id uuid,
+  p_directory_entity_id uuid,
   p_unit_payload jsonb,
   p_evidence_url text DEFAULT NULL,
   p_evidence_description text DEFAULT NULL
@@ -728,7 +734,7 @@ SECURITY INVOKER
 SET search_path TO ''
 AS $function$
   SELECT private.company_project_unit_request_submit(
-    p_project_id,p_unit_payload,p_evidence_url,p_evidence_description
+    p_project_id,p_directory_entity_id,p_unit_payload,p_evidence_url,p_evidence_description
   );
 $function$;
 
@@ -831,7 +837,7 @@ AS $function$
   );
 $function$;
 
-REVOKE ALL ON FUNCTION private.company_project_unit_request_submit(uuid,jsonb,text,text) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION private.company_project_unit_request_submit(uuid,uuid,jsonb,text,text) FROM PUBLIC,anon;
 REVOKE ALL ON FUNCTION private.company_project_unit_requests_mine() FROM PUBLIC,anon;
 REVOKE ALL ON FUNCTION private.property_offer_project_unit_request_submit(bigint,uuid,text,text) FROM PUBLIC,anon;
 REVOKE ALL ON FUNCTION private.property_offer_project_unit_requests_mine() FROM PUBLIC,anon;
@@ -840,7 +846,7 @@ REVOKE ALL ON FUNCTION private.company_project_unit_request_admin_review(uuid,te
 REVOKE ALL ON FUNCTION private.property_offer_project_unit_request_admin_list() FROM PUBLIC,anon;
 REVOKE ALL ON FUNCTION private.property_offer_project_unit_request_admin_review(uuid,text,text) FROM PUBLIC,anon;
 
-REVOKE ALL ON FUNCTION public.company_project_unit_request_submit(uuid,jsonb,text,text) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION public.company_project_unit_request_submit(uuid,uuid,jsonb,text,text) FROM PUBLIC,anon;
 REVOKE ALL ON FUNCTION public.company_project_unit_requests_mine() FROM PUBLIC,anon;
 REVOKE ALL ON FUNCTION public.property_offer_project_unit_request_submit(bigint,uuid,text,text) FROM PUBLIC,anon;
 REVOKE ALL ON FUNCTION public.property_offer_project_unit_requests_mine() FROM PUBLIC,anon;
@@ -849,7 +855,7 @@ REVOKE ALL ON FUNCTION public.company_project_unit_request_admin_review(uuid,tex
 REVOKE ALL ON FUNCTION public.property_offer_project_unit_request_admin_list() FROM PUBLIC,anon;
 REVOKE ALL ON FUNCTION public.property_offer_project_unit_request_admin_review(uuid,text,text) FROM PUBLIC,anon;
 
-GRANT EXECUTE ON FUNCTION private.company_project_unit_request_submit(uuid,jsonb,text,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.company_project_unit_request_submit(uuid,uuid,jsonb,text,text) TO authenticated;
 GRANT EXECUTE ON FUNCTION private.company_project_unit_requests_mine() TO authenticated;
 GRANT EXECUTE ON FUNCTION private.property_offer_project_unit_request_submit(bigint,uuid,text,text) TO authenticated;
 GRANT EXECUTE ON FUNCTION private.property_offer_project_unit_requests_mine() TO authenticated;
@@ -858,7 +864,7 @@ GRANT EXECUTE ON FUNCTION private.company_project_unit_request_admin_review(uuid
 GRANT EXECUTE ON FUNCTION private.property_offer_project_unit_request_admin_list() TO authenticated;
 GRANT EXECUTE ON FUNCTION private.property_offer_project_unit_request_admin_review(uuid,text,text) TO authenticated;
 
-GRANT EXECUTE ON FUNCTION public.company_project_unit_request_submit(uuid,jsonb,text,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.company_project_unit_request_submit(uuid,uuid,jsonb,text,text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.company_project_unit_requests_mine() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.property_offer_project_unit_request_submit(bigint,uuid,text,text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.property_offer_project_unit_requests_mine() TO authenticated;
