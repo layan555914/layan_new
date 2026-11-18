@@ -137,11 +137,12 @@ test("verified manager can submit a project request, but an editor cannot", asyn
   await expect(page.locator("#cdProjectRequestsList")).toContainText("طلب ربط بمشروع منشور");
   expect(managerMocks.getSubmittedBody().p_request_type).toBe("link_project");
 
-  await page.unrouteAll();
-  await installDashboardMocks(page, "editor");
-  await page.goto("/company-dashboard.html");
-  await expect(page.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد");
-  await expect(page.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
+  const editorPage = await page.context().newPage();
+  await installDashboardMocks(editorPage, "editor");
+  await editorPage.goto("/company-dashboard.html");
+  await expect(editorPage.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد");
+  await expect(editorPage.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
+  await editorPage.close();
 });
 
 test("directory administrator can approve a company request and see its final state", async ({ page }) => {
@@ -198,6 +199,7 @@ test("directory administrator can approve a company request and see its final st
   });
 
   await page.goto("/company-project-requests-admin.html");
+  page.on("dialog", dialog => dialog.accept());
   await page.locator("#cprEmail").fill("admin@example.com");
   await page.locator("#cprPassword").fill("valid-password");
   await page.locator("#cprLoginForm button[type=submit]").click();
