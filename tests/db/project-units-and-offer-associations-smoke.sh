@@ -308,7 +308,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM public.property_offers
     WHERE id='$LINK_OFFER_ID'
-      AND project_unit_id=nullif(current_setting('test.phase4_unit_id',true),'')::uuid
+      AND project_unit_id='$UNIT_ID'::uuid
       AND status='available'
   ) THEN RAISE EXCEPTION 'Approved project unit association was not saved to the ad'; END IF;
   IF NOT EXISTS (
