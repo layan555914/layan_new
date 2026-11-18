@@ -1,0 +1,473 @@
+/* ASYUT AQAR — unified platform colour system
+   Presentation only. Keep page structure, branding assets, copy, behaviour and data unchanged.
+   Warm/light shared palette; dark surfaces are reserved for navigation and feature panels. */
+
+:root {
+  color-scheme: light;
+
+  /* Shared palette */
+  --aa-page: #FAF8F5;
+  --aa-surface: #FFFFFF;
+  --aa-surface-soft: #F5F0EA;
+  --aa-surface-warm: #FCF6EF;
+  --aa-ink: #40362F;
+  --aa-muted: #786B61;
+  --aa-line: #E8DED5;
+
+  --aa-brand: #A65C40;
+  --aa-brand-hover: #8D4B35;
+  --aa-brand-soft: #F7ECE5;
+  --aa-accent: #D2A477;
+  --aa-accent-soft: #F2E1D0;
+  --aa-danger: #A34F3E;
+  --aa-success: #397451;
+
+  --aa-espresso: #514237;
+  --aa-espresso-2: #6A5445;
+  --aa-sand: #F5EEE6;
+  --aa-cream: #FFF9F3;
+  --aa-peach: #EBD0B9;
+  --aa-copper: #D2A477;
+  --aa-terracotta: #A65C40;
+  --aa-terracotta-dark: #8D4B35;
+
+  --aa-radius-sm: 10px;
+  --aa-radius: 16px;
+  --aa-radius-lg: 22px;
+  --aa-shadow: 0 8px 24px rgba(64, 54, 47, .07);
+  --aa-shadow-hover: 0 14px 30px rgba(64, 54, 47, .11);
+
+  /* Compatibility aliases for existing page styles */
+  --navy: var(--aa-espresso);
+  --blue: var(--aa-espresso-2);
+  --gold: var(--aa-accent);
+  --gold-light: var(--aa-peach);
+  --red: var(--aa-danger);
+  --bg: var(--aa-page);
+  --text: var(--aa-ink);
+  --muted: var(--aa-muted);
+  --border: var(--aa-line);
+  --paper: #FFFCF8;
+  --line: var(--aa-line);
+  --ink: var(--aa-ink);
+
+  /* Page-specific tokens mapped to the same shared palette */
+  --cd-ink: var(--aa-ink);
+  --cd-ink-soft: #594A40;
+  --cd-muted: var(--aa-muted);
+  --cd-canvas: var(--aa-page);
+  --cd-card: var(--aa-surface);
+  --cd-line: var(--aa-line);
+  --cd-accent: var(--aa-accent);
+  --cd-accent-dark: var(--aa-brand);
+  --cd-accent-soft: var(--aa-brand-soft);
+  --cd-green: var(--aa-success);
+
+  --project-ink: var(--aa-ink);
+  --project-dark: var(--aa-espresso);
+  --project-gold: var(--aa-accent);
+  --project-paper: var(--aa-page);
+  --project-muted: var(--aa-muted);
+  --project-line: var(--aa-line);
+
+  --ab-ink: var(--aa-ink);
+  --ab-ink-2: var(--aa-muted);
+  --ab-line: var(--aa-line);
+  --ab-soft: var(--aa-surface-soft);
+  --ab-accent: var(--aa-brand);
+  --ab-accent-bg: var(--aa-brand-soft);
+
+  --hw-ink: var(--aa-ink);
+  --hw-ink-2: var(--aa-muted);
+  --hw-line: var(--aa-line);
+  --hw-accent: var(--aa-brand);
+  --hw-accent-bg: var(--aa-brand-soft);
+
+  --adm-ink: var(--aa-espresso);
+  --adm-ink-2: #6B584B;
+  --adm-muted: #85766B;
+  --adm-bg: var(--aa-page);
+  --adm-card: var(--aa-surface);
+  --adm-soft: var(--aa-surface-soft);
+  --adm-line: var(--aa-line);
+  --adm-accent: var(--aa-brand);
+  --adm-accent-2: var(--aa-accent);
+  --adm-peach: var(--aa-peach);
+  --adm-ok: var(--aa-success);
+}
+
+html {
+  color-scheme: light;
+  background: var(--aa-page);
+}
+
+html body {
+  background-color: var(--aa-page);
+  color: var(--aa-ink);
+}
+
+/* A consistent navigation and footer anchor across public pages. */
+html body header.topbar,
+html body .project-profile-page .topbar {
+  background: linear-gradient(110deg, #594638 0%, #514237 58%, #493A30 100%);
+  color: var(--aa-cream);
+  border-bottom: 2px solid var(--aa-accent);
+  box-shadow: 0 5px 18px rgba(64, 49, 39, .12);
+}
+
+html body header.topbar .brand strong,
+html body header.topbar nav a,
+html body .project-profile-page .topbar .brand {
+  color: var(--aa-cream);
+}
+
+html body header.topbar .brand small,
+html body .project-profile-page .topbar .brand small {
+  color: var(--aa-peach);
+}
+
+html body header.topbar nav a:hover,
+html body header.topbar nav a.active,
+html body header.topbar nav a[aria-current="page"],
+html body .project-profile-page .topbar nav a.active,
+html body .project-profile-page .topbar nav a:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, .12);
+}
+
+html body header.topbar .btn-outline,
+html body .project-profile-page .topbar .btn-outline {
+  color: var(--aa-cream);
+  background: rgba(255, 255, 255, .06);
+  border-color: rgba(255, 249, 243, .52);
+}
+
+html body footer.footer,
+html body footer.footer-pro,
+html body .project-footer {
+  background: #40342B;
+  color: #F4EDE5;
+  border-color: rgba(210, 164, 119, .34);
+}
+
+html body footer.footer a,
+html body footer.footer-pro a,
+html body .project-footer a {
+  color: #EBD0B9;
+}
+
+html body .mobile-nav,
+html body .aa-appnav {
+  background: rgba(255, 252, 248, .98);
+  border-color: var(--aa-line);
+  box-shadow: 0 -7px 22px rgba(64, 54, 47, .08);
+}
+
+html body .mobile-nav a,
+html body .mobile-nav button,
+html body .aa-appnav a,
+html body .aa-appnav button {
+  color: #6D5D52;
+}
+
+html body .mobile-nav a.is-current,
+html body .mobile-nav a[aria-current="page"],
+html body .aa-appnav a.is-current {
+  color: var(--aa-brand);
+}
+
+/* Shared page canvas, text hierarchy and links. */
+html body main :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--aa-ink);
+}
+
+html body main :is(.section-heading .eyebrow, .eyebrow, .cd-eyebrow) {
+  color: var(--aa-brand);
+}
+
+html body main :is(p, li, dd, dt, figcaption) {
+  color: inherit;
+}
+
+html body main a:not(.btn):not(.topbar a):not(.home-hub-card) {
+  text-decoration-color: rgba(166, 92, 64, .32);
+}
+
+html body main a:not(.btn):not(.topbar a):not(.home-hub-card):hover {
+  color: var(--aa-brand-hover);
+}
+
+/* Shared borders, fields and keyboard focus. */
+html body :is(input, select, textarea) {
+  color: var(--aa-ink);
+  background-color: var(--aa-surface);
+  border-color: var(--aa-line);
+  border-radius: var(--aa-radius-sm);
+}
+
+html body :is(input, select, textarea)::placeholder {
+  color: #92857A;
+  opacity: 1;
+}
+
+html body :is(input, select, textarea):focus,
+html body :is(input, select, textarea):focus-visible,
+html body button:focus-visible,
+html body a:focus-visible {
+  outline-color: rgba(166, 92, 64, .35);
+  border-color: var(--aa-brand);
+}
+
+html body :is(.offer-card, .listing-card, .company-directory-card, .directory-card,
+  .featured-card, .mk-profile-card, .know-card, .directory-stat, .project-section,
+  .project-fact, .project-entity-card, .project-source-card, .project-unit-card,
+  .project-unit-offer-card, .cd-company-card, .cd-stat-card, .cd-quick-card,
+  .cd-team-panel, .cd-project-card, .cd-account-listing, .cd-request-card,
+  .cd-team-member, .cd-review-list > div, .cd-footer-note, .marketplace-category-tile,
+  .home-hub-card, .ab-party, .ab-value) {
+  border-color: var(--aa-line);
+  box-shadow: var(--aa-shadow);
+}
+
+html body :is(.offer-card, .listing-card, .company-directory-card, .directory-card,
+  .featured-card, .mk-profile-card, .know-card, .directory-stat, .project-section,
+  .project-fact, .project-entity-card, .project-source-card, .project-unit-card,
+  .project-unit-offer-card, .cd-company-card, .cd-stat-card, .cd-quick-card,
+  .cd-team-panel, .cd-project-card, .cd-account-listing, .cd-request-card,
+  .cd-team-member, .cd-review-list > div, .cd-footer-note, .marketplace-category-tile,
+  .home-hub-card, .ab-party, .ab-value) {
+  color: var(--aa-ink);
+}
+
+html body :is(.offer-card h2, .offer-card h3, .listing-card h2, .listing-card h3,
+  .company-directory-card h2, .company-directory-card h3, .directory-card h2,
+  .directory-card h3, .home-hub-card b, .project-section h2, .project-unit-card h3) {
+  color: var(--aa-ink);
+}
+
+html body :is(.offer-card p, .listing-card p, .directory-card p,
+  .company-directory-card p, .home-hub-card small, .project-unit-card p) {
+  color: var(--aa-muted);
+}
+
+/* Brand actions share one terracotta treatment; gold is an accent, not a competing theme. */
+html body :is(.btn-gold, .btn-primary, .cd-live-action:not(.cd-live-action--secondary),
+  .cd-primary-link, .project-profile-page .btn-gold) {
+  background: var(--aa-brand);
+  border-color: var(--aa-brand);
+  color: #FFFFFF;
+}
+
+html body :is(.btn-gold, .btn-primary, .cd-live-action:not(.cd-live-action--secondary),
+  .cd-primary-link, .project-profile-page .btn-gold):hover {
+  background: var(--aa-brand-hover);
+  border-color: var(--aa-brand-hover);
+  color: #FFFFFF;
+}
+
+html body :is(.btn-outline-dark, .ab-link, .project-breadcrumbs a,
+  .project-map-link, .project-source-card a, .project-entity-card a) {
+  color: var(--aa-brand);
+  border-color: #DCC5B5;
+}
+
+html body :is(.btn-outline-dark, .ab-link):hover {
+  color: var(--aa-brand-hover);
+  background: var(--aa-brand-soft);
+  border-color: #D8B49B;
+}
+
+/* Navigation and work areas in the company dashboard use the same tokens. */
+html body.company-dashboard-page {
+  background: var(--aa-page);
+  color: var(--aa-ink);
+}
+
+html body.company-dashboard-page .cd-topbar,
+html body.company-dashboard-page .cd-sidebar {
+  background: var(--aa-surface);
+  border-color: var(--aa-line);
+}
+
+html body.company-dashboard-page .cd-nav a {
+  color: #66564B;
+}
+
+html body.company-dashboard-page .cd-nav a:hover,
+html body.company-dashboard-page .cd-nav a.is-active {
+  color: var(--aa-brand);
+  background: var(--aa-brand-soft);
+}
+
+html body.company-dashboard-page .cd-primary-link {
+  background: var(--aa-brand);
+  color: #FFFFFF;
+}
+
+html body.company-dashboard-page .cd-primary-link:hover {
+  background: var(--aa-brand-hover);
+}
+
+html body.company-dashboard-page .cd-welcome {
+  border-color: #E8D7C6;
+  background: linear-gradient(115deg, #FFFCF8 0%, #F7EDE3 60%, #F1E2D2 100%);
+}
+
+html body.company-dashboard-page .cd-welcome h1,
+html body.company-dashboard-page .cd-welcome h2 {
+  color: var(--aa-ink);
+}
+
+html body.company-dashboard-page .cd-welcome p {
+  color: var(--aa-muted);
+}
+
+html body.company-dashboard-page .cd-live-action--secondary {
+  color: var(--aa-brand);
+  background: var(--aa-surface);
+  border-color: var(--aa-line);
+}
+
+/* Public project pages keep a dark, high-contrast project cover, using the shared dark tone. */
+html body.project-profile-page {
+  background: var(--aa-page);
+  color: var(--aa-ink);
+}
+
+html body.project-profile-page .project-hero {
+  background: linear-gradient(130deg, #514237 0%, #665143 70%, #79604A 100%);
+}
+
+html body.project-profile-page .project-fact,
+html body.project-profile-page .project-section,
+html body.project-profile-page .project-entity-card,
+html body.project-profile-page .project-source-card,
+html body.project-profile-page .project-unit-card,
+html body.project-profile-page .project-unit-offer-card {
+  background: var(--aa-surface);
+  border-color: var(--aa-line);
+}
+
+/* Homepage: balanced light bands, white cards and consistent copper accents. */
+html body.page-home main > section.design-benefits {
+  background: var(--aa-surface);
+  border-block: 1px solid var(--aa-line);
+}
+
+html body.page-home main > section.home-areas,
+html body.page-home main > section.home-partners {
+  background: var(--aa-surface-soft);
+}
+
+html body.page-home main > section.home-hub,
+html body.page-home .ab,
+html body.page-home .hw {
+  background: var(--aa-page);
+}
+
+html body.page-home .home-hub-card {
+  background: var(--aa-surface);
+  color: var(--aa-ink);
+  border-color: var(--aa-line);
+}
+
+html body.page-home .home-hub-icon {
+  background: var(--aa-brand-soft);
+  color: var(--aa-brand);
+}
+
+html body.page-home .home-hub-card:hover {
+  border-color: #D8B49B;
+}
+
+html body.page-home .area-chip,
+html body.page-home .category-tile,
+html body.page-marketplace .mk-chip {
+  color: var(--aa-ink);
+  background: var(--aa-surface);
+  border-color: var(--aa-line);
+}
+
+html body.page-home .area-chip:hover,
+html body.page-home .category-tile:hover,
+html body.page-marketplace .mk-chip:hover {
+  color: var(--aa-brand);
+  background: var(--aa-brand-soft);
+  border-color: #D8B49B;
+}
+
+html body.page-home .design-benefits > div > span,
+html body.page-home .category-tile-icon,
+html body.page-home .ab-icon,
+html body.page-home .hw-badge,
+html body.page-home .hw-trust-icon {
+  color: var(--aa-brand);
+  background: var(--aa-brand-soft);
+}
+
+html body.page-home .hw-tabs [role="tab"].is-active {
+  color: #FFFFFF;
+  background: var(--aa-espresso);
+}
+
+html body.page-home .hw-panel {
+  background: linear-gradient(135deg, #FFFCF8 0%, #F6EEE5 100%);
+  border-color: var(--aa-line);
+}
+
+html body.page-home .launch-campaign,
+html body.page-home .hero.design-hero,
+html body.page-marketplace .marketplace-page-hero {
+  color: var(--aa-cream);
+  background: linear-gradient(125deg, #40342B 0%, #514237 64%, #665142 100%);
+  border-color: var(--aa-accent);
+}
+
+html body.page-home .launch-campaign h2,
+html body.page-home .launch-campaign p,
+html body.page-home .launch-campaign small {
+  color: var(--aa-cream);
+}
+
+/* Shared marketplace, directory and listing-page filter states. */
+html body :is(.category.active, .category[aria-pressed="true"],
+  .mk-chip.is-active, .mk-chip[aria-pressed="true"],
+  .filter-chip.is-active, .filter-chip[aria-pressed="true"]) {
+  color: #FFFFFF;
+  background: var(--aa-brand);
+  border-color: var(--aa-brand);
+}
+
+html body :is(.status-message, .notice, .form-note, .cd-preview-note,
+  .cd-helper-line, .project-disclaimer) {
+  color: #6D5748;
+  background: var(--aa-surface-warm);
+  border-color: #EADBCB;
+}
+
+html body :is(.trust-badge-company, .cd-project-role, .project-unit-count,
+  .project-unit-kind, .project-unit-offer-purpose) {
+  color: var(--aa-brand);
+  background: var(--aa-brand-soft);
+  border-color: #EAD6C8;
+}
+
+/* Keep status meaning intact while aligning the surrounding neutral palette. */
+html body :is(.cd-mark-approved, .cd-live-status--success, [data-state="success"]) {
+  border-color: #C9DFCF;
+}
+
+@media (max-width: 760px) {
+  html body header.topbar {
+    border-bottom-width: 2px;
+  }
+
+  html body.page-home main > section.home-areas,
+  html body.page-home main > section.home-partners {
+    background: var(--aa-surface-soft);
+  }
+
+  html body.company-dashboard-page .cd-topbar {
+    border-bottom-color: var(--aa-line);
+  }
+}
