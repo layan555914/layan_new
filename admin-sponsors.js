@@ -215,7 +215,7 @@
     '<div class="as-dialog-head"><h2 data-title>إضافة إعلان ممول</h2><button type="button" class="as-close" data-close aria-label="إغلاق">×</button></div>' +
     '<div class="as-grid">' +
       '<label>اسم النشاط *<input name="business_name" required minlength="2" maxlength="120"></label>' +
-      '<label data-new-only>بريد صاحب الإعلان المسجل *<input name="owner_email" type="email" maxlength="255" placeholder="name@example.com"></label>' +
+      '<label data-new-only>بريد العميل (اختياري)<input name="owner_email" type="email" maxlength="255" placeholder="اتركه فارغًا لحساب الإدارة"><small>اكتب بريد العميل لربط الإعلان بحسابه، أو اتركه فارغًا لو الإعلان تابع لحساب الإدارة.</small></label>' +
       '<label>المجال *<select name="category" required>' + CATEGORIES.map(c => "<option>" + c + "</option>").join("") + '</select></label>' +
       '<label class="is-wide">عنوان الإعلان *<input name="title" required minlength="3" maxlength="140"></label>' +
       '<label class="is-wide">الوصف *<textarea name="description" required minlength="5" maxlength="500" rows="3"></textarea></label>' +
@@ -263,10 +263,14 @@
       let ownerId = editingAd?.owner_id || "";
       if (!editingAd) {
         const ownerEmail = aForm.owner_email.value.trim();
-        if (!ownerEmail) throw new Error("اكتب بريد صاحب الإعلان المسجل.");
-        status.textContent = "جارٍ التحقق من حساب صاحب الإعلان...";
-        ownerId = await rpc("layan_admin_resolve_user", { p_email: ownerEmail });
-        if (typeof ownerId !== "string" || !ownerId) throw new Error("تعذر تحديد حساب صاحب الإعلان.");
+        if (ownerEmail) {
+          status.textContent = "جارٍ التحقق من حساب صاحب الإعلان...";
+          ownerId = await rpc("layan_admin_resolve_user", { p_email: ownerEmail });
+          if (typeof ownerId !== "string" || !ownerId) throw new Error("تعذر تحديد حساب صاحب الإعلان.");
+        } else {
+          ownerId = window.LAYAN_SUPABASE?.getSession?.()?.user?.id || "";
+          if (!ownerId) throw new Error("تعذر تحديد حساب الإدارة الحالي.");
+        }
       }
       let image = aForm.image_url.value.trim();
       if (pendingAdFile) { status.textContent = "جارٍ رفع الصورة..."; image = await uploadImage(pendingAdFile, "sponsored-ad", ownerId); }
