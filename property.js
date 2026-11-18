@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "bedrooms","bathrooms","monthly_installment","property_type","description",
     "total_price","price_on_request","down_payment","paid_amount","remaining_amount","assignment_fee",
     "assignment_fee_percentage","discount_amount","discount_percent","developer_name",
-    "project_name","image_urls","is_featured","featured_until","contact_phone",
+    "project_name","directory_project_id","directory_entity_id","image_urls","is_featured","featured_until","contact_phone",
     "latitude","longitude","created_at","updated_at"
   ].join(",");
 
@@ -98,6 +98,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const locationText = [row.city, row.area].filter(Boolean).join(" · ") || "أسيوط";
     const mapURL = row.latitude !== null && row.latitude !== undefined && row.longitude !== null && row.longitude !== undefined
       ? "https://www.google.com/maps?q=" + encodeURIComponent(Number(row.latitude) + "," + Number(row.longitude)) : "";
+    const projectContext = row.directory_project_id
+      ? '<a class="property-project-link" href="./project.html?id=' + encodeURIComponent(String(row.directory_project_id)) + '">عرض ملف المشروع المرتبط بهذه الوحدة ↗</a>'
+      : "";
 
     document.title = title + " | أسيوط عقار";
     const description = String(row.description || ("تفاصيل " + (row.property_type || "العقار") + " في " + locationText + " على منصة أسيوط عقار.")).slice(0, 155);
@@ -200,6 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${listingDates(row)}
           <h1>${escapeHTML(title)}</h1>
           <p class="property-location">⌖ ${escapeHTML(locationText)} ${mapURL ? ' · <a href="' + escapeHTML(mapURL) + '" target="_blank" rel="noopener noreferrer">عرض الموقع</a>' : ""}</p>
+          ${projectContext}
           <div class="property-price-highlight"><span>${displayedPriceLabel}</span><strong>${row.price_on_request === true ? "السعر عند التواصل" : money(row.total_price) + (isRent ? " / شهر" : "")}</strong></div>
           ${isAssignment && (Number(row.down_payment) > 0 || Number(row.remaining_amount) > 0) ? `<div class="property-key-figures">
             ${Number(row.down_payment) > 0 ? `<div class="property-key-figure"><span>المقدم عند التعاقد</span><strong>${money(row.down_payment)}</strong></div>` : ""}
@@ -279,8 +283,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       const endpointFor = list => base + "/rest/v1/property_offers?select=" + list + "&id=eq." + encodeURIComponent(id) + "&status=eq.available&limit=1";
       const headers = {headers:{apikey:key,Authorization:"Bearer " + key},cache:"no-store"};
       let response = await fetch(endpointFor(fields + ",trust_badge"), headers);
-      // Databases without the admin trust badge column still load the listing.
+      // Preview branches may still point to a database before the project-unit migration.
       if (response.status === 400) response = await fetch(endpointFor(fields), headers);
+      if (response.status === 400 && fields.includes("directory_project_id")) {
+        const legacyFields = fields.split(",").filter(field => !["directory_project_id","directory_entity_id"].includes(field)).join(",");
+        response = await fetch(endpointFor(legacyFields), headers);
+      }
       if (!response.ok) throw new Error("تعذر تحميل الإعلان.");
       const rows = await response.json();
       if (!Array.isArray(rows) || !rows.length) {
