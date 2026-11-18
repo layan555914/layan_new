@@ -8,26 +8,47 @@
     try { const u = new URL(String(value || "")); return ["https:", "http:"].includes(u.protocol) ? u.href : ""; } catch (_) { return ""; }
   };
   const initial = name => (String(name || "").trim().match(/[\p{L}\p{N}]/u) || ["★"])[0].toUpperCase();
-  const waNumber = phone => {
+  const phoneNumbers = value => [...new Set(String(value || "").split(/[;,،|/\r\n]+/u)
+    .map(phone => phone.trim().replace(/[^+0-9]/g, ""))
+    .filter(phone => {
+      const digits = phone.replace(/\D/g, "");
+      return digits.length >= 10 && digits.length <= 15;
+    }))];
+  const telNumber = phone => {
     let digits = String(phone || "").replace(/\D/g, "");
     if (digits.startsWith("00")) digits = digits.slice(2);
-    if (digits.startsWith("01") && digits.length === 11) digits = "2" + digits;
-    return digits.length >= 10 ? digits : "";
+    if (digits.startsWith("0") && digits.length === 11) digits = "2" + digits;
+    return digits.startsWith("20") ? "+" + digits : digits;
+  };
+  const waNumber = phone => {
+    const tel = telNumber(phone).replace(/\D/g, "");
+    return tel.length >= 10 ? tel : "";
   };
 
   function renderAd(ad, options = {}) {
     const image = httpUrl(ad.image_url);
     const target = httpUrl(ad.target_url);
-    const phone = String(ad.contact_phone || "").replace(/[^+0-9]/g, "");
-    const wa = waNumber(ad.contact_phone);
+    const phones = phoneNumbers(ad.contact_phone);
+    const description = String(ad.description || "")
+      .replace(/\s*(?:للتواصل|للاتصال)\s*[:：]?\s*(?:[+＋]?[\d٠-٩\s().,،;/|-]+)?[.!،]?\s*$/u, "")
+      .trim();
+    const phoneActions = phones.length
+      ? '<div class="sp-ad-phone-list" aria-label="أرقام التواصل">' + phones.map(phone => {
+          const tel = telNumber(phone);
+          const wa = waNumber(phone);
+          const displayPhone = esc(phone.replace(/[^+0-9]/g, ""));
+          const call = tel ? '<a class="sp-ad-btn sp-ad-call-btn" href="tel:' + esc(tel) + '">اتصال <bdi dir="ltr">' + displayPhone + '</bdi></a>' : "";
+          const whatsapp = wa ? '<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || name) + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + esc(name) + ' — ' + displayPhone + '">واتساب</a>' : "";
+          return '<div class="sp-ad-phone-row">' + call + whatsapp + '</div>';
+        }).join("") + '</div>'
+      : "";
     const name = ad.business_name || ad.title || "إعلان ممول";
     const media = image
       ? '<img src="' + esc(image) + '" alt="' + esc(name) + '" loading="lazy" referrerpolicy="no-referrer">'
       : '<div class="sp-ad-monogram" aria-hidden="true"><span>' + esc(initial(name)) + '</span><small>' + esc(name) + '</small></div>';
     const actions = [
       target ? '<a class="sp-ad-btn sp-ad-btn-primary" href="' + esc(target) + '" target="_blank" rel="noopener noreferrer sponsored">اعرف التفاصيل</a>' : "",
-      phone ? '<a class="sp-ad-btn" href="tel:' + esc(phone) + '" data-listing-id="ad-' + esc(ad.id) + '">اتصل بالمعلن</a>' : "",
-      wa ? '<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || name) + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + esc(name) + '">واتساب</a>' : ""
+      phoneActions
     ].filter(Boolean).join("");
     const extraClass = options.className ? " " + options.className : "";
     const extraAttr = options.attr ? " " + options.attr : "";
@@ -37,7 +58,7 @@
         '<div class="sp-ad-brand"><span class="sp-ad-avatar" aria-hidden="true">' + esc(initial(name)) + '</span>' +
           '<div><strong>' + esc(name) + '</strong><small>' + esc(ad.category || "إعلانات الأنشطة") + ' · <b>مساحة إعلانية</b></small></div></div>' +
         '<h3>' + esc(ad.title || name) + '</h3>' +
-        (ad.description ? '<p class="sp-ad-desc">' + esc(ad.description) + '</p>' : "") +
+        (description ? '<p class="sp-ad-desc">' + esc(description).replace(/\r?\n/g, "<br>") + '</p>' : "") +
         '<div class="sp-ad-actions">' + (actions || '<a class="sp-ad-btn sp-ad-btn-primary" href="./advertise.html">تفاصيل الإعلان</a>') + '</div>' +
       '</div></article>';
   }
