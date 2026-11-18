@@ -103,6 +103,15 @@
     document.head.appendChild(platformTheme);
   }
 
+  // Final visual finish: shared heading hierarchy, component lighting and empty-photo treatment.
+  if (!document.querySelector('link[data-asyut-visual-finish="global"]')) {
+    const visualFinish = document.createElement("link");
+    visualFinish.rel = "stylesheet";
+    visualFinish.href = "/assets/theme/platform-visual-finish.css?v=20261119-1";
+    visualFinish.dataset.asyutVisualFinish = "global";
+    document.head.appendChild(visualFinish);
+  }
+
   const header = document.querySelector("header.topbar");
   if (!header) return;
   const nav = header.querySelector("nav");
