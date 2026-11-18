@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./assets/theme/company-dashboard.css?v=20261118-phase3-1">
+  <link rel="stylesheet" href="./assets/theme/company-dashboard.css?v=20261118-phase4-1">
 </head>
 <body class="company-dashboard-page no-appnav">
   <header class="cd-topbar">
@@ -145,6 +145,15 @@
         </div>
         <div id="cdListingsList" class="cd-account-listings" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل إعلانات الحساب...</p></div>
         <p class="cd-helper-line">المعروض هنا إعلانات الحساب المسجل فقط. لا نعتبر الإعلان تابعًا للشركة أو لمشروع بعينه إلا بعد وجود علاقة موثقة في النظام.</p>
+        <section class="cd-company-units" aria-labelledby="cdProjectUnitsTitle">
+          <div class="cd-section-heading">
+            <div><span class="cd-eyebrow">إدارة وحدات المشروعات</span><h3 id="cdProjectUnitsTitle">وحدات مرتبطة بمشروعات شركتك</h3></div>
+            <span class="cd-section-count">تظهر للزوار بعد اعتماد الإدارة</span>
+          </div>
+          <div id="cdProjectUnitsRoot" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل إدارة وحدات المشروعات...</p></div>
+          <div id="cdProjectUnitsList" class="cd-project-units-list" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل الوحدات المرتبطة...</p></div>
+          <p id="cdProjectUnitsStatus" class="cd-team-feedback" role="status" aria-live="polite"></p>
+        </section>
       </section>
 
       <section class="cd-section" id="requests" aria-labelledby="cdRequestsTitle">
@@ -188,6 +197,7 @@
   <script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script>
   <script src="./company-dashboard.js?v=20261117-live-dashboard-1" defer></script>
   <script src="./company-project-management.js?v=20261118-phase3-1" defer></script>
+  <script src="./company-project-units.js?v=20261118-phase4-1" defer></script>
   <script src="./app-shell.js?v=20261117-persistent-auth-session-1" defer></script>
   <script src="./site-nav.js?v=20261117-persistent-auth-session-1" defer></script>
 </body>
