@@ -287,3 +287,24 @@ test("unauthenticated visitors are directed to the platform login entry", async 
   await expect(page.locator("#cdConnectionMessage")).toContainText("سجّل الدخول");
   await expect(page.locator("#cdCompanyProfiles a")).toHaveAttribute("href", "./");
 });
+
+
+test("dashboard focuses the company profile selected from its public profile", async ({ page }) => {
+  await installDashboardMocks(page);
+  await page.goto("/company-dashboard.html?company_id=" + ENTITY_ID + "#company-data");
+
+  const selected = page.locator('#cdCompanyProfiles [data-company-id="' + ENTITY_ID + '"]');
+  await expect(selected).toBeVisible();
+  await expect(selected).toContainText("وكالة أسيوط للتسويق");
+  await expect(page.locator("#cdConnectionMessage")).not.toContainText("غير مرتبط بصلاحيات حسابك");
+});
+
+test("dashboard refuses to focus a company profile that is not linked to the account", async ({ page }) => {
+  await installDashboardMocks(page);
+  await page.goto("/company-dashboard.html?company_id=99999999-9999-4999-8999-999999999999#company-data");
+
+  await expect(page.locator("#cdConnectionMessage"))
+    .toContainText("الملف المحدد غير مرتبط بصلاحيات حسابك الحالية");
+  await expect(page.locator("#cdCompanyProfiles [data-company-id=\"99999999-9999-4999-8999-999999999999\"]"))
+    .toHaveCount(0);
+});
