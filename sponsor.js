@@ -44,8 +44,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Show only the advertiser's own verified image; otherwise render the neutral business-name placeholder.
     const image = safeUrl(ad.image_url);
     const target = safeUrl(ad.target_url);
-    const phone = String(ad.contact_phone || "").replace(/[^+0-9]/g, "");
-    const phoneLink = phone ? '<a class="btn btn-outline-dark" href="tel:' + esc(phone) + '">اتصل بالمعلن</a>' : "";
+    const phones = [...new Set(String(ad.contact_phone || "").split(/[;,،|\/\r\n]+/u).map(value => value.trim().replace(/[^+0-9]/g, "")).filter(value => value.replace(/\D/g, "").length >= 10))];
+    const phoneLink = phones.map(phone => {
+      const digits = phone.replace(/\D/g, "");
+      const tel = digits.startsWith("0") && digits.length === 11 ? "+2" + digits : (digits.startsWith("20") ? "+" + digits : digits);
+      return '<a class="btn btn-outline-dark" href="tel:' + esc(tel) + '">اتصل <bdi dir="ltr">' + esc(phone) + '</bdi></a>';
+    }).join("");
     return '<article class="offer-card sponsor-card" data-sponsor-card="' + esc(ad.id) + '">' +
       '<span class="sponsor-label">' + esc(ad.demo ? "نموذج مجاني تجريبي — غير معتمد رسميًا" : "إعلان ممول") + '</span>' +
       (image ? '<img class="offer-image" src="' + esc(image) + '" alt="' + esc(ad.business_name) + '" loading="lazy" referrerpolicy="no-referrer">' :

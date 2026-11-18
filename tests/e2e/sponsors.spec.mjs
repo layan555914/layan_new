@@ -9,7 +9,7 @@ async function mock(page) {
     { id: "s1", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
     { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
   ], ads: [
-    { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
+    { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع. للتواصل: 01229303561 / 01060354675", image_url: null, target_url: null, contact_phone: "01229303561 / 01060354675", status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
   ], rpc: [], patches: [], posts: [] };
   const user = { id: USER_ID, email: "sponsor-admin@example.invalid", email_confirmed_at: "2026-11-01T00:00:00Z", app_metadata: {}, user_metadata: {} };
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
@@ -61,7 +61,13 @@ test("home page shows the sponsors and the premium sponsored ad from the databas
   // The shared premium ad component labels this placement as featured, not a paid "sponsored" disclosure.
   await expect(ad.locator(".sp-ad-badge")).toContainText("إعلان مميز");
   await expect(ad.locator(".sp-ad-monogram")).toBeVisible();
-  await expect(ad.locator("a[href^='tel:']")).toBeVisible();
+  const phoneRows = ad.locator(".sp-ad-phone-row");
+  await expect(phoneRows).toHaveCount(2);
+  await expect(phoneRows.nth(0).locator("a[href='tel:+201229303561']")).toBeVisible();
+  await expect(phoneRows.nth(1).locator("a[href='tel:+201060354675']")).toBeVisible();
+  await expect(phoneRows.nth(0)).toContainText("01229303561");
+  await expect(phoneRows.nth(1)).toContainText("01060354675");
+  await expect(ad.locator("a[href^='tel:']")).toHaveCount(2);
 });
 
 test("admin adds, hides and deletes sponsors and publishes a sponsored ad", async ({ page }) => {
