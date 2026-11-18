@@ -114,6 +114,11 @@ BEGIN
     RAISE EXCEPTION 'Property owners must not be able to attach a project unit by direct table update';
   END IF;
 
+  IF has_function_privilege('anon','private.guard_property_offer_project_unit_link()','EXECUTE')
+     OR has_function_privilege('authenticated','private.guard_property_offer_project_unit_link()','EXECUTE') THEN
+    RAISE EXCEPTION 'The trigger-only project-unit guard must not be directly executable by API roles';
+  END IF;
+
   IF NOT has_function_privilege('authenticated','public.company_project_unit_request_submit(uuid,jsonb,text,text)','EXECUTE')
      OR NOT has_function_privilege('authenticated','public.property_offer_project_unit_request_submit(bigint,uuid,text,text)','EXECUTE')
      OR NOT has_function_privilege('authenticated','public.company_project_unit_request_admin_review(uuid,text,text)','EXECUTE')
