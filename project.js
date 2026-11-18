@@ -135,12 +135,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      const [areaRows, sourceLinks, relationLinks] = await Promise.all([
+      const [areaRows, sourceLinks, relationLinks, unitOffers] = await Promise.all([
         project.area_id ? optionalRows("directory_areas", {
           id:"eq." + project.area_id,public_visible:"eq.true",verification_status:"eq.published",is_active:"eq.true",limit:"1"
         }, "id,name_ar,area_type,public_visible,verification_status") : Promise.resolve([]),
         optionalRows("directory_project_sources", { project_id:"eq." + project.id }, "source_id"),
-        optionalRows("directory_project_entities", { project_id:"eq." + project.id }, "entity_id,relation_type")
+        optionalRows("directory_project_entities", { project_id:"eq." + project.id }, "entity_id,relation_type"),
+        optionalRows("property_offers", {
+          directory_project_id:"eq." + project.id,
+          status:"eq.available",
+          verification_status:"eq.verified",
+          order:"created_at.desc",
+          limit:"100"
+        }, "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,price_on_request,down_payment,paid_amount,remaining_amount,monthly_installment,assignment_fee,image_urls")
       ]);
       const sourceIds = [...new Set(sourceLinks.map(row => row.source_id).filter(Boolean))];
       const entityIds = [...new Set(relationLinks.map(row => row.entity_id).filter(Boolean))];
@@ -195,8 +202,47 @@ document.addEventListener("DOMContentLoaded", async () => {
       const relationFallback = relationsHTML
         ? '<div class="project-relations">' + relationsHTML + '</div>'
         : '<p>لا توجد جهة مرتبطة منشورة للعامة بهذا المشروع حتى الآن.</p>';
+      const publishedUnits = Array.isArray(unitOffers) ? unitOffers : [];
+      const unitMoney = value => {
+        const amount = Number(value);
+        return Number.isFinite(amount) && amount > 0
+          ? new Intl.NumberFormat("ar-EG-u-nu-latn",{maximumFractionDigits:0}).format(amount) + " جنيه"
+          : "غير معلن";
+      };
+      const unitCards = publishedUnits.map(unit => {
+        const images = Array.isArray(unit.image_urls) ? unit.image_urls : [];
+        const imageUrl = images.map(safeURL).find(Boolean) || "";
+        const purpose = String(unit.listing_purpose || "بيع");
+        const price = unit.price_on_request ? "السعر عند التواصل" :
+          unitMoney(unit.total_price) + (purpose === "إيجار" ? " / شهر" : "");
+        const assignment = purpose === "تنازل"
+          ? [
+              Number(unit.down_payment) > 0 ? "المقدم: " + unitMoney(unit.down_payment) : "",
+              Number(unit.paid_amount) > 0 ? "المدفوع: " + unitMoney(unit.paid_amount) : "",
+              Number(unit.remaining_amount) > 0 ? "المتبقي: " + unitMoney(unit.remaining_amount) : ""
+            ].filter(Boolean).join(" · ")
+          : "";
+        const specs = [
+          unit.area_m2 ? new Intl.NumberFormat("ar-EG-u-nu-latn").format(Number(unit.area_m2)) + " م²" : "",
+          unit.bedrooms ? Number(unit.bedrooms) + " غرف" : "",
+          unit.bathrooms ? Number(unit.bathrooms) + " حمام" : ""
+        ].filter(Boolean).join(" · ");
+        return '<article class="project-unit-card">' +
+          (imageUrl ? '<a class="project-unit-image" href="./property.html?id=' + encodeURIComponent(String(unit.id)) + '"><img src="' + escapeHTML(imageUrl) + '" alt="' + escapeHTML(unit.title || "وحدة") + '" loading="lazy"></a>' : '') +
+          '<div class="project-unit-copy"><span class="project-unit-tag">' + escapeHTML(purpose) + ' · متاحة</span>' +
+          '<h3>' + escapeHTML(unit.title || unit.property_type || "وحدة عقارية") + '</h3>' +
+          '<p>' + escapeHTML([unit.property_type,unit.city,unit.area].filter(Boolean).join(" · ")) + '</p>' +
+          (specs ? '<small>' + escapeHTML(specs) + '</small>' : '') +
+          '<strong class="project-unit-price">' + escapeHTML(price) + '</strong>' +
+          (assignment ? '<small>' + escapeHTML(assignment) + '</small>' : '') +
+          '<a class="project-unit-link" href="./property.html?id=' + encodeURIComponent(String(unit.id)) + '">عرض تفاصيل الوحدة</a></div></article>';
+      }).join("");
+      const unitsSection = '<section class="project-section project-units-section"><h2>الوحدات المنشورة في هذا المشروع</h2>' +
+        '<p class="project-units-intro">الوحدات التي اعتمدت إدارة أسيوط عقار نشرها فقط. افتح إعلان الوحدة لمراجعة التفاصيل والتواصل مع المعلن.</p>' +
+        (unitCards ? '<div class="project-units-grid">' + unitCards + '</div>' : '<div class="project-empty"><p>لا توجد وحدات منشورة مرتبطة بهذا المشروع حتى الآن.</p></div>') +
+        '</section>';
       const approvedDate = dateLabel(project.last_verified_at);
-      const disclaimer = "هذا ملف معلوماتي مستقل مبني على السجلات والمراجع المنشورة. الإدراج لا يعني شراكة أو تزكية أو شهادة ترخيص من أسيوط عقار. حالة المشروع والمعلومات المنشورة تعكس ما ورد بالمصادر وقت مراجعتها وقد تتغير؛ يجب الرجوع إلى الجهة المختصة والمطور مباشرة قبل اتخاذ قرار أو دفع أي مبالغ. لا تعرض هذه الصفحة وحدات أو توافرًا للبيع لعدم وجود ربط معتمد بين سجل المشروع وإعلانات العقارات.";
+      const disclaimer = "هذا ملف معلوماتي مستقل مبني على السجلات والمراجع المنشورة. الإدراج لا يعني شراكة أو تزكية أو شهادة ترخيص من أسيوط عقار. حالة المشروع والمعلومات المنشورة والوحدات المعروضة تعكس ما ورد في السجلات وقت مراجعتها وقد تتغير؛ يجب الرجوع إلى الجهة المختصة والمطور مباشرة قبل اتخاذ قرار أو دفع أي مبالغ. الوحدات المعروضة أدناه هي إعلانات مرتبطة بهذا المشروع وتم اعتماد نشرها، ولا يضمن ظهورها استمرار التوافر.";
 
       root.innerHTML =
         '<section class="project-hero"><span class="project-eyebrow">ملف مشروع منشور في الدليل العقاري</span>' +
@@ -210,6 +256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (approvedDate ? '<p class="project-map-note">آخر مراجعة مسجلة: ' + escapeHTML(approvedDate) + '</p>' : "") +
         '</section>' +
         mapSection(project, area, trustedSource) +
+        unitsSection +
         '<section class="project-section"><h2>الجهات المرتبطة بالمشروع</h2>' + relationFallback + '</section>' +
         '<section class="project-section"><h2>المصادر والمراجع</h2>' + sourcesFallback + '</section>' +
         '<section class="project-disclaimer">' + escapeHTML(disclaimer) + '</section>' +
