@@ -86,7 +86,7 @@ test("verified company owner can request a unit and it remains under review", as
   const root = page.locator("#cdProjectUnitsRoot");
   const form = root.locator(".cd-project-unit-form");
   await expect(form).toBeVisible();
-  await form.locator("select").nth(0).selectOption(PROJECT_ID);
+  await form.locator("select").nth(0).selectOption(PROJECT_ID + "|" + ENTITY_ID);
   await form.locator("select").nth(1).selectOption("apartment");
   await form.locator('input[placeholder="مثال: عمارة 2 - الدور 3 - شقة 12"]').fill("عمارة 2 - شقة 12");
   await form.locator('input[placeholder="مثال: عمارة 2"]').fill("عمارة 2");
@@ -104,6 +104,7 @@ test("verified company owner can request a unit and it remains under review", as
   await expect(page.locator("#cdProjectUnitRequestsList")).toContainText("عمارة 2 - شقة 12");
   await expect(page.locator("#cdProjectUnitRequestsList")).toContainText("قيد مراجعة الإدارة");
   expect(submitted.p_project_id).toBe(PROJECT_ID);
+  expect(submitted.p_directory_entity_id).toBe(ENTITY_ID);
   expect(submitted.p_unit_payload.unit_ref).toBe("عمارة 2 - شقة 12");
   expect(submitted.p_unit_payload.public_visible).toBeUndefined();
 });
