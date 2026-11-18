@@ -18,7 +18,7 @@
   const MIGRATION_NOTE = '<p class="admin-empty admin-pending">تحتاج هذه الخاصية تطبيق تحديث قاعدة البيانات «الرعاة والإعلانات الممولة» (20261110120000).</p>';
 
   // ---------- Image upload (no watermark; JPEG into the admin's own folder, publicly readable) ----------
-  async function uploadImage(file, prefix) {
+  async function uploadImage(file, prefix, ownerId) {
     const cfg = window.LAYAN_CONFIG || {}, auth = window.LAYAN_SUPABASE;
     const session = auth?.getSession?.();
     if (!session?.access_token || !session?.user?.id) throw new Error("انتهت جلسة الدخول. سجّل الدخول مرة أخرى.");
@@ -27,7 +27,7 @@
     if (jpg.type !== "image/jpeg") throw new Error("تعذر تحويل الصورة إلى JPG. جرّب صورة أخرى.");
     const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
     const id = (crypto.randomUUID?.() || String(Date.now()) + Math.random().toString(16).slice(2));
-    const path = "offers/" + session.user.id + "/" + prefix + "-" + id + ".jpg";
+    const path = "offers/" + (ownerId || session.user.id) + "/" + prefix + "-" + id + ".jpg";
     const target = base + "/storage/v1/object/layan_real_estat/" + path;
     const r = typeof auth.authedFetch === "function"
       ? await auth.authedFetch(target, { method: "POST", headers: { "Content-Type": "image/jpeg", "x-upsert": "false" }, body: jpg })
@@ -215,6 +215,7 @@
     '<div class="as-dialog-head"><h2 data-title>إضافة إعلان ممول</h2><button type="button" class="as-close" data-close aria-label="إغلاق">×</button></div>' +
     '<div class="as-grid">' +
       '<label>اسم النشاط *<input name="business_name" required minlength="2" maxlength="120"></label>' +
+      '<label data-new-only>بريد العميل (اختياري)<input name="owner_email" type="email" maxlength="255" placeholder="اتركه فارغًا لحساب الإدارة"><small>اكتب بريد العميل لربط الإعلان بحسابه، أو اتركه فارغًا لو الإعلان تابع لحساب الإدارة.</small></label>' +
       '<label>المجال *<select name="category" required>' + CATEGORIES.map(c => "<option>" + c + "</option>").join("") + '</select></label>' +
       '<label class="is-wide">عنوان الإعلان *<input name="title" required minlength="3" maxlength="140"></label>' +
       '<label class="is-wide">الوصف *<textarea name="description" required minlength="5" maxlength="500" rows="3"></textarea></label>' +
@@ -246,6 +247,7 @@
       if (![...aForm.category.options].some(o => o.value === a.category)) aForm.category.insertAdjacentHTML("afterbegin", "<option>" + esc(a.category) + "</option>");
       aForm.category.value = a.category;
     }
+    if (!a) aForm.owner_email.value = "";
     paintAd(a ? httpUrl(a.image_url) : "");
     adDialog.querySelector("[data-status]").textContent = "";
     adDialog.showModal();
@@ -258,8 +260,20 @@
     if (target && !httpUrl(target)) { status.textContent = "رابط النشاط غير صحيح."; return; }
     btn.disabled = true;
     try {
+      let ownerId = editingAd?.owner_id || "";
+      if (!editingAd) {
+        const ownerEmail = aForm.owner_email.value.trim();
+        if (ownerEmail) {
+          status.textContent = "جارٍ التحقق من حساب صاحب الإعلان...";
+          ownerId = await rpc("layan_admin_resolve_user", { p_email: ownerEmail });
+          if (typeof ownerId !== "string" || !ownerId) throw new Error("تعذر تحديد حساب صاحب الإعلان.");
+        } else {
+          ownerId = window.LAYAN_SUPABASE?.getSession?.()?.user?.id || "";
+          if (!ownerId) throw new Error("تعذر تحديد حساب الإدارة الحالي.");
+        }
+      }
       let image = aForm.image_url.value.trim();
-      if (pendingAdFile) { status.textContent = "جارٍ رفع الصورة..."; image = await uploadImage(pendingAdFile, "sponsored-ad"); }
+      if (pendingAdFile) { status.textContent = "جارٍ رفع الصورة..."; image = await uploadImage(pendingAdFile, "sponsored-ad", ownerId); }
       if (image && !httpUrl(image)) throw new Error("رابط الصورة غير صحيح.");
       const row = {
         business_name: aForm.business_name.value.trim(), category: aForm.category.value, title: aForm.title.value.trim(),
@@ -272,10 +286,9 @@
       } else {
         const days = Math.round(Number(aForm.days.value)), price = Math.max(0, Number(aForm.price.value) || 0);
         if (!(days >= 1 && days <= 365)) throw new Error("مدة النشر من يوم إلى 365 يومًا.");
-        const uid = window.LAYAN_SUPABASE?.getSession?.()?.user?.id;
         status.textContent = "جارٍ إنشاء الإعلان...";
         const created = await req("supplier_ads?select=id", { method: "POST", headers: { Prefer: "return=representation" },
-          body: JSON.stringify({ ...row, owner_id: uid, status: "pending", plan_code: "custom", requested_days: days, requested_price: price, price: 0 }) });
+          body: JSON.stringify({ ...row, owner_id: ownerId, status: "pending", plan_code: "custom", requested_days: days, requested_price: price, price: 0 }) });
         const id = Array.isArray(created) ? created[0]?.id : created?.id;
         try {
           await rpc("layan_activate_supplier_ad", { p_ad_id: id, p_days: days, p_price: price });
