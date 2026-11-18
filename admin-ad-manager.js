@@ -37,8 +37,6 @@
       ["paid_amount","المبلغ المدفوع","number",false],["remaining_amount","المتبقي","number",false],
       ["monthly_installment","القسط الشهري","number",false],["contact_name","اسم المعلن","text",false],
       ["contact_phone","رقم التواصل","tel",false],["description","الوصف","textarea",false],
-      ["status","حالة الإعلان","select",false,["pending","available","reserved","sold"]],
-      ["verification_status","التحقق","select",false,["pending","under_review","verified","rejected"]]
     ],
     marketplace_listing: [
       ["title","عنوان الإعلان","text",true],["category","القسم","select",true,categories],
@@ -46,20 +44,18 @@
       ["description","الوصف","textarea",true],["city","المدينة / المركز","text",false],
       ["area","المنطقة","text",false],["price","السعر","number",false],
       ["price_period","فترة السعر","text",false],["contact_phone","رقم التواصل","tel",true],
-      ["whatsapp","رقم واتساب","tel",false],["status","حالة الإعلان","select",false,["pending","approved","rejected","paused"]]
+      ["whatsapp","رقم واتساب","tel",false]
     ],
     supplier_ad: [
       ["business_name","اسم النشاط","text",true],["category","المجال","text",true],
       ["title","عنوان الإعلان","text",true],["description","الوصف","textarea",true],
       ["contact_phone","رقم التواصل","tel",true],["target_url","رابط النشاط","url",false],
       ["image_url","رابط الصورة الحالية","url",false],["requested_days","مدة النشر المطلوبة","number",false],
-      ["requested_price","السعر المتفق عليه","number",false],["price","السعر المحصل","number",false],
-      ["status","حالة الإعلان","select",false,["pending","active","paused","expired","rejected"]]
+      ["requested_price","السعر المتفق عليه","number",false],["price","السعر المحصل","number",false]
     ],
     company_ad: [
       ["business_name","اسم الشركة / النشاط","text",true],
-      ["plan_code","نوع الطلب","select",true,["trial_30","custom"]],
-      ["status","حالة الطلب","select",false,["pending","active","paused","rejected"]]
+      ["plan_code","نوع الطلب","select",true,["trial_30","starter_15","growth_30","partner_90"]]
     ]
   };
   const selectValue = (value, options) => options.map(x => '<option value="' + esc(x) + '"' + (String(value ?? "") === x ? " selected" : "") + '>' + esc(x) + '</option>').join("");
@@ -139,7 +135,7 @@
       const [key,,type] = spec;
       const el = form.querySelector('[data-field="' + key + '"]');
       if (!el) continue;
-      if (type === "number") data[key] = el.value.trim() === "" ? null : Number(el.value);
+      if (type === "number") data[key] = el.value.trim() === "" ? (["down_payment","price","requested_days","requested_price"].includes(key) ? 0 : null) : Number(el.value);
       else data[key] = el.value.trim();
     }
     if (creating) {
@@ -177,6 +173,9 @@
         if (typeof ownerId !== "string" || !ownerId) throw new Error("تعذر تحديد حساب صاحب الإعلان.");
       }
       const body = readForm(form, kind, creating);
+      if (kind === "marketplace_listing" && body.description.trim().length < 20) throw new Error("وصف إعلان سوق الخدمات يجب ألا يقل عن 20 حرفًا.");
+      if (kind === "supplier_ad" && (body.business_name.trim().length < 2 || body.title.trim().length < 3 || body.description.trim().length < 5 || body.contact_phone.trim().length < 7)) throw new Error("راجع اسم النشاط والعنوان والوصف ورقم التواصل؛ توجد خانات لا تحقق الحد الأدنى المطلوب.");
+      if (kind === "company_ad" && body.business_name.trim().length < 2) throw new Error("اسم الشركة يجب ألا يقل عن حرفين.");
       body.owner_id = ownerId;
 
       if (kind === "property_offer" || kind === "marketplace_listing") {
@@ -202,6 +201,7 @@
         A.setStatus("تم إنشاء " + labels[kind] + " وربطه بحساب العميل، وأُرسل إلى المراجعة.");
       } else {
         delete body.owner_id;
+        body.updated_at = new Date().toISOString();
         result = await A.request("/rest/v1/" + endpoint[kind] + "?id=eq." + encodeURIComponent(row.id), {
           method:"PATCH", headers:{ Prefer:"return=representation" }, body:JSON.stringify(body)
         });
