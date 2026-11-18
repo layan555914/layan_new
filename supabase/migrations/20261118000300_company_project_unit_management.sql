@@ -141,19 +141,7 @@ USING (
   )
 );
 
--- A verified company-file owner or delegated manager can see every offer
--- associated with their own directory entity, including unpublished items.
--- Editors can read the unit list but cannot create, change or publish offers.
-DROP POLICY IF EXISTS property_offers_company_file_read ON public.property_offers;
-CREATE POLICY property_offers_company_file_read
-ON public.property_offers
-FOR SELECT
-TO authenticated
-USING (
-  directory_entity_id IS NOT NULL
-  AND private.company_entity_manager_access(directory_entity_id)
-    IN ('owner','manager','editor')
-);
+-- Company-file owner/manager/editor reads are included in the authenticated read policy above.
 
 CREATE OR REPLACE FUNCTION private.company_project_offer_submit(
   p_directory_entity_id uuid,
