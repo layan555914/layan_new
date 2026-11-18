@@ -247,7 +247,7 @@
       if (![...aForm.category.options].some(o => o.value === a.category)) aForm.category.insertAdjacentHTML("afterbegin", "<option>" + esc(a.category) + "</option>");
       aForm.category.value = a.category;
     }
-    if (!a) aForm.owner_email.value = window.LAYAN_SUPABASE?.getSession?.()?.user?.email || "";
+    if (!a) aForm.owner_email.value = "";
     paintAd(a ? httpUrl(a.image_url) : "");
     adDialog.querySelector("[data-status]").textContent = "";
     adDialog.showModal();
