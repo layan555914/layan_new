@@ -138,12 +138,19 @@ test("verified manager can submit a project request, but an editor cannot", asyn
   await expect(page.locator("#cdProjectRequestsList")).toContainText("طلب ربط بمشروع منشور");
   expect(managerMocks.getSubmittedBody().p_request_type).toBe("link_project");
 
-  // Change the mocked membership role and reload with the same auth/network
-  // fixtures, avoiding route teardown while the dashboard scripts are active.
-  managerMocks.setRole("editor");
-  await page.reload();
-  await expect(page.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد أو مدير الملف المفوض فقط");
-  await expect(page.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
+  // Run the editor permission check in a fresh context so it has no
+  // persisted session, cached script, or service-worker state from the manager.
+  const editorContext = await page.context().browser().newContext({ serviceWorkers: "block" });
+  const editorPage = await editorContext.newPage();
+  try {
+    await installDashboardMocks(editorPage, "editor");
+    const editorUrl = new URL("/company-dashboard.html", page.url()).href;
+    await editorPage.goto(editorUrl);
+    await expect(editorPage.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد أو مدير الملف المفوض فقط");
+    await expect(editorPage.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
+  } finally {
+    await editorContext.close();
+  }
 });
 
 test("directory administrator can approve a company request and see its final state", async ({ page }) => {
