@@ -19,7 +19,7 @@ ENTITY_ID="eeeeeeee-eeee-4eee-8eee-eeeeeeeeee01"
 PROJECT_ID="55555555-5555-4555-8555-555555555555"
 OLD_OFFER_ID="7001"
 LINK_OFFER_ID="7002"
-UNIT_ID="66666666-6666-4666-8666-666666666666"
+UNIT_ID=""
 HIDDEN_UNIT_ID="77777777-7777-4777-8777-777777777777"
 
 echo "Preparing an isolated property-offer baseline on top of the Phase 3 company/project schema..."
@@ -231,6 +231,12 @@ END
 \$unit_published\$;
 SQL
 
+UNIT_ID="$(psql -X -Atqc "SELECT resulting_unit_id::text FROM private.company_project_unit_requests WHERE project_id='$PROJECT_ID' AND unit_payload->>'unit_ref'='A-12' AND status='approved' ORDER BY reviewed_at DESC LIMIT 1")"
+if [[ -z "$UNIT_ID" ]]; then
+  echo "FAIL: the approved unit identifier could not be retrieved from the review record." >&2
+  exit 1
+fi
+
 echo "The owner requests an explicit link from an existing available ad to the approved unit."
 psql -X -v ON_ERROR_STOP=1 <<SQL
 BEGIN;
@@ -238,7 +244,7 @@ SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
 SELECT public.property_offer_project_unit_request_submit(
   '$LINK_OFFER_ID',
-  nullif(current_setting('test.phase4_unit_id',true),'')::uuid,
+  '$UNIT_ID',
   'https://example.invalid/ad-unit-evidence',
   'المعلن يؤكد أن الإعلان يخص الوحدة A-12 داخل المشروع المحدد'
 );
@@ -258,7 +264,7 @@ psql -X -v ON_ERROR_STOP=1 >/tmp/project-unit-direct-link-denied.log 2>&1 <<SQL
 BEGIN;
 SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
 UPDATE public.property_offers
-SET project_unit_id=nullif(current_setting('test.phase4_unit_id',true),'')::uuid
+SET project_unit_id='$UNIT_ID'::uuid
 WHERE id='$LINK_OFFER_ID';
 COMMIT;
 SQL
@@ -287,7 +293,7 @@ BEGIN
   WHERE offer_id='$LINK_OFFER_ID' AND status='pending';
   IF v_request IS NULL THEN RAISE EXCEPTION 'Ad-unit link request not available to administrator'; END IF;
   v_unit:=public.property_offer_project_unit_request_admin_review(v_request,'approve',NULL);
-  IF v_unit IS NULL OR v_unit<>nullif(current_setting('test.phase4_unit_id',true),'')::uuid THEN
+  IF v_unit IS NULL OR v_unit<>'$UNIT_ID'::uuid THEN
     RAISE EXCEPTION 'Admin approved the wrong unit link';
   END IF;
 END
