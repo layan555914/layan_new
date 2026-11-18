@@ -1,7 +1,7 @@
 // ASYUT AQAR site assistant (مساعد أسيوط عقار)
 // Answers questions about the platform from a built-in knowledge base and turns
 // property requests ("شقة إيجار في ديروط بمقدم 200 ألف") into filtered results.
-// Runs entirely in the browser: no login, no external AI service, no cost.
+// Keeps deterministic local answers and property filters, with optional server-side Gemini for open questions. The API key never enters the browser.
 (() => {
   "use strict";
   if (window.AsyutAssistant) return;
@@ -181,7 +181,53 @@
     return { html: `أنا مساعد أسيوط عقار، أساعدك في: البحث عن عقار (اكتب مثلًا «شقة إيجار في ديروط»)، إضافة إعلانك، التنازل ورسومه، التوثيق، الحساب، وسوق الخدمات والشركات. لو سؤالك يحتاج الإدارة ${ext(WA, "راسلنا على واتساب")}.` };
   }
 
-  const SUGGESTIONS = ["إزاي أضيف إعلاني؟", "هل فيه عمولة؟", "شقة إيجار في ديروط", "يعني إيه تنازل؟", "إزاي أتواصل مع الإدارة؟"];
+  function hasLocalAnswer(message) {
+    if (parseRequest(message)) return true;
+    const text = norm(message);
+    let bestScore = 0;
+    for (const [keys] of KB) {
+      const score = keys.reduce((sum, key) => sum + (text.includes(norm(key)) ? norm(key).length : 0), 0);
+      if (score > bestScore) bestScore = score;
+    }
+    const ownerIntent = /(اعرض|اضيف|انشر|اعلن عن|ابيع شقتي|ابيع عقاري|انزل اعلان|نزل اعلان)/.test(text);
+    const question = /(ازاي|ازاى|ايه|هل|يعني|ليه|امتي|امتى|كيف|ماذا|ما هو|ما هي|اعمل ايه)/.test(text);
+    return bestScore > 0 && (ownerIntent || question);
+  }
+
+  async function askGemini(message) {
+    const config = window.LAYAN_CONFIG || {};
+    const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
+    const publishableKey = String(config.SUPABASE_PUBLISHABLE_KEY || "");
+    if (!base || !publishableKey) return null;
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 25000);
+    try {
+      const response = await fetch(base + "/functions/v1/asyut-gemini", {
+        method: "POST",
+        credentials: "omit",
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          apikey: publishableKey
+        },
+        body: JSON.stringify({ message, website: "" })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || typeof data.answer !== "string") return null;
+      return data.answer.trim().slice(0, 2400) || null;
+    } catch {
+      return null;
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
+  }
+
+  function formatGeminiAnswer(answer) {
+    return esc(String(answer || "").replace(/\r\n?/g, "\n")).replace(/\n/g, "<br>");
+  }
+
+  const SUGGESTIONS = ["إزاي أضيف إعلاني؟", "هل فيه عمولة؟", "شقة إيجار في ديروط", "يعني إيه تنازل؟", "إزاي أتواصل مع الإدارة؟", "ساعدني أكتب وصفًا لعقاري"];
   window.AsyutAssistant = { reply, parseRequest, SUGGESTIONS };
 
   // ---- Floating chat widget on every page ----
@@ -193,7 +239,7 @@
     root.innerHTML = `
       <button type="button" class="aa-chat-toggle" aria-expanded="false" aria-controls="aaChatPanel" aria-label="اسأل مساعد أسيوط عقار" title="اسأل مساعد أسيوط عقار"><span class="aa-chat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11.5c0 4.1-3.6 7.5-8 7.5-1.1 0-2.2-.2-3.1-.6L4 20l1.3-3.8C4.5 14.8 4 13.2 4 11.5 4 7.4 7.6 4 12 4s8 3.4 8 7.5z"/><path d="M12 8.2l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="currentColor" stroke="none"/></svg><i class="aa-chat-dot"></i></span><span class="aa-chat-label">اسأل المساعد</span></button>
       <section class="aa-chat-panel" id="aaChatPanel" hidden aria-label="مساعد أسيوط عقار">
-        <header class="aa-chat-head"><div><b>مساعد أسيوط عقار</b><small>اسأل عن أي شيء في الموقع</small></div><button type="button" class="aa-chat-close" aria-label="إغلاق المساعد">×</button></header>
+        <header class="aa-chat-head"><div><b>مساعد أسيوط عقار</b><small>مساعد عقاري ذكي لمنصة أسيوط عقار</small></div><button type="button" class="aa-chat-close" aria-label="إغلاق المساعد">×</button></header>
         <div class="aa-chat-log" role="log" aria-live="polite"></div>
         <div class="aa-chat-chips">${SUGGESTIONS.map(s => `<button type="button">${esc(s)}</button>`).join("")}</div>
         <form class="aa-chat-form"><input type="text" maxlength="400" placeholder="اكتب سؤالك أو طلبك..." aria-label="اكتب سؤالك لمساعد أسيوط عقار"><button type="submit" class="btn btn-gold">إرسال</button></form>
@@ -216,6 +262,7 @@
       item.innerHTML = html;
       log.appendChild(item);
       log.scrollTop = log.scrollHeight;
+      return item;
     };
     const open = state => {
       panel.hidden = !state;
@@ -224,13 +271,38 @@
       if (state && !log.children.length) add("bot", "أهلًا بك! أنا مساعد أسيوط عقار. اسألني عن أي شيء في الموقع، أو اكتب العقار الذي تبحث عنه.");
       if (state) input.focus();
     };
-    const ask = text => {
+    let isAsking = false;
+    const submitButton = root.querySelector(".aa-chat-form button[type='submit']");
+    const ask = async text => {
       const q = String(text || "").trim();
-      if (!q) return;
+      if (!q || isAsking) return;
       add("user", esc(q));
-      const r = reply(q);
-      window.setTimeout(() => add("bot", r.html), 180);
       input.value = "";
+      isAsking = true;
+      input.disabled = true;
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "جارٍ التفكير...";
+      }
+      try {
+        const localReply = reply(q);
+        if (hasLocalAnswer(q)) {
+          add("bot", localReply.html);
+          return;
+        }
+        const waiting = add("bot", "جارٍ تجهيز رد المساعد الذكي...");
+        const answer = await askGemini(q);
+        waiting.remove();
+        add("bot", answer ? formatGeminiAnswer(answer) : localReply.html);
+      } finally {
+        isAsking = false;
+        input.disabled = false;
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = "إرسال";
+        }
+        input.focus();
+      }
     };
     toggle.addEventListener("click", () => open(panel.hidden));
     root.querySelector(".aa-chat-close").addEventListener("click", () => open(false));
