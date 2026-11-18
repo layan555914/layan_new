@@ -113,6 +113,11 @@ CREATE TABLE IF NOT EXISTS public.property_offers (
 
 ALTER TABLE public.property_offers ENABLE ROW LEVEL SECURITY;
 GRANT SELECT ON public.directory_projects,public.directory_entities,public.directory_project_entities TO anon,authenticated;
+-- The offer RLS policy itself checks the published flags and verified relationship.
+-- Keep these small directory fixtures readable so this test isolates the offer policy.
+ALTER TABLE public.directory_entities DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.directory_projects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.directory_project_entities DISABLE ROW LEVEL SECURITY;
 GRANT SELECT ON public.property_offers TO anon,authenticated;
 
 CREATE OR REPLACE FUNCTION private.layan_clean_offer_changes(
