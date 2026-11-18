@@ -129,6 +129,21 @@
           <div class="cd-section-heading"><div><span class="cd-eyebrow">متابعة الإدارة</span><h3 id="cdProjectRequestsTitle">طلبات المشروعات</h3></div><span class="cd-section-count">طلبات الحسابات المخوّلة فقط</span></div>
           <div id="cdProjectRequestsList" aria-live="polite"><p class="cd-live-loading">جارٍ تحميل طلبات المشروعات...</p></div>
         </section>
+        <section class="cd-section" id="projectUnits" aria-labelledby="cdProjectUnitsTitle">
+          <div class="cd-section-heading">
+            <div><span class="cd-eyebrow">إدارة المخزون العقاري</span><h2 id="cdProjectUnitsTitle">وحدات المشروعات</h2></div>
+            <span class="cd-section-count">تُراجع كل وحدة قبل ظهورها</span>
+          </div>
+          <div id="cdProjectUnitsRoot" class="cd-project-management" aria-live="polite">
+            <p class="cd-live-loading">جارٍ تحميل أدوات إدارة الوحدات...</p>
+          </div>
+          <div class="cd-section-heading cd-project-units-requests-heading">
+            <div><span class="cd-eyebrow">متابعة الإدارة</span><h3>طلبات الوحدات</h3></div>
+          </div>
+          <div id="cdProjectUnitRequestsList" aria-live="polite">
+            <p class="cd-live-loading">جارٍ تحميل طلبات الوحدات...</p>
+          </div>
+        </section>
         <div class="cd-project-flow" aria-label="ترتيب البيانات">
           <div><span>1</span><strong>ملف الشركة</strong><small>الهوية والخدمات والفروع</small></div>
           <i aria-hidden="true">←</i>
@@ -188,6 +203,7 @@
   <script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script>
   <script src="./company-dashboard.js?v=20261117-live-dashboard-1" defer></script>
   <script src="./company-project-management.js?v=20261118-phase3-1" defer></script>
+  <script src="./company-project-units.js?v=20261118-phase4-1" defer></script>
   <script src="./app-shell.js?v=20261117-persistent-auth-session-1" defer></script>
   <script src="./site-nav.js?v=20261117-persistent-auth-session-1" defer></script>
 </body>
