@@ -88,7 +88,7 @@ test("verified company owner can request a unit and it remains under review", as
   await expect(form).toBeVisible();
   await form.locator("select").nth(0).selectOption(PROJECT_ID);
   await form.locator("select").nth(1).selectOption("apartment");
-  await form.locator('input[placeholder*="عمارة"]').fill("عمارة 2 - شقة 12");
+  await form.locator('input[placeholder="مثال: عمارة 2 - الدور 3 - شقة 12"]').fill("عمارة 2 - شقة 12");
   await form.locator('input[placeholder="مثال: عمارة 2"]').fill("عمارة 2");
   await form.locator('input[placeholder="مثال: الثالث"]').fill("الثالث");
   await form.locator('input[placeholder="مثال: 12"]').fill("12");
