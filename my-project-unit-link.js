@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const requestRows=Array.isArray(requests)?requests:[];
     renderRequests(requestRows);
 
-    const linkedOfferIds=new Set(requestRows.filter(r=>["pending","needs_changes","approved"].includes(r.status)).map(r=>String(r.offer_id)));
+    const linkedOfferIds=new Set(requestRows.filter(r=>["pending","approved"].includes(r.status)).map(r=>String(r.offer_id)));
     const availableOffers=(Array.isArray(offers)?offers:[]).filter(o=>!linkedOfferIds.has(String(o.id)));
     const publicUnits=Array.isArray(units)?units:[];
     const projectIds=[...new Set(publicUnits.map(u=>u.project_id).filter(Boolean))];
