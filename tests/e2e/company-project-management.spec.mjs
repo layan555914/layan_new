@@ -92,7 +92,8 @@ async function installDashboardMocks(page, role = "owner") {
   });
 
   return {
-    getSubmittedBody: () => submittedBody
+    getSubmittedBody: () => submittedBody,
+    setRole: nextRole => { role = nextRole; }
   };
 }
 
@@ -137,12 +138,19 @@ test("verified manager can submit a project request, but an editor cannot", asyn
   await expect(page.locator("#cdProjectRequestsList")).toContainText("طلب ربط بمشروع منشور");
   expect(managerMocks.getSubmittedBody().p_request_type).toBe("link_project");
 
-  const editorPage = await page.context().newPage();
-  await installDashboardMocks(editorPage, "editor");
-  await editorPage.goto("/company-dashboard.html");
-  await expect(editorPage.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد");
-  await expect(editorPage.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
-  await editorPage.close();
+  // Run the editor permission check in a fresh context so it has no
+  // persisted session, cached script, or service-worker state from the manager.
+  const editorContext = await page.context().browser().newContext({ serviceWorkers: "block" });
+  const editorPage = await editorContext.newPage();
+  try {
+    await installDashboardMocks(editorPage, "editor");
+    const editorUrl = new URL("/company-dashboard.html", page.url()).href;
+    await editorPage.goto(editorUrl);
+    await expect(editorPage.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد أو مدير الملف المفوض فقط");
+    await expect(editorPage.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
+  } finally {
+    await editorContext.close();
+  }
 });
 
 test("directory administrator can approve a company request and see its final state", async ({ page }) => {
@@ -199,12 +207,13 @@ test("directory administrator can approve a company request and see its final st
   });
 
   await page.goto("/company-project-requests-admin.html");
-  page.on("dialog", dialog => dialog.accept());
   await page.locator("#cprEmail").fill("admin@example.com");
   await page.locator("#cprPassword").fill("valid-password");
   await page.locator("#cprLoginForm button[type=submit]").click();
 
   await expect(page.locator("#cprRequestsList")).toContainText("مشروع جديد بانتظار المراجعة");
+  // The review UI intentionally asks for confirmation before making the decision.
+  page.once("dialog", dialog => dialog.accept());
   await page.locator("#cprRequestsList button").filter({ hasText: "اعتماد وإنشاء سجل داخلي" }).click();
   await expect(page.locator("#cprStatus")).toContainText("تم اعتماد الطلب");
   await expect(page.locator("#cprRequestsList")).toContainText("تم الاعتماد");
