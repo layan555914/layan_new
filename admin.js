@@ -176,12 +176,61 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!target) return;
     target.innerHTML = '<p class="admin-empty">جارٍ تحميل تفاصيل التنازلات والعقارات...</p>';
     try {
-      const rows = await request("/rest/v1/property_offers?select=id,title,property_type,listing_purpose,city,area,area_m2,total_price,price_on_request,down_payment,paid_amount,remaining_amount,monthly_installment,assignment_fee,discount_amount,developer_name,project_name,contact_name,contact_phone,description,verification_status,developer_approval_status,verification_notes,created_at&status=eq.pending&or=(verification_status.eq.pending,verification_status.eq.under_review)&order=created_at.asc");
-      if (!Array.isArray(rows) || !rows.length) { target.innerHTML = '<p class="admin-empty">لا توجد إعلانات عقارية معلقة.</p>'; return; }
-      target.innerHTML = rows.map(x => '<article class="admin-ad" data-property-offer-id="' + esc(x.id) + '"><div><span class="admin-chip">' + esc(x.property_type || "عقار") + ' · ' + esc(x.listing_purpose || "بيع") + '</span><h2>' + esc(x.title) + '</h2><p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + '</p><p><strong>المساحة:</strong> ' + (x.area_m2 == null ? "غير محددة" : esc(x.area_m2) + " م²") + '</p><p><strong>السعر:</strong> ' + (x.price_on_request ? "عند التواصل" : Number(x.total_price || 0).toLocaleString("ar-EG-u-nu-latn") + " جنيه") + ' · <strong>المقدم:</strong> ' + Number(x.down_payment || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه · <strong>المدفوع:</strong> ' + Number(x.paid_amount || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه</p><p><strong>المتبقي:</strong> ' + Number(x.remaining_amount || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه · <strong>القسط:</strong> ' + Number(x.monthly_installment || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه</p><p><strong>رسوم التنازل:</strong> ' + Number(x.assignment_fee || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه · <strong>الخصم:</strong> ' + Number(x.discount_amount || 0).toLocaleString("ar-EG-u-nu-latn") + ' جنيه</p><p><strong>المطور/المشروع:</strong> ' + esc(x.developer_name || "غير مسجل") + ' / ' + esc(x.project_name || "غير مسجل") + '</p><p><strong>صاحب الإعلان:</strong> ' + esc(x.contact_name || "غير مسجل") + ' · ' + esc(x.contact_phone || "لا يوجد هاتف") + '</p><p>' + esc(x.description || "") + '</p><p><strong>حالة التحقق:</strong> ' + esc(x.verification_status || "غير محددة") + ' · <strong>موافقة المطور:</strong> ' + esc(x.developer_approval_status || "غير محددة") + '</p>' + (x.verification_notes ? '<p class="admin-chip">' + esc(x.verification_notes) + '</p>' : '') + '<div class="admin-actions"><button type="button" class="btn btn-gold" data-property-action="approve">اعتماد ونشر</button><button type="button" class="btn btn-outline-dark" data-property-action="reject">رفض مع السبب</button></div></div></article>').join("");
-    } catch (error) { target.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل الإعلانات العقارية.") + '</p>'; }
+      const legacyFields = "id,title,property_type,listing_purpose,city,area,area_m2,total_price,price_on_request,down_payment,paid_amount,remaining_amount,monthly_installment,assignment_fee,discount_amount,developer_name,project_name,contact_name,contact_phone,description,verification_status,developer_approval_status,verification_notes,created_at";
+      const fields = legacyFields + ",directory_project_id,directory_entity_id";
+      let rows;
+      try {
+        rows = await request("/rest/v1/property_offers?select=" + fields + "&status=eq.pending&or=(verification_status.eq.pending,verification_status.eq.under_review)&order=created_at.asc");
+      } catch (error) {
+        if (!/directory_project_id|directory_entity_id|column/i.test(String(error?.message || error))) throw error;
+        rows = await request("/rest/v1/property_offers?select=" + legacyFields + "&status=eq.pending&or=(verification_status.eq.pending,verification_status.eq.under_review)&order=created_at.asc");
+      }
+      if (!Array.isArray(rows) || !rows.length) {
+        target.innerHTML = '<p class="admin-empty">لا توجد إعلانات عقارية معلقة.</p>';
+        return;
+      }
+
+      const projectIds = [...new Set(rows.map(row => row.directory_project_id).filter(Boolean))];
+      const entityIds = [...new Set(rows.map(row => row.directory_entity_id).filter(Boolean))];
+      const [projects, entities] = await Promise.all([
+        projectIds.length ? request("/rest/v1/directory_projects?select=id,name_ar&id=in.(" + projectIds.join(",") + ")") : Promise.resolve([]),
+        entityIds.length ? request("/rest/v1/directory_entities?select=id,name_ar&id=in.(" + entityIds.join(",") + ")") : Promise.resolve([])
+      ]);
+      const projectNames = new Map((Array.isArray(projects) ? projects : []).map(row => [String(row.id), row.name_ar]));
+      const entityNames = new Map((Array.isArray(entities) ? entities : []).map(row => [String(row.id), row.name_ar]));
+
+      target.innerHTML = rows.map(x => {
+        const projectName = projectNames.get(String(x.directory_project_id || "")) || "";
+        const entityName = entityNames.get(String(x.directory_entity_id || "")) || "";
+        const linkedUnit = x.directory_project_id
+          ? '<p class="admin-chip">وحدة مرتبطة بمشروع: ' + esc(projectName || x.directory_project_id) +
+            (entityName ? ' · ملف الشركة: ' + esc(entityName) : "") + '</p>'
+          : "";
+        return '<article class="admin-ad" data-property-offer-id="' + esc(x.id) + '"><div><span class="admin-chip">' +
+          esc(x.property_type || "عقار") + ' · ' + esc(x.listing_purpose || "بيع") + '</span><h2>' + esc(x.title) +
+          '</h2>' + linkedUnit + '<p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") +
+          '</p><p><strong>المساحة:</strong> ' + (x.area_m2 == null ? "غير محددة" : esc(x.area_m2) + " م²") +
+          '</p><p><strong>السعر:</strong> ' + (x.price_on_request ? "عند التواصل" : Number(x.total_price || 0).toLocaleString("ar-EG-u-nu-latn") + " جنيه") +
+          ' · <strong>المقدم:</strong> ' + Number(x.down_payment || 0).toLocaleString("ar-EG-u-nu-latn") +
+          ' جنيه · <strong>المدفوع:</strong> ' + Number(x.paid_amount || 0).toLocaleString("ar-EG-u-nu-latn") +
+          ' جنيه</p><p><strong>المتبقي:</strong> ' + Number(x.remaining_amount || 0).toLocaleString("ar-EG-u-nu-latn") +
+          ' جنيه · <strong>القسط:</strong> ' + Number(x.monthly_installment || 0).toLocaleString("ar-EG-u-nu-latn") +
+          ' جنيه</p><p><strong>رسوم التنازل:</strong> ' + Number(x.assignment_fee || 0).toLocaleString("ar-EG-u-nu-latn") +
+          ' جنيه · <strong>الخصم:</strong> ' + Number(x.discount_amount || 0).toLocaleString("ar-EG-u-nu-latn") +
+          ' جنيه</p><p><strong>المطور/المشروع:</strong> ' + esc(x.developer_name || "غير مسجل") + ' / ' +
+          esc(x.project_name || "غير مسجل") + '</p><p><strong>صاحب الإعلان:</strong> ' + esc(x.contact_name || "غير مسجل") +
+          ' · ' + esc(x.contact_phone || "لا يوجد هاتف") + '</p><p>' + esc(x.description || "") +
+          '</p><p><strong>حالة التحقق:</strong> ' + esc(x.verification_status || "غير محددة") +
+          ' · <strong>موافقة المطور:</strong> ' + esc(x.developer_approval_status || "غير محددة") +
+          '</p>' + (x.verification_notes ? '<p class="admin-chip">' + esc(x.verification_notes) + '</p>' : '') +
+          '<div class="admin-actions"><button type="button" class="btn btn-gold" data-property-action="approve">اعتماد ونشر</button>' +
+          '<button type="button" class="btn btn-outline-dark" data-property-action="reject">رفض مع السبب</button></div></div></article>';
+      }).join("");
+    } catch (error) {
+      target.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل الإعلانات العقارية.") + '</p>';
+    }
   }
-  async function loadTrustBadgeOffers() {
+    async function loadTrustBadgeOffers() {
     const target = document.getElementById("trustBadgeOffers");
     if (!target) return;
     target.innerHTML = '<p class="admin-empty">جارٍ تحميل الإعلانات المنشورة...</p>';
