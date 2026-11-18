@@ -207,7 +207,7 @@ if [[ "$editor_status" -eq 0 ]]; then
   echo "FAIL: a company editor was allowed to submit a unit request." >&2
   exit 1
 fi
-if ! grep -Eqi 'إضافة الوحدات متاحة|permission denied|insufficient privilege|42501' /tmp/project-unit-editor-denied.log; then
+if ! grep -Eqi 'إضافة الوحدات متاحة|مالكًا معتمدًا أو مديرًا مفوضًا|permission denied|insufficient privilege|42501' /tmp/project-unit-editor-denied.log; then
   cat /tmp/project-unit-editor-denied.log >&2
   echo "FAIL: editor denial failed for an unexpected reason." >&2
   exit 1
