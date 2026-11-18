@@ -643,3 +643,50 @@ body.company-dashboard-page :is(p,small){color:var(--cd-muted)}
  #cdProjectRequestsList{grid-template-columns:1fr}
 }
 
+
+
+/* Phase 4: project-linked unit management */
+.cd-company-units{display:grid;gap:13px;margin-top:24px;padding-top:19px;border-top:1px solid var(--cd-line)}
+.cd-company-units>.cd-section-heading{margin:0}
+.cd-company-units .cd-section-heading h3{margin:5px 0 0;font-family:"Alexandria",sans-serif;font-size:16px;line-height:1.7}
+.cd-unit-panel{margin-top:0}
+.cd-unit-form,.cd-unit-edit-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.cd-unit-field{display:grid;gap:6px;min-width:0;color:var(--cd-ink-soft);font-size:11px;font-weight:700}
+.cd-unit-field>span{line-height:1.7}
+.cd-unit-field input,.cd-unit-field select,.cd-unit-field textarea{width:100%;min-width:0;min-height:42px;padding:9px 11px;border:1px solid var(--cd-line);border-radius:10px;background:#fff;color:var(--cd-ink);font:inherit;font-size:12px;outline:none}
+.cd-unit-field textarea{min-height:85px;resize:vertical;line-height:1.8}
+.cd-unit-field input:focus,.cd-unit-field select:focus,.cd-unit-field textarea:focus{border-color:var(--cd-accent);box-shadow:0 0 0 3px rgba(201,138,100,.13)}
+.cd-unit-field--wide,.cd-unit-check.cd-unit-field--wide{grid-column:1/-1}
+.cd-unit-check{display:flex;align-items:center;gap:9px;min-height:38px;padding:8px 10px;border:1px solid var(--cd-line);border-radius:10px;background:#fff;color:var(--cd-ink-soft);font-size:11px;font-weight:700}
+.cd-unit-check input{width:18px;height:18px;flex:0 0 18px;accent-color:var(--cd-accent-dark)}
+.cd-unit-assignment{grid-column:1/-1;padding:12px;border:1px solid #EAD9C7;border-radius:12px;background:#FFF9F2}
+.cd-unit-assignment>strong{display:block;margin-bottom:10px;color:var(--cd-accent-dark);font-size:12px}
+.cd-unit-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cd-unit-submit{grid-column:1/-1;min-height:44px}
+.cd-unit-note{margin:0;padding:10px 12px;border-radius:10px;font-size:10px;line-height:1.9}
+.cd-unit-note--neutral{background:#F6F0EA;color:#6F5B4C}
+.cd-unit-note--warning{background:#FFF4E5;color:#805321}
+.cd-unit-note--success{background:#EAF3EC;color:#306342}
+.cd-unit-note--danger{background:#FBEDEA;color:#8A352D}
+.cd-unit-edit-form{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px;padding:12px;border:1px solid #EAD9C7;border-radius:12px;background:#FFFBF6}
+.cd-unit-edit-form>.cd-unit-note{grid-column:1/-1}
+.cd-unit-edit-form>button{min-height:40px}
+.cd-project-units-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cd-unit-card{display:grid;gap:11px;align-content:start;min-width:0;padding:14px;border:1px solid var(--cd-line);border-radius:13px;background:#fff;box-shadow:var(--cd-shadow)}
+.cd-unit-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.cd-unit-card-title{display:grid;gap:5px;min-width:0}
+.cd-unit-card-title strong{font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.cd-unit-card-title small{color:var(--cd-muted);font-size:9px;line-height:1.7}
+.cd-unit-card-facts{display:flex;flex-wrap:wrap;gap:7px}
+.cd-unit-card-facts span,.cd-unit-card-facts strong{padding:6px 8px;border:1px solid #EFE6DD;border-radius:8px;background:#FCFAF7;color:var(--cd-ink-soft);font-size:10px;line-height:1.6}
+.cd-unit-card-facts strong{background:#FFF5E9;color:var(--cd-accent-dark);font-weight:800}
+.cd-unit-actions{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.cd-unit-button{min-height:34px;padding:7px 10px;font-size:10px}
+.cd-unit-button--secondary{border:1px solid var(--cd-line);background:#fff;color:var(--cd-ink-soft)}
+.cd-unit-link{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 10px;border:1px solid var(--cd-accent);border-radius:9px;color:var(--cd-accent-dark);font-size:10px;font-weight:800;text-decoration:none}
+@media(max-width:760px){
+ .cd-project-units-list{grid-template-columns:1fr}
+ .cd-unit-form,.cd-unit-edit-form{grid-template-columns:1fr}
+ .cd-unit-fields{grid-template-columns:1fr}
+ .cd-unit-field--wide,.cd-unit-check.cd-unit-field--wide,.cd-unit-assignment,.cd-unit-submit{grid-column:auto}
+}
