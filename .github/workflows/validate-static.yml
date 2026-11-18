@@ -274,63 +274,22 @@ jobs:
           }
 
           const authClientJs = fs.readFileSync('gubabase.js', 'utf8');
-          const resetPasswordHtml = fs.readFileSync('reset-password.html', 'utf8');
-          const resetPasswordTests = fs.readFileSync('tests/e2e/reset-password.spec.mjs', 'utf8');
-          const signupClientTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
+          const otpClientTests = fs.readFileSync('tests/e2e/email-otp.spec.mjs', 'utf8');
+          const callbackUiTests = fs.readFileSync('tests/e2e/auth-callback-ui.spec.mjs', 'utf8');
           const appAuthJs = fs.readFileSync('app.js', 'utf8');
 
-          const signupTests = fs.readFileSync('tests/e2e/signup-confirmation.spec.mjs', 'utf8');
-          if (!authClientJs.includes('SIGNUP_PKCE_STORAGE_KEY') ||
-              !authClientJs.includes('code_challenge: pkce.codeChallenge') ||
-              !authClientJs.includes('code_challenge_method: "s256"')) {
-            errors.push('Email signups must send an S256 PKCE challenge and preserve its verifier');
+          if (!authClientJs.includes('async function requestEmailOtp(') ||
+              !authClientJs.includes('async function verifyEmailOtp(') ||
+              !otpClientTests.includes('new accounts use email + OTP only') ||
+              !otpClientTests.includes('email OTP session persists when the app is reopened') ||
+              !otpClientTests.includes('marketplace can create an account with email + OTP only') ||
+              !otpClientTests.includes('all public account access is email OTP only')) {
+            errors.push('Public account creation and sign-in must be covered by email + OTP browser tests');
           }
-          if (!authClientJs.includes('resend?redirect_to=') ||
-              !authClientJs.includes('token?grant_type=pkce') ||
-              !authClientJs.includes('emitAuthCallback') ||
-              !appAuthJs.includes('window.LAYAN_AUTH_CALLBACK_RESULT') ||
-              !appAuthJs.includes('handleAuthCallback({ detail: window.LAYAN_AUTH_CALLBACK_RESULT })')) {
-            errors.push('Signup confirmation must use the correct resend redirect and replay PKCE callback results to the UI');
-          }
-          if (!signupClientTests.includes('signup sends an S256 PKCE challenge') ||
-              !signupClientTests.includes('email confirmation PKCE code creates a session') ||
-              !signupClientTests.includes('resend confirmation retains the original signup verifier') ||
-              !signupClientTests.includes('callback results are replayed') ||
-              !signupClientTests.includes('legacy implicit email-confirmation callbacks remain supported')) {
-            errors.push('Signup confirmation PKCE browser regression tests are incomplete');
-          }
-          if (!authClientJs.includes('resend?redirect_to=') ||
-              authClientJs.includes('options: { emailRedirectTo: redirectTo }')) {
-            errors.push('Signup confirmation resend must use the Auth REST redirect_to query and retain the original verifier');
-          }
-          if (!authClientJs.includes('token?grant_type=pkce') ||
-              !authClientJs.includes('SIGNUP_PKCE_STORAGE_KEY') ||
-              !authClientJs.includes('LAYAN_AUTH_CALLBACK_RESULT')) {
-            errors.push('Signup confirmation callback must exchange PKCE code and expose the result to late UI listeners');
-          }
-          if (!signupTests.includes('signup sends an S256 PKCE challenge') ||
-              !signupTests.includes('email confirmation PKCE code creates a session') ||
-              !signupTests.includes('resend confirmation retains the original signup verifier') ||
-              !signupTests.includes('legacy implicit email-confirmation callbacks remain supported')) {
-            errors.push('Signup confirmation PKCE browser regression tests are incomplete');
-          }
-
-
-          if (!authClientJs.includes('code_challenge_method: "s256"') ||
-              !authClientJs.includes('code_challenge: codeChallenge') ||
-              !authClientJs.includes('RECOVERY_PKCE_STORAGE_KEY')) {
-            errors.push('Password recovery requests must create and send a PKCE challenge and preserve its verifier');
-          }
-          if (!resetPasswordHtml.includes('token?grant_type=pkce') ||
-              !resetPasswordHtml.includes('auth_code: authCode') ||
-              !resetPasswordHtml.includes('code_verifier: verifier') ||
-              !resetPasswordHtml.includes('token_hash')) {
-            errors.push('Password recovery callback must exchange PKCE codes and retain legacy token_hash support');
-          }
-          if (!resetPasswordTests.includes('password recovery request sends a PKCE challenge') ||
-              !resetPasswordTests.includes('PKCE recovery callback exchanges the one-time code') ||
-              !resetPasswordTests.includes('legacy token_hash recovery links remain supported')) {
-            errors.push('Password recovery browser regression tests are incomplete');
+          if (!appAuthJs.includes('window.LAYAN_AUTH_CALLBACK_RESULT') ||
+              !appAuthJs.includes('handleAuthCallback({ detail: window.LAYAN_AUTH_CALLBACK_RESULT })') ||
+              !callbackUiTests.includes('callback results are replayed when the main UI attaches')) {
+            errors.push('The shared auth callback UI must still handle results delivered before the main UI attaches');
           }
 
           const companiesJs = fs.readFileSync('companies.js', 'utf8');
