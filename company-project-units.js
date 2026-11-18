@@ -273,13 +273,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const relationRows = await query("directory_project_entities", {
-      select: "project_id,entity_id,relation_type",
-      entity_id: "in.(" + entityIds.join(",") + ")",
-      relation_type: "in.(developer,land_owner)"
-    });
-    const relationPairs = new Set((Array.isArray(relationRows) ? relationRows : []).map(row => row.project_id));
-    const projectIds = [...relationPairs];
+    const [relationRows, entities] = await Promise.all([
+      query("directory_project_entities", {
+        select: "project_id,entity_id,relation_type",
+        entity_id: "in.(" + entityIds.join(",") + ")",
+        relation_type: "in.(developer,land_owner)"
+      }),
+      query("directory_entities", {
+        select: "id,name_ar",
+        id: "in.(" + entityIds.join(",") + ")",
+        public_visible: "eq.true",
+        verification_status: "eq.published"
+      })
+    ]);
+    const relatedRows = Array.isArray(relationRows) ? relationRows : [];
+    const projectIds = [...new Set(relatedRows.map(row => row.project_id).filter(Boolean))];
     const projects = projectIds.length ? await query("directory_projects", {
       select: "id,name_ar",
       id: "in.(" + projectIds.join(",") + ")",
@@ -287,16 +295,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       verification_status: "eq.published",
       order: "name_ar.asc"
     }) : [];
+    const projectNames = new Map((Array.isArray(projects) ? projects : []).map(row => [String(row.id), row.name_ar]));
+    const entityNames = new Map((Array.isArray(entities) ? entities : []).map(row => [String(row.id), row.name_ar]));
+    const seenLinks = new Set();
+    const projectChoices = relatedRows.flatMap(row => {
+      const projectName = projectNames.get(String(row.project_id));
+      const entityName = entityNames.get(String(row.entity_id));
+      if (!projectName || !entityName) return [];
+      const key = String(row.project_id) + "|" + String(row.entity_id);
+      if (seenLinks.has(key)) return [];
+      seenLinks.add(key);
+      const relationName = row.relation_type === "developer" ? "المطوّر" : "مالك الأرض";
+      return [{ value:key, label:projectName + " · " + entityName + " · " + relationName }];
+    });
 
     root.replaceChildren();
-    if (!projects.length) {
+    if (!projectChoices.length) {
       root.append(el(
         "p",
-        "لا يوجد مشروع منشور مرتبط بملف شركتك بصفة المطوّر أو مالك الأرض. بعد اعتماد علاقة الشركة بالمشروع ستتمكن من تقديم بيانات وحداته.",
+        "لا يوجد مشروع منشور مرتبط بأحد ملفات شركتك المخوّلة بصفة المطوّر أو مالك الأرض. بعد اعتماد علاقة الشركة بالمشروع ستتمكن من تقديم بيانات وحداته.",
         "cd-team-note"
       ));
     } else {
-      root.append(buildForm(projects));
+      root.append(buildForm(projectChoices));
     }
     renderRequests(await rpc("company_project_unit_requests_mine"));
   }
