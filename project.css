@@ -50,3 +50,32 @@ body.project-profile-page{margin:0;background:var(--project-paper);color:var(--p
 @media(max-width:760px){.project-profile-page .topbar{align-items:flex-start}.project-profile-page .topbar nav{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;gap:15px;padding-bottom:3px}.project-profile-page .top-actions{width:100%}.project-profile-page .top-actions .btn{flex:1}.project-main{width:calc(100% - 22px);margin-top:14px}.project-hero{border-radius:14px;padding:22px 17px}.project-hero p{font-size:12px}.project-section{padding:16px}.project-map-frame iframe{height:230px}.project-footer{justify-content:center;text-align:center}}
 @media(max-width:360px){.project-profile-page .topbar{padding-inline:10px}.project-profile-page .top-actions{display:grid;grid-template-columns:1fr}.project-main{width:calc(100% - 18px)}.project-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.project-fact{padding:11px}}
 .project-profile-page a:focus-visible{outline:3px solid #BF7347;outline-offset:3px}
+
+/* Phase 4 — published unit inventory and explicit property-ad associations */
+.project-units-section{display:grid;gap:14px}
+.project-units-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.project-units-heading h2{margin:3px 0 0}
+.project-unit-count{display:inline-flex;align-items:center;justify-content:center;min-width:72px;padding:5px 10px;border-radius:999px;background:#F7EEE5;color:#80583D;font-size:10px;font-weight:800}
+.project-units-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.project-unit-card{display:grid;align-content:start;gap:9px;min-width:0;padding:15px;border:1px solid var(--project-line);border-radius:12px;background:#FEFDFB}
+.project-unit-card-head{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}
+.project-unit-card-head h3{margin:0;color:#47372D;font-size:14px;overflow-wrap:anywhere}
+.project-unit-kind{display:inline-flex;padding:4px 8px;border-radius:999px;background:#F7EEE5;color:#80583D;font-size:10px;font-weight:800}
+.project-unit-card>p{margin:0;color:#806D60;font-size:11px;line-height:1.8;overflow-wrap:anywhere}
+.project-unit-facts{display:flex;gap:6px;flex-wrap:wrap}
+.project-unit-facts span{display:inline-flex;padding:4px 8px;border-radius:7px;background:#F7F2EC;color:#6F5C4E;font-size:10px;font-weight:700}
+.project-unit-offers{display:grid;gap:8px;margin-top:5px;padding-top:11px;border-top:1px solid var(--project-line)}
+.project-unit-offers>h4{margin:0;color:#47372D;font-size:11px}
+.project-unit-offer-card{display:grid;gap:5px;padding:10px;border:1px solid #EEE2D6;border-radius:9px;background:#fff}
+.project-unit-offer-purpose{justify-self:start;padding:3px 7px;border-radius:999px;background:#F9F0E7;color:#85583C;font-size:9px;font-weight:800}
+.project-unit-offer-card h4{margin:0;font-size:12px;line-height:1.7}
+.project-unit-offer-card h4 a{color:#47372D;text-decoration:none}
+.project-unit-offer-card p{margin:0;color:#897668;font-size:10px;line-height:1.7}
+.project-unit-offer-card>strong{color:#815536;font-size:12px}
+.project-unit-offer-link{justify-self:start;color:#925A38;font-size:10px;font-weight:800;text-decoration:underline;text-underline-offset:3px}
+.project-unit-no-offers{margin:0;padding:9px;border-radius:8px;background:#FAF6F1;color:#897668;font-size:10px;line-height:1.8}
+@media(max-width:760px){
+ .project-units-grid{grid-template-columns:1fr}
+ .project-unit-card{padding:13px}
+}
+

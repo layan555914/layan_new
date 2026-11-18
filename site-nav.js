@@ -77,6 +77,23 @@
     document.head.appendChild(lightTheme);
   }
 
+  // Shared brighter clarity layer across every page using the common navigation script.
+  if (!document.querySelector('link[data-asyut-clarity="global"]')) {
+    const clarity = document.createElement("link");
+    clarity.rel = "stylesheet";
+    clarity.href = "/assets/theme/unified-bright-clarity.css?v=20261118-brand-identity-1";
+    clarity.dataset.asyutClarity = "global";
+    document.head.appendChild(clarity);
+  }
+  // Shared component foundation is intentionally loaded last.
+  if (!document.querySelector('link[data-asyut-design-foundation="global"]')) {
+    const designSystem = document.createElement("link");
+    designSystem.rel = "stylesheet";
+    designSystem.href = "/assets/theme/design-system.css?v=20261118-brand-identity-1";
+    designSystem.dataset.asyutDesignFoundation = "global";
+    document.head.appendChild(designSystem);
+  }
+
   const header = document.querySelector("header.topbar");
   if (!header) return;
   const nav = header.querySelector("nav");

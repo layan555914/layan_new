@@ -1,0 +1,114 @@
+/* ASYUT AQAR — unified bright clarity layer (review branch)
+   Visual-only polish: brighter surfaces and clearer contrast.
+   Preserves the existing espresso, terracotta, and copper/champagne palette. */
+:root {
+  --aa-page: #FBF8F5;
+  --aa-surface: #FFFFFF;
+  --aa-surface-soft: #FFFDFB;
+  --aa-surface-warm: #FFF8F0;
+  --aa-ink: #2B211B;
+  --aa-muted: #6B5D52;
+  --aa-line: #E6DACB;
+  --aa-brand: #A4472A;
+  --aa-brand-hover: #8C3A21;
+  --aa-brand-soft: #F6E8DE;
+  --aa-copper: #C98A64;
+  --aa-shadow: 0 8px 24px rgba(43, 33, 27, .065);
+  --aa-shadow-hover: 0 13px 30px rgba(43, 33, 27, .105);
+}
+html { color-scheme: light; }
+html body {
+  background-color: var(--aa-page);
+  color: var(--aa-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+html body :is(.muted, .text-muted, .description, .form-note) {
+  color: var(--aa-muted);
+}
+html body :is(main h1, main h2, main h3, main h4, .section-heading) {
+  color: var(--aa-ink);
+  text-wrap: pretty;
+}
+html body :is(header.topbar, header.info-topbar) {
+  background: linear-gradient(112deg, #1E1712 0%, #2B211B 62%, #3A2D25 100%);
+  color: #F3ECE1;
+  border-bottom: 2px solid var(--aa-copper);
+  box-shadow: 0 6px 22px rgba(43, 33, 27, .12);
+}
+html body header.topbar :is(.brand, .brand strong, nav a),
+html body header.info-topbar :is(.info-brand, nav a) {
+  color: #F3ECE1;
+}
+html body header.topbar .brand small,
+html body header.info-topbar .info-brand small,
+html body header.info-topbar nav a:hover,
+html body header.info-topbar nav a.active,
+html body header.topbar nav a:hover,
+html body header.topbar nav a.active,
+html body header.topbar nav a[aria-current="page"] {
+  color: #E9B08F;
+}
+html body header.topbar nav a:is(:hover, .active, [aria-current="page"]),
+html body header.info-topbar nav a:is(:hover, .active, [aria-current="page"]) {
+  background-color: rgba(233, 176, 143, .14);
+}
+html body :is(.section, .directory-browser, .directory-method, .company-map-panel,
+  .directory-map-panel, .know-card, .info-card, .info-doc, .info-grid article,
+  .offer-card, .listing-card, .company-directory-card, .directory-card,
+  .featured-card, .mk-profile-card, .marketplace-card, .category-tile,
+  .how-card, .audience-card, .pricing-card, .company-card, .calculator-card,
+  .details-panel, .filter-panel, .search-panel) {
+  background-color: var(--aa-surface);
+  border-color: var(--aa-line);
+  box-shadow: var(--aa-shadow);
+}
+html body :is(.offer-card, .listing-card, .company-directory-card, .directory-card,
+  .featured-card, .marketplace-card, .category-tile, .company-card):hover {
+  box-shadow: var(--aa-shadow-hover);
+}
+html body :is(input, select, textarea) {
+  color: var(--aa-ink);
+  background-color: #FFFFFF;
+  border-color: #D8C8B8;
+}
+html body :is(input, select, textarea)::placeholder {
+  color: #82756B;
+  opacity: 1;
+}
+html body :is(input, select, textarea):focus {
+  border-color: var(--aa-brand);
+  box-shadow: 0 0 0 3px rgba(164, 71, 42, .14);
+}
+html body :is(.notice, .status-message, .know-note, .company-review-note,
+  .directory-results-note, .form-note) {
+  background-color: #FFF8F0;
+  border-color: #EAD6C4;
+  color: #5B473B;
+}
+html body :is(.category, .detail-chip, .directory-tag, .company-service-list li,
+  .mk-chip, .filter-chip) {
+  background-color: #F8F3EE;
+  border-color: var(--aa-line);
+  color: #524135;
+}
+html body :is(.directory-tabs button.is-active, .category.active,
+  .mk-chip.is-active, .mk-chip[aria-pressed="true"]) {
+  background-color: var(--aa-brand);
+  border-color: var(--aa-brand);
+  color: #FFFFFF;
+}
+html body :is(a, .link) { text-decoration-color: rgba(164, 71, 42, .35); }
+html body :is(a, .link):focus-visible,
+html body :is(button, input, select, textarea, summary, [role="button"]):focus-visible {
+  outline: 3px solid rgba(201, 138, 100, .55);
+  outline-offset: 2px;
+}
+html body :is(.page-hero:not(.design-hero), .companies-hero, .directory-hero,
+  .featured-hero, .info-hero, .project-hero, .my-listings-hero) {
+  border-color: var(--aa-line);
+}
+@media (max-width: 760px) {
+  html body { font-size: 15.5px; }
+  html body :is(button, .btn, input, select, textarea) { min-height: 42px; }
+}

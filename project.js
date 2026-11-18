@@ -37,6 +37,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     sales_agent:"وكيل مبيعات",contractor:"مقاول",consultant:"استشاري",
     operator:"جهة تشغيل",public_authority:"جهة حكومية / عامة",other:"جهة مرتبطة"
   };
+  const unitTypes = {
+    apartment:"شقة",villa:"فيلا",shop:"محل تجاري",office:"مكتب إداري",
+    clinic:"عيادة",land:"قطعة أرض",other:"وحدة أخرى"
+  };
+  const moneyLabel = value => value == null || value === ""
+    ? "السعر عند التواصل"
+    : new Intl.NumberFormat("ar-EG-u-nu-latn",{maximumFractionDigits:0}).format(Number(value)) + " جنيه";
+  function unitCard(unit, unitOffers) {
+    const facts = [
+      unit.area_m2 ? new Intl.NumberFormat("ar-EG-u-nu-latn",{maximumFractionDigits:2}).format(Number(unit.area_m2)) + " م²" : null,
+      unit.bedrooms != null ? unit.bedrooms + " غرف" : null,
+      unit.bathrooms != null ? unit.bathrooms + " حمامات" : null
+    ].filter(Boolean);
+    const offersHTML = unitOffers.length ? unitOffers.map(offer => {
+      const rent = String(offer.listing_purpose || "").includes("إيجار");
+      const title = offer.title || "إعلان عقاري منشور";
+      const price = offer.price_on_request === true ? "السعر عند التواصل" : moneyLabel(offer.total_price);
+      const href = "./property.html?id=" + encodeURIComponent(offer.id);
+      return '<article class="project-unit-offer-card">' +
+        '<span class="project-unit-offer-purpose">' + escapeHTML(offer.listing_purpose || "إعلان عقاري") + '</span>' +
+        '<h4><a href="' + escapeHTML(href) + '">' + escapeHTML(title) + '</a></h4>' +
+        '<p>' + escapeHTML(offer.property_type || "عقار") + (offer.area_m2 ? " · " + escapeHTML(offer.area_m2) + " م²" : "") + '</p>' +
+        '<strong>' + escapeHTML(price) + (rent ? " · إيجار" : "") + '</strong>' +
+        '<a class="project-unit-offer-link" href="' + escapeHTML(href) + '">عرض الإعلان ↗</a>' +
+      '</article>';
+    }).join("") : '<p class="project-unit-no-offers">لا توجد إعلانات متاحة مرتبطة بهذه الوحدة حاليًا.</p>';
+    return '<article class="project-unit-card">' +
+      '<div class="project-unit-card-head"><span class="project-unit-kind">' + escapeHTML(unitTypes[unit.unit_type] || "وحدة") + '</span><h3>' + escapeHTML(unit.unit_ref || "وحدة منشورة") + '</h3></div>' +
+      (facts.length ? '<div class="project-unit-facts">' + facts.map(fact => '<span>' + escapeHTML(fact) + '</span>').join("") + '</div>' : "") +
+      (unit.building_label ? '<p><strong>المبنى:</strong> ' + escapeHTML(unit.building_label) + '</p>' : "") +
+      (unit.floor_label ? '<p><strong>الدور:</strong> ' + escapeHTML(unit.floor_label) + '</p>' : "") +
+      (unit.unit_number ? '<p><strong>رقم الوحدة:</strong> ' + escapeHTML(unit.unit_number) + '</p>' : "") +
+      (unit.finishing ? '<p><strong>التشطيب:</strong> ' + escapeHTML(unit.finishing) + '</p>' : "") +
+      (unit.description ? '<p>' + escapeHTML(unit.description) + '</p>' : "") +
+      '<div class="project-unit-offers"><h4>الإعلانات المرتبطة بالوحدة</h4>' + offersHTML + '</div>' +
+    '</article>';
+  }
 
   function stateMessage(title, message) {
     root.innerHTML = '<section class="project-state"><h1>' + escapeHTML(title) +
@@ -135,12 +172,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      const [areaRows, sourceLinks, relationLinks] = await Promise.all([
+      const [areaRows, sourceLinks, relationLinks, unitRows] = await Promise.all([
         project.area_id ? optionalRows("directory_areas", {
           id:"eq." + project.area_id,public_visible:"eq.true",verification_status:"eq.published",is_active:"eq.true",limit:"1"
         }, "id,name_ar,area_type,public_visible,verification_status") : Promise.resolve([]),
         optionalRows("directory_project_sources", { project_id:"eq." + project.id }, "source_id"),
-        optionalRows("directory_project_entities", { project_id:"eq." + project.id }, "entity_id,relation_type")
+        optionalRows("directory_project_entities", { project_id:"eq." + project.id }, "entity_id,relation_type"),
+        optionalRows("directory_project_units", {
+          project_id:"eq." + project.id,public_visible:"eq.true",verification_status:"eq.published",order:"unit_ref.asc"
+        }, "id,project_id,unit_ref,unit_type,building_label,floor_label,unit_number,area_m2,bedrooms,bathrooms,finishing,description,verification_status,public_visible")
       ]);
       const sourceIds = [...new Set(sourceLinks.map(row => row.source_id).filter(Boolean))];
       const entityIds = [...new Set(relationLinks.map(row => row.entity_id).filter(Boolean))];
@@ -152,6 +192,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           id:"in.(" + entityIds.join(",") + ")",public_visible:"eq.true",verification_status:"eq.published"
         }, "id,name_ar,entity_type,description,website_url,public_phone,public_whatsapp,public_visible,verification_status") : Promise.resolve([])
       ]);
+      const unitIds = [...new Set(unitRows.map(unit => unit.id).filter(Boolean))];
+      const linkedOffers = unitIds.length ? await optionalRows("property_offers", {
+        project_unit_id:"in.(" + unitIds.join(",") + ")",
+        status:"eq.available",
+        order:"created_at.desc"
+      }, "id,title,listing_purpose,property_type,total_price,price_on_request,area_m2,project_unit_id,status,created_at") : [];
       const area = areaRows.find(row => row.public_visible === true && row.verification_status === "published") || null;
       const publicSources = sources.filter(source => source.is_public === true && safeURL(source.source_url));
       const publicEntities = entities.filter(entity => entity.public_visible === true && entity.verification_status === "published");
@@ -188,6 +234,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const entity = publicEntities.find(row => String(row.id) === String(link.entity_id));
         return entity ? relationCard(entity, link.relation_type) : "";
       }).filter(Boolean).join("");
+      const projectUnits = unitRows.filter(unit =>
+        unit.public_visible === true && unit.verification_status === "published"
+      );
+      const projectUnitsHTML = projectUnits.length
+        ? '<section class="project-section project-units-section"><div class="project-units-heading"><div><span class="project-source-kind">وحدات مسجلة ومعتمدة</span><h2>الوحدات العقارية بالمشروع</h2></div><span class="project-unit-count">' + projectUnits.length + ' وحدة</span></div>' +
+          '<div class="project-units-grid">' + projectUnits.map(unit => unitCard(
+            unit, linkedOffers.filter(offer => String(offer.project_unit_id) === String(unit.id) && offer.status === "available")
+          )).join("") + '</div></section>'
+        : '<section class="project-section project-units-section"><h2>الوحدات العقارية بالمشروع</h2><p>لا توجد وحدات مسجلة ومعتمدة للعامة بهذا المشروع حتى الآن.</p></section>';
       const sourcesHTML = publicSources.map(sourceCard).join("");
       const sourcesFallback = sourcesHTML
         ? '<div class="project-sources">' + sourcesHTML + '</div>'
@@ -196,7 +251,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? '<div class="project-relations">' + relationsHTML + '</div>'
         : '<p>لا توجد جهة مرتبطة منشورة للعامة بهذا المشروع حتى الآن.</p>';
       const approvedDate = dateLabel(project.last_verified_at);
-      const disclaimer = "هذا ملف معلوماتي مستقل مبني على السجلات والمراجع المنشورة. الإدراج لا يعني شراكة أو تزكية أو شهادة ترخيص من أسيوط عقار. حالة المشروع والمعلومات المنشورة تعكس ما ورد بالمصادر وقت مراجعتها وقد تتغير؛ يجب الرجوع إلى الجهة المختصة والمطور مباشرة قبل اتخاذ قرار أو دفع أي مبالغ. لا تعرض هذه الصفحة وحدات أو توافرًا للبيع لعدم وجود ربط معتمد بين سجل المشروع وإعلانات العقارات.";
+      const disclaimer = "هذا ملف معلوماتي مستقل مبني على السجلات والمراجع المنشورة. الإدراج لا يعني شراكة أو تزكية أو شهادة ترخيص من أسيوط عقار. حالة المشروع والمعلومات المنشورة تعكس ما ورد بالمصادر وقت مراجعتها وقد تتغير؛ يجب الرجوع إلى الجهة المختصة والمطور مباشرة قبل اتخاذ قرار أو دفع أي مبالغ. تظهر الوحدات والإعلانات هنا فقط بعد تسجيلها وربطها صراحة بسجل الوحدة واعتماد الإدارة؛ لا يتم الربط اعتمادًا على تشابه الأسماء.";
 
       root.innerHTML =
         '<section class="project-hero"><span class="project-eyebrow">ملف مشروع منشور في الدليل العقاري</span>' +
@@ -210,6 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (approvedDate ? '<p class="project-map-note">آخر مراجعة مسجلة: ' + escapeHTML(approvedDate) + '</p>' : "") +
         '</section>' +
         mapSection(project, area, trustedSource) +
+        projectUnitsHTML +
         '<section class="project-section"><h2>الجهات المرتبطة بالمشروع</h2>' + relationFallback + '</section>' +
         '<section class="project-section"><h2>المصادر والمراجع</h2>' + sourcesFallback + '</section>' +
         '<section class="project-disclaimer">' + escapeHTML(disclaimer) + '</section>' +
