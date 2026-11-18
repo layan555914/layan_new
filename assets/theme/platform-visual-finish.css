@@ -22,7 +22,7 @@ html body {
 html body main :is(h1, h2, h3, h4, h5, h6),
 html body :is(.section-heading, .directory-section-heading, .mk-heading, .adm-card-title) {
   color: var(--aa-ink);
-  font-family: "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif;
+  font-family: "Readex Pro", "Alexandria", Tahoma, Arial, sans-serif;
   letter-spacing: 0;
   text-wrap: pretty;
 }
@@ -115,7 +115,7 @@ html body :is(input, select, textarea) {
   color: var(--aa-ink);
   background-color: #FFFFFF;
   border-color: #DDCFC2;
-  font-family: "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif;
+  font-family: "Readex Pro", "Alexandria", Tahoma, Arial, sans-serif;
 }
 
 html body :is(input, select, textarea)::placeholder {
@@ -136,7 +136,7 @@ html body :is(button, a, summary, [role="button"]):focus-visible {
 
 /* Consistent button finish; existing action labels and handlers are untouched. */
 html body :is(.btn, button, .favorite-button, .marketplace-pagination button) {
-  font-family: "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif;
+  font-family: "Readex Pro", "Alexandria", Tahoma, Arial, sans-serif;
   border-radius: 11px;
   transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
 }
