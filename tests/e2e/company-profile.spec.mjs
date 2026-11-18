@@ -109,6 +109,8 @@ test("directory entity profile clearly labels missing logo and all mobile action
   await expect(page.locator(".company-contact-actions a")).toHaveCount(4);
   await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
   await expect(page.locator(".company-claim-panel--prominent button")).toBeVisible();
+  await expect(page.locator("#companyProfileRoot .company-manager-panel")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "إدارة المشروعات والوحدات والطلبات" })).toHaveCount(0);
   await expect(page.locator(".company-contact-details")).toContainText("بيانات التواصل ومقر مقدم الخدمة");
   await expect(page.locator(".company-coverage-section")).toContainText("أسيوط");
   for (const action of await page.locator(".company-contact-actions a").all()) {
