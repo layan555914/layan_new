@@ -229,7 +229,14 @@
           method:"PATCH", headers:{ Prefer:"return=representation" }, body:JSON.stringify(body)
         });
         if (!Array.isArray(result) || result.length !== 1) throw new Error("لم يؤكد النظام حفظ التعديلات. حدّث القائمة وحاول مرة أخرى.");
-        A.setStatus("تم تحديث الإعلان مع الحفاظ على ملكية العميل.");
+        const oldImages = kind === "supplier_ad" ? [row.image_url].filter(Boolean) : (Array.isArray(row.image_urls) ? row.image_urls : []);
+        const currentImages = kind === "supplier_ad" ? [body.image_url].filter(Boolean) : (Array.isArray(body.image_urls) ? body.image_urls : []);
+        const removedImages = oldImages.filter(url => !currentImages.includes(url));
+        const cleanup = await Promise.allSettled(removedImages.map(deleteStoredImage));
+        const failedCleanup = cleanup.filter(x => x.status === "rejected").length;
+        A.setStatus(failedCleanup
+          ? "تم تحديث الإعلان مع الحفاظ على ملكية العميل، لكن تعذر حذف " + failedCleanup + " ملف صورة قديم من التخزين."
+          : "تم تحديث الإعلان مع الحفاظ على ملكية العميل.");
       }
       dialog.close();
       await load();
