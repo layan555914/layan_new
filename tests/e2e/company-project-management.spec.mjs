@@ -137,11 +137,19 @@ test("verified manager can submit a project request, but an editor cannot", asyn
   await expect(page.locator("#cdProjectRequestsList")).toContainText("طلب ربط بمشروع منشور");
   expect(managerMocks.getSubmittedBody().p_request_type).toBe("link_project");
 
-  await page.unrouteAll();
-  await installDashboardMocks(page, "editor");
-  await page.goto("/company-dashboard.html");
-  await expect(page.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد");
-  await expect(page.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
+  // Use a fresh isolated browser context for the editor scenario. This prevents
+  // an in-flight request or cached auth state from the manager scenario leaking
+  // into the second permission check.
+  const editorContext = await page.context().browser().newContext();
+  const editorPage = await editorContext.newPage();
+  try {
+    await installDashboardMocks(editorPage, "editor");
+    await editorPage.goto("/company-dashboard.html");
+    await expect(editorPage.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد أو مدير الملف المفوض فقط");
+    await expect(editorPage.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
+  } finally {
+    await editorContext.close();
+  }
 });
 
 test("directory administrator can approve a company request and see its final state", async ({ page }) => {
@@ -203,6 +211,8 @@ test("directory administrator can approve a company request and see its final st
   await page.locator("#cprLoginForm button[type=submit]").click();
 
   await expect(page.locator("#cprRequestsList")).toContainText("مشروع جديد بانتظار المراجعة");
+  // The review UI intentionally asks for confirmation before making the decision.
+  page.once("dialog", dialog => dialog.accept());
   await page.locator("#cprRequestsList button").filter({ hasText: "اعتماد وإنشاء سجل داخلي" }).click();
   await expect(page.locator("#cprStatus")).toContainText("تم اعتماد الطلب");
   await expect(page.locator("#cprRequestsList")).toContainText("تم الاعتماد");
