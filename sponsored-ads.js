@@ -38,7 +38,7 @@
           const wa = waNumber(phone);
           const displayPhone = esc(phone.replace(/[^+0-9]/g, ""));
           const call = tel ? '<a class="sp-ad-btn sp-ad-call-btn" href="tel:' + esc(tel) + '">اتصال <bdi dir="ltr">' + displayPhone + '</bdi></a>' : "";
-          const whatsapp = wa ? '<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || name) + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + esc(name) + ' — ' + displayPhone + '">واتساب</a>' : "";
+          const whatsapp = wa ? '<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || name) + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + esc(ad.business_name || ad.title || "إعلان ممول") + ' — ' + displayPhone + '">واتساب</a>' : "";
           return '<div class="sp-ad-phone-row">' + call + whatsapp + '</div>';
         }).join("") + '</div>'
       : "";
