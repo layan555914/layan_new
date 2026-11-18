@@ -467,3 +467,34 @@ html body.page-home .category-tile-icon {
 @media (max-width: 380px) {
   html body.page-home .design-benefits { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* ASYUT AQAR brand alignment — keep the mobile and desktop top bars on
+   the same medium warm-brown used by the approved homepage identity.
+   This intentionally overrides older premium-layer !important rules. */
+html body header.topbar,
+html body header.info-topbar,
+html body .topbar {
+  background: #5B4638 !important;
+  color: #FFF9F3 !important;
+  border-bottom-color: #D7AD75 !important;
+}
+html body header.topbar :is(.brand, .brand strong, .brand small, nav a),
+html body header.info-topbar :is(.info-brand, nav a) {
+  color: #FFF9F3 !important;
+}
+html body header.topbar .brand small,
+html body header.info-topbar .brand small {
+  color: #F3DCC5 !important;
+}
+html body header.topbar nav a:is(:hover, .active, [aria-current="page"]),
+html body header.info-topbar nav a:is(:hover, .active, [aria-current="page"]) {
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, .14) !important;
+}
+html body header.topbar .btn-outline,
+html body header.info-topbar .btn-outline {
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, .65) !important;
+  background: rgba(255, 255, 255, .06) !important;
+}
