@@ -92,7 +92,8 @@ async function installDashboardMocks(page, role = "owner") {
   });
 
   return {
-    getSubmittedBody: () => submittedBody
+    getSubmittedBody: () => submittedBody,
+    setRole: nextRole => { role = nextRole; }
   };
 }
 
@@ -137,19 +138,12 @@ test("verified manager can submit a project request, but an editor cannot", asyn
   await expect(page.locator("#cdProjectRequestsList")).toContainText("طلب ربط بمشروع منشور");
   expect(managerMocks.getSubmittedBody().p_request_type).toBe("link_project");
 
-  // Use a fresh isolated browser context for the editor scenario. This prevents
-  // an in-flight request or cached auth state from the manager scenario leaking
-  // into the second permission check.
-  const editorContext = await page.context().browser().newContext();
-  const editorPage = await editorContext.newPage();
-  try {
-    await installDashboardMocks(editorPage, "editor");
-    await editorPage.goto("/company-dashboard.html");
-    await expect(editorPage.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد أو مدير الملف المفوض فقط");
-    await expect(editorPage.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
-  } finally {
-    await editorContext.close();
-  }
+  // Change the mocked membership role and reload with the same auth/network
+  // fixtures, avoiding route teardown while the dashboard scripts are active.
+  managerMocks.setRole("editor");
+  await page.reload();
+  await expect(page.locator("#cdProjectManagementRoot")).toContainText("إرسال طلبات المشروعات متاح للمالك المعتمد أو مدير الملف المفوض فقط");
+  await expect(page.locator("#cdProjectManagementRoot .cd-project-request-form")).toHaveCount(0);
 });
 
 test("directory administrator can approve a company request and see its final state", async ({ page }) => {
