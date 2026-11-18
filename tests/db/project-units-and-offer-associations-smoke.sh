@@ -119,11 +119,11 @@ BEGIN
     RAISE EXCEPTION 'The trigger-only project-unit guard must not be directly executable by API roles';
   END IF;
 
-  IF NOT has_function_privilege('authenticated','public.company_project_unit_request_submit(uuid,jsonb,text,text)','EXECUTE')
+  IF NOT has_function_privilege('authenticated','public.company_project_unit_request_submit(uuid,uuid,jsonb,text,text)','EXECUTE')
      OR NOT has_function_privilege('authenticated','public.property_offer_project_unit_request_submit(bigint,uuid,text,text)','EXECUTE')
      OR NOT has_function_privilege('authenticated','public.company_project_unit_request_admin_review(uuid,text,text)','EXECUTE')
      OR NOT has_function_privilege('authenticated','public.property_offer_project_unit_request_admin_review(uuid,text,text)','EXECUTE')
-     OR has_function_privilege('anon','public.company_project_unit_request_submit(uuid,jsonb,text,text)','EXECUTE')
+     OR has_function_privilege('anon','public.company_project_unit_request_submit(uuid,uuid,jsonb,text,text)','EXECUTE')
      OR has_function_privilege('anon','public.property_offer_project_unit_request_submit(bigint,uuid,text,text)','EXECUTE')
      OR has_function_privilege('anon','public.company_project_unit_request_admin_review(uuid,text,text)','EXECUTE')
      OR has_function_privilege('anon','public.property_offer_project_unit_request_admin_review(uuid,text,text)','EXECUTE') THEN
@@ -157,6 +157,7 @@ SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
 SELECT public.company_project_unit_request_submit(
   '$PROJECT_ID',
+  '$ENTITY_ID',
   '{"unit_ref":"A-12","unit_type":"apartment","building_label":"عمارة أ","floor_label":"الثالث","unit_number":"12","area_m2":145,"bedrooms":3,"bathrooms":2,"finishing":"نصف تشطيب","description":"وحدة اختبار من الشركة"}'::jsonb,
   'https://example.invalid/unit-evidence',
   'وصف دليل بيانات الوحدة من ملف المشروع'
@@ -178,6 +179,7 @@ SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$MANAGER_ID',true);
 SELECT public.company_project_unit_request_submit(
   '$PROJECT_ID',
+  '$ENTITY_ID',
   '{"unit_ref":"B-07","unit_type":"shop","building_label":"مبنى تجاري","floor_label":"الأرضي","unit_number":"7","area_m2":60}'::jsonb,
   NULL,
   'بيانات الوحدة مقدمة من مدير ملف الشركة المفوض'
@@ -192,6 +194,7 @@ SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$EDITOR_ID',true);
 SELECT public.company_project_unit_request_submit(
   '$PROJECT_ID',
+  '$ENTITY_ID',
   '{"unit_ref":"EDITOR-1","unit_type":"apartment"}'::jsonb,
   NULL,
   'محاولة غير مصرح بها من محرر الشركة'
