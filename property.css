@@ -70,3 +70,6 @@
  .property-mobile-contact .property-action{min-height:44px}
  .property-page-footer{padding-bottom:130px}
 }
+
+.property-project-link{display:inline-flex;align-items:center;gap:7px;margin:2px 0 12px;padding:8px 11px;border:1px solid #EAD9C7;border-radius:9px;background:#FFF9F2;color:#895536;font-size:11px;font-weight:800;text-decoration:none}
+.property-project-link:hover{background:#FBF2EA}
