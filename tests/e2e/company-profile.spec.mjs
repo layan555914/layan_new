@@ -55,6 +55,7 @@ test("company directory continues to render approved profiles from the public vi
   await expect(companyCard).toHaveCount(1);
   await expect(companyCard).toContainText(approvedCompany.company_name);
   await expect(page.locator("#companyDirectoryCount")).toContainText("1 ملفًا متاحًا");
+  await expect(page.locator('header .top-actions a[href="./company-dashboard.html"]')).toHaveCount(0);
 });
 
 
@@ -109,6 +110,8 @@ test("directory entity profile clearly labels missing logo and all mobile action
   await expect(page.locator(".company-contact-actions a")).toHaveCount(4);
   await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
   await expect(page.locator(".company-claim-panel--prominent button")).toBeVisible();
+  await expect(page.locator("#companyProfileRoot .company-manager-panel")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "إدارة المشروعات والوحدات والطلبات" })).toHaveCount(0);
   await expect(page.locator(".company-contact-details")).toContainText("بيانات التواصل ومقر مقدم الخدمة");
   await expect(page.locator(".company-coverage-section")).toContainText("أسيوط");
   for (const action of await page.locator(".company-contact-actions a").all()) {
@@ -265,4 +268,82 @@ test("marketing and brokerage directory profiles are presented as companies", as
     await expect(page.locator(".company-claim-panel")).toContainText("ممثل الشركة؟");
     await expect(page.locator(".company-contact-details")).not.toContainText("مقدم الخدمة");
   }
+});
+
+
+const OWNER_USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+
+async function installVerifiedCompanyOwnerSession(page) {
+  await page.route("**/config.js*", route => route.fulfill({
+    status: 200,
+    contentType: "application/javascript",
+    body: 'window.LAYAN_CONFIG = { SUPABASE_URL: "' + SUPABASE + '", SUPABASE_PUBLISHABLE_KEY: "test-publishable-key", ENVIRONMENT: "test" };'
+  }));
+  await page.route("**/gubabase.js*", route => route.fulfill({
+    status: 200,
+    contentType: "application/javascript",
+    body: 'window.LAYAN_SUPABASE = { isAuthenticated: () => true, requireAuthenticated: async () => ({ user: { id: "' + OWNER_USER_ID + '" } }), authedFetch: (url, options) => fetch(url, options) };'
+  }));
+}
+
+test("authorized company owners can open management from inside their company profile", async ({ page }) => {
+  await installVerifiedCompanyOwnerSession(page);
+  await page.route(SUPABASE + "/rest/v1/company_profiles_public**", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([approvedCompany]) })
+  );
+  await page.route(SUPABASE + "/rest/v1/rpc/layan_company_owner_profile", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
+      id: COMPANY_ID,
+      verified_at: "2026-11-17T10:00:00Z"
+    }) })
+  );
+  await page.route(SUPABASE + "/rest/v1/company_profiles?*", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: "[]" })
+  );
+  await page.route(SUPABASE + "/rest/v1/rpc/company_profile_manager_member_list", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: "[]" })
+  );
+
+  await page.goto("/company.html?id=" + COMPANY_ID);
+
+  const managementPanel = page.locator("#companyProfileRoot .company-manager-panel");
+  await expect(managementPanel).toBeVisible();
+  await expect(managementPanel.getByRole("link", { name: "إدارة المشروعات والوحدات والطلبات" }))
+    .toHaveAttribute("href", "./company-dashboard.html?company_id=" + COMPANY_ID + "#company-data");
+});
+
+test("verified directory company representatives can open management from inside the company profile", async ({ page }) => {
+  await installVerifiedCompanyOwnerSession(page);
+  const verifiedEntity = {
+    ...publicDirectoryEntity,
+    entity_type: "developer",
+    service_category: "real_estate_development"
+  };
+  await page.route(SUPABASE + "/rest/v1/directory_entities**", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([verifiedEntity]) })
+  );
+  await page.route(SUPABASE + "/rest/v1/directory_entity_sources**", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: "[]" })
+  );
+  await page.route(SUPABASE + "/rest/v1/company_entity_managers**", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([{
+      directory_entity_id: DIRECTORY_ENTITY_ID,
+      owner_user_id: OWNER_USER_ID,
+      verified_at: "2026-11-17T10:00:00Z",
+      representative_role: "المالك"
+    }]) })
+  );
+  await page.route(SUPABASE + "/rest/v1/company_entity_profile_update_requests**", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: "[]" })
+  );
+  await page.route(SUPABASE + "/rest/v1/rpc/company_entity_manager_member_list", route =>
+    route.fulfill({ status: 200, contentType: "application/json", body: "[]" })
+  );
+
+  await page.goto("/company.html?entity_id=" + DIRECTORY_ENTITY_ID);
+
+  const managementPanel = page.locator("#companyProfileRoot .company-manager-panel");
+  await expect(managementPanel).toBeVisible();
+  await expect(managementPanel.getByRole("link", { name: "إدارة المشروعات والوحدات والطلبات" }))
+    .toHaveAttribute("href", "./company-dashboard.html?company_id=" + DIRECTORY_ENTITY_ID + "#company-data");
 });

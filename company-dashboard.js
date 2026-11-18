@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const auth = window.LAYAN_SUPABASE;
   const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
   const root = $("cdCompanyProfiles");
+  const requestedCompanyId = new URLSearchParams(window.location.search).get("company_id");
+  let requestedCompanyAccessible = !requestedCompanyId;
   const projectsRoot = $("cdProjectsList");
   const listingsRoot = $("cdListingsList");
   const requestsRoot = $("cdRequestsList");
@@ -153,6 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderProfileCard(profile) {
     const card = el("article", undefined, "cd-company-card cd-company-card--live");
+    card.dataset.companyId = profile.id;
     const identity = el("div", undefined, "cd-company-identity");
     const name = profile.name || profile.company_name || "ملف شركة";
     identity.append(renderLogo(name, profile.logo_url));
@@ -613,6 +616,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       );
     } else {
       profiles.forEach(profile => root.append(renderProfileCard(profile)));
+      if (requestedCompanyId) {
+        const selected = [...root.querySelectorAll("[data-company-id]")].find(card => card.dataset.companyId === requestedCompanyId);
+        if (selected) {
+          selected.scrollIntoView({ behavior: "smooth", block: "center" });
+          requestedCompanyAccessible = true;
+        } else {
+          requestedCompanyAccessible = false;
+        }
+      }
     }
 
     let projectRows = [];
@@ -657,7 +669,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     setStat("listings", Array.isArray(accountOffers) ? accountOffers.length : 0);
     setStat("reviews", accountReviewCount);
 
-    if (errors.length) {
+    if (!requestedCompanyAccessible) {
+      message.textContent = "الملف المحدد غير مرتبط بصلاحيات حسابك الحالية. نعرض لك الملفات التي تملك صلاحية إدارتها فقط.";
+      message.dataset.state = "warning";
+    } else if (errors.length) {
       message.textContent = "تم تحميل البيانات المتاحة. بعض الأقسام لم تكتمل قراءتها؛ لن نعرض بيانات غير مؤكدة.";
       message.dataset.state = "warning";
     } else {
@@ -673,7 +688,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     message.dataset.state = "error";
     renderEmpty(
       root,
-      "يلزم تسجيل الدخول لفتح مساحة الشركة",
+      "يلزم تسجيل الدخول لفتح إدارة ملف الشركة",
       "افتح الصفحة الرئيسية وسجّل الدخول إلى حسابك على أسيوط عقار، ثم ارجع إلى لوحة الشركة.",
       "العودة إلى الصفحة الرئيسية",
       "./"
