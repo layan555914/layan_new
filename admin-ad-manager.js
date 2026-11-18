@@ -84,12 +84,11 @@
 
   function dialogContent(kind, row) {
     const creating = !row;
-    const ownerEmail = window.LAYAN_SUPABASE?.getSession?.()?.user?.email || "";
     const fields = specs[kind].filter(s => creating ? !["status","verification_status","image_url"].includes(s[0]) : true);
     const currentImages = kind === "supplier_ad" ? (row?.image_url ? [row.image_url] : []) : (Array.isArray(row?.image_urls) ? row.image_urls : []);
     return '<form class="as-form" novalidate>' +
       '<div class="as-dialog-head"><h2>' + (creating ? "إضافة " + labels[kind] + " لعميل" : "تعديل " + labels[kind]) + '</h2><button type="button" class="as-close" data-close aria-label="إغلاق">×</button></div>' +
-      (creating ? '<label class="as-field is-wide">بريد صاحب الإعلان المسجل *<input type="email" name="owner_email" required value="' + esc(ownerEmail) + '" placeholder="name@example.com"><small>سيظل الإعلان مربوطًا بهذا الحساب بعد الحفظ.</small></label>' : '<p class="admin-empty">صاحب الإعلان: ' + esc(row.owner_id || "غير محدد") + ' — لن يتم تغيير ملكية الإعلان.</p>') +
+      (creating ? '<label class="as-field is-wide">بريد صاحب الإعلان المسجل *<input type="email" name="owner_email" required value="" placeholder="name@example.com"><small>سيظل الإعلان مربوطًا بهذا الحساب بعد الحفظ.</small></label>' : '<p class="admin-empty">صاحب الإعلان: ' + esc(row.owner_id || "غير محدد") + ' — لن يتم تغيير ملكية الإعلان.</p>') +
       '<div class="as-grid">' + fields.map(s => inputFor(s, row?.[s[0]] ?? (s[0] === "city" ? "أسيوط" : s[0] === "listing_type" ? "خدمة" : s[0] === "down_payment" ? 0 : ""))).join("") +
       (kind === "property_offer" && creating ? '<label class="as-check is-wide"><input type="checkbox" name="featured_requested" data-featured-request> طلب إعلان مميز (يظل قيد المراجعة والاتفاق)</label>' : "") +
       (kind !== "company_ad" ? '<div class="as-logo-field is-wide"><div class="as-info"><strong>صور الإعلان</strong><small>JPG فقط بعد التحويل الآمن. الحد الأقصى بعد الضغط 5 ميجابايت للصورة.</small></div><label class="as-upload">إضافة صور<input type="file" accept="image/*" multiple data-image-files></label></div>' : "") +
@@ -163,7 +162,7 @@
     if (creating) {
       if (kind === "property_offer") Object.assign(data, {
         governorate:"أسيوط", status:"pending", verification_status:"pending", developer_approval_status:"unknown",
-        verified_at:null, is_featured:false, featured_requested:false, featured_until:null,
+        verified_at:null, is_featured:false, featured_until:null,
         promotion_status:form.querySelector("[data-featured-request]")?.checked ? "requested" : "none",
         featured_requested:!!form.querySelector("[data-featured-request]")?.checked, image_urls:[], photos:[], document_urls:[]
       });
@@ -200,6 +199,8 @@
       if (kind === "supplier_ad" && (body.business_name.trim().length < 2 || body.title.trim().length < 3 || body.description.trim().length < 5 || body.contact_phone.trim().length < 7)) throw new Error("راجع اسم النشاط والعنوان والوصف ورقم التواصل؛ توجد خانات لا تحقق الحد الأدنى المطلوب.");
       if (kind === "company_ad" && body.business_name.trim().length < 2) throw new Error("اسم الشركة يجب ألا يقل عن حرفين.");
       body.owner_id = ownerId;
+
+      if (kind === "supplier_ad" && row?.image_url && !form.querySelector("[data-keep-image]:checked") && body.image_url === row.image_url) body.image_url = null;
 
       if (kind === "property_offer" || kind === "marketplace_listing") {
         const kept = Array.from(form.querySelectorAll("[data-keep-image]:checked")).map(x => x.value);
