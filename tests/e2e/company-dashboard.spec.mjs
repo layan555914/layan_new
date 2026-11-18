@@ -15,7 +15,7 @@ async function installDashboardMocks(page, scenario = "populated") {
   }));
 
   const authBody = scenario === "unauthenticated"
-    ? 'window.LAYAN_SUPABASE = { requireAuthenticated: async () => { throw new Error("سجّل الدخول أولًا قبل فتح مساحة الشركة."); }, authedFetch: (url, options) => fetch(url, options) };'
+    ? 'window.LAYAN_SUPABASE = { requireAuthenticated: async () => { throw new Error("سجّل الدخول أولًا قبل فتح إدارة ملف الشركة."); }, authedFetch: (url, options) => fetch(url, options) };'
     : 'window.LAYAN_SUPABASE = { requireAuthenticated: async () => ({ user: { id: "' + USER_ID + '" } }), authedFetch: (url, options) => fetch(url, options) };';
   await page.route("**/gubabase.js*", route => route.fulfill({
     status: 200,
@@ -161,6 +161,8 @@ test("dashboard displays only current account profiles, published project links 
   await page.goto("/company-dashboard.html");
 
   await expect(page.locator("#cdConnectionMessage")).toContainText("تم تحميل ملفاتك");
+  await expect(page).toHaveTitle(/إدارة ملف الشركة/);
+  await expect(page.locator(".cd-sidebar-kicker")).toHaveText("إدارة ملف الشركة");
   await expect(page.locator("#cdCompanyProfiles")).toContainText("شركة أسيوط للاختبار");
   await expect(page.locator("#cdCompanyProfiles")).toContainText("وكالة أسيوط للتسويق");
   await expect(page.locator("#cdCompanyProfiles")).toContainText("شركة عضو مفوض");
