@@ -55,6 +55,7 @@ test("company directory continues to render approved profiles from the public vi
   await expect(companyCard).toHaveCount(1);
   await expect(companyCard).toContainText(approvedCompany.company_name);
   await expect(page.locator("#companyDirectoryCount")).toContainText("1 ملفًا متاحًا");
+  await expect(page.locator('header .top-actions a[href="./company-dashboard.html"]')).toHaveCount(0);
 });
 
 
