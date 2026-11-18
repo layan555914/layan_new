@@ -1,0 +1,31 @@
+.my-project-unit-link-panel{
+  display:grid;gap:14px;margin:20px 0 24px;padding:18px;
+  border:1px solid #E9DED3;border-radius:15px;background:#fff;
+  box-shadow:0 8px 24px rgba(43,33,27,.045)
+}
+.my-project-unit-kicker{display:block;color:#996541;font-size:11px;font-weight:800}
+.my-project-unit-link-panel h2{margin:4px 0 6px;color:#2B211B;font-size:19px;line-height:1.6}
+.my-project-unit-link-panel>div>p{margin:0;color:#806B5B;font-size:12px;line-height:1.9}
+.my-project-unit-link-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.my-project-unit-link-form label{display:grid;gap:6px;min-width:0;color:#49392E;font-size:11px;font-weight:700}
+.my-project-unit-link-form input,.my-project-unit-link-form select,.my-project-unit-link-form textarea{
+ width:100%;min-width:0;min-height:43px;padding:10px;border:1px solid #E3D8CD;
+ border-radius:9px;background:#fff;color:#30251E;font:inherit;font-size:12px
+}
+.my-project-unit-link-form textarea{min-height:76px;resize:vertical}
+.my-project-unit-link-form button{grid-column:1/-1;min-height:44px;cursor:pointer}
+.my-project-unit-link-form button:disabled{opacity:.6;cursor:wait}
+.my-project-unit-feedback,.my-project-unit-muted{margin:0;color:#806B5B;font-size:11px;line-height:1.9}
+.my-project-unit-request{display:grid;gap:7px;margin-top:8px;padding:12px;border:1px solid #EADFD4;border-radius:10px;background:#FCFAF7}
+.my-project-unit-request-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.my-project-unit-request-head strong{font-size:12px}
+.my-project-unit-status{display:inline-flex;padding:4px 8px;border-radius:20px;background:#F5EEE7;color:#76583F;font-size:10px;font-weight:800}
+.my-project-unit-request p{margin:0;color:#806B5B;font-size:11px;line-height:1.8;overflow-wrap:anywhere}
+.my-project-unit-admin-note{padding:8px;border-radius:8px;background:#FFF7E9;color:#805C2E!important}
+.my-project-unit-link-panel :focus-visible{outline:3px solid #C88762;outline-offset:2px}
+@media(max-width:640px){
+ .my-project-unit-link-panel{padding:14px}
+ .my-project-unit-link-panel h2{font-size:17px}
+ .my-project-unit-link-form{grid-template-columns:1fr}
+ .my-project-unit-link-form button{grid-column:auto;width:100%}
+}
