@@ -51,6 +51,7 @@ const AREAS_DIR = path.join(root, "areas");
 const FIELDS = [
   "id", "title", "governorate", "listing_purpose", "city", "area", "area_m2", "bedrooms", "bathrooms",
   "property_type", "description", "total_price", "down_payment", "remaining_amount", "monthly_installment",
+  "rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months",
   "project_name", "developer_name", "image_urls", "created_at", "updated_at"
 ].join(",");
 
@@ -97,13 +98,18 @@ function listingPage(template, row) {
   const purpose = String(row.listing_purpose || "بيع");
   const place = [row.city, row.area].filter(Boolean).join(" · ") || "أسيوط";
   const price = money(row.total_price);
+  const rentPeriod = ["يومي", "شهري", "سنوي"].includes(row.rental_period) ? row.rental_period : "شهري";
+  const displayPrice = price ? price + (purpose === "إيجار" ? " / " + rentPeriod : "") : "";
   const pageUrl = `${SITE}/ads/${id}.html`;
   const image = firstImage(row) || DEFAULT_IMAGE;
-  const headline = `${title}${price ? " — " + price : ""}`;
+  const headline = `${title}${displayPrice ? " — " + displayPrice : ""}`;
   const specs = [
     row.property_type, purpose, place,
     row.area_m2 ? row.area_m2 + " م²" : "",
-    row.bedrooms && /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(String(row.property_type || "")) ? row.bedrooms + " غرف" : ""
+    row.bedrooms && /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(String(row.property_type || "")) ? row.bedrooms + " غرف" : "",
+    purpose === "إيجار" && row.rental_furnishing ? row.rental_furnishing : "",
+    purpose === "إيجار" && Number(row.rental_security_deposit) > 0 ? "التأمين " + money(row.rental_security_deposit) : "",
+    purpose === "إيجار" && Number(row.rental_minimum_months) > 0 ? "الحد الأدنى " + row.rental_minimum_months + " شهر" : ""
   ].filter(Boolean).join(" · ");
   const description = (specs + ". " + String(row.description || "")).replace(/\s+/g, " ").trim().slice(0, 155);
   const schema = {
@@ -146,7 +152,7 @@ function listingPage(template, row) {
         <p class="property-listing-code">كود الإعلان: <strong>${esc(offerCode(row))}</strong></p>
         <h1>${esc(title)}</h1>
         <p>${esc(specs)}</p>
-        ${price ? `<p><strong>${esc(price)}</strong></p>` : ""}
+        ${displayPrice ? `<p><strong>${esc(displayPrice)}</strong></p>` : ""}
         ${row.description ? `<p>${esc(String(row.description).slice(0, 600))}</p>` : ""}
       </section>`;
   swap(/<section class="property-state"><h1>جارٍ فتح الإعلان<\/h1><p>[^<]*<\/p><\/section>/, preview);
