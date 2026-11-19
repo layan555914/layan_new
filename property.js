@@ -284,9 +284,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const endpointFor = list => base + "/rest/v1/property_offers?select=" + list + "&id=eq." + encodeURIComponent(id) + "&status=eq.available&limit=1";
       const headers = {headers:{apikey:key,Authorization:"Bearer " + key},cache:"no-store"};
+      const legacyFields = fields.split(",").filter(name =>
+        !["rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months"].includes(name)
+      ).join(",");
       let response = await fetch(endpointFor(fields + ",trust_badge"), headers);
-      // Databases without the admin trust badge column still load the listing.
       if (response.status === 400) response = await fetch(endpointFor(fields), headers);
+      if (response.status === 400) response = await fetch(endpointFor(legacyFields + ",trust_badge"), headers);
+      if (response.status === 400) response = await fetch(endpointFor(legacyFields), headers);
       if (!response.ok) throw new Error("تعذر تحميل الإعلان.");
       const rows = await response.json();
       if (!Array.isArray(rows) || !rows.length) {
