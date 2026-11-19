@@ -142,7 +142,7 @@
         <label>نوع العقار
           <select id="heroTypeFilter">
             <option value="">كل الوحدات</option>
-            <option value="شقة">شقة</option><option value="فيلا">فيلا</option>
+            <option value="شقة">شقة</option><option value="منزل">منزل / بيت</option><option value="فيلا">فيلا</option>
             <option value="محل">محل تجاري</option><option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option><option value="أرض تنازل">أرض تنازل</option>
             <option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option>
           </select>
@@ -231,6 +231,7 @@
             <select id="typeFilter" aria-label="تصفية حسب نوع العقار">
               <option value="">كل أنواع العقارات</option>
               <option value="شقة">شقة</option>
+              <option value="منزل">منزل / بيت</option>
               <option value="فيلا">فيلا</option>
               <option value="محل">محل تجاري</option>
               <option value="مكتب إداري">مكتب إداري</option>
@@ -641,6 +642,7 @@
         <select name="property_type" required>
           <option value="">اختر النوع</option>
           <option value="شقة">شقة</option>
+          <option value="منزل">منزل / بيت</option>
           <option value="فيلا">فيلا</option>
           <option value="محل">محل تجاري</option>
           <option value="مكتب إداري">مكتب إداري</option>
@@ -731,15 +733,42 @@
         </label>
       </fieldset>
 
-      <label>
-        قيمة الخصم بالجنيه (إن وجدت)
-        <input name="discount_amount" type="number" min="0" step="0.01" inputmode="decimal">
-      </label>
+      <fieldset id="saleFields" class="transaction-fields" hidden>
+        <legend>تفاصيل البيع</legend>
+        <label>
+          قيمة الخصم بالجنيه (إن وجدت)
+          <input name="discount_amount" type="number" min="0" step="0.01" inputmode="decimal">
+        </label>
+        <label>
+          نسبة الخصم إن وجدت (%)
+          <input name="discount_percent" type="number" min="0" max="100">
+        </label>
+      </fieldset>
 
-      <label>
-        نسبة الخصم إن وجدت (%)
-        <input name="discount_percent" type="number" min="0" max="100">
-      </label>
+      <fieldset id="rentalFields" class="transaction-fields" hidden>
+        <legend>تفاصيل الإيجار</legend>
+        <label>دورية الإيجار
+          <select name="rental_period">
+            <option value="شهري" selected>شهري</option>
+            <option value="سنوي">سنوي</option>
+            <option value="يومي">يومي</option>
+          </select>
+        </label>
+        <label>حالة الوحدة
+          <select name="rental_furnishing">
+            <option value="">غير محدد</option>
+            <option value="مفروش">مفروش</option>
+            <option value="نصف مفروش">نصف مفروش</option>
+            <option value="غير مفروش">غير مفروش</option>
+          </select>
+        </label>
+        <label>التأمين (جنيه)
+          <input name="rental_security_deposit" type="number" min="0" step="0.01" inputmode="decimal" placeholder="اختياري">
+        </label>
+        <label>الحد الأدنى لمدة الإيجار (بالشهور)
+          <input name="rental_minimum_months" type="number" min="1" max="600" step="1" inputmode="numeric" placeholder="اختياري">
+        </label>
+      </fieldset>
 
       <label>
         اسم صاحب العرض
