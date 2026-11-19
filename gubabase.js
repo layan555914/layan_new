@@ -498,7 +498,7 @@
   }
   async function getOffers() {
     const fields = [
-      "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price","price_on_request",
+      "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","rental_period","rental_furnishing","rental_security_deposit","rental_minimum_months","description","total_price","price_on_request",
       "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","contact_name","owner_id","latitude","longitude","created_at","updated_at"
@@ -784,6 +784,10 @@
       bathrooms: Number(offer.bathrooms || 0) || null,
       monthly_installment: Number(offer.monthly_installment || 0) || null,
       property_type: offer.property_type || "شقة",
+      rental_period: offer.listing_purpose === "إيجار" ? (offer.rental_period || "شهري") : null,
+      rental_furnishing: offer.listing_purpose === "إيجار" ? (offer.rental_furnishing || null) : null,
+      rental_security_deposit: offer.listing_purpose === "إيجار" && offer.rental_security_deposit != null ? Number(offer.rental_security_deposit) : null,
+      rental_minimum_months: offer.listing_purpose === "إيجار" && offer.rental_minimum_months != null ? Number(offer.rental_minimum_months) : null,
       description: offer.description || null,
       price_on_request: offer.price_on_request === true,
       total_price: offer.price_on_request === true ? null : Number(offer.total_price || 0),
