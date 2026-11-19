@@ -820,9 +820,30 @@
       promotion_status: offer.featured_requested === true ? "requested" : "none",
       status: "pending"
     };
-    const rows = await request("property_offers", {
-      method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(payload)
-    });
+    let rows;
+    try {
+      rows = await request("property_offers", {
+        method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(payload)
+      });
+    } catch (error) {
+      const message = String(error?.message || error);
+      const missingRentalSchema = /rental_period|rental_furnishing|rental_security_deposit|rental_minimum_months|schema cache|PGRST204|column .* does not exist/i.test(message);
+      if (!missingRentalSchema || offer.listing_purpose === "إيجار") {
+        if (missingRentalSchema && offer.listing_purpose === "إيجار") {
+          throw new Error("تفاصيل الإيجار الجديدة لم تُفعّل في قاعدة البيانات بعد. لم يتم حفظ الإعلان؛ حاول بعد اكتمال تحديث النظام.");
+        }
+        throw error;
+      }
+      // Sale and assignment ads keep working during a staged release; their new rental fields are empty.
+      const legacyPayload = { ...payload };
+      delete legacyPayload.rental_period;
+      delete legacyPayload.rental_furnishing;
+      delete legacyPayload.rental_security_deposit;
+      delete legacyPayload.rental_minimum_months;
+      rows = await request("property_offers", {
+        method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(legacyPayload)
+      });
+    }
     return Array.isArray(rows) ? rows[0] : rows;
   }
   async function getFavoriteOfferIds() {
