@@ -49,7 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
       '<div class="my-listing-top"><span class="my-listing-status status-' + esc(x.status) + '">' + esc(OFFER_STATUS[x.status] || x.status || "غير محدد") + "</span><small>" + esc(x.property_type || "عقار") + " · " + esc(x.listing_purpose || "تنازل") + "</small></div>" +
       "<h2>" + esc(x.title) + "</h2>" + photos(x.image_urls) +
       '<p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + "</p>" +
-      "<p><strong>" + (rent ? "قيمة الإيجار" : "السعر") + ":</strong> " + money(x.total_price) + (x.area_m2 ? " · <strong>المساحة:</strong> " + esc(x.area_m2) + " م²" : "") + "</p>" +
+      "<p><strong>" + (rent ? "الإيجار " + (x.rental_period || "شهري") : "السعر") + ":</strong> " + money(x.total_price) + (x.area_m2 ? " · <strong>المساحة:</strong> " + esc(x.area_m2) + " م²" : "") + "</p>" +
+      (rent && (x.rental_furnishing || x.rental_security_deposit != null || x.rental_minimum_months != null) ? '<p><strong>تفاصيل الإيجار:</strong> ' + esc(x.rental_furnishing || "حالة التأثيث غير محددة") + (x.rental_security_deposit != null ? " · التأمين: " + money(x.rental_security_deposit) : "") + (x.rental_minimum_months != null ? " · الحد الأدنى: " + esc(x.rental_minimum_months) + " شهر" : "") + "</p>" : "") +
       (x.contact_phone ? '<p><strong>رقم التواصل:</strong> <span dir="ltr">' + esc(x.contact_phone) + "</span></p>" : "") +
       (x.verification_notes ? '<p class="my-listing-note"><strong>ملاحظة المراجعة:</strong> ' + esc(x.verification_notes) + "</p>" : "") +
       editState(x) +
@@ -74,13 +75,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const OFFER_FIELDS = [
     ["title", "عنوان الإعلان", "text", { required: true, maxlength: 160, wide: true }],
     ["listing_purpose", "نوع الإعلان", "select", { options: [["تنازل", "تنازل عقاري"], ["بيع", "بيع مباشر"], ["إيجار", "إيجار"]] }],
-    ["property_type", "نوع العقار", "select", { options: ["شقة", "فيلا", "محل", "مكتب إداري", "عيادة طبية", "مخزن", "معرض", "مشروع عقاري", "أرض مطروحة للبناء", "أرض تنازل"].map(v => [v, v]) }],
+    ["property_type", "نوع العقار", "select", { options: ["شقة", "منزل", "فيلا", "محل", "مكتب إداري", "عيادة طبية", "مخزن", "معرض", "مشروع عقاري", "أرض مطروحة للبناء", "أرض تنازل"].map(v => [v, v === "منزل" ? "منزل / بيت" : v]) }],
     ["city", "المدينة / المركز", "text", { list: "asyut-centers" }],
     ["area", "الحي / المنطقة", "text"],
     ["area_m2", "المساحة (م²)", "number"],
     ["bedrooms", "غرف النوم", "int"],
     ["bathrooms", "الحمامات", "int"],
     ["total_price", "السعر / قيمة الإيجار (جنيه)", "number"],
+    ["rental_period", "دورية الإيجار", "select", { options: [["شهري", "شهري"], ["سنوي", "سنوي"], ["يومي", "يومي"]] }],
+    ["rental_furnishing", "حالة التأثيث", "select", { options: [["", "غير محدد"], ["مفروش", "مفروش"], ["نصف مفروش", "نصف مفروش"], ["غير مفروش", "غير مفروش"]] }],
+    ["rental_security_deposit", "تأمين الإيجار (جنيه)", "number"],
+    ["rental_minimum_months", "الحد الأدنى لمدة الإيجار (بالشهور)", "int"],
     ["down_payment", "المقدم", "number"],
     ["paid_amount", "إجمالي المدفوع", "number"],
     ["remaining_amount", "المبلغ المتبقي", "number"],
@@ -88,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ["remaining_installments", "عدد الأقساط المتبقية", "int"],
     ["assignment_fee", "رسوم التنازل", "number"],
     ["discount_amount", "قيمة الخصم", "number"],
+    ["discount_percent", "نسبة الخصم (%)", "number"],
     ["developer_name", "المطور / الشركة", "text"],
     ["project_name", "اسم المشروع", "text"],
     ["contact_name", "اسم التواصل", "text"],
@@ -162,7 +168,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const land = fieldsBox.querySelectorAll('[data-field="land_area_m2"], [data-field="land_zoning"]');
     land.forEach(n => { n.hidden = kind !== "land"; });
   }
-  fieldsBox.addEventListener("change", e => { if (e.target.name === "property_type") syncTypeFields(); });
+  function syncPurposeFields() {
+    const purpose = fieldsBox.querySelector('[name="listing_purpose"]')?.value || "";
+    const groups = [
+      { fields: ["discount_amount", "discount_percent"], visible: purpose === "بيع" },
+      { fields: ["rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months"], visible: purpose === "إيجار" },
+      { fields: ["down_payment", "paid_amount", "remaining_amount", "monthly_installment", "remaining_installments", "assignment_fee"], visible: purpose === "تنازل" }
+    ];
+    groups.forEach(group => group.fields.forEach(name => {
+      const label = fieldsBox.querySelector('[data-field="' + name + '"]');
+      const control = label?.querySelector("input, select, textarea");
+      if (label) label.hidden = !group.visible;
+      if (control) control.disabled = !group.visible;
+    }));
+  }
+  fieldsBox.addEventListener("change", e => {
+    if (e.target.name === "property_type") syncTypeFields();
+    if (e.target.name === "listing_purpose") syncPurposeFields();
+  });
 
   function openEdit(kind, row) {
     const fields = kind === "offer" ? OFFER_FIELDS : SERVICE_FIELDS;
@@ -178,6 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     filesInput.value = "";
     renderPhotos();
     syncTypeFields();
+    syncPurposeFields();
     $("myEditSave").disabled = false;
     dialog.showModal();
   }
@@ -314,11 +338,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Loading ----------
   const EXTRA = ",pending_update,update_status,update_notes";
   const SERVICE_COLS = "id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,status,admin_notes,details,image_urls,created_at";
-  const OFFER_COLS = "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,remaining_installments,assignment_fee,discount_amount,developer_name,project_name,contact_name,contact_phone,land_area_m2,land_zoning,description,image_urls,status,verification_notes,created_at";
+  const OFFER_COLS = "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,remaining_installments,assignment_fee,discount_amount,discount_percent,developer_name,project_name,contact_name,contact_phone,land_area_m2,land_zoning,rental_period,rental_furnishing,rental_security_deposit,rental_minimum_months,description,image_urls,status,verification_notes,created_at";
   async function fetchMine(table, cols, owner) {
     const q = c => table + "?select=" + c + "&owner_id=eq." + owner + "&order=created_at.desc";
-    try { return await api(q(cols + EXTRA)); }
-    catch (e) { if (e.code === "42703" || e.status === 400) return api(q(cols)); throw e; } // before the edit columns exist
+    const legacyCols = cols.split(",").filter(name =>
+      !["rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months"].includes(name)
+    ).join(",");
+    let lastError;
+    for (const selected of [cols + EXTRA, cols, legacyCols + EXTRA, legacyCols]) {
+      try { return await api(q(selected)); }
+      catch (e) {
+        lastError = e;
+        if (!(e.code === "42703" || e.status === 400 || /column .* does not exist|schema cache|PGRST204/i.test(String(e.message || e)))) throw e;
+      }
+    }
+    throw lastError;
   }
   async function load() {
     try {

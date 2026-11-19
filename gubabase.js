@@ -498,19 +498,30 @@
   }
   async function getOffers() {
     const fields = [
-      "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","description","total_price","price_on_request",
+      "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","rental_period","rental_furnishing","rental_security_deposit","rental_minimum_months","description","total_price","price_on_request",
       "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","contact_name","owner_id","latitude","longitude","created_at","updated_at"
     ].join(",");
-    let rows;
-    try {
-      // trust_badge («مالك موثّق» / «شركة موثّقة») is set by the admin only; older databases may not have it yet.
-      rows = await request("property_offers?select=" + fields + ",trust_badge&status=eq.available&order=created_at.desc");
-    } catch (error) {
-      if (!/trust_badge/.test(String(error?.message || error))) throw error;
-      rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
+    const legacyFields = fields.split(",").filter(name =>
+      !["rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months"].includes(name)
+    ).join(",");
+    const query = selected => "property_offers?select=" + selected + "&status=eq.available&order=created_at.desc";
+    let rows, lastError;
+    // Keep public listings readable during a staged deployment where an older preview database
+    // has not received the additive rental columns yet.
+    for (const selected of [fields + ",trust_badge", fields, legacyFields + ",trust_badge", legacyFields]) {
+      try {
+        rows = await request(query(selected));
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = String(error?.message || error);
+        if (!/trust_badge|rental_period|rental_furnishing|rental_security_deposit|rental_minimum_months|column .* does not exist|schema cache|PGRST204/i.test(message)) throw error;
+      }
     }
+    if (lastError) throw lastError;
     return Array.isArray(rows) ? rows : [];
   }
   async function getPriceGuideOffers() {
@@ -784,6 +795,10 @@
       bathrooms: Number(offer.bathrooms || 0) || null,
       monthly_installment: Number(offer.monthly_installment || 0) || null,
       property_type: offer.property_type || "شقة",
+      rental_period: offer.listing_purpose === "إيجار" ? (offer.rental_period || "شهري") : null,
+      rental_furnishing: offer.listing_purpose === "إيجار" ? (offer.rental_furnishing || null) : null,
+      rental_security_deposit: offer.listing_purpose === "إيجار" && offer.rental_security_deposit != null ? Number(offer.rental_security_deposit) : null,
+      rental_minimum_months: offer.listing_purpose === "إيجار" && offer.rental_minimum_months != null ? Number(offer.rental_minimum_months) : null,
       description: offer.description || null,
       price_on_request: offer.price_on_request === true,
       total_price: offer.price_on_request === true ? null : Number(offer.total_price || 0),
@@ -805,9 +820,30 @@
       promotion_status: offer.featured_requested === true ? "requested" : "none",
       status: "pending"
     };
-    const rows = await request("property_offers", {
-      method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(payload)
-    });
+    let rows;
+    try {
+      rows = await request("property_offers", {
+        method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(payload)
+      });
+    } catch (error) {
+      const message = String(error?.message || error);
+      const missingRentalSchema = /rental_period|rental_furnishing|rental_security_deposit|rental_minimum_months|schema cache|PGRST204|column .* does not exist/i.test(message);
+      if (!missingRentalSchema || offer.listing_purpose === "إيجار") {
+        if (missingRentalSchema && offer.listing_purpose === "إيجار") {
+          throw new Error("تفاصيل الإيجار الجديدة لم تُفعّل في قاعدة البيانات بعد. لم يتم حفظ الإعلان؛ حاول بعد اكتمال تحديث النظام.");
+        }
+        throw error;
+      }
+      // Sale and assignment ads keep working during a staged release; their new rental fields are empty.
+      const legacyPayload = { ...payload };
+      delete legacyPayload.rental_period;
+      delete legacyPayload.rental_furnishing;
+      delete legacyPayload.rental_security_deposit;
+      delete legacyPayload.rental_minimum_months;
+      rows = await request("property_offers", {
+        method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(legacyPayload)
+      });
+    }
     return Array.isArray(rows) ? rows[0] : rows;
   }
   async function getFavoriteOfferIds() {

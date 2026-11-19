@@ -134,6 +134,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const listingPurposeInput = form?.querySelector('[name="listing_purpose"]');
   const assignmentFields = $("assignmentFields");
   const assignmentFieldControls = Array.from(assignmentFields?.querySelectorAll("input, select, textarea") || []);
+  const rentalFields = $("rentalFields");
+  const rentalFieldControls = Array.from(rentalFields?.querySelectorAll("input, select, textarea") || []);
+  const saleFields = $("saleFields");
+  const saleFieldControls = Array.from(saleFields?.querySelectorAll("input, select, textarea") || []);
+  const rentalPeriodInput = form?.querySelector('[name="rental_period"]');
   const priceLabel = form?.querySelector("[data-price-label]");
   const priceRequestLabel = form?.querySelector("[data-price-request-label]");
   const isAssignmentFormSelection = () => listingPurposeInput?.value === "تنازل";
@@ -182,16 +187,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   function updateTransactionFormFields() {
     const purpose = String(listingPurposeInput?.value || "");
     const isAssignment = purpose === "تنازل";
+    const isRent = purpose === "إيجار";
+    const isSale = purpose === "بيع";
     if (assignmentFields) assignmentFields.hidden = !isAssignment;
     assignmentFieldControls.forEach(control => { control.disabled = !isAssignment; });
+    if (rentalFields) rentalFields.hidden = !isRent;
+    rentalFieldControls.forEach(control => { control.disabled = !isRent; });
+    if (saleFields) saleFields.hidden = !isSale;
+    saleFieldControls.forEach(control => { control.disabled = !isSale; });
+    const rentPeriod = ["يومي", "شهري", "سنوي"].includes(rentalPeriodInput?.value) ? rentalPeriodInput.value : "شهري";
     if (priceLabel) {
-      priceLabel.textContent = purpose === "إيجار" ? "قيمة الإيجار الشهري" :
-        purpose === "تنازل" ? "القيمة الإجمالية المعلنة للتنازل" :
-        purpose === "بيع" ? "سعر البيع الإجمالي" : "اختر نوع المعاملة أولًا";
+      priceLabel.textContent = isRent ? "قيمة الإيجار " + rentPeriod :
+        isAssignment ? "القيمة الإجمالية المعلنة للتنازل" :
+        isSale ? "سعر البيع الإجمالي" : "اختر نوع المعاملة أولًا";
     }
     if (priceRequestLabel) {
-      priceRequestLabel.textContent = purpose === "إيجار" ? "أفضل تحديد قيمة الإيجار الشهري عند التواصل بدلًا من كتابة مبلغ." :
-        purpose === "تنازل" ? "أفضل عرض قيمة التنازل عند التواصل بدلًا من كتابة مبلغ." :
+      priceRequestLabel.textContent = isRent ? "أفضل تحديد قيمة الإيجار عند التواصل بدلًا من كتابة مبلغ." :
+        isAssignment ? "أفضل عرض قيمة التنازل عند التواصل بدلًا من كتابة مبلغ." :
         "أفضل عرض سعر البيع عند التواصل بدلًا من كتابة مبلغ.";
     }
     updatePriceRequestState();
@@ -199,6 +211,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   financeFields.forEach(field => field.addEventListener("input", updateFinanceCheck));
   priceOnRequestToggle?.addEventListener("change", updatePriceRequestState);
   listingPurposeInput?.addEventListener("change", updateTransactionFormFields);
+  rentalPeriodInput?.addEventListener("change", updateTransactionFormFields);
   updateTransactionFormFields();
   const photosPreview = document.createElement("div");
   photosPreview.className = "layan-photo-preview";
@@ -904,7 +917,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const isAssignment = purposeText === "تنازل";
       const isFeatured = o.is_featured && (!o.featured_until || new Date(o.featured_until) > new Date());
       const photoCount = o.image_urls.length;
-      const priceLabel = purposeText === "إيجار" ? "الإيجار الشهري المعلن" :
+      const rentPeriod = ["يومي", "شهري", "سنوي"].includes(o.rental_period) ? o.rental_period : "شهري";
+      const priceLabel = purposeText === "إيجار" ? "الإيجار " + rentPeriod + " المعلن" :
         purposeText === "تنازل" ? "القيمة المعلنة للتنازل" :
         purposeText === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
 
@@ -947,7 +961,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="offer-card-content">
             <div class="listing-head">
               <h3><a href="${detailsHref}">${esc(o.title)}</a></h3>
-              <strong class="listing-price" aria-label="${priceLabel}">${o.price_on_request ? "السعر عند التواصل" : money2(o.total_price)}${!o.price_on_request && isRent ? " / شهر" : ""}</strong>
+              <strong class="listing-price" aria-label="${priceLabel}">${o.price_on_request ? "السعر عند التواصل" : money2(o.total_price)}${!o.price_on_request && isRent ? " / " + rentPeriod : ""}</strong>
             </div>
             <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join("، ") || "أسيوط")}</p>
             ${specs.length ? `<p class="listing-specs">${specs.join(" <i>•</i> ")}</p>` : ""}
@@ -1538,6 +1552,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       bedrooms: Math.floor(amount("bedrooms")),
       bathrooms: Math.floor(amount("bathrooms")),
       monthly_installment: value("listing_purpose") === "تنازل" ? amount("monthly_installment") : 0,
+      rental_period: value("listing_purpose") === "إيجار" ? (["يومي", "شهري", "سنوي"].includes(value("rental_period")) ? value("rental_period") : "شهري") : null,
+      rental_furnishing: value("listing_purpose") === "إيجار" ? (value("rental_furnishing") || null) : null,
+      rental_security_deposit: value("listing_purpose") === "إيجار" && value("rental_security_deposit") !== "" ? amount("rental_security_deposit") : null,
+      rental_minimum_months: value("listing_purpose") === "إيجار" && value("rental_minimum_months") !== "" ? Math.floor(amount("rental_minimum_months")) : null,
       property_type: value("property_type") || "شقة",
       description: value("description"),
       price_on_request: priceOnRequestToggle?.checked === true,
@@ -1616,6 +1634,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (offer.listing_purpose === "تنازل" && !offer.price_on_request && offer.paid_amount + offer.remaining_amount > offer.total_price + 0.01) {
       setStatus("مجموع المبلغ المدفوع والمتبقي أكبر من إجمالي قيمة التنازل؛ راجع الأرقام قبل الإرسال.");
+      return;
+    }
+    if (offer.listing_purpose === "إيجار" &&
+        (offer.rental_security_deposit != null && offer.rental_security_deposit < 0 ||
+         offer.rental_minimum_months != null && (offer.rental_minimum_months < 1 || offer.rental_minimum_months > 600))) {
+      setStatus("راجع قيمة التأمين والحد الأدنى لمدة الإيجار.");
       return;
     }
     if (offer.discount_percent < 0 || offer.discount_percent > 100) {

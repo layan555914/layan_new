@@ -19,7 +19,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fields = [
     "id","title","governorate","listing_purpose","land_ownership_authority",
     "land_permit_details","land_utilities","land_zoning","city","area","area_m2",
-    "bedrooms","bathrooms","monthly_installment","property_type","description",
+    "bedrooms","bathrooms","monthly_installment","property_type","rental_period","rental_furnishing",
+    "rental_security_deposit","rental_minimum_months","description",
     "total_price","price_on_request","down_payment","paid_amount","remaining_amount","assignment_fee",
     "assignment_fee_percentage","discount_amount","discount_percent","developer_name",
     "project_name","image_urls","is_featured","featured_until","contact_phone",
@@ -84,7 +85,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const purpose = ["بيع", "إيجار", "تنازل"].includes(rawPurpose) ? rawPurpose : "غير محدد";
     const isAssignment = purpose === "تنازل";
     const isRent = purpose === "إيجار";
-    const displayedPriceLabel = isRent ? "الإيجار الشهري المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : purpose === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
+    const rentPeriod = ["يومي", "شهري", "سنوي"].includes(row.rental_period) ? row.rental_period : "شهري";
+    const displayedPriceLabel = isRent ? "الإيجار " + rentPeriod + " المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : purpose === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
     const imagesRaw = Array.isArray(row.image_urls) ? row.image_urls : [];
     const images = imagesRaw.map(safeURL).filter(Boolean).slice(0, 20);
     const phone = String(row.contact_phone || "");
@@ -149,6 +151,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("المشروع / الكمبوند", row.project_name),
       makeFact("المطور العقاري", row.developer_name),
       makeFact("المساحة", row.area_m2 ? row.area_m2 + " م²" : ""),
+      makeFact("دورية الإيجار", isRent ? rentPeriod : ""),
+      makeFact("حالة التأثيث", isRent ? row.rental_furnishing : ""),
+      makeFact("تأمين الإيجار", isRent && Number(row.rental_security_deposit) > 0 ? money(row.rental_security_deposit) : ""),
+      makeFact("الحد الأدنى لمدة الإيجار", isRent && Number(row.rental_minimum_months) > 0 ? row.rental_minimum_months + " شهر" : ""),
       makeFact("غرف النوم", /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(String(row.property_type || "")) ? row.bedrooms : ""),
       makeFact("الحمامات", /أرض|ارض|مشروع/.test(String(row.property_type || "")) ? "" : row.bathrooms),
       makeFact("المقدم عند التعاقد", isAssignment && Number(row.down_payment) > 0 ? money(row.down_payment) : ""),
@@ -200,7 +206,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           ${listingDates(row)}
           <h1>${escapeHTML(title)}</h1>
           <p class="property-location">⌖ ${escapeHTML(locationText)} ${mapURL ? ' · <a href="' + escapeHTML(mapURL) + '" target="_blank" rel="noopener noreferrer">عرض الموقع</a>' : ""}</p>
-          <div class="property-price-highlight"><span>${displayedPriceLabel}</span><strong>${row.price_on_request === true ? "السعر عند التواصل" : money(row.total_price) + (isRent ? " / شهر" : "")}</strong></div>
+          <div class="property-price-highlight"><span>${displayedPriceLabel}</span><strong>${row.price_on_request === true ? "السعر عند التواصل" : money(row.total_price) + (isRent ? " / " + rentPeriod : "")}</strong></div>
           ${isAssignment && (Number(row.down_payment) > 0 || Number(row.remaining_amount) > 0) ? `<div class="property-key-figures">
             ${Number(row.down_payment) > 0 ? `<div class="property-key-figure"><span>المقدم عند التعاقد</span><strong>${money(row.down_payment)}</strong></div>` : ""}
             ${Number(row.remaining_amount) > 0 ? `<div class="property-key-figure"><span>المبلغ المتبقي</span><strong>${money(row.remaining_amount)}</strong></div>` : ""}
@@ -278,9 +284,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const endpointFor = list => base + "/rest/v1/property_offers?select=" + list + "&id=eq." + encodeURIComponent(id) + "&status=eq.available&limit=1";
       const headers = {headers:{apikey:key,Authorization:"Bearer " + key},cache:"no-store"};
+      const legacyFields = fields.split(",").filter(name =>
+        !["rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months"].includes(name)
+      ).join(",");
       let response = await fetch(endpointFor(fields + ",trust_badge"), headers);
-      // Databases without the admin trust badge column still load the listing.
       if (response.status === 400) response = await fetch(endpointFor(fields), headers);
+      if (response.status === 400) response = await fetch(endpointFor(legacyFields + ",trust_badge"), headers);
+      if (response.status === 400) response = await fetch(endpointFor(legacyFields), headers);
       if (!response.ok) throw new Error("تعذر تحميل الإعلان.");
       const rows = await response.json();
       if (!Array.isArray(rows) || !rows.length) {
