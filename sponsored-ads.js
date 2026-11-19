@@ -8,6 +8,16 @@
     try { const u = new URL(String(value || "")); return ["https:", "http:"].includes(u.protocol) ? u.href : ""; } catch (_) { return ""; }
   };
   const initial = name => (String(name || "").trim().match(/[\p{L}\p{N}]/u) || ["★"])[0].toUpperCase();
+  const splitPhoneNumbers = value => {
+    const parts = String(value || "").split(/[\/،,;|\r\n]+/);
+    const numbers = parts.map(part => {
+      const raw = String(part || "").trim();
+      const digits = raw.replace(/\D/g, "");
+      if (digits.length < 7 || digits.length > 15) return "";
+      return raw.startsWith("+") ? "+" + digits : digits;
+    }).filter(Boolean);
+    return [...new Set(numbers)];
+  };
   const waNumber = phone => {
     let digits = String(phone || "").replace(/\D/g, "");
     if (digits.startsWith("00")) digits = digits.slice(2);
@@ -18,15 +28,20 @@
   function renderAd(ad, options = {}) {
     const image = httpUrl(ad.image_url);
     const target = httpUrl(ad.target_url);
-    const phone = String(ad.contact_phone || "").replace(/[^+0-9]/g, "");
-    const wa = waNumber(ad.contact_phone);
+    const phones = splitPhoneNumbers(ad.contact_phone);
+    const wa = waNumber(phones[0]);
     const name = ad.business_name || ad.title || "إعلان ممول";
     const media = image
       ? '<img src="' + esc(image) + '" alt="' + esc(name) + '" loading="lazy" referrerpolicy="no-referrer">'
       : '<div class="sp-ad-monogram" aria-hidden="true"><span>' + esc(initial(name)) + '</span><small>' + esc(name) + '</small></div>';
+    const phoneActions = phones.map(phone =>
+      '<a class="sp-ad-btn" href="tel:' + esc(phone) + '" data-listing-id="ad-' + esc(ad.id) + '">' +
+        (phones.length > 1 ? 'اتصال ' + esc(phone) : 'اتصل بالمعلن') +
+      '</a>'
+    ).join("");
     const actions = [
       target ? '<a class="sp-ad-btn sp-ad-btn-primary" href="' + esc(target) + '" target="_blank" rel="noopener noreferrer sponsored">اعرف التفاصيل</a>' : "",
-      phone ? '<a class="sp-ad-btn" href="tel:' + esc(phone) + '" data-listing-id="ad-' + esc(ad.id) + '">اتصل بالمعلن</a>' : "",
+      phoneActions,
       wa ? '<a class="sp-ad-btn sp-ad-btn-wa" href="https://wa.me/' + wa + '?text=' + encodeURIComponent("مرحبًا، شاهدت إعلانكم «" + (ad.title || name) + "» على أسيوط عقار.") + '" target="_blank" rel="noopener noreferrer" aria-label="واتساب ' + esc(name) + '">واتساب</a>' : ""
     ].filter(Boolean).join("");
     const extraClass = options.className ? " " + options.className : "";
