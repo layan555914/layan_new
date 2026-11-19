@@ -66,7 +66,8 @@ async function login(page) {
 const KINDS = [
   ["شقة", "بيع"], ["شقة", "إيجار"], ["شقة", "تنازل"], ["فيلا", "بيع"],
   ["محل تجاري", "إيجار"], ["محل تجاري", "بيع"], ["مكتب إداري", "إيجار"], ["عيادة طبية", "بيع"],
-  ["مخزن", "إيجار"], ["معرض", "بيع"], ["أرض مطروحة للبناء", "بيع"], ["أرض تنازل", "تنازل"]
+  ["مخزن", "إيجار"], ["معرض", "بيع"], ["منزل", "بيع"], ["منزل", "إيجار"],
+  ["أرض مطروحة للبناء", "بيع"], ["أرض تنازل", "تنازل"]
 ];
 
 test("property offers require city and area before saving", async ({ page }) => {
@@ -110,6 +111,19 @@ test("every property type and purpose reaches the admin review queue as pending"
     await form.locator("[name='city']").fill("مدينة أسيوط");
     await form.locator("[name='area']").fill("وسط البلد");
     await form.locator("[name='total_price']").fill(purpose === "إيجار" ? "6000" : "900000");
+    if (purpose === "إيجار") {
+      await expect(form.locator("#rentalFields")).toBeVisible();
+      await expect(form.locator("#assignmentFields")).toBeHidden();
+      await form.locator("[name='rental_period']").selectOption("سنوي");
+      await form.locator("[name='rental_furnishing']").selectOption("مفروش");
+      await form.locator("[name='rental_security_deposit']").fill("12000");
+      await form.locator("[name='rental_minimum_months']").fill("12");
+      await expect(form.locator("[data-price-label]")).toContainText("سنوي");
+    } else {
+      await expect(form.locator("#rentalFields")).toBeHidden();
+    }
+    if (purpose === "تنازل") await expect(form.locator("#assignmentFields")).toBeVisible();
+    else await expect(form.locator("#assignmentFields")).toBeHidden();
     await form.locator("[name='photos']").setInputFiles({ name: "IMG_0001.PNG", mimeType: "image/png", buffer: png });
     const before = state.offers.length;
     await page.evaluate(() => { document.getElementById("statusMessage").textContent = ""; });
@@ -122,6 +136,19 @@ test("every property type and purpose reaches the admin review queue as pending"
     expect(state.offers[i]).toMatchObject({ listing_purpose: purpose, status: "pending", owner_id: USER_ID });
     expect(type.startsWith(state.offers[i].property_type)).toBe(true);
     expect(state.offers[i].image_urls).toHaveLength(1);
+    if (purpose === "إيجار") {
+      expect(state.offers[i]).toMatchObject({
+        rental_period: "سنوي",
+        rental_furnishing: "مفروش",
+        rental_security_deposit: 12000,
+        rental_minimum_months: 12
+      });
+    } else {
+      expect(state.offers[i].rental_period).toBeNull();
+      expect(state.offers[i].rental_furnishing).toBeNull();
+      expect(state.offers[i].rental_security_deposit).toBeNull();
+      expect(state.offers[i].rental_minimum_months).toBeNull();
+    }
   });
   // PNG photos were converted and uploaded as real JPEG files.
   expect(state.uploads.length).toBe(KINDS.length);
