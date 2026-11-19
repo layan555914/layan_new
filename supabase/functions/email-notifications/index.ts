@@ -95,6 +95,18 @@ async function requireAccount(req: Request, userClient: any) {
   return data.user;
 }
 
+const FALLBACK_EMAIL_FROM = "Asyut Aqar <notifications@notify.asyutq.com>";
+
+function resolveEmailFrom(): string {
+  const configured = String(Deno.env.get("EMAIL_FROM") || "").trim();
+  const match = configured.match(/<([^<>\\s]+@[^<>\\s]+)>$/);
+  const address = match ? match[1] : configured;
+  const validAddress = /^[^<>\\s@]+@[^<>\\s@]+\\.[^<>\\s@]+$/.test(address);
+  const validDisplay = !match || /^[^<>\\r\\n]{1,78}\\s*<[^<>\\s@]+@[^<>\\s@]+>$/.test(configured);
+  const verifiedDomain = address.split("@")[1]?.toLowerCase() === "notify.asyutq.com";
+  return validAddress && validDisplay && verifiedDomain ? configured : FALLBACK_EMAIL_FROM;
+}
+
 async function sendEmail(
   apiKey: string,
   from: string,
@@ -120,7 +132,7 @@ async function sendEmail(
 
 async function sendWelcome(admin: any, userId: string, email: string, token: string, siteUrl: string) {
   const apiKey = Deno.env.get("RESEND_API_KEY") || "";
-  const from = Deno.env.get("EMAIL_FROM") || "";
+  const from = resolveEmailFrom();
   if (!apiKey || !from) return false;
   const unsubscribeUrl = siteUrl + "/email-unsubscribe.html?token=" + encodeURIComponent(token);
   const html = `
@@ -285,8 +297,9 @@ async function dispatchAnnouncement(admin: any, type: string, id: string, siteUr
   const subscribers: any[] = [];
   for (let offset = 0; ; offset += 500) {
     const { data, error } = await admin.from("email_notification_subscriptions")
-      .select("user_id,email,unsubscribe_token")
-      .eq("is_enabled", true)
+      .select("user_id,email,unsubscribe_token,email_confirmed_at,is_enabled,unsubscribed_at")
+      .is("unsubscribed_at", null)
+      .or("is_enabled.eq.true,email_confirmed_at.is.null")
       .order("created_at", { ascending: true })
       .range(offset, offset + 499);
     if (error) throw error;
@@ -294,12 +307,13 @@ async function dispatchAnnouncement(admin: any, type: string, id: string, siteUr
     if (!data || data.length < 500) break;
   }
   const eligible = subscribers.filter(row =>
-    validEmail(row.email) && row.user_id && row.unsubscribe_token
+    validEmail(row.email) && row.user_id && row.unsubscribe_token &&
+    row.unsubscribed_at == null
   );
   if (!eligible.length) return { subscribers: 0, sent: 0, failed: 0 };
 
   const apiKey = Deno.env.get("RESEND_API_KEY") || "";
-  const from = Deno.env.get("EMAIL_FROM") || "";
+  const from = resolveEmailFrom();
   if (!apiKey || !from) {
     throw new Error("خدمة البريد لم تكتمل بعد: يلزم ضبط RESEND_API_KEY و EMAIL_FROM من أسرار Supabase.");
   }
@@ -390,6 +404,206 @@ async function dispatchAnnouncement(admin: any, type: string, id: string, siteUr
   return { subscribers: eligible.length, sent, failed, skipped: eligible.length - work.length };
 }
 
+
+async function dispatchWeeklyDigest(admin: any, siteUrl: string) {
+  const now = new Date();
+  const localParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Cairo", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(now);
+  const part = (name: string) => localParts.find(item => item.type === name)?.value || "";
+  const digestKey = part("year") + "-" + part("month") + "-" + part("day");
+  const since = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const queries = await Promise.all([
+    admin.from("property_offers").select("id,title,city,area,property_type,total_price,price_on_request,created_at")
+      .eq("status", "available").gte("created_at", since).order("created_at", { ascending: false }).limit(8),
+    admin.from("marketplace_listings").select("id,title,description,city,area,category,created_at")
+      .eq("status", "approved").gte("created_at", since).order("created_at", { ascending: false }).limit(8),
+    admin.from("company_profiles").select("id,company_name,description,city,category,created_at")
+      .eq("status", "active").gte("created_at", since).order("created_at", { ascending: false }).limit(8),
+    admin.from("company_property_ads").select("id,business_name,created_at")
+      .eq("status", "active").gte("created_at", since).order("created_at", { ascending: false }).limit(8),
+    admin.from("supplier_ads").select("id,business_name,category,title,description,target_url,created_at")
+      .eq("status", "active").gte("created_at", since).order("created_at", { ascending: false }).limit(8),
+    admin.from("directory_entities").select("id,name_ar,name_en,entity_type,service_category,description,public_address,created_at")
+      .eq("public_visible", true).eq("verification_status", "published").gte("created_at", since)
+      .order("created_at", { ascending: false }).limit(8),
+    admin.from("directory_projects").select("id,name_ar,name_en,project_type,description,location_text,created_at")
+      .eq("public_visible", true).eq("verification_status", "published").gte("created_at", since)
+      .order("created_at", { ascending: false }).limit(8),
+    admin.from("directory_opportunities").select("id,name_ar,city,activity,opportunity_type,created_at")
+      .eq("public_visible", true).eq("verification_status", "published").gte("created_at", since)
+      .order("created_at", { ascending: false }).limit(8)
+  ]);
+  for (const result of queries) if (result.error) throw result.error;
+
+  const items: Announcement[] = [];
+  const add = (rows: any[], make: (row: any) => Announcement) => {
+    for (const row of rows || []) items.push(make(row));
+  };
+  add(queries[0].data, row => ({
+    title: String(row.title || "عرض عقاري جديد"),
+    category: "عقار جديد",
+    description: [row.property_type, row.price_on_request ? "السعر عند التواصل" :
+      (row.total_price ? Number(row.total_price).toLocaleString("en-US") + " جنيه" : "")].filter(Boolean).join(" · "),
+    location: [row.city || "أسيوط", row.area].filter(Boolean).join(" — "),
+    href: siteUrl + "/property.html?id=" + encodeURIComponent(String(row.id))
+  }));
+  add(queries[1].data, row => ({
+    title: String(row.title || "خدمة جديدة"),
+    category: "خدمة جديدة · " + String(row.category || "سوق الخدمات"),
+    description: String(row.description || "").slice(0, 250),
+    location: [row.city || "أسيوط", row.area].filter(Boolean).join(" — "),
+    href: siteUrl + "/marketplace.html"
+  }));
+  add(queries[2].data, row => ({
+    title: String(row.company_name || "شركة جديدة"),
+    category: "شركة جديدة · " + String(row.category || "الشركات"),
+    description: String(row.description || "").slice(0, 250),
+    location: String(row.city || "أسيوط"),
+    href: siteUrl + "/company.html?id=" + encodeURIComponent(String(row.id))
+  }));
+  add(queries[3].data, row => ({
+    title: String(row.business_name || "إعلان شركة جديد"),
+    category: "إعلان شركة معتمد",
+    description: "تم تفعيل إعلان الشركة على أسيوط عقار.",
+    location: "أسيوط",
+    href: siteUrl + "/companies.html"
+  }));
+  add(queries[4].data, row => ({
+    title: String(row.title || row.business_name || "إعلان جديد"),
+    category: "إعلان ممول · " + String(row.category || "خدمات"),
+    description: String(row.description || "").slice(0, 250),
+    location: String(row.business_name || "أسيوط"),
+    href: /^https?:\/\//i.test(String(row.target_url || "")) ? String(row.target_url) : siteUrl + "/"
+  }));
+  add(queries[5].data, row => ({
+    title: String(row.name_ar || row.name_en || "جهة جديدة في الدليل"),
+    category: "جهة جديدة في دليل أسيوط العقاري · " + String(row.service_category || row.entity_type || ""),
+    description: String(row.description || "").slice(0, 250),
+    location: String(row.public_address || "أسيوط"),
+    href: siteUrl + "/company.html?entity_id=" + encodeURIComponent(String(row.id))
+  }));
+  add(queries[6].data, row => ({
+    title: String(row.name_ar || row.name_en || "مشروع عقاري جديد"),
+    category: "مشروع جديد · " + String(row.project_type || "مشروعات عقارية"),
+    description: String(row.description || "").slice(0, 250),
+    location: String(row.location_text || "أسيوط"),
+    href: siteUrl + "/project.html?id=" + encodeURIComponent(String(row.id))
+  }));
+  add(queries[7].data, row => ({
+    title: String(row.name_ar || "فرصة جديدة"),
+    category: "فرصة جديدة · " + String(row.opportunity_type || "فرص استثمارية"),
+    description: String(row.activity || "").slice(0, 250),
+    location: String(row.city || "أسيوط"),
+    href: siteUrl + "/directory.html?view=opportunities"
+  }));
+
+  const latest = items.slice(0, 40);
+  const { data: subscribers, error: subscribersError } = await admin.from("email_notification_subscriptions")
+    .select("user_id,email,unsubscribe_token,email_confirmed_at,is_enabled,unsubscribed_at")
+    .is("unsubscribed_at", null)
+    .or("is_enabled.eq.true,email_confirmed_at.is.null")
+    .order("created_at", { ascending: true });
+  if (subscribersError) throw subscribersError;
+  const eligible = (subscribers || []).filter((row: any) =>
+    validEmail(row.email) && row.user_id && row.unsubscribe_token
+  );
+  if (!eligible.length) return { subscribers: 0, sent: 0, failed: 0, items: latest.length };
+
+  const apiKey = Deno.env.get("RESEND_API_KEY") || "";
+  const from = resolveEmailFrom();
+  if (!apiKey) throw new Error("مفتاح خدمة البريد RESEND_API_KEY غير مضبوط.");
+
+  const { data: priorRows, error: priorError } = await admin.from("email_notification_deliveries")
+    .select("recipient_user_id,status")
+    .eq("source_table", "weekly_digest")
+    .eq("source_id", digestKey);
+  if (priorError) throw priorError;
+  const sentUsers = new Set((priorRows || [])
+    .filter((row: any) => row.status === "sent")
+    .map((row: any) => row.recipient_user_id));
+  const candidates = eligible.filter((row: any) => !sentUsers.has(row.user_id));
+  if (!candidates.length) return { subscribers: eligible.length, sent: 0, failed: 0, items: latest.length, already_sent: true };
+
+  const queue = candidates.map((row: any) => ({
+    source_table: "weekly_digest",
+    source_id: digestKey,
+    recipient_user_id: row.user_id,
+    recipient_email: String(row.email).trim().toLowerCase(),
+    status: "queued",
+    updated_at: new Date().toISOString()
+  }));
+  const { data: queued, error: queueError } = await admin.from("email_notification_deliveries")
+    .upsert(queue, { onConflict: "source_table,source_id,recipient_user_id" })
+    .select("id,recipient_user_id,recipient_email");
+  if (queueError) throw queueError;
+  const byUser = new Map(candidates.map((row: any) => [row.user_id, row]));
+  const work = (queued || []).map((delivery: any) => ({
+    delivery,
+    subscriber: byUser.get(delivery.recipient_user_id)
+  })).filter((item: any) => item.subscriber);
+
+  const cards = latest.map(item =>
+    '<div style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin:12px 0">' +
+    '<div style="color:#A93636;font-size:12px;font-weight:bold">' + escapeHtml(item.category) + '</div>' +
+    '<h3 style="margin:5px 0 8px">' + escapeHtml(item.title) + '</h3>' +
+    (item.description ? '<p style="margin:4px 0">' + escapeHtml(item.description) + '</p>' : '') +
+    (item.location ? '<p style="margin:4px 0;color:#687386;font-size:13px">' + escapeHtml(item.location) + '</p>' : '') +
+    '<a href="' + escapeHtml(item.href) + '">شاهد التفاصيل</a></div>'
+  ).join("");
+  const digestHtml = '<div dir="rtl" lang="ar" style="font-family:Tahoma,Arial,sans-serif;line-height:1.9;color:#24364b;max-width:650px;margin:auto;padding:22px">' +
+    '<div style="border-bottom:3px solid #C8963E;padding-bottom:12px"><strong style="font-size:23px">أسيوط عقار</strong><div>كل اللي بتدور عليه في مكان واحد</div></div>' +
+    '<h2>أحدث ما نُشر على المنصة هذا الأسبوع</h2>' +
+    '<p>جمعنالك أحدث العقارات والخدمات والشركات والإعلانات والدليل العقاري في رسالة واحدة.</p>' +
+    (cards || '<p>تابع المنصة باستمرار؛ يتم إضافة عروض وخدمات جديدة أولًا بأول.</p>') +
+    '<p><a href="' + siteUrl + '" style="display:inline-block;background:#C8963E;color:#102746;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">افتح أسيوط عقار</a></p>' +
+    '<hr><p style="font-size:12px;color:#687386">وصلتك الرسالة لأن بريدك سُجّل على منصة أسيوط عقار. إذا لم تكن أنت من سجّل هذا البريد، يمكنك إلغاء الرسائل من الرابط التالي: <a href="{{UNSUBSCRIBE_URL}}">إلغاء الاشتراك</a>.</p>' +
+    '<p style="font-size:12px">لو حسابك لم يُفعّل بعد، افتح المنصة وأكمل تأكيد بريدك للاستفادة من خدمات الحساب.</p></div>';
+
+  let sent = 0;
+  let failed = 0;
+  for (let offset = 0; offset < work.length; offset += 10) {
+    const group = work.slice(offset, offset + 10);
+    const results = await Promise.all(group.map(async (item: any) => {
+      const subscriber = item.subscriber;
+      const unsubscribeUrl = siteUrl + "/email-unsubscribe.html?token=" + encodeURIComponent(subscriber.unsubscribe_token);
+      const html = digestHtml.replace("{{UNSUBSCRIBE_URL}}", escapeHtml(unsubscribeUrl));
+      const textBody = "أحدث ما نُشر على أسيوط عقار هذا الأسبوع\n" +
+        latest.map(item => item.category + " — " + item.title + "\n" + item.href).join("\n\n") +
+        "\n\nتصفح المنصة: " + siteUrl + "\nإلغاء الاشتراك: " + unsubscribeUrl;
+      try {
+        const providerId = await sendEmail(
+          apiKey, from, item.delivery.recipient_email,
+          "جديد أسيوط عقار هذا الأسبوع",
+          html, textBody,
+          "asyutq-weekly-digest-" + digestKey + "-" + item.delivery.recipient_user_id
+        );
+        await admin.from("email_notification_deliveries").update({
+          status: providerId ? "sent" : "failed",
+          provider_message_id: providerId || null,
+          last_error: providerId ? null : "لم يرجع مزود البريد معرّف الرسالة.",
+          sent_at: providerId ? new Date().toISOString() : null,
+          updated_at: new Date().toISOString()
+        }).eq("id", item.delivery.id);
+        return providerId ? "sent" : "failed";
+      } catch (error) {
+        await admin.from("email_notification_deliveries").update({
+          status: "failed",
+          last_error: String((error as Error)?.message || "تعذر إرسال الرسالة.").slice(0, 300),
+          updated_at: new Date().toISOString()
+        }).eq("id", item.delivery.id);
+        return "failed";
+      }
+    }));
+    for (const result of results) {
+      if (result === "sent") sent++;
+      else failed++;
+    }
+  }
+  return { subscribers: eligible.length, sent, failed, items: latest.length, skipped: eligible.length - work.length };
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
@@ -405,6 +619,19 @@ Deno.serve(async (req: Request) => {
     const action = String(body?.action || "");
     const authorization = req.headers.get("Authorization") || "";
     const { admin, user } = clients(authorization || undefined);
+
+    if (action === "weekly_digest") {
+      const cronToken = req.headers.get("x-asyut-cron-secret") || "";
+      if (!cronToken) return json({ error: "غير مصرح بتنفيذ الإجراء." }, 403, origin);
+      const { data: cronAllowed, error: cronAuthError } = await admin.rpc(
+        "verify_email_digest_cron_token",
+        { p_token: cronToken }
+      );
+      if (cronAuthError || cronAllowed !== true) {
+        return json({ error: "غير مصرح بتنفيذ الإجراء." }, 403, origin);
+      }
+      return json({ ok: true, ...(await dispatchWeeklyDigest(admin, siteUrl)) }, 200, origin);
+    }
 
     if (action === "unsubscribe") {
       const token = String(body?.token || "").trim();
