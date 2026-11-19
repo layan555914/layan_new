@@ -503,14 +503,25 @@
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","contact_name","owner_id","latitude","longitude","created_at","updated_at"
     ].join(",");
-    let rows;
-    try {
-      // trust_badge («مالك موثّق» / «شركة موثّقة») is set by the admin only; older databases may not have it yet.
-      rows = await request("property_offers?select=" + fields + ",trust_badge&status=eq.available&order=created_at.desc");
-    } catch (error) {
-      if (!/trust_badge/.test(String(error?.message || error))) throw error;
-      rows = await request("property_offers?select=" + fields + "&status=eq.available&order=created_at.desc");
+    const legacyFields = fields.split(",").filter(name =>
+      !["rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months"].includes(name)
+    ).join(",");
+    const query = selected => "property_offers?select=" + selected + "&status=eq.available&order=created_at.desc";
+    let rows, lastError;
+    // Keep public listings readable during a staged deployment where an older preview database
+    // has not received the additive rental columns yet.
+    for (const selected of [fields + ",trust_badge", fields, legacyFields + ",trust_badge", legacyFields]) {
+      try {
+        rows = await request(query(selected));
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = String(error?.message || error);
+        if (!/trust_badge|rental_period|rental_furnishing|rental_security_deposit|rental_minimum_months|column .* does not exist|schema cache|PGRST204/i.test(message)) throw error;
+      }
     }
+    if (lastError) throw lastError;
     return Array.isArray(rows) ? rows : [];
   }
   async function getPriceGuideOffers() {
