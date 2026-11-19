@@ -39,8 +39,8 @@
       [field("city"), field("area"), form.querySelector("details.location-coordinates")]),
     section(3, "المواصفات", "",
       [field("area_m2"), field("bedrooms"), field("bathrooms"), field("developer_name"), field("project_name"), byId("landDetailsFields")]),
-    section(4, "السعر وطريقة الدفع", "اكتب الأرقام بالجنيه بدون فواصل. في التنازل اكتب المقدم والمدفوع والمتبقي والقسط.",
-      [field("total_price"), field("down_payment"), field("paid_amount"), field("remaining_installments"), field("monthly_installment"), field("transfer_fee"), field("discount_amount"), field("discount_percent")], "lf-money"),
+    section(4, "بيانات المعاملة والسعر", "تظهر هنا الحقول المناسبة لنوع المعاملة الذي اخترته: البيع أو الإيجار أو التنازل.",
+      [field("total_price"), field("price_on_request"), byId("saleFields"), byId("rentalFields"), byId("assignmentFields")], "lf-money"),
     section(5, "الصور والمستندات", "صور واضحة نهارًا. يمكنك التصوير مباشرة بالكاميرا. المستندات خاصة للإدارة فقط.",
       [field("photos"), field("documents")]),
     section(6, "التواصل والوصف", "",
@@ -54,12 +54,18 @@
   if (submit) form.appendChild(submit);
   submit?.classList.add("lf-submit");
 
-  // Show assignment-only money fields when the deal is an assignment.
+  // Keep each transaction's fields inside its own fieldset. In particular, never
+  // move assignment inputs out of #assignmentFields: app.js uses that fieldset
+  // to hide and disable the whole assignment-only group safely.
   const purpose = form.querySelector('[name="listing_purpose"]');
-  const assignmentOnly = ["paid_amount", "remaining_installments", "transfer_fee"].map(field).filter(Boolean);
+  const saleFields = byId("saleFields");
+  const rentalFields = byId("rentalFields");
+  const assignmentFields = byId("assignmentFields");
   const paintPurpose = () => {
-    const isAssignment = /تنازل/.test(purpose?.value || "");
-    assignmentOnly.forEach(node => node.classList.toggle("lf-muted", !isAssignment));
+    const selected = String(purpose?.value || "");
+    if (saleFields) saleFields.hidden = selected !== "بيع";
+    if (rentalFields) rentalFields.hidden = selected !== "إيجار";
+    if (assignmentFields) assignmentFields.hidden = selected !== "تنازل";
   };
   purpose?.addEventListener("change", paintPurpose);
   paintPurpose();
