@@ -336,11 +336,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Loading ----------
   const EXTRA = ",pending_update,update_status,update_notes";
   const SERVICE_COLS = "id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,status,admin_notes,details,image_urls,created_at";
-  const OFFER_COLS = "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,remaining_installments,assignment_fee,discount_amount,developer_name,project_name,contact_name,contact_phone,land_area_m2,land_zoning,description,image_urls,status,verification_notes,created_at";
+  const OFFER_COLS = "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,remaining_installments,assignment_fee,discount_amount,developer_name,project_name,contact_name,contact_phone,land_area_m2,land_zoning,rental_period,rental_furnishing,rental_security_deposit,rental_minimum_months,description,image_urls,status,verification_notes,created_at";
   async function fetchMine(table, cols, owner) {
     const q = c => table + "?select=" + c + "&owner_id=eq." + owner + "&order=created_at.desc";
-    try { return await api(q(cols + EXTRA)); }
-    catch (e) { if (e.code === "42703" || e.status === 400) return api(q(cols)); throw e; } // before the edit columns exist
+    const legacyCols = cols.split(",").filter(name =>
+      !["rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months"].includes(name)
+    ).join(",");
+    let lastError;
+    for (const selected of [cols + EXTRA, cols, legacyCols + EXTRA, legacyCols]) {
+      try { return await api(q(selected)); }
+      catch (e) {
+        lastError = e;
+        if (!(e.code === "42703" || e.status === 400 || /column .* does not exist|schema cache|PGRST204/i.test(String(e.message || e)))) throw e;
+      }
+    }
+    throw lastError;
   }
   async function load() {
     try {
