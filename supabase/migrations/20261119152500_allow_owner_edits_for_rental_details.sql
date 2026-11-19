@@ -2,10 +2,10 @@
 -- ownership-checked review flow. All existing protected fields remain protected.
 
 create or replace function private.layan_offer_editable_fields()
-returns text[] language sql immutable as $f$
+returns text[] language sql immutable set search_path = '' as $f$
   select array[
     'title','governorate','city','area','property_type','listing_purpose','bedrooms','bathrooms','area_m2','land_area_m2',
-    'land_ownership_authority','land_permit_details','land_utilities','land_zoning','total_price','down_payment','paid_amount',
+    'land_ownership_authority','land_permit_details','land_utilities','land_zoning','total_price','price_on_request','down_payment','paid_amount',
     'remaining_amount','remaining_installments','monthly_installment','assignment_fee','assignment_fee_percentage','transfer_fee',
     'discount_amount','discount_percent','description','image_urls','developer_name','project_name','contact_name','contact_phone',
     'latitude','longitude','rental_period','rental_furnishing','rental_security_deposit','rental_minimum_months'
@@ -36,6 +36,7 @@ begin
     land_utilities = r.land_utilities,
     land_zoning = r.land_zoning,
     total_price = r.total_price,
+    price_on_request = r.price_on_request,
     down_payment = r.down_payment,
     paid_amount = r.paid_amount,
     remaining_amount = r.remaining_amount,
