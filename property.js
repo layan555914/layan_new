@@ -19,7 +19,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fields = [
     "id","title","governorate","listing_purpose","land_ownership_authority",
     "land_permit_details","land_utilities","land_zoning","city","area","area_m2",
-    "bedrooms","bathrooms","monthly_installment","property_type","description",
+    "bedrooms","bathrooms","monthly_installment","property_type","rental_period","rental_furnishing",
+    "rental_security_deposit","rental_minimum_months","description",
     "total_price","price_on_request","down_payment","paid_amount","remaining_amount","assignment_fee",
     "assignment_fee_percentage","discount_amount","discount_percent","developer_name",
     "project_name","image_urls","is_featured","featured_until","contact_phone",
@@ -84,7 +85,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const purpose = ["بيع", "إيجار", "تنازل"].includes(rawPurpose) ? rawPurpose : "غير محدد";
     const isAssignment = purpose === "تنازل";
     const isRent = purpose === "إيجار";
-    const displayedPriceLabel = isRent ? "الإيجار الشهري المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : purpose === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
+    const rentPeriod = ["يومي", "شهري", "سنوي"].includes(row.rental_period) ? row.rental_period : "شهري";
+    const displayedPriceLabel = isRent ? "الإيجار " + rentPeriod + " المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : purpose === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
     const imagesRaw = Array.isArray(row.image_urls) ? row.image_urls : [];
     const images = imagesRaw.map(safeURL).filter(Boolean).slice(0, 20);
     const phone = String(row.contact_phone || "");
@@ -149,6 +151,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("المشروع / الكمبوند", row.project_name),
       makeFact("المطور العقاري", row.developer_name),
       makeFact("المساحة", row.area_m2 ? row.area_m2 + " م²" : ""),
+      makeFact("دورية الإيجار", isRent ? rentPeriod : ""),
+      makeFact("حالة التأثيث", isRent ? row.rental_furnishing : ""),
+      makeFact("تأمين الإيجار", isRent && Number(row.rental_security_deposit) > 0 ? money(row.rental_security_deposit) : ""),
+      makeFact("الحد الأدنى لمدة الإيجار", isRent && Number(row.rental_minimum_months) > 0 ? row.rental_minimum_months + " شهر" : ""),
       makeFact("غرف النوم", /شقة|فيلا|دوبلكس|دوبليكس|روف|استوديو|ستوديو|منزل|بيت|شاليه|سكني/.test(String(row.property_type || "")) ? row.bedrooms : ""),
       makeFact("الحمامات", /أرض|ارض|مشروع/.test(String(row.property_type || "")) ? "" : row.bathrooms),
       makeFact("المقدم عند التعاقد", isAssignment && Number(row.down_payment) > 0 ? money(row.down_payment) : ""),
