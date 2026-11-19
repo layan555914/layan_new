@@ -917,7 +917,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const isAssignment = purposeText === "تنازل";
       const isFeatured = o.is_featured && (!o.featured_until || new Date(o.featured_until) > new Date());
       const photoCount = o.image_urls.length;
-      const priceLabel = purposeText === "إيجار" ? "الإيجار الشهري المعلن" :
+      const rentPeriod = ["يومي", "شهري", "سنوي"].includes(o.rental_period) ? o.rental_period : "شهري";
+      const priceLabel = purposeText === "إيجار" ? "الإيجار " + rentPeriod + " المعلن" :
         purposeText === "تنازل" ? "القيمة المعلنة للتنازل" :
         purposeText === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
 
@@ -960,7 +961,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <div class="offer-card-content">
             <div class="listing-head">
               <h3><a href="${detailsHref}">${esc(o.title)}</a></h3>
-              <strong class="listing-price" aria-label="${priceLabel}">${o.price_on_request ? "السعر عند التواصل" : money2(o.total_price)}${!o.price_on_request && isRent ? " / شهر" : ""}</strong>
+              <strong class="listing-price" aria-label="${priceLabel}">${o.price_on_request ? "السعر عند التواصل" : money2(o.total_price)}${!o.price_on_request && isRent ? " / " + rentPeriod : ""}</strong>
             </div>
             <p class="offer-location"><span aria-hidden="true">⌖</span> ${esc([o.city, o.area].filter(Boolean).join("، ") || "أسيوط")}</p>
             ${specs.length ? `<p class="listing-specs">${specs.join(" <i>•</i> ")}</p>` : ""}
