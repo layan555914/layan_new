@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "<h2>" + esc(x.title) + "</h2>" + photos(x.image_urls) +
       '<p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + "</p>" +
       "<p><strong>" + (rent ? "الإيجار " + (x.rental_period || "شهري") : "السعر") + ":</strong> " + money(x.total_price) + (x.area_m2 ? " · <strong>المساحة:</strong> " + esc(x.area_m2) + " م²" : "") + "</p>" +
-      (rent && (x.rental_furnishing || x.rental_security_deposit != null || x.rental_minimum_months != null) ? '<p><strong>تفاصيل الإيجار:</strong> ' + esc(x.rental_furnishing || "حالة التأثيث غير محددة") + (x.rental_security_deposit != null ? " · التأمين: " + money(x.rental_security_deposit) : "") + (x.rental_minimum_months != null ? " · الحد الأدنى: " + esc(x.rental_minimum_months) + " شهر" : "") + "</p>" : ""),
+      (rent && (x.rental_furnishing || x.rental_security_deposit != null || x.rental_minimum_months != null) ? '<p><strong>تفاصيل الإيجار:</strong> ' + esc(x.rental_furnishing || "حالة التأثيث غير محددة") + (x.rental_security_deposit != null ? " · التأمين: " + money(x.rental_security_deposit) : "") + (x.rental_minimum_months != null ? " · الحد الأدنى: " + esc(x.rental_minimum_months) + " شهر" : "") + "</p>" : "") +
       (x.contact_phone ? '<p><strong>رقم التواصل:</strong> <span dir="ltr">' + esc(x.contact_phone) + "</span></p>" : "") +
       (x.verification_notes ? '<p class="my-listing-note"><strong>ملاحظة المراجعة:</strong> ' + esc(x.verification_notes) + "</p>" : "") +
       editState(x) +
