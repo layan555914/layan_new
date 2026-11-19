@@ -79,10 +79,23 @@ async function loadOffers() {
   if (fileArg > -1) return JSON.parse(fs.readFileSync(process.argv[fileArg + 1], "utf8"));
   const { url, key } = readConfig();
   const rows = [];
+  const legacyFields = FIELDS.split(",").filter(name =>
+    !["rental_period", "rental_furnishing", "rental_security_deposit", "rental_minimum_months"].includes(name)
+  ).join(",");
+  let selectedFields = FIELDS;
   for (let from = 0; ; from += 1000) {
-    const response = await fetch(`${url}/rest/v1/property_offers?select=${FIELDS}&status=eq.available&order=id.asc`, {
-      headers: { apikey: key, Authorization: "Bearer " + key, Range: `${from}-${from + 999}` }
-    });
+    const endpoint = `${url}/rest/v1/property_offers?select=${selectedFields}&status=eq.available&order=id.asc`;
+    const headers = { apikey: key, Authorization: "Bearer " + key, Range: `${from}-${from + 999}` };
+    let response = await fetch(endpoint, { headers });
+    if (!response.ok && from === 0 && response.status === 400) {
+      const detail = await response.text();
+      if (/rental_period|rental_furnishing|rental_security_deposit|rental_minimum_months|schema cache|PGRST204/i.test(detail)) {
+        selectedFields = legacyFields;
+        response = await fetch(`${url}/rest/v1/property_offers?select=${selectedFields}&status=eq.available&order=id.asc`, { headers });
+      } else {
+        throw new Error("Listing request failed: " + response.status + " " + detail.slice(0, 200));
+      }
+    }
     if (!response.ok) throw new Error("Listing request failed: " + response.status + " " + (await response.text()).slice(0, 200));
     const page = await response.json();
     rows.push(...page);
