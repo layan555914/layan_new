@@ -124,6 +124,8 @@ test("every property type and purpose reaches the admin review queue as pending"
     }
     if (purpose === "تنازل") await expect(form.locator("#assignmentFields")).toBeVisible();
     else await expect(form.locator("#assignmentFields")).toBeHidden();
+    if (purpose === "بيع") await expect(form.locator("#saleFields")).toBeVisible();
+    else await expect(form.locator("#saleFields")).toBeHidden();
     await form.locator("[name='photos']").setInputFiles({ name: "IMG_0001.PNG", mimeType: "image/png", buffer: png });
     const before = state.offers.length;
     await page.evaluate(() => { document.getElementById("statusMessage").textContent = ""; });
