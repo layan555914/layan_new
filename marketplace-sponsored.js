@@ -187,6 +187,8 @@
           }));
         }
       }
+      // Keep the marketplace order independent from created_at and from other placements.
+      ads = window.AsyutSponsoredAd?.sortForPlacement?.(ads, "marketplace") || ads;
       render();
     } catch (error) {
       loadFailed = true;
