@@ -48,6 +48,13 @@ ALTER TABLE public.supplier_ads ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.supplier_ads FROM PUBLIC;
 GRANT SELECT ON public.supplier_ads TO anon, authenticated;
 GRANT INSERT, UPDATE ON public.supplier_ads TO authenticated;
+CREATE OR REPLACE VIEW public.public_active_supplier_ads
+WITH (security_invoker = true)
+AS SELECT id, business_name, category, title, description, image_url,
+          target_url, contact_phone, created_at
+     FROM public.supplier_ads
+    WHERE status='active' AND (ends_at IS NULL OR ends_at > now());
+GRANT SELECT ON public.public_active_supplier_ads TO anon, authenticated;
 DROP POLICY IF EXISTS supplier_ads_test_public_read ON public.supplier_ads;
 CREATE POLICY supplier_ads_test_public_read ON public.supplier_ads FOR SELECT TO anon USING(status='active');
 DROP POLICY IF EXISTS supplier_ads_test_auth_read ON public.supplier_ads;
