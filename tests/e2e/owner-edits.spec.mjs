@@ -69,7 +69,7 @@ test("owner edits a published listing: all data, new photo and cover photo go to
   await onRequestCard.getByRole("button", { name: "تعديل الإعلان" }).click();
   const onRequestDialog = page.locator(".my-edit-dialog");
   await expect(onRequestDialog.locator("[name='price_on_request']")).toBeChecked();
-  await onRequestDialog.locator("[data-close]").click();
+  await onRequestDialog.getByRole("button", { name: "إلغاء" }).click();
 
   await card.getByRole("button", { name: "تعديل الإعلان" }).click();
   const dialog = page.locator(".my-edit-dialog");
