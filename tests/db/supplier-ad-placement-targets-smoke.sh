@@ -2,6 +2,7 @@
 set -euo pipefail
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 MIGRATION="$ROOT_DIR/supabase/migrations/20261120190000_supplier_ads_placement_targets.sql"
+ORDER_MIGRATION="$ROOT_DIR/supabase/migrations/20261120223000_supplier_ads_manual_placement_order.sql"
 : "${PGHOST:=127.0.0.1}"
 : "${PGPORT:=5432}"
 : "${PGUSER:=postgres}"
@@ -77,6 +78,8 @@ SQL
 echo "Apply migration twice to check fresh-install and idempotent-upgrade behavior..."
 psql -X -v ON_ERROR_STOP=1 -f "$MIGRATION"
 psql -X -v ON_ERROR_STOP=1 -f "$MIGRATION"
+psql -X -v ON_ERROR_STOP=1 -f "$ORDER_MIGRATION"
+psql -X -v ON_ERROR_STOP=1 -f "$ORDER_MIGRATION"
 
 echo "Verify placement column, invoker view and internal trigger boundary..."
 psql -X -v ON_ERROR_STOP=1 <<'SQL'
@@ -86,6 +89,11 @@ BEGIN
     WHERE table_schema='public' AND table_name='supplier_ads'
       AND column_name='placement_keys' AND is_nullable='NO') THEN
     RAISE EXCEPTION 'placement_keys must be a required column';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+    WHERE table_schema='public' AND table_name='supplier_ads'
+      AND column_name='placement_order' AND is_nullable='NO') THEN
+    RAISE EXCEPTION 'placement_order must be a required column';
   END IF;
   IF has_function_privilege('anon','private.layan_guard_supplier_ad_placements()','EXECUTE')
      OR has_function_privilege('authenticated','private.layan_guard_supplier_ad_placements()','EXECUTE') THEN
@@ -108,11 +116,14 @@ SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
 INSERT INTO public.supplier_ads(id,owner_id,business_name,category,title,description,contact_phone,status,placement_keys)
 VALUES ('$OWNER_AD_ID','$OWNER_ID','Owner test','Ceramics','Owner ad test','Placement security test.','01012345678','pending',ARRAY['featured']);
 DO \$owner_check\$
-DECLARE v text[];
+DECLARE v text[]; v_order jsonb;
 BEGIN
-  SELECT placement_keys INTO v FROM public.supplier_ads WHERE id='$OWNER_AD_ID';
+  SELECT placement_keys, placement_order INTO v, v_order FROM public.supplier_ads WHERE id='$OWNER_AD_ID';
   IF v IS DISTINCT FROM ARRAY['home','offers','marketplace','featured']::text[] THEN
     RAISE EXCEPTION 'Owner-supplied placement was not replaced: %',v;
+  END IF;
+  IF v_order IS DISTINCT FROM '{}'::jsonb THEN
+    RAISE EXCEPTION 'Owner-supplied ordering metadata was not reset: %',v_order;
   END IF;
 END
 \$owner_check\$;
@@ -136,6 +147,22 @@ if [[ "$OWNER_STATUS" -eq 0 ]]; then
   exit 1
 fi
 
+echo "Owner placement order update must also be denied..."
+set +e
+psql -X -v ON_ERROR_STOP=1 >/tmp/supplier-ad-owner-order-denied.log 2>&1 <<SQL
+BEGIN;
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
+UPDATE public.supplier_ads SET placement_order='{"home":0}'::jsonb WHERE id='$OWNER_AD_ID';
+COMMIT;
+SQL
+OWNER_ORDER_STATUS=$?
+set -e
+if [[ "$OWNER_ORDER_STATUS" -eq 0 ]]; then
+  echo "FAIL: owner changed sponsored-ad placement order." >&2
+  exit 1
+fi
+
 echo "Administrator may set a selected placement; unsupported keys must be rejected..."
 psql -X -v ON_ERROR_STOP=1 <<SQL
 BEGIN;
@@ -152,6 +179,16 @@ BEGIN
 END
 \$admin_check\$;
 UPDATE public.supplier_ads SET placement_keys=ARRAY['property_details','home'] WHERE id='$ADMIN_AD_ID';
+SELECT public.layan_reorder_supplier_ads('property_details', ARRAY['$ADMIN_AD_ID']::uuid[]);
+DO \$order_check\$
+DECLARE v jsonb;
+BEGIN
+  SELECT placement_order INTO v FROM public.supplier_ads WHERE id='$ADMIN_AD_ID';
+  IF v ->> 'property_details' <> '0' THEN
+    RAISE EXCEPTION 'Expected property_details position 0, got %',v;
+  END IF;
+END
+\$order_check\$;
 COMMIT;
 SQL
 
@@ -183,9 +220,10 @@ BEGIN
   SELECT placement_keys INTO v FROM public.public_active_supplier_ads WHERE id='$ADMIN_AD_ID';
   IF v IS DISTINCT FROM ARRAY['property_details','home']::text[] THEN RAISE EXCEPTION 'Wrong public placement metadata: %',v; END IF;
   IF has_table_privilege('anon','public.supplier_ads','UPDATE') THEN RAISE EXCEPTION 'Anon unexpectedly has update rights'; END IF;
+  IF NOT has_column_privilege('anon','public.supplier_ads','placement_order','SELECT') THEN RAISE EXCEPTION 'Anon cannot read public placement order'; END IF;
 END
 \$public_check\$;
 ROLLBACK;
 SQL
 
-echo "PASS: placement migration idempotence, owner protection, admin control, valid placement constraints and public SECURITY INVOKER visibility."
+echo "PASS: placement and ordering migrations are idempotent; owners cannot forge or update placement order; admins can reorder active ads per placement; public SECURITY INVOKER visibility remains intact."
