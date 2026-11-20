@@ -238,3 +238,49 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
 .adm-quicklink:hover{background:#FBF1E9;border-color:var(--adm-accent-2);transform:translateY(-1px)}
 .adm-quicklink:focus-visible{outline:3px solid rgba(164,71,42,.25);outline-offset:2px}
 @media(max-width:640px){.adm-quicklinks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.adm-quicklink{width:100%;min-height:46px;padding:8px;font-size:12.5px}}
+
+/* Sponsored-ad placement targets */
+.as-placement-field{
+  min-width:0;
+  margin:0;
+  padding:12px 14px;
+  border:1px solid #E6D3C2;
+  border-radius:13px;
+  background:#FDF9F5;
+}
+.as-placement-field legend{
+  padding:0 6px;
+  color:#45362C;
+  font-size:13px;
+  font-weight:800;
+}
+.as-placement-options{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 14px;
+}
+.as-placement-options .as-check{
+  display:flex!important;
+  align-items:center;
+  gap:8px;
+  min-height:38px;
+  color:#5E4C40;
+  font-size:13px;
+  font-weight:700;
+}
+.as-placement-options .as-check input{
+  flex:0 0 19px;
+  width:19px!important;
+  min-height:19px!important;
+  accent-color:#A66B3F;
+}
+.as-placement-field small{
+  display:block;
+  margin-top:8px;
+  color:#806C5D;
+  font-size:11.5px;
+  line-height:1.7;
+}
+.as-placement-field:disabled{opacity:.72}
+.as-ad-placements{color:#8A5638;font-weight:700}
+@media(max-width:700px){.as-placement-options{grid-template-columns:1fr}}
