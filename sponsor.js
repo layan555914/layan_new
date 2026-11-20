@@ -5,6 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const key = config.SUPABASE_PUBLISHABLE_KEY || "";
   const grid = document.getElementById("supplierAdsGrid");
   let ads = [];
+  const DEFAULT_PLACEMENTS = ["home", "offers", "marketplace", "featured"];
+  const hasPlacement = (ad, key) => Array.isArray(ad.placement_keys)
+    ? ad.placement_keys.includes(key)
+    : DEFAULT_PLACEMENTS.includes(key);
 
   const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -60,10 +64,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function placeAds() {
     if (!grid) return;
     grid.querySelectorAll("[data-sponsor-card], [data-partner-slot], .sponsor-slot").forEach(node => node.remove());
-    ads.forEach(ad => grid.insertAdjacentHTML("beforeend", renderCard(ad)));
+    const homeAds = ads.filter(ad => hasPlacement(ad, "home"));
+    homeAds.forEach(ad => grid.insertAdjacentHTML("beforeend", renderCard(ad)));
     // Until each place is booked, show the service it is meant for, with a photo of that service,
     // so the section always looks complete: 3 on top, 3 below (approved ads come first).
-    const free = SLOTS.slice(0, Math.max(0, SLOTS.length - ads.length));
+    const free = SLOTS.slice(0, Math.max(0, SLOTS.length - homeAds.length));
     grid.insertAdjacentHTML("beforeend", free.map(slotCard).join(""));
   }
 
@@ -99,9 +104,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const slots = [];
     for (let i = 6; i <= listings.length && slots.length < 2; i += 6) slots.push(i);
     if (!slots.length) slots.push(listings.length);
+    const offersAds = ads.filter(ad => hasPlacement(ad, "offers"));
     slots.forEach((position, index) => {
-      const html = ads.length
-        ? inlineCard(ads[index % ads.length])
+      const html = offersAds.length
+        ? inlineCard(offersAds[index % offersAds.length])
         : '<article class="offer-card sponsor-card sponsor-inline sponsor-cta" data-sponsor-inline>' +
           '<span class="sponsor-label">مساحة إعلانية</span>' +
           '<div class="offer-card-content"><h3>اعرض نشاطك هنا أمام الباحثين عن عقار في أسيوط</h3>' +
@@ -123,7 +129,16 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadAds() {
     if (!base || !key) return;
     try {
-      const rows = await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12", { headers: { Authorization: "Bearer " + key } });
+      let rows;
+      try {
+        rows = await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at,placement_keys&order=created_at.desc&limit=12", { headers: { Authorization: "Bearer " + key } });
+      } catch (schemaError) {
+        const message = String(schemaError?.message || schemaError || "");
+        if (!/placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
+        // Before the placement migration is applied, preserve the previous all-surfaces behavior.
+        rows = await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12", { headers: { Authorization: "Bearer " + key } });
+        rows = (Array.isArray(rows) ? rows : []).map(item => ({ ...item, placement_keys: DEFAULT_PLACEMENTS }));
+      }
       const approvedAds = Array.isArray(rows) ? rows : [];
       // Only show real advertisements that have been approved by ASYUT AQAR administration.
       ads = approvedAds;
@@ -170,10 +185,10 @@ document.addEventListener("DOMContentLoaded", () => {
     dialog.innerHTML =
       '<div class="sponsor-dialog-head"><h2>اطلب إعلانًا مميزًا أو إعلان شركة</h2><button type="button" class="sponsor-close" aria-label="إغلاق">×</button></div>' +
       '<p class="sponsor-price-note">إرسال طلب الإعلان مجاني ولا يعني وجود التزام بالدفع. تحدد إدارة أسيوط عقار المميزات والمدة والسعر النهائي بعد مراجعة النشاط والتواصل معك عبر واتساب. لا تُعرض أسعار الباقات على المنصة.</p>' +
-      '<p>الإعلانات تظهر داخل قائمة العروض العقارية بعد موافقة الإدارة. أرسل بيانات نشاطك للمراجعة.</p>' +
+      '<p>يُحدد موضع الإعلان بعد مراجعة النشاط؛ ويمكن أن يظهر بين نتائج العقارات أو في سوق الخدمات حسب التخصص أو ضمن مساحات الصفحة الرئيسية، بعد اعتماد الإدارة والاتفاق على التفاصيل.</p>' +
       '<form class="sponsor-form">' +
       '<label>اسم النشاط<input name="business_name" required minlength="2" maxlength="120" autocomplete="organization"></label>' +
-      '<label>مجال النشاط<select name="category" required><option value="">اختر المجال</option><option>مواد بناء</option><option>تشطيبات</option><option>سيراميك وبورسلين</option><option>دهانات</option><option>أبواب وشبابيك</option><option>مطابخ وأثاث</option><option>ستائر ومفروشات</option><option>أدوات صحية</option><option>كهرباء وسباكة</option><option>مقاولات</option><option>أخرى</option></select></label>' +
+      '<label>مجال النشاط<select name="category" required><option value="">اختر المجال</option><option>مواد بناء</option><option>تشطيبات</option><option>سيراميك وبورسلين</option><option>دهانات</option><option>أبواب وشبابيك</option><option>مطابخ وأثاث</option><option>ستائر ومفروشات</option><option>أدوات صحية</option><option>كهرباء وسباكة</option><option>مقاولات</option><option>مواد البناء والتشطيب</option><option>الأثاث والفرش وتجهيز الوحدات</option><option>الصيانة وإدارة العقارات</option><option>الاستشارات والخدمات العقارية</option><option>مكاتب التصميم الهندسي</option><option>مهندسو الديكور والتصميم الداخلي</option><option>السيراميك والبورسلين والأدوات الصحية</option><option>الإضاءة ووحدات الإنارة</option><option>الستائر والمفروشات</option><option>أخرى</option></select></label>' +
       '<label>عنوان الإعلان<input name="title" required minlength="3" maxlength="140"></label>' +
       '<label>وصف مختصر<textarea name="description" required minlength="5" maxlength="500" rows="3"></textarea></label>' +
       '<label>رابط صورة الإعلان (اختياري)<input name="image_url" type="url" maxlength="1000" placeholder="https://..."></label>' +

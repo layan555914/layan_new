@@ -1,0 +1,64 @@
+/* Sponsored placements inside the services marketplace. */
+.mk-sponsored-section {
+  margin: 18px 0 24px;
+  padding: 20px;
+  border: 1px solid #ead8c8;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffdfa 0%, #fff8f1 100%);
+}
+.mk-sponsored-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.mk-sponsored-heading h2 {
+  margin: 0;
+  color: var(--navy, #342922);
+  font-size: clamp(18px, 2.5vw, 22px);
+}
+.mk-sponsored-heading p {
+  margin: 4px 0 0;
+  color: var(--muted, #8b7768);
+  font-size: 13px;
+}
+.mk-sponsored-count {
+  color: #8a5638;
+  font-size: 12px;
+  font-weight: 800;
+}
+.mk-sponsored-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.mk-sponsored-grid .mk-sponsored-card {
+  min-width: 0;
+  height: 100%;
+}
+.mk-sponsored-empty {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  padding: 18px;
+  border: 1px dashed #d9c2af;
+  border-radius: 12px;
+  background: #fff;
+}
+.mk-sponsored-empty strong { color: #342922; }
+.mk-sponsored-empty p {
+  margin: 0;
+  color: #806c5d;
+  font-size: 13px;
+}
+.mk-sponsored-empty .btn { min-height: 42px; }
+@media (max-width: 900px) {
+  .mk-sponsored-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .mk-sponsored-section { padding: 14px; border-radius: 13px; }
+  .mk-sponsored-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+}

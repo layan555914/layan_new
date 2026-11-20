@@ -117,12 +117,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   const SERVICE_CATEGORIES = [
-    "الشركات والمكاتب العقارية",
     "مواد البناء والتشطيب",
     "الأثاث والفرش وتجهيز الوحدات",
-    "المشروعات والمطورون العقاريون",
     "الصيانة وإدارة العقارات",
-    "الاستشارات والخدمات العقارية"
+    "الاستشارات والخدمات العقارية",
+    "مكاتب التصميم الهندسي",
+    "مهندسو الديكور والتصميم الداخلي",
+    "السيراميك والبورسلين والأدوات الصحية",
+    "الإضاءة ووحدات الإنارة",
+    "الستائر والمفروشات"
   ];
   async function loadServices() {
     const grid = $("featuredServicesGrid");
@@ -138,9 +141,20 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadSponsors() {
     const grid = $("featuredSponsorsGrid");
     try {
-      const rows = await rest("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12");
-      grid.innerHTML = rows.length ? rows.map(sponsorCard).join("") :
-        '<p class="featured-state">لا توجد إعلانات تجارية نشطة للعرض حاليًا. <a href="./advertise.html">اعرف كيف تعلن معنا</a>.</p>';
+      let rows;
+      try {
+        rows = await rest("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at,placement_keys&order=created_at.desc&limit=12");
+      } catch (schemaError) {
+        const message = String(schemaError?.message || schemaError || "");
+        if (!/placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
+        rows = (await rest("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12"))
+          .map(item => ({ ...item, placement_keys: ["home", "offers", "marketplace", "featured"] }));
+      }
+      const featuredRows = rows.filter(item =>
+        !Array.isArray(item.placement_keys) || item.placement_keys.includes("featured")
+      );
+      grid.innerHTML = featuredRows.length ? featuredRows.map(sponsorCard).join("") :
+        '<p class="featured-state">لا توجد إعلانات تجارية مخصصة لهذه الصفحة حاليًا. <a href="./advertise.html">اعرف كيف تعلن معنا</a>.</p>';
     } catch (error) {
       state(grid, error.message || "تعذر تحميل الإعلانات التجارية.", true);
     }
