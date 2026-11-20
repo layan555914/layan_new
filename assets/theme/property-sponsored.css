@@ -1,5 +1,5 @@
 /* ASYUT AQAR — approved sponsored ads within property details */
-.property-sponsored-section[hidden]{display:none!important}
+.property-sponsored-section[hidden]{display:none}
 .property-sponsored-section{display:grid;gap:14px}
 .property-sponsored-section .property-services-head{align-items:center}
 .property-sponsored-section .property-services-head span{color:#8A7465;font-size:11px;font-weight:700}
