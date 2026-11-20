@@ -1,5 +1,4 @@
 async function mountCompanyProjectManagement(options = {}) {
-  "use strict";
 
   const $ = id => document.getElementById(id);
   const profileEntityId = String(options.entityId || "");
