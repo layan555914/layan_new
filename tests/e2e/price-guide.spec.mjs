@@ -15,7 +15,7 @@ function offer(id, purpose, price, rentalPeriod = null) {
     rental_period: rentalPeriod,
     status: "available",
     title: "إعلان عقاري",
-    description: "عرض منشور لاختبار فصل مؤشرات الأسعار."
+    description: "عرض عقاري منشور يتضمن سعرًا ومساحة معلنين."
   };
 }
 
