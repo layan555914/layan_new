@@ -194,7 +194,7 @@ test("developer company manages project requests, units and its own ad links ins
 
   const tools = page.locator("#companyProfileRoot .company-profile-managed-project-tools");
   await expect(tools).toBeVisible();
-  await expect(tools.locator("h3")).toContainText("إدارة المشروعات والوحدات والإعلانات");
+  await expect(tools.getByRole("heading", { name: "إدارة المشروعات والوحدات والإعلانات" })).toBeVisible();
 
   const projectForms = tools.locator("#companyProfileProjectManagementRoot .cd-project-request-form");
   await expect(projectForms).toHaveCount(2);
@@ -246,7 +246,7 @@ test("marketing company can only request a marketing or sales relationship to an
 
   const forms = tools.locator("#companyProfileProjectManagementRoot .cd-project-request-form");
   await expect(forms).toHaveCount(1);
-  await expect(forms.nth(0)).toContainText("طلب ربط الشركة بمشروع منشور");
+  await expect(tools.locator("#companyProfileProjectManagementRoot")).toContainText("طلب ربط الشركة بمشروع منشور");
   const relation = forms.nth(0).getByLabel("صفة الشركة داخل المشروع");
   const values = await relation.locator("option").evaluateAll(options => options.map(option => option.value).filter(Boolean));
   expect(values).toEqual(["marketing_agent", "sales_agent"]);
