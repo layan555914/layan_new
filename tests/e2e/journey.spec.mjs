@@ -294,7 +294,19 @@ test("customer can search, open, save, submit, track and admin-review a property
 
   // 7. A newly published listing can now be opened from its public details URL.
   await page.goto("/property.html?id=202");
-  await expect(page.locator("#propertyDetailsRoot")).toContainText("إعلان اختبار رحلة المستخدم");
+  const propertyDetails = page.locator("#propertyDetailsRoot");
+  await expect(propertyDetails).toContainText("إعلان اختبار رحلة المستخدم");
+  await expect(propertyDetails).toContainText("القيمة المعلنة للتنازل");
+  await expect(propertyDetails).toContainText("المقدم عند التعاقد");
+  await expect(propertyDetails).toContainText("إجمالي المدفوع (شامل المقدم)");
+  await expect(propertyDetails).toContainText("المبلغ المتبقي");
+  await expect(propertyDetails).toContainText("عدد الأقساط المتبقية");
+  await expect(propertyDetails).toContainText("القسط الشهري");
+  await expect(propertyDetails).toContainText("رسوم التنازل");
+  const assignmentFigures = (await propertyDetails.locator(".property-facts-grid").innerText()).replace(/[^\d]/g, "");
+  for (const amount of ["200000", "400000", "800000", "80", "10000", "25000"]) {
+    expect(assignmentFigures).toContain(amount);
+  }
 });
 
 

@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       '<div class="my-listing-top"><span class="my-listing-status status-' + esc(x.status) + '">' + esc(OFFER_STATUS[x.status] || x.status || "غير محدد") + "</span><small>" + esc(x.property_type || "عقار") + " · " + esc(x.listing_purpose || "تنازل") + "</small></div>" +
       "<h2>" + esc(x.title) + "</h2>" + photos(x.image_urls) +
       '<p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + "</p>" +
-      "<p><strong>" + (rent ? "الإيجار " + (x.rental_period || "شهري") : "السعر") + ":</strong> " + money(x.total_price) + (x.area_m2 ? " · <strong>المساحة:</strong> " + esc(x.area_m2) + " م²" : "") + "</p>" +
+      "<p><strong>" + (rent ? "الإيجار " + (x.rental_period || "شهري") : "السعر") + ":</strong> " + (x.price_on_request === true ? "السعر عند التواصل" : money(x.total_price)) + (x.area_m2 ? " · <strong>المساحة:</strong> " + esc(x.area_m2) + " م²" : "") + "</p>" +
       (rent && (x.rental_furnishing || x.rental_security_deposit != null || x.rental_minimum_months != null) ? '<p><strong>تفاصيل الإيجار:</strong> ' + esc(x.rental_furnishing || "حالة التأثيث غير محددة") + (x.rental_security_deposit != null ? " · التأمين: " + money(x.rental_security_deposit) : "") + (x.rental_minimum_months != null ? " · الحد الأدنى: " + esc(x.rental_minimum_months) + " شهر" : "") + "</p>" : "") +
       (x.contact_phone ? '<p><strong>رقم التواصل:</strong> <span dir="ltr">' + esc(x.contact_phone) + "</span></p>" : "") +
       (x.verification_notes ? '<p class="my-listing-note"><strong>ملاحظة المراجعة:</strong> ' + esc(x.verification_notes) + "</p>" : "") +
@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ["bedrooms", "غرف النوم", "int"],
     ["bathrooms", "الحمامات", "int"],
     ["total_price", "السعر / قيمة الإيجار (جنيه)", "number"],
+    ["price_on_request", "عرض السعر عند التواصل بدلًا من كتابة مبلغ", "checkbox"],
     ["rental_period", "دورية الإيجار", "select", { options: [["شهري", "شهري"], ["سنوي", "سنوي"], ["يومي", "يومي"]] }],
     ["rental_furnishing", "حالة التأثيث", "select", { options: [["", "غير محدد"], ["مفروش", "مفروش"], ["نصف مفروش", "نصف مفروش"], ["غير مفروش", "غير مفروش"]] }],
     ["rental_security_deposit", "تأمين الإيجار (جنيه)", "number"],
@@ -129,7 +130,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function fieldHtml([name, label, type, opt = {}], value) {
     const req = opt.required ? " required" : "", max = opt.maxlength ? ' maxlength="' + opt.maxlength + '"' : "";
     let control;
-    if (type === "select") {
+    if (type === "checkbox") {
+      const checked = value === true || value === "true" || value === 1;
+      control = '<input name="' + name + '" type="checkbox" value="true"' + (checked ? " checked" : "") + '>';
+    } else if (type === "select") {
       const opts = opt.options.slice();
       if (value && !opts.some(([v]) => v === value)) opts.unshift([value, value]);
       control = '<select name="' + name + '"' + req + ">" + opts.map(([v, t]) => '<option value="' + esc(v) + '"' + (v === value ? " selected" : "") + ">" + esc(t) + "</option>").join("") + "</select>";
@@ -252,14 +256,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function readChanges() {
     const fd = new FormData(form), changes = {};
     for (const [name, label, type, opt = {}] of editing.fields) {
-      let v = String(fd.get(name) ?? "").trim();
-      if (opt.required && !v) throw Error("املأ خانة «" + label + "».");
+      let v = type === "checkbox"
+        ? Boolean(form.elements.namedItem(name)?.checked)
+        : String(fd.get(name) ?? "").trim();
+      if (type !== "checkbox" && opt.required && !v) throw Error("املأ خانة «" + label + "».");
       if (type === "number" || type === "int") {
         if (v === "") v = null;
         else { const n = Number(v); if (!Number.isFinite(n) || n < 0) throw Error("قيمة غير صحيحة في «" + label + "»."); v = type === "int" ? Math.round(n) : n; }
-      } else if (v === "" && !opt.required) v = null;
-      const old = editing.row[name];
-      const same = (old ?? null) === v || (old != null && v != null && String(old) === String(v));
+      } else if (type !== "checkbox" && v === "" && !opt.required) v = null;
+      const old = editing.row[name] ?? (type === "checkbox" ? false : null);
+      const same = old === v || (old != null && v != null && String(old) === String(v));
       if (!same) changes[name] = v;
     }
     if (changes.title !== undefined && String(changes.title).length < 3) throw Error("العنوان قصير جدًا.");
@@ -338,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Loading ----------
   const EXTRA = ",pending_update,update_status,update_notes";
   const SERVICE_COLS = "id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,status,admin_notes,details,image_urls,created_at";
-  const OFFER_COLS = "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,remaining_installments,assignment_fee,discount_amount,discount_percent,developer_name,project_name,contact_name,contact_phone,land_area_m2,land_zoning,rental_period,rental_furnishing,rental_security_deposit,rental_minimum_months,description,image_urls,status,verification_notes,created_at";
+  const OFFER_COLS = "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,price_on_request,down_payment,paid_amount,remaining_amount,monthly_installment,remaining_installments,assignment_fee,discount_amount,discount_percent,developer_name,project_name,contact_name,contact_phone,land_area_m2,land_zoning,rental_period,rental_furnishing,rental_security_deposit,rental_minimum_months,description,image_urls,status,verification_notes,created_at";
   async function fetchMine(table, cols, owner) {
     const q = c => table + "?select=" + c + "&owner_id=eq." + owner + "&order=created_at.desc";
     const legacyCols = cols.split(",").filter(name =>
