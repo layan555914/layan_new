@@ -58,21 +58,21 @@ test("marketplace shows active sponsored ads and filters them by the selected se
   const sponsoredSection = page.locator("#marketplaceFeaturedAds");
   const cards = sponsoredSection.locator(".mk-sponsored-card");
   await expect(cards).toHaveCount(2);
-  await expect(cards).toContainText("معرض النخبة");
-  await expect(cards).toContainText("معرض البيت");
-  await expect(cards).not.toContainText("شركة تطوير");
+  await expect(sponsoredSection).toContainText("معرض النخبة");
+  await expect(sponsoredSection).toContainText("معرض البيت");
+  await expect(sponsoredSection).not.toContainText("شركة تطوير");
   await expect(sponsoredSection).toContainText("إعلانات مميزة في سوق الخدمات");
 
   await page.locator("#marketplaceCategoryFilter").selectOption({ label: "السيراميك والبورسلين والأدوات الصحية" });
   await expect(cards).toHaveCount(1);
-  await expect(cards).toContainText("معرض النخبة");
-  await expect(cards).not.toContainText("معرض البيت");
+  await expect(sponsoredSection).toContainText("معرض النخبة");
+  await expect(sponsoredSection).not.toContainText("معرض البيت");
   await expect(sponsoredSection).toContainText("إعلانات مميزة في السيراميك والبورسلين والأدوات الصحية");
 
   await page.locator("#marketplaceCategoryFilter").selectOption({ label: "الأثاث والفرش وتجهيز الوحدات" });
   await expect(cards).toHaveCount(1);
-  await expect(cards).toContainText("معرض البيت");
-  await expect(cards).not.toContainText("معرض النخبة");
+  await expect(sponsoredSection).toContainText("معرض البيت");
+  await expect(sponsoredSection).not.toContainText("معرض النخبة");
 });
 
 test("a category without an active ad offers a clear route to request an ad", async ({ page }) => {
