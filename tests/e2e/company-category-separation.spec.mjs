@@ -224,7 +224,8 @@ test("verified company owner is sent from the companies page to the existing com
   await page.locator("#companyRegisterOpen").click();
   await page.waitForURL("**/company.html?id=" + COMPANY_ID);
 
-  await expect(page.locator("#companyProfileRoot .company-profile-hero h1")).toHaveText(COMPANY.company_name);
+  await expect(page).toHaveURL(new RegExp("/company\\.html\\?id=" + COMPANY_ID.replace(/[.*+?^\\u007b}()|[\\]\\\\]/g, "\\\\  await expect(page.locator("#companyProfileRoot .company-profile-hero h1")).toHaveText(COMPANY.company_name);
   await expect(page.locator("#companyProfileRoot")).toContainText("ملف شركة مقدم من الشركة ومعتمد من الإدارة");
+  await expect(page.locator(".company-topbar a[href='./company-dashboard.html']")).toHaveCount(0);") + "$"));
   await expect(page.locator(".company-topbar a[href='./company-dashboard.html']")).toHaveCount(0);
 });
