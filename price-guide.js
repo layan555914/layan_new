@@ -8,9 +8,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cityFilter = $("priceGuideCity");
   const areaFilter = $("priceGuideArea");
   const typeFilter = $("priceGuideType");
+  const rentalPeriodFilter = $("priceGuideRentalPeriod");
+  const rentalPeriodField = $("priceGuideRentalPeriodField");
   const updatedAt = $("priceGuideUpdatedAt");
   const MIN_SAMPLE_SIZE = 3;
   const purposes = ["بيع", "إيجار", "تنازل"];
+  const rentalPeriods = ["يومي", "شهري", "سنوي"];
+  const rentalPeriodLabels = {
+    "يومي": "يوميًا",
+    "شهري": "شهريًا",
+    "سنوي": "سنويًا"
+  };
   let selectedPurpose = "بيع";
   let sourceRows = [];
 
@@ -32,11 +40,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   function usableRows() {
     return sourceRows.filter(row => {
       const purpose = String(row.listing_purpose || "").trim();
+      const rentalPeriod = String(row.rental_period || "").trim();
       const price = Number(row.total_price);
       const area = Number(row.area_m2);
       return row.status === "available" &&
         purposes.includes(purpose) &&
         purpose === selectedPurpose &&
+        (purpose !== "إيجار" || rentalPeriods.includes(rentalPeriod)) &&
         row.price_on_request !== true &&
         Number.isFinite(price) && price > 0 &&
         Number.isFinite(area) && area > 0 &&
@@ -48,6 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       city: String(row.city).trim(),
       area: String(row.area).trim(),
       propertyType: String(row.property_type).trim(),
+      rentalPeriod: selectedPurpose === "إيجار" ? String(row.rental_period).trim() : "",
       pricePerMeter: Number(row.total_price) / Number(row.area_m2)
     })).filter(row => Number.isFinite(row.pricePerMeter) && row.pricePerMeter > 0);
   }
@@ -63,7 +74,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function populateFilters() {
-    const rows = usableRows();
+    const allRows = usableRows();
+    if (rentalPeriodField) rentalPeriodField.hidden = selectedPurpose !== "إيجار";
+    if (selectedPurpose === "إيجار") {
+      populateSelect(rentalPeriodFilter, allRows.map(row => row.rentalPeriod), "كل دوريات الإيجار");
+    } else if (rentalPeriodFilter) {
+      rentalPeriodFilter.value = "";
+    }
+    const selectedPeriod = selectedPurpose === "إيجار" ? (rentalPeriodFilter?.value || "") : "";
+    const rows = selectedPeriod ? allRows.filter(row => row.rentalPeriod === selectedPeriod) : allRows;
     populateSelect(cityFilter, rows.map(row => row.city), "كل مدن ومراكز أسيوط");
     const selectedCity = cityFilter?.value || "";
     const cityRows = selectedCity ? rows.filter(row => row.city === selectedCity) : rows;
@@ -77,13 +96,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const rows = usableRows().filter(row =>
       (!cityFilter?.value || row.city === cityFilter.value) &&
       (!areaFilter?.value || row.area === areaFilter.value) &&
-      (!typeFilter?.value || row.propertyType === typeFilter.value)
+      (!typeFilter?.value || row.propertyType === typeFilter.value) &&
+      (selectedPurpose !== "إيجار" || !rentalPeriodFilter?.value || row.rentalPeriod === rentalPeriodFilter.value)
     );
 
     const groups = new Map();
     rows.forEach(row => {
-      const key = [row.city, row.area, row.propertyType].join("\u001f");
-      if (!groups.has(key)) groups.set(key, {city:row.city, area:row.area, propertyType:row.propertyType, values:[]});
+      const key = [row.city, row.area, row.propertyType, row.rentalPeriod].join("\u001f");
+      if (!groups.has(key)) groups.set(key, {
+        city:row.city, area:row.area, propertyType:row.propertyType,
+        rentalPeriod:row.rentalPeriod, values:[]
+      });
       groups.get(key).values.push(row.pricePerMeter);
     });
 
@@ -98,7 +121,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       }))
       .sort((a,b) => b.sampleSize - a.sampleSize || a.city.localeCompare(b.city,"ar") || a.area.localeCompare(b.area,"ar"));
 
-    const unit = selectedPurpose === "إيجار" ? "جنيه / م² شهريًا" : "جنيه / م²";
     const summaryItems = [
       ["إعلانات مكتملة داخلة في الحساب", rows.length],
       ["مناطق ونوع عقار لديها عينة كافية", sufficientGroups.length],
@@ -119,7 +141,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
     if (!sufficientGroups.length) {
-      results.innerHTML = '<div class="price-guide-empty">البيانات الحالية لا تكفي لإظهار مؤشر موثوق. نحتاج إلى 3 إعلانات مكتملة على الأقل لنفس نوع العقار والمنطقة والمعاملة. لن نعرض متوسطًا أو سعرًا تقديريًا بعينة أقل من ذلك.</div>';
+      results.innerHTML = '<div class="price-guide-empty">البيانات الحالية لا تكفي لإظهار مؤشر موثوق. نحتاج إلى 3 إعلانات مكتملة على الأقل لنفس نوع العقار والمنطقة والمعاملة' +
+        (selectedPurpose === "إيجار" ? " ودورية الإيجار" : "") +
+        '. لن نعرض متوسطًا أو سعرًا تقديريًا بعينة أقل من ذلك.</div>';
       return;
     }
 
@@ -131,13 +155,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         type: group.propertyType
       });
       const queryLink = "./offers.html?" + params.toString();
+      const unit = selectedPurpose === "إيجار"
+        ? "جنيه / م² " + rentalPeriodLabels[group.rentalPeriod]
+        : "جنيه / م²";
+      const basis = selectedPurpose === "تنازل"
+        ? "من القيمة الإجمالية المعلنة للتنازل"
+        : selectedPurpose === "بيع"
+          ? "من سعر البيع الإجمالي"
+          : "";
       return `
         <article class="price-guide-card">
           <h3>${escapeHTML(group.propertyType)}</h3>
+          ${selectedPurpose === "إيجار" ? `<p class="price-guide-card-period">دورية الإيجار: ${escapeHTML(group.rentalPeriod)}</p>` : ""}
           <p class="price-guide-card-location">${escapeHTML(group.city)} · ${escapeHTML(group.area)}</p>
           <div class="price-guide-median">
             <strong>${money(group.median)}</strong>
-            <span>${unit} · الوسيط</span>
+            <span>${unit} · الوسيط${basis ? " · " + basis : ""}</span>
           </div>
           <div class="price-guide-range">
             <div><span>أقل قيمة معلنة للمتر</span><strong>${money(group.minimum)} ج.م</strong></div>
@@ -172,12 +205,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (cityFilter) cityFilter.value = "";
       if (areaFilter) areaFilter.value = "";
       if (typeFilter) typeFilter.value = "";
+      if (rentalPeriodFilter) rentalPeriodFilter.value = "";
       refresh();
     });
   });
-  [cityFilter, areaFilter, typeFilter].forEach(select => select?.addEventListener("change", () => {
-    if (select === cityFilter && areaFilter) areaFilter.value = "";
-    if (select !== typeFilter && typeFilter) typeFilter.value = "";
+  [rentalPeriodFilter, cityFilter, areaFilter, typeFilter].forEach(select => select?.addEventListener("change", () => {
+    if (select === cityFilter) {
+      if (areaFilter) areaFilter.value = "";
+      if (typeFilter) typeFilter.value = "";
+    } else if (select === areaFilter && typeFilter) {
+      typeFilter.value = "";
+    }
     populateFilters();
     render();
   }));
@@ -185,6 +223,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (cityFilter) cityFilter.value = "";
     if (areaFilter) areaFilter.value = "";
     if (typeFilter) typeFilter.value = "";
+    if (rentalPeriodFilter) rentalPeriodFilter.value = "";
     refresh();
   });
 
