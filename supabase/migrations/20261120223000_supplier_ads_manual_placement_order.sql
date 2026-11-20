@@ -88,7 +88,7 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
-  IF p_placement_key NOT IN ('home', 'offers', 'marketplace', 'featured', 'property_details') THEN
+  IF p_placement_key IS NULL OR p_placement_key NOT IN ('home', 'offers', 'marketplace', 'featured', 'property_details') THEN
     RAISE EXCEPTION 'موضع الإعلان غير صحيح'
       USING ERRCODE = '22023';
   END IF;
@@ -99,7 +99,7 @@ BEGIN
   END IF;
 
   IF cardinality(p_ordered_ad_ids) <>
-     (SELECT count(DISTINCT item_id) FROM unnest(p_ordered_ad_ids) AS item_id) THEN
+     (SELECT count(DISTINCT id) FROM unnest(p_ordered_ad_ids) AS ids(id)) THEN
     RAISE EXCEPTION 'قائمة ترتيب الإعلانات تحتوي على عناصر مكررة'
       USING ERRCODE = '22023';
   END IF;
