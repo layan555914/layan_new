@@ -92,6 +92,12 @@ test("company directory separates marketing firms from developers and excludes s
   await expect(developers).not.toContainText("شركة اختبار التسويق العقاري");
   await expect(developers).not.toContainText("مقدم اختبار الصيانة");
 
+  await expect(page.locator('.company-topbar a[href="./company-dashboard.html"]')).toHaveCount(0);
+  await expect(marketing.locator('a[href="./company.html?id=profile-marketing-1"]')).toHaveCount(1);
+  await expect(developers.locator('a[href="./company.html?id=profile-developer-1"]')).toHaveCount(1);
+  await expect(marketing.locator('a[href="./company.html?entity_id=entity-marketing-1"]')).toContainText("عرض الملف واستلامه من داخله");
+  await expect(developers.locator('a[href="./company.html?entity_id=entity-developer-1"]')).toContainText("عرض الملف واستلامه من داخله");
+
   await page.locator("#companyCategoryFilter").selectOption("developers");
   await expect(page.locator("#marketingCompaniesSection")).toBeHidden();
   await expect(page.locator("#developmentCompaniesSection")).toBeVisible();
@@ -167,4 +173,57 @@ test("services marketplace excludes marketing offices and developers from servic
   await expect(page.locator("#marketplaceServiceProfiles")).not.toContainText("مكتب تسويق للاختبار");
   await expect(page.locator("#marketplaceServiceProfiles")).not.toContainText("شركة تطوير للاختبار");
   await expect(page.locator("#marketplaceServiceProfiles")).toContainText("مقدم خدمة");
+});
+
+test("verified company owner is sent from the companies page to the existing company profile", async ({ page }) => {
+  const SUPABASE = "https://company-profile-owner.test.supabase.co";
+  const USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  const COMPANY_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+  const COMPANY = {
+    id: COMPANY_ID,
+    company_name: "شركة اختبار إدارة ملف التطوير",
+    category: "شركات التطوير العقاري",
+    description: "ملف شركة تجريبي لاختبار إدارة الملف من داخله.",
+    services: ["تطوير عقاري"],
+    city: "أسيوط",
+    address: "أسيوط",
+    phone: "01012345678",
+    status: "active",
+    verified_at: "2026-11-17T10:00:00Z",
+    logo_url: null,
+    gallery_urls: [],
+    projects: []
+  };
+
+  await page.route("**/config.js*", route => route.fulfill({
+    status: 200,
+    contentType: "application/javascript",
+    body: 'window.LAYAN_CONFIG = { SUPABASE_URL: "' + SUPABASE + '", SUPABASE_PUBLISHABLE_KEY: "test-publishable-key" };'
+  }));
+  await page.route("**/gubabase.js*", route => route.fulfill({
+    status: 200,
+    contentType: "application/javascript",
+    body: 'window.LAYAN_SUPABASE = {' +
+      'getSession: () => ({ access_token: "test-token", user: { id: "' + USER_ID + '" } }),' +
+      'requireAuthenticated: async () => ({ user: { id: "' + USER_ID + '" } }),' +
+      'isAuthenticated: () => true,' +
+      'authedFetch: (url, options) => fetch(url, options)' +
+    '};'
+  }));
+  await page.route(SUPABASE + "/rest/v1/**", async route => {
+    const url = new URL(route.request().url());
+    const path = url.pathname.replace("/rest/v1/", "");
+    if (path === "rpc/layan_company_owner_profile") return reply(route, COMPANY);
+    if (path === "company_profiles_public") return reply(route, [COMPANY]);
+    if (path === "directory_entities") return reply(route, []);
+    if (path === "company_profile_manager_members") return reply(route, []);
+    return reply(route, []);
+  });
+
+  await page.goto("/companies.html");
+  await page.locator("#companyRegisterOpen").click();
+  await page.waitForURL("**/company.html?id=" + COMPANY_ID);
+
+  await expect(page).toHaveURL(new URL("./company.html?id=" + COMPANY_ID, page.url()).href);
+  await expect(page.locator(".company-topbar a[href='./company-dashboard.html']")).toHaveCount(0);
 });

@@ -92,6 +92,33 @@ document.addEventListener("DOMContentLoaded",async()=>{
    return '<li><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+esc(source.title||source.publisher||"مصدر")+' ↗</a><small>'+esc(source.publisher||"مصدر منشور")+(date?" · تاريخ الاطلاع: "+esc(date):"")+'</small></li>';
   }).join("")+'</ul>';
  }
+ async function publicProjectsMarkup(directoryEntityId){
+  try{
+   const relations=await api("directory_project_entities?select=project_id,relation_type&entity_id=eq."+encodeURIComponent(directoryEntityId));
+   const rows=Array.isArray(relations)?relations:[];
+   const projectIds=[...new Set(rows.map(row=>row.project_id).filter(Boolean))];
+   if(!projectIds.length){
+    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2><p>لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن.</p></section>';
+   }
+   const projectFilter="("+projectIds.join(",")+")";
+   const projects=await api("directory_projects?select=id,name_ar,project_type,project_status&public_visible=eq.true&verification_status=eq.published&id=in."+encodeURIComponent(projectFilter)+"&order=name_ar.asc");
+   const roleLabels={
+    developer:"المطور العقاري",land_owner:"مالك الأرض",marketing_agent:"وكيل تسويق",
+    sales_agent:"وكيل مبيعات",contractor:"مقاول",consultant:"استشاري",
+    operator:"جهة تشغيل",public_authority:"جهة عامة",other:"جهة مرتبطة"
+   };
+   const visible=(Array.isArray(projects)?projects:[]);
+   const byProject=new Map(rows.map(row=>[String(row.project_id),row.relation_type]));
+   return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2>'+
+    (visible.length
+     ?'<div class="company-linked-project-list">'+visible.map(project=>'<article class="company-linked-project"><div><strong>'+esc(project.name_ar||"مشروع عقاري")+'</strong><small>'+esc(roleLabels[byProject.get(String(project.id))]||"علاقة موثقة")+'</small></div><a href="./project.html?id='+encodeURIComponent(project.id)+'">فتح ملف المشروع ←</a></article>').join("")+'</div>'
+     :'<p>لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن. الطلبات التي ما زالت قيد المراجعة لا تظهر للعامة.</p>')+
+    '</section>';
+  }catch(error){
+   console.warn("Published company projects unavailable:",error);
+   return "";
+  }
+ }
  async function loadDirectoryEntity(){
   if(!/^[0-9a-f-]{36}$/i.test(entityId||"")){renderError("رابط ملف الجهة غير صحيح.");return;}
   const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,latitude,longitude,location_public,location_precision,location_source_id,location_verified_at,verification_status,representative_verified_at,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
@@ -109,6 +136,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   );
   const profileSubject=isServiceProvider?"مقدم الخدمة":isRealEstateCompany?"الشركة":"الجهة";
   const profileRepresentative=isServiceProvider?"ممثل مقدم الخدمة":isRealEstateCompany?"ممثل الشركة":"ممثل الجهة";
+  const managedSubject=isRealEstateCompany?"الشركة":"الجهة";
   const name=entity.name_ar||entity.name_en||"جهة عقارية";
   const type=categoryLabel(entity.entity_type,entity.service_category);
   const website=safeUrl(entity.website_url);
@@ -144,6 +172,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     sources=Array.isArray(rows)?rows:[];
    }
   }catch(error){console.warn("Public source references unavailable:",error);}
+  const projectSectionMarkup=await publicProjectsMarkup(entity.id);
   document.title=name+" | ملف "+profileSubject+" – أسيوط عقار";
   const canonical=new URL("./company.html",location.href);
   canonical.searchParams.set("entity_id",entity.id);
@@ -180,6 +209,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   root.innerHTML=
    '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>لا يتوفر شعار موثّق</small></span>')+'</div><div><span class="eyebrow">ملف تعريفي منشور في دليل أسيوط عقار</span>'+(entity.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الجهة وصفته · لا يعني ذلك شهادة ترخيص للنشاط</span>':'')+'<h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div>'+serviceHighlightsMarkup+'<div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
    claimPanelMarkup+
+   projectSectionMarkup+
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':'')+
    contactDetailsMarkup+
    coverageMarkup+
@@ -187,7 +217,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    (gallery.length?'<section class="company-profile-section"><h2>معرض أعمال الشركة ومقدم الخدمة</h2><div class="company-gallery">'+gallery.map((u,i)=>'<img src="'+esc(u)+'" alt="صورة من أعمال '+esc(name)+' رقم '+(i+1)+'" loading="lazy">').join('')+'</div></section>':'')+
    '<section class="company-profile-section"><h2>مصادر المعلومات</h2>'+sourceLinks(sources)+'</section>'+
    '<section class="company-profile-section company-source-note"><h2>تنويه من أسيوط عقار</h2><p>هذا ملف تعريفي مجاني، ولا يعني الإدراج وجود شراكة أو تزكية أو ضمان أو شهادة ترخيص من المنصة. راجع التفاصيل والعناوين وبيانات الاتصال مباشرة مع الجهة قبل التعاقد.</p></section>'+
-   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف جهة</span><h2 id="companyClaimTitle">بيانات '+profileRepresentative+'</h2></div><button type="button" id="companyClaimClose" class="company-claim-close" aria-label="إغلاق نافذة طلب استلام الملف"><span aria-hidden="true">×</span><span>إغلاق</span></button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الجهة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم '+profileRepresentative+' *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>المالك</option><option>شريك</option><option>مدير النشاط</option><option>مدير الفرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><label>رابط موقع أو صفحة رسمية للجهة (اختياري)<input name="evidence_url" type="url" maxlength="500" placeholder="https://..."></label><label>وصف مختصر لما يثبت صفتك أو علاقتك بالجهة (اختياري)<textarea name="evidence_description" rows="2" maxlength="500" placeholder="مثال: اسمي مدرج كمدير في صفحة الشركة الرسمية."></textarea></label><p class="company-claim-dialog-note">لا ترفع بطاقة هوية أو مستندات حساسة في النموذج. يمكن للإدارة طلب إثبات مناسب عبر قناة آمنة عند الحاجة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
+   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف '+profileSubject+'</span><h2 id="companyClaimTitle">بيانات '+profileRepresentative+'</h2></div><button type="button" id="companyClaimClose" class="company-claim-close" aria-label="إغلاق نافذة طلب استلام الملف"><span aria-hidden="true">×</span><span>إغلاق</span></button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الجهة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم '+profileRepresentative+' *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>المالك</option><option>شريك</option><option>مدير النشاط</option><option>مدير الفرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><label>رابط موقع أو صفحة رسمية للجهة (اختياري)<input name="evidence_url" type="url" maxlength="500" placeholder="https://..."></label><label>وصف مختصر لما يثبت صفتك أو علاقتك بالجهة (اختياري)<textarea name="evidence_description" rows="2" maxlength="500" placeholder="مثال: اسمي مدرج كمدير في صفحة الشركة الرسمية."></textarea></label><p class="company-claim-dialog-note">لا ترفع بطاقة هوية أو مستندات حساسة في النموذج. يمكن للإدارة طلب إثبات مناسب عبر قناة آمنة عند الحاجة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
   attachLogoFallback(root,name);
   const claimDialog=document.getElementById("companyClaimDialog");
   document.getElementById("companyClaimOpen")?.addEventListener("click",()=>{claimDialog?.showModal();refreshMyClaimStatus();});
@@ -268,7 +298,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const categories=
       '<option value="contracting_construction">مقاولات وإنشاءات</option><option value="real_estate_marketing">تسويق عقاري</option><option value="real_estate_brokerage">وساطة ومكتب عقاري</option><option value="building_materials">مواد بناء وتشطيب</option><option value="finishing_decoration">تشطيب وديكور</option><option value="furniture_furnishings">أثاث وفرش وتجهيز وحدات</option><option value="engineering_design">مكاتب هندسية وتصميم معماري</option><option value="maintenance_property_management">صيانة وإدارة عقارات</option><option value="real_estate_consultancy">استشارات عقارية</option><option value="real_estate_development">تطوير ومشروعات عقارية</option><option value="real_estate_sales">مبيعات عقارية</option><option value="other_real_estate_services">خدمات عقارية مساندة</option>';
     target.innerHTML=
-     '<div><span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة بيانات الجهة</h2><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر ملف مفوض")+'. التعديلات التشغيلية المسموح بها تظهر مباشرة وتسجل في سجل المراجعة. بيانات الهوية والتواصل الأساسي تحتاج اعتماد الإدارة.</p></div>'+
+     '<div><span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة ملف '+managedSubject+'</h2><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر ملف مفوض")+'. التعديلات التشغيلية المسموح بها تظهر مباشرة وتسجل في سجل المراجعة. بيانات الهوية والتواصل الأساسي تحتاج اعتماد الإدارة.</p></div>'+
      '<p class="company-manager-status" id="companyManagerStatus" role="status" aria-live="polite"></p>'+
      '<h3>تحديثات تشغيلية تظهر مباشرة</h3><form class="company-manager-form" id="companyManagerDirectForm">'+
       '<label class="wide">وصف النشاط والخدمات<textarea name="description" rows="3" maxlength="2000">'+esc(entity.description||"")+'</textarea></label>'+
@@ -296,7 +326,60 @@ document.addEventListener("DOMContentLoaded",async()=>{
       '<form class="company-manager-form" id="companyManagerInviteForm"><label>بريد الموظف الإلكتروني<input name="email" type="email" required maxlength="254"></label><label>الصلاحية<select name="role"><option value="editor">محرر بيانات تشغيلية</option><option value="manager">مدير ملف مفوض</option></select></label><button class="btn btn-outline-dark" type="submit">إضافة إلى فريق الملف</button></form>'+
       '<div id="companyManagerMembers" class="company-manager-status">جارٍ تحميل أعضاء الفريق...</div></section>'
       :"");
-    root.appendChild(target);
+    const profileHero=root.querySelector(".company-profile-hero");
+    if(profileHero)profileHero.insertAdjacentElement("afterend",target);else root.appendChild(target);
+
+    if(isRealEstateCompany){
+     const canManageProjects=isOwner||accessRole==="manager";
+     if(canManageProjects){
+      const tools=document.createElement("section");
+      tools.className="company-profile-managed-project-tools";
+      const isDeveloper=entity.entity_type==="developer"||entity.service_category==="real_estate_development";
+      const isMarketing=["marketing","brokerage","sales_office"].includes(entity.entity_type)||
+       ["real_estate_marketing","real_estate_brokerage","real_estate_sales"].includes(entity.service_category);
+      tools.innerHTML=
+       '<div class="company-profile-tools-heading"><span class="eyebrow">أدوات ملف الشركة</span><h3>إدارة المشروعات والوحدات والإعلانات</h3><p>كل طلب يخضع لمراجعة إدارة أسيوط عقار، ولا يظهر مشروع أو وحدة أو إعلان داخل المشروع إلا بعد اعتماد العلاقة والبيانات.</p></div>'+
+       '<section class="company-profile-tool-section"><h4>إدارة المشروعات</h4><p>'+
+        (isDeveloper?"يمكنك طلب إضافة مشروع جديد أو ربط ملف الشركة بمشروع منشور. طلب الإضافة لا ينشر المشروع تلقائيًا.":isMarketing?"يمكنك طلب ربط ملف الشركة بمشروع منشور بصفتك وكيل تسويق أو وكيل مبيعات. لا يتيح ملف التسويق إنشاء سجل مشروع جديد.":"طلبات المشروعات غير متاحة لهذا النوع من الملفات.")+
+       '</p><div id="companyProfileProjectManagementRoot"></div><div class="company-profile-tool-subheading"><strong>طلبات المشروعات</strong></div><div id="companyProfileProjectRequestsRoot" aria-live="polite"></div></section>'+
+       (isDeveloper
+        ?'<section class="company-profile-tool-section"><h4>وحدات المشروعات</h4><p>إضافة الوحدات متاحة للمالك المعتمد أو مدير الملف المفوض عندما تكون الشركة مرتبطة بالمشروع بصفة المطور أو مالك الأرض. تُراجع كل وحدة قبل ظهورها.</p><div id="companyProfileProjectUnitsRoot"></div><div class="company-profile-tool-subheading"><strong>طلبات الوحدات</strong></div><div id="companyProfileProjectUnitRequestsRoot" aria-live="polite"></div></section>'
+        :'<section class="company-profile-tool-section"><h4>وحدات المشروعات</h4><p>إضافة الوحدات ليست من صلاحيات وكيل التسويق أو المبيعات؛ يتولاها المطور أو مالك الأرض المعتمد.</p></section>')+
+       '<section class="company-profile-tool-section"><h4>ربط إعلان بوحدة منشورة</h4><p>يمكنك طلب ربط إعلان متاح تملكه أنت بوحدة منشورة في أحد مشروعات هذا الملف. لن يظهر الربط إلا بعد مراجعة الإدارة، ولا تُربط إعلانات الموظفين أو الشركة تلقائيًا.</p><div id="companyProfileOfferUnitLinkRoot"></div><div class="company-profile-tool-subheading"><strong>طلبات ربط إعلاناتك</strong></div><div id="companyProfileOfferUnitLinkRequestsRoot" aria-live="polite"></div></section>';
+      target.appendChild(tools);
+      const projectMount=window.AsyutCompanyProjectManagement?.mount;
+      if(typeof projectMount==="function"){
+       await projectMount({
+        entityId:entity.id,
+        root:tools.querySelector("#companyProfileProjectManagementRoot"),
+        requestsRoot:tools.querySelector("#companyProfileProjectRequestsRoot")
+       });
+      }
+      if(isDeveloper&&typeof window.AsyutCompanyProjectUnits?.mount==="function"){
+       await window.AsyutCompanyProjectUnits.mount({
+        entityId:entity.id,
+        root:tools.querySelector("#companyProfileProjectUnitsRoot"),
+        requestsRoot:tools.querySelector("#companyProfileProjectUnitRequestsRoot")
+       });
+      }else if(isDeveloper){
+       tools.querySelector("#companyProfileProjectUnitsRoot").textContent="أدوات إدارة الوحدات غير محملة. حدّث الصفحة وحاول مرة أخرى.";
+      }
+      if(typeof window.AsyutMyProjectUnitLink?.mount==="function"){
+       await window.AsyutMyProjectUnitLink.mount({
+        entityId:entity.id,
+        root:tools.querySelector("#companyProfileOfferUnitLinkRoot"),
+        requestsRoot:tools.querySelector("#companyProfileOfferUnitLinkRequestsRoot")
+       });
+      }else{
+       tools.querySelector("#companyProfileOfferUnitLinkRoot").textContent="أداة ربط الإعلانات غير محملة. حدّث الصفحة وحاول مرة أخرى.";
+      }
+     }else{
+      const note=document.createElement("section");
+      note.className="company-profile-section company-manager-access-note";
+      note.innerHTML='<h3>إدارة مشروعات الشركة</h3><p>تحديث بيانات الملف متاح بصلاحيتك الحالية، أما طلبات إضافة أو ربط المشروعات وإدارة الوحدات فتحتاج صفة المالك المعتمد أو مدير الملف المفوض.</p>';
+      target.appendChild(note);
+     }
+    }
 
     const directForm=target.querySelector("#companyManagerDirectForm");
     const directStatus=target.querySelector("#companyManagerStatus");
@@ -550,7 +633,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    panel.className="company-profile-section company-manager-panel";
    const rows=value=>Array.isArray(value)?value.join("\n"):"";
    panel.innerHTML=
-    '<span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة بيانات الشركة</h2><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر بيانات تشغيلية")+'. تحديث الوصف والخدمات والصور والمشروعات يظهر مباشرة ويسجل في سجل التغييرات. الاسم والتصنيف ووسائل الاتصال الأساسية تحتاج موافقة الإدارة.</p>'+
+    '<span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة ملف الشركة</h2><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر بيانات تشغيلية")+'. تحديث الوصف والخدمات والصور والمشروعات يظهر مباشرة ويسجل في سجل التغييرات. الاسم والتصنيف ووسائل الاتصال الأساسية تحتاج موافقة الإدارة.</p>'+
     '<p id="companyProfileManagerDirectStatus" role="status" aria-live="polite"></p>'+
     '<form class="company-manager-form" id="companyProfileManagerDirectForm">'+
      '<label class="wide">نبذة الشركة<textarea name="description" rows="3" minlength="20" maxlength="1200" required>'+esc(company.description||"")+'</textarea></label>'+
@@ -572,7 +655,12 @@ document.addEventListener("DOMContentLoaded",async()=>{
       '<section class="company-manager-team"><h3>فريق إدارة الشركة</h3><p>أضف موظفًا لديه حساب مؤكد على أسيوط عقار، واختر صلاحية مدير ملف أو محرر بيانات تشغيلية.</p>'+
       '<form class="company-manager-form" id="companyProfileTeamInviteForm"><label>بريد الموظف<input name="email" type="email" required maxlength="254"></label><label>الصلاحية<select name="role"><option value="editor">محرر بيانات تشغيلية</option><option value="manager">مدير ملف مفوض</option></select></label><button type="submit" class="btn btn-outline-dark">إضافة الموظف</button></form><div id="companyProfileTeamMembers" role="status" aria-live="polite"></div></section>'
      :"");
-   root.appendChild(panel);
+   const profileHero=root.querySelector(".company-profile-hero");
+   if(profileHero)profileHero.insertAdjacentElement("afterend",panel);else root.appendChild(panel);
+   const projectAccessNote=document.createElement("section");
+   projectAccessNote.className="company-profile-section company-manager-access-note";
+   projectAccessNote.innerHTML='<h3>المشروعات والوحدات التابعة للشركة</h3><p>إدارة المشروعات والوحدات تعتمد على سجل الشركة المنشور في الدليل العقاري والعلاقات الموثقة به. هذا الملف المقدم من الشركة لا يُربط بسجل الدليل لمجرد تشابه الاسم؛ حتى لا ننسب مشروعًا إلى جهة غير مقصودة. يمكن للإدارة مراجعة الربط الصحيح واستكماله عند التحقق.</p>';
+   panel.appendChild(projectAccessNote);
 
    const rpc=async(name,args)=>{
     const response=await auth.authedFetch(base+"/rest/v1/rpc/"+name,{

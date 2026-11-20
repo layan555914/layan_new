@@ -60,7 +60,7 @@ function card(c,type){
  const href="./company.html?id="+encodeURIComponent(c.id);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
  const label=companyTypeLabel(type);
- return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف مقدم من الشركة ومعتمد من الإدارة</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف شركة معتمد لدى أسيوط عقار</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
 }
 function directoryCard(c,type){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
@@ -71,7 +71,7 @@ function directoryCard(c,type){
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
  const services=Array.isArray(c.public_services)?c.public_services.slice(0,3):[];
- return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">ملف شركة منشور في الدليل العقاري</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">عرض ملف الشركة وطلب استلامه ←</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">ملف شركة منشور في الدليل العقاري</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">عرض الملف واستلامه من داخله ←</span></div></a></article>';
 }
 function renderGroup(type,ownerRows,entityRows,gridElement,countElement,q){
  const owners=ownerRows.filter(c=>!q||normalizeName([c.company_name,c.description,c.city,c.category,...(c.services||[])].join(" ")).includes(q));
@@ -133,8 +133,6 @@ async function loadMyProfile(){
   const values={company_name:src.company_name,category:src.category,description:src.description,services:(src.services||[]).join("، "),city:src.city,address:src.address||"",phone:src.phone,whatsapp:src.whatsapp||"",website:src.website||"",logo_url:src.logo_url||"",gallery_urls:(src.gallery_urls||[]).join("\n"),projects:(src.projects||[]).map(p=>(p.title||"")+" — "+(p.description||"")).join("\n"),representative_name:c.representative_name||"",representative_role:c.representative_role||"",evidence_url:c.evidence_url||"",evidence_description:c.evidence_description||""};
   for(const [name,value] of Object.entries(values)){const field=form.elements.namedItem(name);if(field)field.value=value;}
   setRepresentativeProofVisibility(c.status!=="active"&&!c.verified_at);
-  const teamPanel=$("companyProfileManagerTeamPanel");if(teamPanel)teamPanel.hidden=!(c.status==="active"&&Boolean(c.verified_at));
-  if(c.status==="active"&&c.verified_at)loadCompanyProfileTeam(c.id);
   const draftStatus=supportsDraft?c.update_status:null;const noteText=draftStatus?c.update_notes:c.admin_notes;const needsChanges=c.status==="needs_changes"||draftStatus==="needs_changes";
   if(needsChanges){status.textContent="طلبت إدارة أسيوط عقار استكمال البيانات التالية قبل النشر: "+(noteText||"يرجى مراجعة بيانات الشركة وإكمال الناقص.")+". بعد التعديل أرسل الطلب للمراجعة من جديد.";}
   else if(draftStatus==="rejected"){status.textContent="رفضت إدارة أسيوط عقار التعديلات الأخيرة: "+(noteText||"لم تُسجَّل ملاحظات")+". ملفك المعتمد السابق ما زال ظاهرًا. يمكنك تعديل البيانات وإعادة الإرسال.";}
@@ -156,49 +154,7 @@ function setRepresentativeProofVisibility(visible){
   if(field)field.required=Boolean(visible);
  }
 }
-async function loadCompanyProfileTeam(profileId){
- const panel=$("companyProfileManagerTeamPanel"),membersRoot=$("companyProfileManagerMembers");
- if(!panel||!membersRoot)return;
- async function reload(){
-  membersRoot.textContent="جارٍ تحميل أعضاء الفريق...";
-  const rows=await api("rpc/company_profile_manager_member_list",{method:"POST",body:JSON.stringify({p_company_profile_id:profileId})});
-  if(!Array.isArray(rows)||!rows.length){membersRoot.textContent="لا يوجد موظفون مفوضون حاليًا.";return;}
-  membersRoot.innerHTML=rows.map(row=>'<div class="company-manager-member" data-company-profile-user="'+esc(row.user_id)+'"><strong>'+esc(row.email||"حساب أسيوط عقار")+'</strong> · '+(row.member_role==="manager"?"مدير ملف مفوض":"محرر بيانات تشغيلية")+' <button type="button" class="btn btn-outline-dark" data-company-profile-revoke>إلغاء الصلاحية</button></div>').join("");
- }
- const inviteForm=$("companyProfileManagerInviteForm");
- if(inviteForm&&!inviteForm.dataset.bound){
-  inviteForm.dataset.bound="1";
-  inviteForm.addEventListener("submit",async event=>{
-   event.preventDefault();if(!inviteForm.reportValidity())return;
-   const data=new FormData(inviteForm),button=inviteForm.querySelector('button[type="submit"]');
-   button.disabled=true;
-   try{
-    await api("rpc/company_profile_manager_invite",{method:"POST",body:JSON.stringify({
-     p_company_profile_id:profileId,p_email:String(data.get("email")||"").trim(),p_role:String(data.get("role")||"editor")
-    })});
-    inviteForm.reset();membersRoot.textContent="تمت إضافة الموظف إلى فريق الشركة.";await reload();
-   }catch(error){membersRoot.textContent=error.message||"تعذرت إضافة الموظف.";}
-   finally{button.disabled=false;}
-  });
- }
- if(!membersRoot.dataset.bound){
-  membersRoot.dataset.bound="1";
-  membersRoot.addEventListener("click",async event=>{
-   const button=event.target.closest("[data-company-profile-revoke]");
-   const row=event.target.closest("[data-company-profile-user]");
-   if(!button||!row)return;
-   if(!window.confirm("إلغاء صلاحية هذا المستخدم من إدارة ملف الشركة؟"))return;
-   button.disabled=true;
-   try{
-    await api("rpc/company_profile_manager_revoke",{method:"POST",body:JSON.stringify({p_company_profile_id:profileId,p_user_id:row.dataset.companyProfileUser})});
-    await reload();
-   }catch(error){membersRoot.textContent=error.message||"تعذر إلغاء الصلاحية.";}
-   finally{button.disabled=false;}
-  });
- }
- try{await reload();}catch(error){membersRoot.textContent=error.message||"تعذر تحميل فريق الشركة.";}
-}
-async function open(){try{await verifiedSession();if(!profileLookupComplete){const ok=await loadMyProfile();if(!ok){dialog.showModal();return}}dialog.showModal()}catch(_){sessionStorage.setItem("layanCompanyRegistrationPending","1");window.location.href="./?company-register=1"}}
+async function open(){try{await verifiedSession();if(!profileLookupComplete){const ok=await loadMyProfile();if(!ok){dialog.showModal();return}}if(existingProfileId&&existingStatus==="active"&&existingVerifiedAt){window.location.href="./company.html?id="+encodeURIComponent(existingProfileId);return}dialog.showModal()}catch(_){sessionStorage.setItem("layanCompanyRegistrationPending","1");window.location.href="./?company-register=1"}}
 $("companyRegisterOpen")?.addEventListener("click",open);if(new URLSearchParams(location.search).get("edit")==="1")setTimeout(open,300);$("companyRegisterOpenBottom")?.addEventListener("click",open);$("companyDialogClose")?.addEventListener("click",()=>dialog.close());dialog?.addEventListener("click",e=>{if(e.target===dialog)dialog.close()});$("companyDirectorySearch")?.addEventListener("input",render);$("companyCategoryFilter")?.addEventListener("change",render);
 form?.addEventListener("submit",async e=>{
 e.preventDefault();if(!form.reportValidity())return;

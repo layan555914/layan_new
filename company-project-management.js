@@ -1,9 +1,9 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  "use strict";
+async function mountCompanyProjectManagement(options = {}) {
 
   const $ = id => document.getElementById(id);
-  const root = $("cdProjectManagementRoot");
-  const requestsRoot = $("cdProjectRequestsList");
+  const profileEntityId = String(options.entityId || "");
+  const root = options.root || $("cdProjectManagementRoot");
+  const requestsRoot = options.requestsRoot || $("cdProjectRequestsList");
   if (!root || !requestsRoot) return;
 
   const config = window.LAYAN_CONFIG || {};
@@ -128,10 +128,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function companySelect(entities) {
-    return makeSelect(entities.map(entity => [
+    const select = makeSelect(entities.map(entity => [
       entity.id,
       entity.name_ar + (entity.accessRole === "owner" ? " · المالك المعتمد" : " · مدير ملف مفوض")
     ]), "اختر ملف الشركة", true);
+    if (profileEntityId && entities.length === 1) {
+      select.value = entities[0].id;
+      select.disabled = true;
+      select.required = false;
+    }
+    return select;
   }
 
   function addSubmit(form, feedback) {
@@ -147,7 +153,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderRequests(rows) {
     requestsRoot.replaceChildren();
-    const list = Array.isArray(rows) ? rows : [];
+    const allRows = Array.isArray(rows) ? rows : [];
+    const list = profileEntityId ? allRows.filter(row => row.directory_entity_id === profileEntityId) : allRows;
     if (!list.length) {
       const empty = el("div", undefined, "cd-empty-panel cd-empty-panel--live");
       empty.append(
@@ -193,11 +200,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     return { url, description };
   }
 
-  function relationField(form) {
-    return addField(form, "صفة الشركة داخل المشروع", makeSelect(relationOptions, "اختر الصفة", true));
+  function relationField(form, optionsForEntity = relationOptions) {
+    return addField(form, "صفة الشركة داخل المشروع", makeSelect(optionsForEntity, "اختر الصفة", true));
   }
 
-  function buildNewProjectForm(entities, areas) {
+  function buildNewProjectForm(entities, areas, optionsForEntity = relationOptions) {
     const section = panel(
       "طلب إضافة مشروع جديد",
       "أدخل المعلومات الأساسية فقط. الطلب لا ينشر المشروع تلقائيًا؛ بعد مراجعة الإدارة يُنشأ سجل داخلي لاستكمال المراجع والتحقق قبل النشر."
@@ -219,7 +226,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const units = addField(form, "عدد الوحدات (إن كان معلومًا)", makeInput("number", "عدد الوحدات", false));
     units.min = "0";
     units.step = "1";
-    const relation = relationField(form);
+    const relation = relationField(form, optionsForEntity);
     const evidence = evidenceFields(form);
     const feedback = el("p");
     const submit = addSubmit(form, feedback);
@@ -272,7 +279,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return section;
   }
 
-  function buildLinkProjectForm(entities, projects) {
+  function buildLinkProjectForm(entities, projects, optionsForEntity = relationOptions) {
     const section = panel(
       "طلب ربط الشركة بمشروع منشور",
       "استخدم هذا الخيار عندما يكون المشروع موجودًا بالفعل في دليل المشروعات. لن نكرر سجل المشروع؛ ستراجع الإدارة العلاقة والصفة قبل اعتماد الربط."
@@ -281,7 +288,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const company = addField(form, "ملف الشركة المخوّل", companySelect(entities));
     const projectOptions = projects.map(project => [project.id, project.name_ar]);
     const project = addField(form, "المشروع المنشور", makeSelect(projectOptions, projects.length ? "اختر المشروع" : "لا توجد مشروعات منشورة متاحة", true));
-    const relation = relationField(form);
+    const relation = relationField(form, optionsForEntity);
     const evidence = evidenceFields(form);
     const feedback = el("p");
     const submit = addSubmit(form, feedback);
@@ -352,7 +359,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-    const entityIds = [...accessByEntity.keys()];
+    const entityIds = profileEntityId
+      ? (accessByEntity.has(profileEntityId) ? [profileEntityId] : [])
+      : [...accessByEntity.keys()];
     if (!entityIds.length) {
       root.replaceChildren();
       root.append(el(
@@ -367,7 +376,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const inFilter = "in.(" + entityIds.join(",") + ")";
     const [entities, projects, areas, requests] = await Promise.all([
       query("directory_entities", {
-        select: "id,name_ar,entity_type",
+        select: "id,name_ar,entity_type,service_category",
         id: inFilter,
         public_visible: "eq.true",
         verification_status: "eq.published",
@@ -403,6 +412,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         "لم نعثر على ملف شركة منشور مرتبط بحسابك وبصلاحية مالك أو مدير مفوض. المحرر يستطيع تحديث البيانات التشغيلية المسموح بها لكنه لا يرسل طلبات إنشاء أو ربط المشروعات.",
         "cd-team-note"
       ));
+    } else if (profileEntityId) {
+      const entity = eligibleEntities[0];
+      const isDeveloper = entity.entity_type === "developer" || entity.service_category === "real_estate_development";
+      const isMarketing = ["marketing","brokerage","sales_office"].includes(entity.entity_type) ||
+        ["real_estate_marketing","real_estate_brokerage","real_estate_sales"].includes(entity.service_category);
+      if (isDeveloper) {
+        const developerRelations = relationOptions.filter(option => ["developer","land_owner"].includes(option[0]));
+        root.append(buildNewProjectForm(eligibleEntities, Array.isArray(areas) ? areas : [], developerRelations));
+        root.append(buildLinkProjectForm(eligibleEntities, Array.isArray(projects) ? projects : [], developerRelations));
+      } else if (isMarketing) {
+        const marketingRelations = relationOptions.filter(option => ["marketing_agent","sales_agent"].includes(option[0]));
+        root.append(buildLinkProjectForm(eligibleEntities, Array.isArray(projects) ? projects : [], marketingRelations));
+      } else {
+        root.append(el("p", "إدارة المشروعات متاحة لملفات التطوير العقاري أو التسويق والوساطة بعد اعتماد ممثل الشركة.", "cd-team-note"));
+      }
     } else {
       root.append(buildNewProjectForm(eligibleEntities, Array.isArray(areas) ? areas : []));
       root.append(buildLinkProjectForm(eligibleEntities, Array.isArray(projects) ? projects : []));
@@ -415,5 +439,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     root.replaceChildren(el("p", error.message || "تعذر تحميل أدوات المشروعات.", "cd-team-note"));
     requestsRoot.replaceChildren(el("p", "تعذر تحميل طلبات المشروعات.", "cd-team-note"));
+  }
+}
+
+window.AsyutCompanyProjectManagement = { mount: mountCompanyProjectManagement };
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("cdProjectManagementRoot")) {
+    mountCompanyProjectManagement().catch(error => console.warn("Company project management:", error));
   }
 });
