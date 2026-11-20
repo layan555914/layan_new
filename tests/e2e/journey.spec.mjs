@@ -222,15 +222,38 @@ test("customer can search, open, save, submit, track and admin-review a property
   const form = page.locator("#offerForm");
   await expect(page.locator("#offerDialog")).toBeVisible();
   await form.locator("[name='title']").fill("إعلان اختبار رحلة المستخدم");
-  await form.locator("[name='listing_purpose']").selectOption("تنازل");
   await form.locator("[name='property_type']").selectOption("شقة");
+
+  // Each transaction gets its own visible price control and only its own details.
+  await form.locator("[name='listing_purpose']").selectOption("بيع");
+  await expect(form.locator("#saleFields")).toBeVisible();
+  await expect(form.locator("#saleFields #transactionPriceFields")).toBeVisible();
+  await expect(form.locator("#rentalFields")).toBeHidden();
+  await expect(form.locator("#assignmentFields [name='down_payment']")).toBeDisabled();
+
+  await form.locator("[name='listing_purpose']").selectOption("إيجار");
+  await expect(form.locator("#rentalFields")).toBeVisible();
+  await expect(form.locator("#rentalFields #transactionPriceFields")).toBeVisible();
+  await expect(form.locator("[name='rental_period']")).toBeEnabled();
+  await expect(form.locator("#saleFields [name='discount_amount']")).toBeDisabled();
+  await expect(form.locator("#assignmentFields [name='down_payment']")).toBeDisabled();
+
+  await form.locator("[name='listing_purpose']").selectOption("تنازل");
+  await expect(form.locator("#assignmentFields")).toBeVisible();
+  await expect(form.locator("#assignmentFields #transactionPriceFields")).toBeVisible();
+  await expect(form.locator("#saleFields")).toBeHidden();
+  await expect(form.locator("#rentalFields")).toBeHidden();
+  await expect(form.locator("#rentalFields [name='rental_period']")).toBeDisabled();
+
   await form.locator("[name='city']").fill("أسيوط الجديدة");
   await form.locator("[name='area']").fill("الهضبة");
   await form.locator("[name='total_price']").fill("1200000");
   await form.locator("[name='down_payment']").fill("200000");
   await form.locator("[name='paid_amount']").fill("400000");
-  await form.locator("[name='remaining_installments']").fill("800000");
+  await form.locator("[name='remaining_amount']").fill("800000");
+  await form.locator("[name='remaining_installments']").fill("80");
   await form.locator("[name='monthly_installment']").fill("10000");
+  await form.locator("[name='assignment_fee']").fill("25000");
   await form.locator("[name='contact_phone']").fill("01012345678");
   await form.locator("[name='contact_consent']").check();
   await form.locator("[name='description']").fill("إعلان تجريبي للتأكد من استلام المنصة بيانات العقار وإرساله إلى قائمة مراجعة الإدارة.");
@@ -243,6 +266,10 @@ test("customer can search, open, save, submit, track and admin-review a property
   expect(state.createdPayload.owner_id).toBe(USER_ID);
   expect(state.createdPayload.total_price).toBe(1200000);
   expect(state.createdPayload.paid_amount + state.createdPayload.remaining_amount).toBe(1200000);
+  expect(state.createdPayload.remaining_amount).toBe(800000);
+  expect(state.createdPayload.remaining_installments).toBe(80);
+  expect(state.createdPayload.assignment_fee).toBe(25000);
+  expect(state.createdPayload.rental_period).toBeNull();
 
   // 5. The advertiser sees the pending state in My Listings.
   await page.goto("/my-listings.html");
