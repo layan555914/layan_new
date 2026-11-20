@@ -130,10 +130,37 @@ BEGIN
       OR (n.nspname='public' AND p.proname IN ('layan_reject_supplier_ad','layan_approve_free_trial_ad')))
     AND p.prosrc ILIKE '%private.layan_is_owner()%';
 
+  SELECT count(*) INTO v_old_admin_storage_write_policies
+  FROM pg_policies
+  WHERE schemaname='storage' AND tablename='objects' AND cmd <> 'SELECT'
+    AND (coalesce(qual,'') || coalesce(with_check,'')) ~* '(^|[^a-z_])layan_is_admin\(\)';
+
+  SELECT count(*) INTO v_old_admin_write_functions
+  FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+  WHERE ((n.nspname='private' AND p.proname IN (
+        'layan_activate_supplier_ad','layan_admin_review_property_offer',
+        'company_entity_profile_update_admin_review','company_claim_admin_review',
+        'layan_review_company_profile','company_project_request_admin_review',
+        'company_project_unit_request_admin_review','property_offer_project_unit_request_admin_review'
+      ))
+      OR (n.nspname='public' AND p.proname IN ('layan_reject_supplier_ad','layan_approve_free_trial_ad')))
+    AND p.prosrc ILIKE '%private.layan_is_admin()%';
+
+  SELECT count(*) INTO v_owner_write_functions
+  FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+  WHERE ((n.nspname='private' AND p.proname IN (
+        'layan_activate_supplier_ad','layan_admin_review_property_offer',
+        'company_entity_profile_update_admin_review','company_claim_admin_review',
+        'layan_review_company_profile','company_project_request_admin_review',
+        'company_project_unit_request_admin_review','property_offer_project_unit_request_admin_review'
+      ))
+      OR (n.nspname='public' AND p.proname IN ('layan_reject_supplier_ad','layan_approve_free_trial_ad')))
+    AND p.prosrc ILIKE '%private.layan_is_owner()%';
+
   IF v_old_admin_write_policies <> 0 OR v_owner_write_policies = 0
      OR v_old_admin_storage_write_policies <> 0
-     OR v_old_admin_write_functions <> 0 OR v_owner_write_functions <> 4 THEN
-    RAISE EXCEPTION 'Owner-only ad management gate incomplete (public policies admin %, owner %; storage admin %; write RPCs admin %, owner %)',
+     OR v_old_admin_write_functions <> 0 OR v_owner_write_functions <> 10 THEN
+    RAISE EXCEPTION 'Owner-only ad/company/project gate incomplete (public policies admin %, owner %; storage admin %; write RPCs admin %, owner %)',
       v_old_admin_write_policies, v_owner_write_policies, v_old_admin_storage_write_policies,
       v_old_admin_write_functions, v_owner_write_functions;
   END IF;
