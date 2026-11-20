@@ -140,6 +140,18 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const name=entity.name_ar||entity.name_en||"جهة عقارية";
   const type=categoryLabel(entity.entity_type,entity.service_category);
   const website=safeUrl(entity.website_url);
+  // A promotional social post is separate from the entity's official website.
+  let promoUrl="";
+  try{
+   const promoRows=await api("supplier_ads?select=id,title,promo_url,ends_at&business_name=eq."+encodeURIComponent(name)+"&status=eq.active&order=created_at.desc&limit=10");
+   const now=Date.now();
+   const promo=(Array.isArray(promoRows)?promoRows:[]).find(row=>{
+    const url=safeUrl(row.promo_url);
+    if(!url||(row.ends_at&&(!Number.isFinite(Date.parse(row.ends_at))||Date.parse(row.ends_at)<=now)))return false;
+    try{return /(^|\.)facebook\.com$/i.test(new URL(url).hostname);}catch(_){return false;}
+   });
+   promoUrl=safeUrl(promo?.promo_url);
+  }catch(error){console.warn("Public promotional link unavailable:",error);}
   const officialBrand=officialBrandProfile(website);
   const logo=safeUrl(entity.public_logo_url)||ENTITY_LOGO_ASSETS[entity.id]||safeUrl(officialBrand?.logoUrl)||"";
   const publishedPhone=String(entity.public_phone||"").trim();
@@ -187,6 +199,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(whatsapp){const wa=whatsapp.startsWith("0")?"2"+whatsapp.slice(1):whatsapp;contact.push('<a class="company-contact-secondary" href="https://wa.me/'+esc(wa)+'" target="_blank" rel="noopener noreferrer">واتساب</a>');}
   if(entity.public_email)contact.push('<a class="company-contact-secondary" href="mailto:'+esc(entity.public_email)+'">البريد الإلكتروني</a>');
   if(website){const isFacebook=/^(?:www\.)?facebook\.com$/i.test(new URL(website).hostname);const websiteLabel=isFacebook?"صفحة الجهة على فيسبوك ↗":"الموقع الإلكتروني ↗";contact.push('<a class="company-contact-secondary" href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">'+websiteLabel+'</a>');}
+  if(promoUrl)contact.push('<a class="company-contact-secondary company-promo-link" href="'+esc(promoUrl)+'" target="_blank" rel="noopener noreferrer">شاهد إعلان النشاط على فيسبوك ↗</a>');
   if(mapUrl)contact.push('<a class="company-contact-secondary" href="'+esc(mapUrl)+'" target="_blank" rel="noopener noreferrer">بحث العنوان على الخريطة ↗</a>');
   const serviceHighlightsMarkup=services.length
    ?'<div class="company-profile-highlights" aria-label="أبرز الخدمات">'+services.slice(0,4).map(item=>'<span>'+esc(item)+'</span>').join('')+'</div>'
