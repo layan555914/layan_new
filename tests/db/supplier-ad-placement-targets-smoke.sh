@@ -213,12 +213,13 @@ GRANT SELECT ON public.public_active_supplier_ads TO anon, authenticated;
 BEGIN;
 SET LOCAL ROLE anon;
 DO \$public_check\$
-DECLARE v_count integer; v text[];
+DECLARE v_count integer; v text[]; v_order jsonb;
 BEGIN
   SELECT count(*) INTO v_count FROM public.public_active_supplier_ads;
   IF v_count<>1 THEN RAISE EXCEPTION 'Expected one active public ad, got %',v_count; END IF;
-  SELECT placement_keys INTO v FROM public.public_active_supplier_ads WHERE id='$ADMIN_AD_ID';
+  SELECT placement_keys, placement_order INTO v, v_order FROM public.public_active_supplier_ads WHERE id='$ADMIN_AD_ID';
   IF v IS DISTINCT FROM ARRAY['property_details','home']::text[] THEN RAISE EXCEPTION 'Wrong public placement metadata: %',v; END IF;
+  IF v_order ->> 'property_details' <> '0' THEN RAISE EXCEPTION 'Wrong public placement order metadata: %',v_order; END IF;
   IF has_table_privilege('anon','public.supplier_ads','UPDATE') THEN RAISE EXCEPTION 'Anon unexpectedly has update rights'; END IF;
   IF NOT has_column_privilege('anon','public.supplier_ads','placement_order','SELECT') THEN RAISE EXCEPTION 'Anon cannot read public placement order'; END IF;
 END
