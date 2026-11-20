@@ -175,7 +175,7 @@ test("services marketplace excludes marketing offices and developers from servic
   await expect(page.locator("#marketplaceServiceProfiles")).toContainText("مقدم خدمة");
 });
 
-test("verified company owner is sent from the companies page to the embedded company profile manager", async ({ page }) => {
+test("verified company owner is sent from the companies page to the existing company profile", async ({ page }) => {
   const SUPABASE = "https://company-profile-owner.test.supabase.co";
   const USER_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
   const COMPANY_ID = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
