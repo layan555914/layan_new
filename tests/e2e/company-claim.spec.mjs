@@ -148,7 +148,10 @@ test("anonymous visitors can open the claim form but cannot submit a company cla
 
   await page.goto("/company.html?entity_id=" + ENTITY_ID);
   await expect(page.locator("#companyProfileRoot h1")).toHaveText(ENTITY.name_ar);
+  await expect(page.locator(".company-claim-panel")).toContainText("ممثل الشركة؟");
   await page.locator("#companyClaimOpen").click();
+  await expect(page.locator(".company-claim-dialog-head .eyebrow")).toHaveText("طلب استلام ملف الشركة");
+  await expect(page.locator("#companyClaimTitle")).toHaveText("بيانات ممثل الشركة");
 
   const form = await fillClaimForm(page);
   await form.locator("button[type='submit']").click();
