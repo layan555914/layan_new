@@ -54,14 +54,16 @@ BEGIN
   END LOOP;
 
   v_count := 0;
-  FOR f IN SELECT p.oid FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
-    WHERE (n.nspname='private' AND p.proname IN (
+  FOR f IN SELECT proc_row.oid
+    FROM pg_proc AS proc_row
+    JOIN pg_namespace AS schema_row ON schema_row.oid=proc_row.pronamespace
+    WHERE (schema_row.nspname='private' AND proc_row.proname IN (
       'layan_activate_supplier_ad','layan_admin_review_property_offer',
       'company_entity_profile_update_admin_review','company_claim_admin_review',
       'layan_review_company_profile','company_project_request_admin_review',
       'company_project_unit_request_admin_review','property_offer_project_unit_request_admin_review'
     ))
-       OR (n.nspname='public' AND p.proname IN ('layan_reject_supplier_ad','layan_approve_free_trial_ad'))
+       OR (schema_row.nspname='public' AND proc_row.proname IN ('layan_reject_supplier_ad','layan_approve_free_trial_ad'))
   LOOP
     v_definition := pg_get_functiondef(f.oid);
     IF position('private.layan_is_admin()' IN v_definition)=0 THEN
