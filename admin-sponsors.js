@@ -181,7 +181,8 @@
     { key: "home", label: "الصفحة الرئيسية" },
     { key: "offers", label: "صفحة العقارات" },
     { key: "marketplace", label: "سوق الخدمات" },
-    { key: "featured", label: "صفحة الإعلانات المميزة" }
+    { key: "featured", label: "صفحة الإعلانات المميزة" },
+    { key: "property_details", label: "داخل صفحة تفاصيل العقار" }
   ];
   const DEFAULT_PLACEMENTS = PLACEMENT_OPTIONS.map(item => item.key);
   const placementLabel = keys => (Array.isArray(keys) ? keys : DEFAULT_PLACEMENTS)
@@ -244,7 +245,7 @@
         '<legend>أماكن ظهور الإعلان *</legend>' +
         '<div class="as-placement-options">' + PLACEMENT_OPTIONS.map(item => '<label class="as-check"><input type="checkbox" name="placement_keys" value="' + item.key + '"><span>' + item.label + '</span></label>').join("") + '</div>' +
         '<small data-placement-help>اختر مكانًا واحدًا على الأقل. يمكن اختيار أكثر من مكان.</small>' +
-        '<small>الظهور داخل صفحة تفاصيل العقار ما زال قيد التطوير وغير متاح للحجز حاليًا.</small>' +
+        '<small>يظهر الإعلان داخل تفاصيل العقارات المنشورة عند اختيار هذا الموضع، في مساحة مستقلة عن بيانات العقار.</small>' +
       '</fieldset>' +
       '<label class="is-wide">عنوان الإعلان *<input name="title" required minlength="3" maxlength="140"></label>' +
       '<label class="is-wide">الوصف *<textarea name="description" required minlength="5" maxlength="500" rows="3"></textarea></label>' +
