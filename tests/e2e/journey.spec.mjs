@@ -36,7 +36,7 @@ function makeOffer(overrides = {}) {
 
 async function installBackendMocks(page) {
   const offers = [makeOffer()];
-  const state = { createdPayload: null, adminReviews: [] };
+  const state = { createdPayload: null, adminReviews: [], otpRequests: [] };
   const user = {
     id: USER_ID,
     email: EMAIL,
@@ -61,7 +61,10 @@ async function installBackendMocks(page) {
     const path = url.pathname;
 
     // Supabase Auth is simulated locally. No real account is accessed or changed.
-    if (path === "/auth/v1/otp" && method === "POST") return reply(route, { message_id: "e2e-otp-message" });
+    if (path === "/auth/v1/otp" && method === "POST") {
+      state.otpRequests.push(request.postDataJSON());
+      return reply(route, { message_id: "e2e-otp-message" });
+    }
     if (path === "/auth/v1/verify" && method === "POST") {
       return reply(route, {
         access_token: "e2e-access-token",
@@ -201,19 +204,21 @@ test("customer can search, open, save, submit, track and admin-review a property
   await expect(page.locator("#favoritesGrid")).toContainText("شقة اختبار أسيوط الجديدة");
   await expect(page.locator("#favoritesCount")).toContainText("1");
 
-  // 4. A simulated user session allows the customer to submit an ordinary free listing.
+  // 4. A first-time customer creates an account with email OTP and resumes the add-listing flow.
   await page.goto("/");
   await page.locator("#addOfferTop").click();
   await expect(page.locator("#authDialog")).toBeVisible();
+  await page.locator("#authToggle").click();
   await page.locator("#authEmail").fill(EMAIL);
   await page.locator("#authSubmit").click();
   await expect(page.locator("#authOtpCode")).toBeVisible();
+  expect(state.otpRequests).toEqual([{ email: EMAIL, create_user: true }]);
   await page.locator("#authOtpCode").fill("123456");
   await page.locator("#authVerifyOtpBtn").click();
-  await expect(page.locator("#authStatus")).toContainText("تم التحقق وتسجيل الدخول بنجاح");
+  await expect(page.locator("#authStatus")).toContainText("تم إنشاء الحساب وتسجيل الدخول بنجاح");
   await expect(page.locator("#authDialog")).not.toBeVisible();
+  await expect(page.locator("#offerDialog")).toBeVisible();
 
-  await page.locator("#addOfferTop").click();
   const form = page.locator("#offerForm");
   await expect(page.locator("#offerDialog")).toBeVisible();
   await form.locator("[name='title']").fill("إعلان اختبار رحلة المستخدم");

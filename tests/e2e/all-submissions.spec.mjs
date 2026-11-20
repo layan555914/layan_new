@@ -54,7 +54,9 @@ async function mockBackend(page) {
 }
 
 async function login(page) {
-  await page.locator("#addOfferTop").click();
+  // This helper authenticates without requesting a listing; the dedicated journey test
+  // covers the separate behavior where OTP completion resumes an add-listing request.
+  await page.locator("#loginBtn").click();
   await page.locator("#authEmail").fill("all-types@example.invalid");
   await page.locator("#authSubmit").click();
   await expect(page.locator("#authOtpCode")).toBeVisible();

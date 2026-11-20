@@ -379,6 +379,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   let authDialog;
+  // Preserve the user's intent when email verification is required before adding a listing.
+  let pendingAddOfferAfterAuth = false;
   function ensureAuthDialog() {
     if (authDialog) return authDialog;
     authDialog = document.createElement("dialog");
@@ -479,6 +481,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         clearOtpFlow();
         window.setTimeout(() => {
           if (continueCompanyRegistration()) return;
+          if (pendingAddOfferAfterAuth) {
+            pendingAddOfferAfterAuth = false;
+            authDialog.close();
+            openDialog();
+            setStatus("تم تأكيد بريدك الإلكتروني. أكمل بيانات إعلانك لإرساله إلى مراجعة الإدارة.");
+            return;
+          }
           const returnTo = new URLSearchParams(window.location.search).get("return");
           if (returnTo) {
             try {
@@ -535,6 +544,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     otpCode.addEventListener("keydown", event => {
       if (event.key === "Enter") { event.preventDefault(); finishOtpSignIn(); }
+    });
+    authDialog.addEventListener("close", () => {
+      if (!window.LAYAN_SUPABASE?.isAuthenticated()) pendingAddOfferAfterAuth = false;
     });
     authDialog.querySelector("#closeAuthDialog").addEventListener("click", () => authDialog.close());
     authDialog.addEventListener("click", event => { if (event.target === authDialog) authDialog.close(); });
@@ -1330,7 +1342,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   function startAddOffer() {
     const api = window.LAYAN_SUPABASE;
-    if (!api?.isAuthenticated()) { openAuth("login"); setStatus("سجّل الدخول أولًا، ثم أضف عرضك."); return; }
+    if (!api?.isAuthenticated()) {
+      pendingAddOfferAfterAuth = true;
+      openAuth("login");
+      setStatus("أدخل بريدك الإلكتروني وكود التحقق، وسنفتح لك نموذج الإعلان تلقائيًا.");
+      return;
+    }
     selectedAccountType = selectedAccountType || "individual";
     openDialog();
   }
