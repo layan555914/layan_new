@@ -60,6 +60,8 @@ test("rent guide keeps daily, monthly and annual asking prices in separate group
   const cards = page.locator(".price-guide-card");
   await expect(cards).toHaveCount(2);
   await expect(cards.nth(0)).toContainText("دورية الإيجار:");
+  const annualListingsLink = page.locator(".price-guide-card").filter({ hasText: "سنوي" }).getByRole("link", { name: "عرض إعلانات المنطقة" });
+  await expect(annualListingsLink).toHaveAttribute("href", /rental_period=%D8%B3%D9%86%D9%88%D9%8A/);
   await expect(page.locator("#priceGuideRentalPeriodField")).toBeVisible();
   await expect(page.locator("#priceGuideRentalPeriod option")).toHaveCount(4);
   await expect(page.locator("#priceGuideResults")).toContainText("جنيه / م² شهريًا");
