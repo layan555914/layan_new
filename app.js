@@ -217,6 +217,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   listingPurposeInput?.addEventListener("change", updateTransactionFormFields);
   rentalPeriodInput?.addEventListener("change", updateTransactionFormFields);
   updateTransactionFormFields();
+  form?.addEventListener("reset", () => window.setTimeout(updateTransactionFormFields, 0));
   const photosPreview = document.createElement("div");
   photosPreview.className = "layan-photo-preview";
   photosPreview.setAttribute("aria-live", "polite");
