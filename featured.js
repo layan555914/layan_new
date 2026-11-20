@@ -142,17 +142,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const grid = $("featuredSponsorsGrid");
     try {
       let rows;
+      const baseSelect = "id,business_name,category,title,description,image_url,target_url,contact_phone,created_at";
       try {
-        rows = await rest("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at,placement_keys&order=created_at.desc&limit=12");
+        rows = await rest("public_active_supplier_ads?select=" + baseSelect + ",placement_keys,placement_order&order=created_at.desc&limit=200");
       } catch (schemaError) {
         const message = String(schemaError?.message || schemaError || "");
-        if (!/placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
-        rows = (await rest("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12"))
-          .map(item => ({ ...item, placement_keys: ["home", "offers", "marketplace", "featured"] }));
+        if (!/placement_order|placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
+        try {
+          rows = await rest("public_active_supplier_ads?select=" + baseSelect + ",placement_keys&order=created_at.desc&limit=200");
+          rows = rows.map(item => ({ ...item, placement_order: {} }));
+        } catch (placementError) {
+          const placementMessage = String(placementError?.message || placementError || "");
+          if (!/placement_keys|PGRST204|42703/i.test(placementMessage)) throw placementError;
+          rows = (await rest("public_active_supplier_ads?select=" + baseSelect + "&order=created_at.desc&limit=200"))
+            .map(item => ({ ...item, placement_keys: ["home", "offers", "marketplace", "featured"], placement_order: {} }));
+        }
       }
-      const featuredRows = rows.filter(item =>
-        !Array.isArray(item.placement_keys) || item.placement_keys.includes("featured")
-      );
+      const featuredRows = window.AsyutSponsoredAd?.sortForPlacement
+        ? window.AsyutSponsoredAd.sortForPlacement(rows.filter(item =>
+            !Array.isArray(item.placement_keys) || item.placement_keys.includes("featured")
+          ), "featured")
+        : rows.filter(item => !Array.isArray(item.placement_keys) || item.placement_keys.includes("featured"));
       grid.innerHTML = featuredRows.length ? featuredRows.map(sponsorCard).join("") :
         '<p class="featured-state">لا توجد إعلانات تجارية مخصصة لهذه الصفحة حاليًا. <a href="./advertise.html">اعرف كيف تعلن معنا</a>.</p>';
     } catch (error) {
