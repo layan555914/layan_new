@@ -112,7 +112,18 @@
     } catch (_) { /* keep static fallback */ }
   }
 
-  window.AsyutSponsoredAd = { render: renderAd };
+  function sortForPlacement(rows, placementKey) {
+    return (Array.isArray(rows) ? rows : []).slice().sort((a, b) => {
+      const aHas = Object.prototype.hasOwnProperty.call(a?.placement_order || {}, placementKey);
+      const bHas = Object.prototype.hasOwnProperty.call(b?.placement_order || {}, placementKey);
+      const aOrder = aHas ? Number(a.placement_order[placementKey]) : Number.POSITIVE_INFINITY;
+      const bOrder = bHas ? Number(b.placement_order[placementKey]) : Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    });
+  }
+
+  window.AsyutSponsoredAd = { render: renderAd, sortForPlacement };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", loadOfficialSponsors);
   else loadOfficialSponsors();
 })();
