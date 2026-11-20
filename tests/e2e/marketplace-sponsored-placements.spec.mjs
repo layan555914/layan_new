@@ -11,6 +11,7 @@ const ads = [
     target_url: "https://example.com/ceramics",
     contact_phone: "01012345678",
     placement_keys: ["marketplace"],
+    placement_order: { marketplace: 1 },
     created_at: "2026-11-20T10:00:00Z"
   },
   {
@@ -23,6 +24,7 @@ const ads = [
     target_url: null,
     contact_phone: "01098765432",
     placement_keys: ["marketplace", "featured"],
+    placement_order: { marketplace: 0, featured: 0 },
     created_at: "2026-11-19T10:00:00Z"
   },
   {
@@ -35,6 +37,7 @@ const ads = [
     target_url: null,
     contact_phone: "01011112222",
     placement_keys: ["home", "offers", "featured"],
+    placement_order: { home: 0, featured: 1 },
     created_at: "2026-11-18T10:00:00Z"
   },
   {
@@ -47,6 +50,7 @@ const ads = [
     target_url: null,
     contact_phone: "01033334444",
     placement_keys: ["home", "featured"],
+    placement_order: { home: 1, featured: 0 },
     created_at: "2026-11-17T10:00:00Z"
   }
 ];
@@ -77,6 +81,8 @@ test("marketplace shows active sponsored ads and filters them by the selected se
   await expect(sponsoredSection).toContainText("معرض البيت");
   await expect(sponsoredSection).not.toContainText("شركة تطوير");
   await expect(sponsoredSection).toContainText("إعلانات مميزة في سوق الخدمات");
+  await expect(cards.nth(0)).toContainText("معرض البيت");
+  await expect(cards.nth(1)).toContainText("معرض النخبة");
 
   await page.locator("#marketplaceCategoryFilter").selectOption({ label: "السيراميك والبورسلين والأدوات الصحية" });
   await expect(cards).toHaveCount(1);
