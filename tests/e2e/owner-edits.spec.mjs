@@ -16,11 +16,11 @@ function tinyPng() {
 }
 
 async function mockBackend(page, { admin = false } = {}) {
-  const state = { rpc: [], uploads: 0 };
+  const state = { rpc: [], uploads: 0, offerSelects: [] };
   const user = { id: USER_ID, email: "owner-edit@example.invalid", email_confirmed_at: "2026-11-01T00:00:00Z", app_metadata: {}, user_metadata: {} };
   const offers = [
     { id: 501, title: "كمبوند أصايلة فيوز", property_type: "شقة", listing_purpose: "بيع", city: "أسيوط الجديدة", area: "", total_price: 1, price_on_request: false, contact_phone: "01000000000", description: "وصف قديم", image_urls: [IMG("a"), IMG("b")], status: "available", created_at: "2026-11-01T00:00:00Z" },
-    { id: 502, title: "شقة لسه في المراجعة", property_type: "شقة", listing_purpose: "إيجار", city: "مدينة أسيوط", total_price: 3000, contact_phone: "01000000001", image_urls: [], status: "pending", created_at: "2026-11-02T00:00:00Z" }
+    { id: 502, title: "شقة لسه في المراجعة", property_type: "شقة", listing_purpose: "إيجار", city: "مدينة أسيوط", total_price: 3000, price_on_request: true, contact_phone: "01000000001", image_urls: [], status: "pending", created_at: "2026-11-02T00:00:00Z" }
   ];
   const services = [{ id: "11111111-2222-4333-8444-555555555555", category: "تشطيبات", listing_type: "خدمة", title: "تشطيب شقق", description: "وصف", city: "أسيوط", price: null, contact_phone: "0111", status: "approved", image_urls: [], details: {}, created_at: "2026-11-01T00:00:00Z" }];
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
@@ -41,7 +41,10 @@ async function mockBackend(page, { admin = false } = {}) {
       if (name === "layan_admin_review_edit") return reply(route, body.p_approve ? "approved" : "rejected");
       return reply(route, null);
     }
-    if (path === "/rest/v1/property_offers") return reply(route, url.searchParams.get("owner_id") ? offers : []);
+    if (path === "/rest/v1/property_offers") {
+      if (url.searchParams.get("owner_id")) state.offerSelects.push(url.searchParams.get("select") || "");
+      return reply(route, url.searchParams.get("owner_id") ? offers : []);
+    }
     if (path === "/rest/v1/marketplace_listings") return reply(route, url.searchParams.get("owner_id") ? services : []);
     if (req.method() === "GET") return reply(route, []);
     return route.fulfill({ status: 204, body: "" });
@@ -60,6 +63,13 @@ test("owner edits a published listing: all data, new photo and cover photo go to
   await expect(card.getByRole("button", { name: "تعديل الإعلان" })).toBeVisible();
   await expect(page.locator("[data-kind='offer'][data-id='502']").getByRole("button", { name: "تعديل الإعلان" })).toBeVisible();
   await expect(page.locator("[data-kind='service']").getByRole("button", { name: "تعديل الإعلان" })).toBeVisible();
+  expect(state.offerSelects[0]).toContain("price_on_request");
+  const onRequestCard = page.locator("[data-kind='offer'][data-id='502']");
+  await expect(onRequestCard).toContainText("السعر عند التواصل");
+  await onRequestCard.getByRole("button", { name: "تعديل الإعلان" }).click();
+  const onRequestDialog = page.locator(".my-edit-dialog");
+  await expect(onRequestDialog.locator("[name='price_on_request']")).toBeChecked();
+  await onRequestDialog.locator("[data-close]").click();
 
   await card.getByRole("button", { name: "تعديل الإعلان" }).click();
   const dialog = page.locator(".my-edit-dialog");
