@@ -12,7 +12,7 @@
   const key = config.SUPABASE_PUBLISHABLE_KEY || "";
   if (!section || !grid || !categoryFilter || !base || !key) return;
 
-  const limit = 3;
+  const limit = 5;
   const normalize = value => String(value || "")
     .trim()
     .toLowerCase()
