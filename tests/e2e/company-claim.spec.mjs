@@ -247,6 +247,36 @@ test("admin can review and approve a pending company claim from the claim queue"
 });
 
 
+test("marketing company representatives can request ownership from inside the company profile", async ({ page }) => {
+  await seedAuthenticatedSession(page);
+  const marketingEntity = {
+    ...ENTITY,
+    id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+    name_ar: "وكالة اختبار التسويق العقاري",
+    entity_type: "marketing",
+    service_category: "real_estate_marketing",
+    description: "ملف شركة تسويق عقاري تجريبي."
+  };
+  const state = await mockCompanyClaimBackend(page, { entity: marketingEntity });
+
+  await page.goto("/company.html?entity_id=" + marketingEntity.id);
+  await expect(page.locator("#companyProfileRoot h1")).toHaveText(marketingEntity.name_ar);
+  await expect(page.locator(".company-claim-panel")).toContainText("ممثل الشركة؟");
+  await page.locator("#companyClaimOpen").click();
+  await expect(page.locator(".company-claim-dialog-head .eyebrow")).toHaveText("طلب استلام ملف الشركة");
+  await expect(page.locator("#companyClaimTitle")).toHaveText("بيانات ممثل الشركة");
+
+  const form = await fillClaimForm(page);
+  await form.locator("button[type='submit']").click();
+  await expect(page.locator("#companyClaimStatus")).toContainText("قيد المراجعة");
+  expect(state.submissions).toHaveLength(1);
+  expect(state.submissions[0]).toMatchObject({
+    directory_entity_id: marketingEntity.id,
+    requester_user_id: USER_ID,
+    representative_name: "ممثل الشركة التجريبي"
+  });
+});
+
 test("marketing company claim and verified management stay inside the same company profile", async ({ page }) => {
   await seedAuthenticatedSession(page);
   const marketingEntity = {
