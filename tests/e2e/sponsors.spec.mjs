@@ -40,7 +40,7 @@ async function mock(page) {
     if (path === "/rest/v1/public_active_supplier_ads") return reply(route, state.ads.filter(a => a.status === "active"));
     if (path === "/rest/v1/supplier_ads") {
       if (method === "POST") { const row = { id: "a" + (state.ads.length + 10), created_at: new Date().toISOString(), ...req.postDataJSON() }; state.ads.push(row); return reply(route, [{ id: row.id }], 201); }
-      if (method === "PATCH") { const id = url.searchParams.get("id").replace("eq.", ""); Object.assign(state.ads.find(a => a.id === id) || {}, req.postDataJSON()); return route.fulfill({ status: 204, body: "" }); }
+      if (method === "PATCH") { const id = url.searchParams.get("id").replace("eq.", ""); const body = req.postDataJSON(); state.adPatches.push({ id, ...body }); Object.assign(state.ads.find(a => a.id === id) || {}, body); return route.fulfill({ status: 204, body: "" }); }
       return reply(route, state.ads);
     }
     if (method === "GET") return reply(route, []);
