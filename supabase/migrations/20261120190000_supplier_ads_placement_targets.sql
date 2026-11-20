@@ -59,6 +59,8 @@ BEFORE INSERT OR UPDATE ON public.supplier_ads
 FOR EACH ROW
 EXECUTE FUNCTION private.layan_guard_supplier_ad_placements();
 
+REVOKE ALL ON FUNCTION private.layan_guard_supplier_ad_placements() FROM PUBLIC, anon, authenticated;
+
 -- The shared public view remains SECURITY INVOKER so supplier_ads RLS still applies.
 -- placement_keys is appended at the end to preserve the existing view column order.
 CREATE OR REPLACE VIEW public.public_active_supplier_ads
