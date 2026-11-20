@@ -303,7 +303,7 @@ test("customer can search, open, save, submit, track and admin-review a property
   await expect(propertyDetails).toContainText("عدد الأقساط المتبقية");
   await expect(propertyDetails).toContainText("القسط الشهري");
   await expect(propertyDetails).toContainText("رسوم التنازل");
-  const assignmentFigures = (await propertyDetails.locator(".property-facts-grid").innerText()).replace(/[^\\d]/g, "");
+  const assignmentFigures = (await propertyDetails.locator(".property-facts-grid").innerText()).replace(/[^\d]/g, "");
   for (const amount of ["200000", "400000", "800000", "80", "10000", "25000"]) {
     expect(assignmentFigures).toContain(amount);
   }
