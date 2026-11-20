@@ -2,11 +2,11 @@
 set -euo pipefail
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 MIGRATION="$ROOT_DIR/supabase/migrations/20261120190000_supplier_ads_placement_targets.sql"
-: "\${PGHOST:=127.0.0.1}"
-: "\${PGPORT:=5432}"
-: "\${PGUSER:=postgres}"
-: "\${PGPASSWORD:=postgres}"
-: "\${PGDATABASE:=asyut_aqar_migration_test}"
+: "${PGHOST:=127.0.0.1}"
+: "${PGPORT:=5432}"
+: "${PGUSER:=postgres}"
+: "${PGPASSWORD:=postgres}"
+: "${PGDATABASE:=asyut_aqar_migration_test}"
 export PGHOST PGPORT PGUSER PGPASSWORD PGDATABASE
 
 OWNER_ID="11111111-1111-4111-8111-111111111111"
