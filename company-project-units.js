@@ -1,9 +1,10 @@
-document.addEventListener("DOMContentLoaded", async () => {
+async function mountCompanyProjectUnits(options = {}) {
   "use strict";
 
   const $ = id => document.getElementById(id);
-  const root = $("cdProjectUnitsRoot");
-  const requestsRoot = $("cdProjectUnitRequestsList");
+  const profileEntityId = String(options.entityId || "");
+  const root = options.root || $("cdProjectUnitsRoot");
+  const requestsRoot = options.requestsRoot || $("cdProjectUnitRequestsList");
   if (!root || !requestsRoot) return;
 
   const config = window.LAYAN_CONFIG || {};
@@ -112,7 +113,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderRequests(rows) {
     requestsRoot.replaceChildren();
-    if (!Array.isArray(rows) || !rows.length) {
+    const allRows = Array.isArray(rows) ? rows : [];
+    const list = profileEntityId ? allRows.filter(row => row.directory_entity_id === profileEntityId) : allRows;
+    if (!list.length) {
       requestsRoot.append(el(
         "p",
         "لا توجد طلبات وحدات حتى الآن. بعد إرسال طلب وحدة سيظهر هنا رقمها وحالة مراجعتها وملاحظات الإدارة.",
@@ -121,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    rows.forEach(row => {
+    list.forEach(row => {
       const card = el("article", undefined, "cd-project-unit-request-card");
       const head = el("div", undefined, "cd-request-heading");
       head.append(el("strong", row.unit_payload?.unit_ref || "وحدة داخل المشروع"));
@@ -262,7 +265,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-    const entityIds = [...entityRoles.keys()];
+    const entityIds = profileEntityId
+      ? (entityRoles.has(profileEntityId) ? [profileEntityId] : [])
+      : [...entityRoles.keys()];
     if (!entityIds.length) {
       root.replaceChildren(el(
         "p",
@@ -276,12 +281,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const [relationRows, entities] = await Promise.all([
       query("directory_project_entities", {
         select: "project_id,entity_id,relation_type",
-        entity_id: "in.(" + entityIds.join(",") + ")",
+        entity_id: profileEntityId ? "eq." + profileEntityId : "in.(" + entityIds.join(",") + ")",
         relation_type: "in.(developer,land_owner)"
       }),
       query("directory_entities", {
         select: "id,name_ar",
-        id: "in.(" + entityIds.join(",") + ")",
+        id: profileEntityId ? "eq." + profileEntityId : "in.(" + entityIds.join(",") + ")",
         public_visible: "eq.true",
         verification_status: "eq.published"
       })
@@ -327,5 +332,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     root.replaceChildren(el("p", error.message || "تعذر تحميل إدارة وحدات المشروعات.", "cd-team-note"));
     requestsRoot.replaceChildren(el("p", "تعذر تحميل طلبات الوحدات.", "cd-team-note"));
+  }
+}
+
+window.AsyutCompanyProjectUnits = { mount: mountCompanyProjectUnits };
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("cdProjectUnitsRoot")) {
+    mountCompanyProjectUnits().catch(error => console.warn("Company project units:", error));
   }
 });
