@@ -842,6 +842,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Advertiser page (advertiser.html?id=<owner>&name=<advertiser name>) shows one advertiser's listings only:
     // same account AND same advertiser name, so one account posting for several companies gets a page per company.
     const pageParams = new URLSearchParams(window.location.search);
+    const requestedRentalPeriod = pageParams.get("rental_period") || "";
+    const rentalPeriodFilter = ["يومي", "شهري", "سنوي"].includes(requestedRentalPeriod)
+      ? normalizeSearch(requestedRentalPeriod)
+      : "";
     const ownerFilter = String(pageParams.get("id") || "").trim();
     const brandFilter = window.LAYAN_BRAND_KEY(pageParams.get("name") || "");
     const onAdvertiserPage = document.body.classList.contains("page-advertiser");
@@ -861,6 +865,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!purpose || normalizeSearch(o.listing_purpose) === purpose) &&
         (!city || normalizeSearch(o.city) === city) &&
         (!area || normalizeSearch(o.area) === area) &&
+        (!rentalPeriodFilter || (normalizeSearch(o.listing_purpose) === "ايجار" && normalizeSearch(o.rental_period) === rentalPeriodFilter)) &&
         (totalPriceMax === null || (!o.price_on_request && num(o.total_price) <= totalPriceMax)) &&
         (purpose === "تنازل" ? (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) : true) &&
         (purpose === "تنازل" ? (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) : true) &&
@@ -895,7 +900,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const resultsSummary = $("resultsSummary");
     if (resultsSummary) {
-      const activeFilters = Boolean(search || companyQuery || type || purpose || city || area || totalPriceMaxRaw.trim() || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || minBedroomsRaw.trim() || activeKind || activeDealKind);
+      const activeFilters = Boolean(search || companyQuery || type || purpose || city || area || rentalPeriodFilter || totalPriceMaxRaw.trim() || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || minBedroomsRaw.trim() || activeKind || activeDealKind);
       resultsSummary.replaceChildren();
       const count = document.createElement("strong");
       count.textContent = String(filtered.length);
