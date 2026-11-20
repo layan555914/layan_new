@@ -154,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         area: group.area,
         type: group.propertyType
       });
+      if (selectedPurpose === "إيجار") params.set("rental_period", group.rentalPeriod);
       const queryLink = "./offers.html?" + params.toString();
       const unit = selectedPurpose === "إيجار"
         ? "جنيه / م² " + rentalPeriodLabels[group.rentalPeriod]
