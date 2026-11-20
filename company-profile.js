@@ -210,11 +210,10 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(whatsapp){const waNumber=whatsapp.startsWith("0")?"2"+whatsapp.slice(1):whatsapp;contactDetails.push('<div class="company-detail-item"><strong>واتساب</strong><a href="https://wa.me/'+esc(waNumber)+'" target="_blank" rel="noopener noreferrer">مراسلة الشركة أو مقدم الخدمة</a></div>');}
   if(entity.public_email)contactDetails.push('<div class="company-detail-item"><strong>البريد الإلكتروني</strong><a href="mailto:'+esc(entity.public_email)+'">'+esc(entity.public_email)+'</a></div>');
   if(entity.public_business_hours)contactDetails.push('<div class="company-detail-item"><strong>مواعيد العمل</strong><span>'+esc(entity.public_business_hours)+'</span></div>');
-  if(website)contactDetails.push('<div class="company-detail-item"><strong>الصفحة الرسمية</strong><a href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">زيارة الصفحة الرسمية ↗</a></div>');
   const contactDetailsTitle=isServiceProvider?"بيانات التواصل ومقر مقدم الخدمة":isRealEstateCompany?"بيانات التواصل ومقر الشركة":"بيانات التواصل ومقر الجهة";
-  const contactDetailsMarkup='<section class="company-profile-section company-contact-details"><h2>'+contactDetailsTitle+'</h2>'+
-   (contactDetails.length?'<div class="company-detail-grid">'+contactDetails.join("")+'</div>':'<p class="company-detail-empty">لم تُنشر بيانات التواصل أو العنوان لهذه الجهة حتى الآن. يمكن لممثلها طلب استلام الملف وتحديث البيانات بعد التحقق.</p>')+
-   '</section>';
+  const contactDetailsMarkup=contactDetails.length
+   ?'<section class="company-profile-section company-contact-details"><h2>'+contactDetailsTitle+'</h2><div class="company-detail-grid">'+contactDetails.join("")+'</div></section>'
+   :"";
   const coverageMarkup=coverage.length
    ?'<section class="company-profile-section company-coverage-section"><h2>نطاق تقديم الخدمات</h2><div class="company-coverage-list">'+coverage.map(area=>'<span>'+esc(area)+'</span>').join('')+'</div></section>'
    :"";
