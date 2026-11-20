@@ -123,7 +123,7 @@ test("admin adds, hides and deletes sponsors and publishes a sponsored ad", asyn
   await ad.locator("[name='days']").fill("15");
   await ad.locator("button[type='submit']").click();
   await expect.poll(() => state.rpc.find(r => r.name === "layan_activate_supplier_ad")?.body.p_days).toBe(15);
-  expect(state.ads.at(-1)).toMatchObject({ business_name: "مصنع النيل", status: "active", owner_id: USER_ID });
+  expect(state.ads.at(-1)).toMatchObject({ business_name: "مصنع النيل", status: "active", owner_id: USER_ID, placement_keys: ["marketplace", "featured"] });
 });
 
 
