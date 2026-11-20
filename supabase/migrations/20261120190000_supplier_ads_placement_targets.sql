@@ -9,10 +9,10 @@ ALTER TABLE public.supplier_ads
 
 ALTER TABLE public.supplier_ads
   ALTER COLUMN placement_keys
-  SET DEFAULT ARRAY['home', 'offers', 'marketplace', 'featured']::text[];
+  SET DEFAULT ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[];
 
 UPDATE public.supplier_ads
-   SET placement_keys = ARRAY['home', 'offers', 'marketplace', 'featured']::text[]
+   SET placement_keys = ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[]
  WHERE placement_keys IS NULL;
 
 ALTER TABLE public.supplier_ads
@@ -42,7 +42,7 @@ DECLARE
 BEGIN
   IF TG_OP = 'INSERT' THEN
     IF NOT v_is_admin THEN
-      NEW.placement_keys := ARRAY['home', 'offers', 'marketplace', 'featured']::text[];
+      NEW.placement_keys := ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[];
     END IF;
   ELSIF NEW.placement_keys IS DISTINCT FROM OLD.placement_keys AND NOT v_is_admin THEN
     RAISE EXCEPTION 'لا يمكن تغيير أماكن ظهور الإعلان إلا من خلال إدارة أسيوط عقار'
