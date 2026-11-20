@@ -107,6 +107,8 @@ test("admin adds, hides and deletes sponsors and publishes a sponsored ad", asyn
     "مكاتب التصميم الهندسي"
   ]));
   await ad.locator("[name='category']").selectOption({ label: "السيراميك والبورسلين والأدوات الصحية" });
+  await ad.locator("[name='placement_keys'][value='marketplace']").check();
+  await ad.locator("[name='placement_keys'][value='featured']").check();
   await ad.locator("[name='business_name']").fill("مصنع النيل");
   await ad.locator("[name='title']").fill("خصم 20% على البورسلين");
   await ad.locator("[name='description']").fill("عرض لفترة محدودة لعملاء أسيوط عقار.");
