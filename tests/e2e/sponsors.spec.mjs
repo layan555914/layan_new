@@ -37,6 +37,13 @@ async function mock(page) {
       if (method === "PATCH") { const id = url.searchParams.get("id").replace("eq.", ""); const body = req.postDataJSON(); state.patches.push({ id, ...body }); Object.assign(state.sponsors.find(s => s.id === id) || {}, body); return route.fulfill({ status: 204, body: "" }); }
       return reply(route, state.sponsors);
     }
+    if (path === "/rest/v1/property_offers") return reply(route, [{
+      id: 101, title: "شقة اختبار في أسيوط", listing_purpose: "بيع", property_type: "شقة",
+      city: "أسيوط", area: "حي شرق", area_m2: 120, total_price: 1500000,
+      price_on_request: false, description: "تفاصيل عقار لاختبار موضع الإعلان المميز.",
+      image_urls: [], contact_phone: "01012345678", is_featured: false,
+      created_at: "2026-11-20T10:00:00Z", updated_at: "2026-11-20T10:00:00Z"
+    }]);
     if (path === "/rest/v1/public_active_supplier_ads") return reply(route, state.ads.filter(a => a.status === "active"));
     if (path === "/rest/v1/supplier_ads") {
       if (method === "POST") { const row = { id: "a" + (state.ads.length + 10), created_at: new Date().toISOString(), ...req.postDataJSON() }; state.ads.push(row); return reply(route, [{ id: row.id }], 201); }
@@ -143,4 +150,31 @@ test("featured commercial ads only include ads assigned to the featured page", a
   const grid = page.locator("#featuredSponsorsGrid");
   await expect(grid).toContainText("إعلان مخصص لصفحة الإعلانات المميزة");
   await expect(grid).not.toContainText("معرض سيراميك asuit");
+});
+
+
+test("property detail page shows only ads explicitly assigned to the property-details placement", async ({ page }) => {
+  const state = await mock(page);
+  state.ads.push({
+    id: "property-details-only",
+    owner_id: USER_ID,
+    business_name: "مركز تشطيب أسيوط",
+    category: "مواد البناء والتشطيب",
+    title: "عرض تشطيب للوحدات الجديدة",
+    description: "خدمات تشطيب ومواد بناء لأصحاب الوحدات.",
+    image_url: null,
+    target_url: null,
+    contact_phone: "01033334444",
+    placement_keys: ["property_details"],
+    status: "active",
+    price: 0,
+    created_at: "2026-11-20T11:00:00Z"
+  });
+
+  await page.goto("/property.html?id=101");
+  const section = page.locator("#propertySponsoredAds");
+  await expect(section).toBeVisible();
+  await expect(section).toContainText("عرض تشطيب للوحدات الجديدة");
+  await expect(section).toContainText("مركز تشطيب أسيوط");
+  await expect(section).not.toContainText("معرض سيراميك asuit");
 });
