@@ -256,19 +256,46 @@ document.addEventListener("DOMContentLoaded", async () => {
       const grid = root.querySelector("#propertySponsoredAdsGrid");
       if (!section || !grid || !base || !key) return;
       try {
-        const response = await fetch(
-          base + "/rest/v1/public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at,placement_keys&order=created_at.desc&limit=30",
-          { headers: { apikey: key, Authorization: "Bearer " + key }, cache: "no-store" }
-        );
-        if (!response.ok) {
-          if (response.status === 400) return; // Placement migration is not active yet.
-          throw new Error("تعذر تحميل الإعلانات المناسبة.");
+        const baseSelect = "id,business_name,category,title,description,image_url,target_url,contact_phone,created_at";
+        const fetchRows = async fields => {
+          const columns = baseSelect +
+            (fields.includes("placement_keys") ? ",placement_keys" : "") +
+            (fields.includes("placement_order") ? ",placement_order" : "");
+          const response = await fetch(
+            base + "/rest/v1/public_active_supplier_ads?select=" + columns + "&order=created_at.desc&limit=200",
+            { headers: { apikey: key, Authorization: "Bearer " + key }, cache: "no-store" }
+          );
+          const raw = await response.text();
+          let data = [];
+          try { data = raw ? JSON.parse(raw) : []; } catch (_) {}
+          if (!response.ok || !Array.isArray(data)) {
+            const error = new Error(data?.message || "تعذر تحميل الإعلانات المناسبة.");
+            error.status = response.status;
+            throw error;
+          }
+          return data;
+        };
+        let rows;
+        try {
+          rows = await fetchRows(["placement_keys", "placement_order"]);
+        } catch (schemaError) {
+          const message = String(schemaError?.message || schemaError || "");
+          if (!/placement_order|placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
+          try {
+            rows = (await fetchRows(["placement_keys"])).map(ad => ({ ...ad, placement_order: {} }));
+          } catch (placementError) {
+            // Do not show a generic all-surfaces ad in the property-details slot.
+            const placementMessage = String(placementError?.message || placementError || "");
+            if (/placement_keys|PGRST204|42703/i.test(placementMessage)) return;
+            throw placementError;
+          }
         }
-        const rows = await response.json();
         if (!Array.isArray(rows)) return;
-        const selected = rows.filter(ad =>
+        const matching = rows.filter(ad =>
           Array.isArray(ad.placement_keys) && ad.placement_keys.includes("property_details")
-        ).slice(0, 3);
+        );
+        const ordered = window.AsyutSponsoredAd?.sortForPlacement?.(matching, "property_details") || matching;
+        const selected = ordered.slice(0, 3);
         if (!selected.length) return;
         grid.innerHTML = selected.map(ad =>
           window.AsyutSponsoredAd?.render
