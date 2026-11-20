@@ -164,7 +164,7 @@ html body :is(
   background-color: var(--aa-espresso);
   background-image:
     linear-gradient(270deg, rgba(66, 45, 31, .76) 0%, rgba(66, 45, 31, .60) 48%, rgba(66, 45, 31, .22) 100%),
-    url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1") !important;
+    url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1");
   background-position: center 48%;
   background-size: cover;
   background-repeat: no-repeat;
@@ -204,18 +204,13 @@ html body :is(
   color: #F4D5AC;
 }
 html body.page-home .hero.design-hero::before {
-  background-image: url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1") !important;
   filter: saturate(1.08) brightness(1.06);
 }
-html body.page-home .hero.design-hero::after {
-  display: block !important;
-  background: linear-gradient(270deg, rgba(66, 45, 31, .62) 0%, rgba(66, 45, 31, .43) 46%, rgba(66, 45, 31, .08) 100%) !important;
-}
 html body.page-home .hero.design-hero :is(h1, p, .eyebrow) {
-  color: #FFFCF8 !important;
+  color: #FFFCF8;
 }
 html body.page-home .hero.design-hero h1 span {
-  color: #F5D7A7 !important;
+  color: #F5D7A7;
 }
 
 /* Empty photo/logo placeholders retain the same villa fallback, now with brighter detail. */
