@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+/**
+ * Lightweight UI source-contract regression tests for the ASYUT AQAR CRM.
+ * Runtime role and data behavior is covered by the disposable local API test.
+ */
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const root = new URL("../../", import.meta.url);
+const read = path => readFile(new URL(path, root), "utf8");
+const [crm, html, migration] = await Promise.all([
+  read("admin-crm.js"),
+  read("admin.html"),
+  read("supabase/migrations/20261113231500_admin_crm_internal_leads.sql"),
+]);
+
+assert.ok(crm.includes('data-lead-id="${esc(lead?.id || "")}"'),
+  "Editing an existing CRM record must preserve its database ID.");
+assert.ok(crm.includes("const id = form.dataset.leadId || null"),
+  "The save action must submit the ID of an existing CRM record.");
+assert.ok(crm.includes('archivedView ? "layan_admin_list_crm_archived" : "layan_admin_list_crm_leads"'),
+  "The archive view must use the dedicated archived-record RPC.");
+assert.ok(crm.includes("data-crm-restore") && crm.includes("layan_admin_crm_restore_lead"),
+  "Archived CRM records must have a wired restore action.");
+assert.ok(html.includes('id="crmToggleArchived"'),
+  "The admin page must expose the archive switch.");
+assert.ok(migration.includes("CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_archived"),
+  "The database must include the role-checked archive lookup RPC.");
+assert.ok(migration.includes("CREATE OR REPLACE FUNCTION public.layan_admin_crm_restore_lead"),
+  "The database must include the owner-only restore RPC.");
+
+console.log("PASS: CRM edit identity, archive switch and restore wiring are present.");

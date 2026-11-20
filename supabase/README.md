@@ -6,12 +6,13 @@ This branch tests whether a new empty local Supabase database can build the curr
 
 ## Migration chain
 
-The clean-install chain contains 45 active SQL migrations: (3 reviewed November 3 baseline files plus all 42 incremental SQL migrations currently present on main, dated November 4–19, 2026).
+The clean-install chain contains 46 active SQL migrations (3 reviewed November 3 baseline files + all 42 incremental migrations now on main through November 19 + 1 CRM migration):
 
 1. 20261103140155_asyut_aqar_production_schema_baseline.sql — catalog-derived application schema snapshot captured on 2026-11-03.
 2. 20261103140655_seed_asyut_aqar_marketplace_categories.sql — 11 stable marketplace categories.
 3. 20261103141537_directory_admin_mutate_with_audit.sql — directory administration RPC.
-4. All 42 incremental SQL files currently present on main, including company-claim locking/reconciliation, company and project management, marketplace, rental, email-notification and weekly digest migrations.
+4. All 42 incremental SQL files currently present on main, including company-claim locking/reconciliation, company and project management, marketplace, rental details, email notifications and the Thursday digest.
+5. 20261113231500_admin_crm_internal_leads.sql — private advertiser/sponsor CRM tables, role-checked RPCs, follow-up fields, activity history, archive lookup and owner-only restoration.
 
 The baseline is a squashed schema snapshot, not a recreation of the original 59 pre-November-3 migration bodies. Those old DDL changes are represented by the baseline snapshot. No empty no-op migration markers are added to this build chain.
 
@@ -20,7 +21,7 @@ The baseline is a squashed schema snapshot, not a recreation of the original 59 
 - Application-owned tables, columns, constraints, indexes, views, functions, triggers, RLS and grants from the November 3 catalog snapshot.
 - Incremental admin, directory, owner approval, advertiser logo, sponsor, buyer notification and company-claim schema changes after November 3.
 - A separate local-only Storage bootstrap for two ASYUT AQAR buckets and six object policies.
-- Local API tests for Auth, owner isolation, directory admin RPC atomicity and Storage RLS.
+- Local API tests for Auth, owner isolation, directory admin RPC atomicity, Storage RLS, and the internal CRM's anonymous/user/supervisor/owner boundaries.
 
 ## What is deliberately not included
 
@@ -51,5 +52,9 @@ The script creates an isolated temporary project, clears hosted Supabase access 
 - No hosted Supabase project ref, production password, API key or secret is configured in this branch.
 - The script uses explicit --local CLI operations and refuses non-loopback endpoints in its API test program.
 - It does not run supabase db push, migration repair, linked reset, or any production command.
-- The 45-migration chain is for clean-install reproducibility only. It does not rewrite or reconcile the production migration ledger.
+- The 46-migration chain is for clean-install reproducibility only. It does not rewrite or reconcile the production migration ledger.
+- CRM phase 1 is limited to real-estate developers, brokerages, real-estate offices, property finance, and related sponsors. Service providers, suppliers, finishing, furniture and other non-real-estate categories are intentionally deferred to phase 2.
+- The CRM API test also verifies that a phase-2 category is rejected by the phase-1 save RPC.
+- CRM CSV export prefixes spreadsheet-formula-looking values as text before quoting cells.
+- The CRM migration and API checks are part of the local rehearsal only; production adoption requires a separate migration-ledger reconciliation and explicit owner approval.
 - No merge, production deployment, or live database change is part of this rehearsal.
