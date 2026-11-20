@@ -77,10 +77,16 @@
       // changing the database contract (property_offers.total_price).
       if (target === rentalFields) {
         const periodLabel = rentalFields.querySelector('[name="rental_period"]')?.closest("label");
-        if (periodLabel) target.insertBefore(priceFields, periodLabel.nextSibling);
-        else target.prepend(priceFields);
+        if (periodLabel) periodLabel.insertAdjacentElement("afterend", priceFields);
+        else {
+          const legend = target.querySelector("legend");
+          if (legend) legend.insertAdjacentElement("afterend", priceFields);
+          else target.appendChild(priceFields);
+        }
       } else {
-        target.prepend(priceFields);
+        const legend = target.querySelector("legend");
+        if (legend) legend.insertAdjacentElement("afterend", priceFields);
+        else target.appendChild(priceFields);
       }
       priceFields.hidden = false;
       if (pricePrompt) pricePrompt.hidden = true;
