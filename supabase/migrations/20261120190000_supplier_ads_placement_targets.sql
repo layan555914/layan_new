@@ -5,14 +5,14 @@
 ALTER TABLE public.supplier_ads
   ADD COLUMN IF NOT EXISTS placement_keys text[]
   NOT NULL
-  DEFAULT ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[];
+  DEFAULT ARRAY['home', 'offers', 'marketplace', 'featured']::text[];
 
 ALTER TABLE public.supplier_ads
   ALTER COLUMN placement_keys
-  SET DEFAULT ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[];
+  SET DEFAULT ARRAY['home', 'offers', 'marketplace', 'featured']::text[];
 
 UPDATE public.supplier_ads
-   SET placement_keys = ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[]
+   SET placement_keys = ARRAY['home', 'offers', 'marketplace', 'featured']::text[]
  WHERE placement_keys IS NULL;
 
 ALTER TABLE public.supplier_ads
@@ -25,7 +25,7 @@ ALTER TABLE public.supplier_ads
   ADD CONSTRAINT supplier_ads_placement_keys_check
   CHECK (
     cardinality(placement_keys) BETWEEN 1 AND 5
-    AND placement_keys <@ ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[]
+    AND placement_keys <@ ARRAY['home', 'offers', 'marketplace', 'featured']::text[]
   );
 
 -- Placement settings are public display metadata, but only administrators may
@@ -42,7 +42,7 @@ DECLARE
 BEGIN
   IF TG_OP = 'INSERT' THEN
     IF NOT v_is_admin THEN
-      NEW.placement_keys := ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[];
+      NEW.placement_keys := ARRAY['home', 'offers', 'marketplace', 'featured']::text[];
     END IF;
   ELSIF NEW.placement_keys IS DISTINCT FROM OLD.placement_keys AND NOT v_is_admin THEN
     RAISE EXCEPTION 'لا يمكن تغيير أماكن ظهور الإعلان إلا من خلال إدارة أسيوط عقار'
