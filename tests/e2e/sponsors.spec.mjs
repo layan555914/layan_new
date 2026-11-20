@@ -118,3 +118,29 @@ test("admin adds, hides and deletes sponsors and publishes a sponsored ad", asyn
   await expect.poll(() => state.rpc.find(r => r.name === "layan_activate_supplier_ad")?.body.p_days).toBe(15);
   expect(state.ads.at(-1)).toMatchObject({ business_name: "مصنع النيل", status: "active", owner_id: USER_ID });
 });
+
+
+test("featured commercial ads only include ads assigned to the featured page", async ({ page }) => {
+  const state = await mock(page);
+  state.ads[0].placement_keys = ["home", "marketplace"];
+  state.ads.push({
+    id: "featured-only",
+    owner_id: USER_ID,
+    business_name: "شركة الظهور المميز",
+    category: "مواد البناء والتشطيب",
+    title: "إعلان مخصص لصفحة الإعلانات المميزة",
+    description: "إعلان اختبار لموضع الصفحة المميزة.",
+    image_url: null,
+    target_url: null,
+    contact_phone: "01022223333",
+    placement_keys: ["featured"],
+    status: "active",
+    price: 0,
+    created_at: "2026-11-10T10:00:00Z"
+  });
+
+  await page.goto("/featured.html");
+  const grid = page.locator("#featuredSponsorsGrid");
+  await expect(grid).toContainText("إعلان مخصص لصفحة الإعلانات المميزة");
+  await expect(grid).not.toContainText("معرض سيراميك asuit");
+});
