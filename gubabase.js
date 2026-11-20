@@ -528,7 +528,7 @@
     // Minimal public fields only: never fetch contact details, photos, owner IDs or financial breakdowns for the price guide.
     const fields = [
       "listing_purpose","city","area","property_type","total_price",
-      "price_on_request","area_m2","status","title","description"
+      "price_on_request","area_m2","rental_period","status","title","description"
     ].join(",");
     const pageSize = 500;
     const allRows = [];

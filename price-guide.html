@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/build/home.min.css?v=324ba89cabdce679">
   <link rel="stylesheet" href="./assets/theme/mobile-app.css?v=20261111-1">
-  <link rel="stylesheet" href="./price-guide.css?v=20261117-1">
+  <link rel="stylesheet" href="./price-guide.css?v=20261120-rental-periods-1">
   <title>دليل أسعار أسيوط | أسيوط عقار</title>
   <link rel="icon" href="./assets/brand/favicon-32.png?v=20261105-2" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="./assets/brand/apple-touch-icon.png?v=20261105-2">
@@ -90,6 +90,11 @@
             <option value="">كل أنواع العقارات</option>
           </select>
         </label>
+        <label id="priceGuideRentalPeriodField" hidden>دورية الإيجار
+          <select id="priceGuideRentalPeriod">
+            <option value="">كل دوريات الإيجار</option>
+          </select>
+        </label>
         <button type="button" class="price-guide-reset" id="priceGuideReset">إعادة ضبط الفلاتر</button>
       </div>
 
@@ -104,7 +109,8 @@
       <h2 id="priceGuideDisclaimerTitle">كيف تقرأ هذا الدليل؟</h2>
       <ul>
         <li>المؤشر محسوب من القيمة المعلنة مقسومة على المساحة المكتملة في الإعلان.</li>
-        <li>في الإيجار، الوحدة هي جنيه للمتر المربع شهريًا. وفي البيع والتنازل، هي جنيه للمتر المربع من القيمة المعلنة.</li>
+        <li>في الإيجار نفصل اليومي عن الشهري والسنوي؛ وتظهر قيمة المتر بحسب دورية الإيجار المكتوبة في الإعلان. لا نقارن الدوريات المختلفة ببعضها.</li>
+        <li>في البيع نحسب سعر البيع الإجمالي للمتر، وفي التنازل نحسب القيمة الإجمالية المعلنة للتنازل للمتر، وليس رسوم التنازل وحدها.</li>
         <li>نستخدم وسيط الأسعار (القيمة الوسطى) مع الحد الأدنى والأعلى، لتقليل تأثير الأسعار الشاذة.</li>
         <li>الإعلانات التي لا تحتوي على سعر معلن أو مساحة صالحة لا تدخل في الحساب، ولا نعرض مؤشرًا عند نقص عدد العينات.</li>
       </ul>
@@ -128,8 +134,8 @@
   </footer>
 
   <script src="./config.js?v=20261105-7"></script>
-  <script src="./gubabase.js?v=20261117-price-guide-read-1"></script>
-  <script src="./price-guide.js?v=20261117-1" defer></script>
+  <script src="./gubabase.js?v=20261120-price-guide-rental-periods-1"></script>
+  <script src="./price-guide.js?v=20261120-rental-periods-1" defer></script>
   <script src="./pwa.js?v=20261111-1" defer></script>
   <script src="./site-nav.js?v=20261117-persistent-auth-session-1" defer></script>
   <script src="./app-shell.js?v=20261117-persistent-auth-session-1" defer></script>

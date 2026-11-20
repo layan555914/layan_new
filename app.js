@@ -78,6 +78,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     if (params.get("kind")) activeKind = params.get("kind");
     if (params.get("deal")) activeDealKind = params.get("deal");
+    const rentalPeriod = params.get("rental_period") || "";
+    activeRentalPeriodFilter = ["يومي", "شهري", "سنوي"].includes(rentalPeriod) ? rentalPeriod : "";
     if (!params.has("purpose") && (params.has("down") || params.has("monthly")) && $("purposeFilter")) {
       $("purposeFilter").value = "تنازل";
     }
@@ -628,6 +630,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let offersPage = 1;
   const FAVORITES_KEY = "asyutAqarFavoriteOffers";
   let activeDealKind = "";
+  let activeRentalPeriodFilter = "";
   let selectedAccountType = "individual";
   let selectedPromotionDuration = 15;
   const LAYAN_PHONE = "201007044265";
@@ -842,6 +845,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Advertiser page (advertiser.html?id=<owner>&name=<advertiser name>) shows one advertiser's listings only:
     // same account AND same advertiser name, so one account posting for several companies gets a page per company.
     const pageParams = new URLSearchParams(window.location.search);
+    const rentalPeriodFilter = normalizeSearch(activeRentalPeriodFilter);
     const ownerFilter = String(pageParams.get("id") || "").trim();
     const brandFilter = window.LAYAN_BRAND_KEY(pageParams.get("name") || "");
     const onAdvertiserPage = document.body.classList.contains("page-advertiser");
@@ -861,6 +865,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         (!purpose || normalizeSearch(o.listing_purpose) === purpose) &&
         (!city || normalizeSearch(o.city) === city) &&
         (!area || normalizeSearch(o.area) === area) &&
+        (!rentalPeriodFilter || (normalizeSearch(o.listing_purpose) === "ايجار" && normalizeSearch(o.rental_period) === rentalPeriodFilter)) &&
         (totalPriceMax === null || (!o.price_on_request && num(o.total_price) <= totalPriceMax)) &&
         (purpose === "تنازل" ? (downPaymentMax === null || num(o.down_payment) <= downPaymentMax) : true) &&
         (purpose === "تنازل" ? (monthlyMax === null || (num(o.monthly_installment) > 0 && num(o.monthly_installment) <= monthlyMax)) : true) &&
@@ -895,7 +900,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const resultsSummary = $("resultsSummary");
     if (resultsSummary) {
-      const activeFilters = Boolean(search || companyQuery || type || purpose || city || area || totalPriceMaxRaw.trim() || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || minBedroomsRaw.trim() || activeKind || activeDealKind);
+      const activeFilters = Boolean(search || companyQuery || type || purpose || city || area || rentalPeriodFilter || totalPriceMaxRaw.trim() || downPaymentMaxRaw.trim() || monthlyMaxRaw.trim() || minBedroomsRaw.trim() || activeKind || activeDealKind);
       resultsSummary.replaceChildren();
       const count = document.createElement("strong");
       count.textContent = String(filtered.length);
@@ -1452,6 +1457,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = "＋ فلاتر إضافية"; }
     activeKind = "";
     activeDealKind = "";
+    activeRentalPeriodFilter = "";
+    const currentUrl = new URL(window.location.href);
+    ["q", "purpose", "type", "city", "area", "rental_period", "max", "down", "monthly", "beds", "sort", "kind", "deal"]
+      .forEach(key => currentUrl.searchParams.delete(key));
+    window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search + currentUrl.hash);
     syncPurposeFilterControls();
     document.querySelectorAll("[data-category-kind]").forEach(tile => {
       tile.classList.remove("active");
