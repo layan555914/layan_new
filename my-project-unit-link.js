@@ -1,7 +1,8 @@
-document.addEventListener("DOMContentLoaded", async () => {
+async function mountMyProjectUnitLink(options = {}) {
   "use strict";
-  const root = document.getElementById("myProjectUnitLinkFormRoot");
-  const requestsRoot = document.getElementById("myProjectUnitLinkRequests");
+  const profileEntityId = String(options.entityId || "");
+  const root = options.root || document.getElementById("myProjectUnitLinkFormRoot");
+  const requestsRoot = options.requestsRoot || document.getElementById("myProjectUnitLinkRequests");
   const config = window.LAYAN_CONFIG || {};
   const base = String(config.SUPABASE_URL || "").replace(/\/$/, "");
   const auth = window.LAYAN_SUPABASE;
@@ -17,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     rejected:"لم تتم الموافقة",
     approved:"تم اعتماد الربط"
   };
+  let profileProjectIds = null;
 
   function el(tag, text, className) {
     const node = document.createElement(tag);
@@ -47,7 +49,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderRequests(rows) {
     requestsRoot.replaceChildren();
-    if (!Array.isArray(rows) || !rows.length) {
+    const allRows = Array.isArray(rows) ? rows : [];
+    const visibleRows = profileProjectIds ? allRows.filter(row => profileProjectIds.has(String(row.project_id))) : allRows;
+    if (!visibleRows.length) {
       requestsRoot.append(el("p","لا توجد طلبات ربط وحدات لهذا الحساب حتى الآن.","my-project-unit-muted"));
       return;
     }
@@ -77,7 +81,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     empty.disabled=true;
     empty.selected=true;
     select.append(empty);
-    rows.forEach(row=>{
+    visibleRows.forEach(row=>{
       const option=el("option",labelOf(row));
       option.value=valueOf(row);
       select.append(option);
@@ -93,6 +97,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const owner=session?.user?.id;
     if (!owner) throw new Error("سجّل الدخول أولًا لربط إعلانك بوحدة.");
 
+    if (profileEntityId) {
+      const relations = await query("directory_project_entities", {
+        select:"project_id", entity_id:"eq."+profileEntityId
+      });
+      profileProjectIds = new Set((Array.isArray(relations) ? relations : []).map(row => String(row.project_id)).filter(Boolean));
+      if (!profileProjectIds.size) {
+        renderRequests([]);
+        root.replaceChildren(el("p","لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن. تُتاح عملية ربط الإعلان بعد اعتماد علاقة الشركة بالمشروع ونشر وحداته.","my-project-unit-muted"));
+        return;
+      }
+    }
+
     const [offers,units,requests]=await Promise.all([
       query("property_offers",{
         select:"id,title,listing_purpose,status",
@@ -104,6 +120,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         select:"id,project_id,unit_ref,unit_type,area_m2",
         public_visible:"eq.true",
         verification_status:"eq.published",
+        ...(profileProjectIds ? { project_id:"in.("+[...profileProjectIds].join(",")+")" } : {}),
         order:"unit_ref.asc"
       }),
       rpc("property_offer_project_unit_requests_mine")
@@ -194,5 +211,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }catch(error){
     root.replaceChildren(el("p",error.message||"تعذر تحميل الوحدات المنشورة.","my-project-unit-muted"));
     requestsRoot.replaceChildren(el("p","تعذر تحميل طلبات ربط الوحدات.","my-project-unit-muted"));
+  }
+}
+
+window.AsyutMyProjectUnitLink = { mount: mountMyProjectUnitLink };
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("myProjectUnitLinkFormRoot")) {
+    mountMyProjectUnitLink().catch(error => console.warn("Project unit offer link:", error));
   }
 });
