@@ -36,6 +36,13 @@ BEGIN
 END
 \$baseline\$;
 
+ALTER TABLE public.directory_entities
+  ADD COLUMN IF NOT EXISTS entity_type text,
+  ADD COLUMN IF NOT EXISTS service_category text;
+UPDATE public.directory_entities
+SET entity_type = 'developer', service_category = 'real_estate_development'
+WHERE id = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeee01';
+
 CREATE TABLE IF NOT EXISTS public.directory_areas (
   id uuid PRIMARY KEY,
   name_ar text NOT NULL,
@@ -112,6 +119,8 @@ SQL
 
 echo "Applying the private company-project request migration to the isolated database..."
 psql -X -v ON_ERROR_STOP=1 -f "$MIGRATION"
+echo "Applying the server-enforced company/project role contract migration..."
+psql -X -v ON_ERROR_STOP=1 -f "$ROLE_MIGRATION"
 
 echo "Checking private storage, row security, function modes and grants..."
 psql -X -v ON_ERROR_STOP=1 <<'SQL'
@@ -207,7 +216,7 @@ SELECT set_config('request.jwt.claim.sub','$MANAGER_ID',true);
 SELECT public.company_project_request_submit(
   '$ENTITY_ID','new_project',NULL,
   '{"name_ar":"مشروع من مدير مفوض","project_type":"commercial","project_status":"planned"}'::jsonb,
-  'marketing_agent',NULL,'تفويض الشركة بتسويق المشروع'
+  'developer',NULL,'تفويض الشركة بإضافة المشروع بصفتها المطور'
 );
 COMMIT;
 SQL
@@ -253,7 +262,7 @@ SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
 SELECT public.company_project_request_submit(
   '$ENTITY_ID','link_project','$EXISTING_PROJECT_ID',NULL,
-  'marketing_agent','https://example.invalid/company-project-link',NULL
+  'developer','https://example.invalid/company-project-link',NULL
 );
 SELECT public.company_project_request_submit(
   '$ENTITY_ID','new_project',NULL,
@@ -285,7 +294,7 @@ DO \$final_check\$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM public.directory_project_entities
-    WHERE project_id='$EXISTING_PROJECT_ID' AND entity_id='$ENTITY_ID' AND relation_type='marketing_agent'
+    WHERE project_id='$EXISTING_PROJECT_ID' AND entity_id='$ENTITY_ID' AND relation_type='developer'
   ) THEN RAISE EXCEPTION 'Approved existing-project link was not created'; END IF;
 
   IF NOT EXISTS (
