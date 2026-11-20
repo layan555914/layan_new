@@ -38,7 +38,7 @@
   <meta name="twitter:image" content="https://www.asyutq.com/assets/brand/og-image.jpg?v=20261108-asyutq">
   <link rel="stylesheet" href="./assets/theme/sponsors-premium.css?v=20261110-3">
   <link rel="stylesheet" href="./assets/theme/mobile-app.css?v=20261111-1">
-  <link rel="stylesheet" href="./assets/theme/transaction-separation.css?v=20261117-1">
+  <link rel="stylesheet" href="./assets/theme/transaction-separation.css?v=20261120-separate-transaction-prices-1">
   <script>window.ASYUT_PRESET_FILTERS = {"city":"أبنوب"};</script>
 </head>
 <body class="page-offers">
@@ -437,16 +437,20 @@
         <input name="bathrooms" type="number" min="0" max="20" step="1" inputmode="numeric">
       </label>
 
-      <label data-price-field>
-        <span data-price-label>إجمالي السعر</span>
-        <input name="total_price" type="number" min="0" required>
-      </label>
-
-      <label class="consent-line price-request-choice">
-        <input name="price_on_request" type="checkbox" value="true">
-        <span data-price-request-label>أفضل عرض السعر عند التواصل بدلًا من كتابة مبلغ.</span>
-      </label>
-      <small>عند اختيار هذا الخيار سيظهر للزوار «السعر عند التواصل» بدلًا من عرض صفر جنيه.</small>
+      <div id="transactionPricePlaceholder" class="transaction-price-placeholder">
+        <p id="transactionPricePrompt">اختار نوع المعاملة أولًا عشان يظهر حقل السعر المناسب لها.</p>
+        <div id="transactionPriceFields" class="transaction-price-fields" hidden>
+          <label data-price-field>
+            <span data-price-label>السعر المعلن (جنيه)</span>
+            <input name="total_price" type="number" min="0" step="0.01" inputmode="decimal" required>
+          </label>
+          <label class="consent-line price-request-choice">
+            <input name="price_on_request" type="checkbox" value="true">
+            <span data-price-request-label>أفضل عرض السعر عند التواصل بدلًا من كتابة مبلغ.</span>
+          </label>
+          <small>عند اختيار هذا الخيار سيظهر للزوار «السعر عند التواصل» بدلًا من عرض صفر جنيه.</small>
+        </div>
+      </div>
 
       <fieldset id="assignmentFields" class="transaction-fields" hidden>
         <legend>تفاصيل التنازل</legend>
@@ -455,9 +459,14 @@
         <label>إجمالي المدفوع حتى الآن (شامل المقدم)<input name="paid_amount" type="number" min="0"><small>إجمالي ما سدده المالك الحالي للمطور أو الجهة المالكة حتى الآن، ويشمل المقدم أعلاه.</small></label>
 
         <label>
-          المبلغ المتبقي
-          <input name="remaining_installments" type="number" min="0" step="0.01" inputmode="decimal">
-          <small>راجع أن مجموع المدفوع والمتبقي لا يتجاوز القيمة الإجمالية المعلنة للتنازل.</small>
+          المبلغ المتبقي (جنيه)
+          <input name="remaining_amount" type="number" min="0" step="0.01" inputmode="decimal">
+          <small>إجمالي القيمة المتبقية بعد حساب ما تم سداده.</small>
+        </label>
+
+        <label>
+          عدد الأقساط المتبقية
+          <input name="remaining_installments" type="number" min="0" step="1" inputmode="numeric" placeholder="اختياري">
         </label>
 
         <label>
@@ -467,7 +476,7 @@
 
         <label>
           رسوم التنازل
-          <input name="transfer_fee" type="number" min="0">
+          <input name="assignment_fee" type="number" min="0" step="0.01">
         </label>
       </fieldset>
 
@@ -571,8 +580,8 @@
   </dialog>
 
   <script src="config.js?v=20261105-7"></script>
-  <script src="gubabase.js?v=20261119-transaction-fields-home-1"></script>
-  <script src="app.js?v=20261120-rental-period-deep-link-1"></script>
+  <script src="gubabase.js?v=20261120-separate-transaction-prices-1"></script>
+  <script src="app.js?v=20261120-separate-transaction-prices-1"></script>
   <script src="map.js?v=20261105-7"></script>
   <script src="buyer.js?v=20261119-house-pref-1"></script>
   <script src="./sponsored-ads.js?v=20261119-phone-split-1"></script>
@@ -584,7 +593,7 @@
   <script src="./assistant.js?v=20261108-2" defer></script>
   <script src="./mascot.js?v=20261110-1" defer></script>
   <script src="./camera.js?v=20261108-1" defer></script>
-  <script src="./listing-form.js?v=20261119-transaction-fields-house-1" defer></script>
+  <script src="./listing-form.js?v=20261120-separate-transaction-prices-1" defer></script>
   <script src="./tracking.js?v=20261108-3" defer></script>
   <script src="./app-shell.js?v=20261117-persistent-auth-session-1" defer></script>
 <script src="./site-nav.js?v=20261117-persistent-auth-session-1" defer></script>
