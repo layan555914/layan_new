@@ -221,6 +221,121 @@ SELECT public.company_project_request_submit(
 COMMIT;
 SQL
 
+echo "Rejecting a forged marketing relation on a developer company's new-project request..."
+set +e
+psql -X -v ON_ERROR_STOP=1 >/tmp/company-project-developer-role-denied.log 2>&1 <<SQL
+BEGIN;
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
+SELECT public.company_project_request_submit(
+  '$ENTITY_ID','new_project',NULL,
+  '{"name_ar":"طلب بصفة تسويق غير صحيحة","project_type":"residential"}'::jsonb,
+  'marketing_agent','https://example.invalid/evidence',NULL
+);
+COMMIT;
+SQL
+developer_role_status=$?
+set -e
+if [[ "$developer_role_status" -eq 0 ]] || ! grep -q 'المطور أو مالك الأرض' /tmp/company-project-developer-role-denied.log; then
+  cat /tmp/company-project-developer-role-denied.log >&2
+  echo "FAIL: a developer company could submit a new project with a marketing relation." >&2
+  exit 1
+fi
+
+echo "Testing the marketing-company contract: linking is allowed, creating projects is denied..."
+psql -X -v ON_ERROR_STOP=1 <<SQL
+UPDATE public.directory_entities
+SET entity_type='marketing',service_category='real_estate_marketing'
+WHERE id='$ENTITY_ID';
+SQL
+
+set +e
+psql -X -v ON_ERROR_STOP=1 >/tmp/company-project-marketing-create-denied.log 2>&1 <<SQL
+BEGIN;
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','$MANAGER_ID',true);
+SELECT public.company_project_request_submit(
+  '$ENTITY_ID','new_project',NULL,
+  '{"name_ar":"طلب مشروع جديد من شركة تسويق","project_type":"residential"}'::jsonb,
+  'marketing_agent',NULL,'تفويض الشركة بتسويق المشروع'
+);
+COMMIT;
+SQL
+marketing_create_status=$?
+set -e
+if [[ "$marketing_create_status" -eq 0 ]] || ! grep -q 'لا يمكنه إنشاء مشروع جديد' /tmp/company-project-marketing-create-denied.log; then
+  cat /tmp/company-project-marketing-create-denied.log >&2
+  echo "FAIL: a marketing company was allowed to create a new project." >&2
+  exit 1
+fi
+
+set +e
+psql -X -v ON_ERROR_STOP=1 >/tmp/company-project-marketing-wrong-relation.log 2>&1 <<SQL
+BEGIN;
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','$MANAGER_ID',true);
+SELECT public.company_project_request_submit(
+  '$ENTITY_ID','link_project','$EXISTING_PROJECT_ID',NULL,
+  'developer','https://example.invalid/evidence',NULL
+);
+COMMIT;
+SQL
+marketing_relation_status=$?
+set -e
+if [[ "$marketing_relation_status" -eq 0 ]] || ! grep -q 'وكيل تسويق أو وكيل مبيعات' /tmp/company-project-marketing-wrong-relation.log; then
+  cat /tmp/company-project-marketing-wrong-relation.log >&2
+  echo "FAIL: a marketing company was allowed to claim a developer/land-owner relationship." >&2
+  exit 1
+fi
+
+psql -X -v ON_ERROR_STOP=1 <<SQL
+BEGIN;
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','$MANAGER_ID',true);
+SELECT public.company_project_request_submit(
+  '$ENTITY_ID','link_project','$EXISTING_PROJECT_ID',NULL,
+  'marketing_agent','https://example.invalid/marketing-project-link',NULL
+);
+COMMIT;
+
+BEGIN;
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','$ADMIN_ID',true);
+DO \$marketing_link_review\$
+DECLARE v_request uuid;
+BEGIN
+  SELECT request_id INTO v_request
+  FROM public.company_project_request_admin_list()
+  WHERE request_type='link_project'
+    AND requested_relation_type='marketing_agent'
+    AND status='pending';
+  IF v_request IS NULL THEN RAISE EXCEPTION 'Marketing project link request was not found'; END IF;
+  PERFORM public.company_project_request_admin_review(v_request,'approve',NULL);
+END
+\$marketing_link_review\$;
+COMMIT;
+
+UPDATE public.directory_entities
+SET entity_type='developer',service_category='real_estate_development'
+WHERE id='$ENTITY_ID';
+SQL
+
+echo "Verifying that the marketing relationship was recorded with the correct role..."
+psql -X -v ON_ERROR_STOP=1 <<SQL
+DO \$marketing_link_check\$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM public.directory_project_entities
+    WHERE project_id='$EXISTING_PROJECT_ID'
+      AND entity_id='$ENTITY_ID'
+      AND relation_type='marketing_agent'
+  ) THEN
+    RAISE EXCEPTION 'Approved marketing relationship was not recorded';
+  END IF;
+END
+\$marketing_link_check\$;
+SQL
+
 echo "Approving the first request: it must create an internal project, not publish it."
 psql -X -v ON_ERROR_STOP=1 <<SQL
 BEGIN;
