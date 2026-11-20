@@ -19,7 +19,7 @@ async function mockBackend(page, { admin = false } = {}) {
   const state = { rpc: [], uploads: 0 };
   const user = { id: USER_ID, email: "owner-edit@example.invalid", email_confirmed_at: "2026-11-01T00:00:00Z", app_metadata: {}, user_metadata: {} };
   const offers = [
-    { id: 501, title: "كمبوند أصايلة فيوز", property_type: "شقة", listing_purpose: "بيع", city: "أسيوط الجديدة", area: "", total_price: 1, contact_phone: "01000000000", description: "وصف قديم", image_urls: [IMG("a"), IMG("b")], status: "available", created_at: "2026-11-01T00:00:00Z" },
+    { id: 501, title: "كمبوند أصايلة فيوز", property_type: "شقة", listing_purpose: "بيع", city: "أسيوط الجديدة", area: "", total_price: 1, price_on_request: false, contact_phone: "01000000000", description: "وصف قديم", image_urls: [IMG("a"), IMG("b")], status: "available", created_at: "2026-11-01T00:00:00Z" },
     { id: 502, title: "شقة لسه في المراجعة", property_type: "شقة", listing_purpose: "إيجار", city: "مدينة أسيوط", total_price: 3000, contact_phone: "01000000001", image_urls: [], status: "pending", created_at: "2026-11-02T00:00:00Z" }
   ];
   const services = [{ id: "11111111-2222-4333-8444-555555555555", category: "تشطيبات", listing_type: "خدمة", title: "تشطيب شقق", description: "وصف", city: "أسيوط", price: null, contact_phone: "0111", status: "approved", image_urls: [], details: {}, created_at: "2026-11-01T00:00:00Z" }];
@@ -66,6 +66,8 @@ test("owner edits a published listing: all data, new photo and cover photo go to
   await expect(dialog).toBeVisible();
   await expect(dialog).toContainText("هتفضل ظاهرة");
   await dialog.locator("[name='total_price']").fill("4500000");
+  await expect(dialog.locator("[name='price_on_request']")).not.toBeChecked();
+  await dialog.locator("[name='price_on_request']").check();
   await dialog.locator("[name='description']").fill("وصف جديد للفيلات");
   await dialog.locator("[data-cover='1']").click();
   await expect(dialog.locator("figure.is-cover img")).toHaveAttribute("src", IMG("b"));
@@ -77,6 +79,7 @@ test("owner edits a published listing: all data, new photo and cover photo go to
   const call = state.rpc.find(c => c.name === "layan_owner_update_offer");
   expect(call.body.p_id).toBe(501);
   expect(call.body.p_changes.total_price).toBe(4500000);
+  expect(call.body.p_changes.price_on_request).toBe(true);
   expect(call.body.p_changes.description).toBe("وصف جديد للفيلات");
   expect(call.body.p_changes.image_urls).toHaveLength(3);
   expect(call.body.p_changes.image_urls[0]).toBe(IMG("b"));
