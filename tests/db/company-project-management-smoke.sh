@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 MIGRATION="$ROOT_DIR/supabase/migrations/20261118000200_company_project_management_requests.sql"
-ROLE_MIGRATION="$ROOT_DIR/supabase/migrations/20261120180000_enforce_company_project_request_role_contract.sql"
+ROLE_MIGRATION="$ROOT_DIR/supabase/migrations/20261120164454_enforce_company_project_request_role_contract.sql"
 
 : "${PGHOST:=127.0.0.1}"
 : "${PGPORT:=5432}"
