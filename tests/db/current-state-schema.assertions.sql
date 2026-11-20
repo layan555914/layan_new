@@ -56,7 +56,7 @@ BEGIN
     INTO v_definer, v_has_lock
     FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
    WHERE n.nspname='private' AND p.proname='company_claim_admin_review'
-     AND pg_get_function_identity_arguments(p.oid)='p_id uuid, p_action text, p_note text';
+     AND pg_get_function_identity_arguments(p.oid)='p_id uuid, p_action text, p_note text, p_verification_method text, p_verification_note text';
   IF v_definer IS DISTINCT FROM true OR v_has_lock IS DISTINCT FROM true THEN
     RAISE EXCEPTION 'Private company claim review must be SECURITY DEFINER with an empty search_path';
   END IF;
@@ -78,9 +78,9 @@ BEGIN
   END IF;
 
   IF has_function_privilege('anon','public.company_claim_admin_list()','EXECUTE')
-     OR has_function_privilege('anon','public.company_claim_admin_review(uuid,text,text)','EXECUTE')
+     OR has_function_privilege('anon','public.company_claim_admin_review(uuid,text,text,text,text)','EXECUTE')
      OR NOT has_function_privilege('authenticated','public.company_claim_admin_list()','EXECUTE')
-     OR NOT has_function_privilege('authenticated','public.company_claim_admin_review(uuid,text,text)','EXECUTE') THEN
+     OR NOT has_function_privilege('authenticated','public.company_claim_admin_review(uuid,text,text,text,text)','EXECUTE') THEN
     RAISE EXCEPTION 'Company claim admin RPC EXECUTE grants are incorrect';
   END IF;
 
