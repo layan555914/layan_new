@@ -73,3 +73,5 @@ AS
      AND (ends_at IS NULL OR ends_at > now());
 
 GRANT SELECT (placement_keys) ON public.supplier_ads TO anon, authenticated;
+
+NOTIFY pgrst, 'reload schema';
