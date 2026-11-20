@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "land_permit_details","land_utilities","land_zoning","city","area","area_m2",
     "bedrooms","bathrooms","monthly_installment","property_type","rental_period","rental_furnishing",
     "rental_security_deposit","rental_minimum_months","description",
-    "total_price","price_on_request","down_payment","paid_amount","remaining_amount","assignment_fee",
+    "total_price","price_on_request","down_payment","paid_amount","remaining_amount","remaining_installments","assignment_fee",
     "assignment_fee_percentage","discount_amount","discount_percent","developer_name",
     "project_name","image_urls","is_featured","featured_until","contact_phone",
     "latitude","longitude","created_at","updated_at"
@@ -160,6 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("المقدم عند التعاقد", isAssignment && Number(row.down_payment) > 0 ? money(row.down_payment) : ""),
       makeFact("إجمالي المدفوع (شامل المقدم)", isAssignment && Number(row.paid_amount) > 0 ? money(row.paid_amount) : ""),
       makeFact("المبلغ المتبقي", isAssignment && Number(row.remaining_amount) > 0 ? money(row.remaining_amount) : ""),
+      makeFact("عدد الأقساط المتبقية", isAssignment && Number(row.remaining_installments) > 0 ? row.remaining_installments : ""),
       makeFact("القسط الشهري", isAssignment && Number(row.monthly_installment) > 0 ? money(row.monthly_installment) : ""),
       makeFact("رسوم التنازل", isAssignment && Number(row.assignment_fee) > 0 ? money(row.assignment_fee) : ""),
       makeFact("قيمة الخصم", Number(row.discount_amount) > 0 ? money(row.discount_amount) : ""),
