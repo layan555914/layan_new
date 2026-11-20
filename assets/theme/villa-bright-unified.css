@@ -51,7 +51,8 @@ html {
   background: var(--aa-page);
   color-scheme: light;
 }
-html body {
+html body[class],
+html body:not([class]) {
   color: var(--aa-ink);
   background-color: var(--aa-page);
   background-image:
@@ -147,6 +148,7 @@ html body header.info-topbar .btn-gold {
 html body :is(
   .hero.design-hero,
   main > .page-hero[aria-labelledby="offersPageTitle"],
+  .page-hero:not(.design-hero),
   .companies-hero,
   main.marketplace-page > .hero,
   .directory-hero,
@@ -171,6 +173,7 @@ html body :is(
 html body :is(
   .hero.design-hero,
   main > .page-hero[aria-labelledby="offersPageTitle"],
+  .page-hero:not(.design-hero),
   .companies-hero,
   main.marketplace-page > .hero,
   .directory-hero,
@@ -317,7 +320,8 @@ html body :is(.mobile-nav, .aa-appnav) :is(a.is-current, a[aria-current="page"])
 
 /* Compact but readable on phones; respect reduced-motion settings. */
 @media (max-width: 760px) {
-  html body {
+  html body[class],
+  html body:not([class]) {
     background-attachment: scroll, scroll;
     font-size: 15px;
   }
