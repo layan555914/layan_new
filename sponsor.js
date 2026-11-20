@@ -170,10 +170,10 @@ document.addEventListener("DOMContentLoaded", () => {
     dialog.innerHTML =
       '<div class="sponsor-dialog-head"><h2>اطلب إعلانًا مميزًا أو إعلان شركة</h2><button type="button" class="sponsor-close" aria-label="إغلاق">×</button></div>' +
       '<p class="sponsor-price-note">إرسال طلب الإعلان مجاني ولا يعني وجود التزام بالدفع. تحدد إدارة أسيوط عقار المميزات والمدة والسعر النهائي بعد مراجعة النشاط والتواصل معك عبر واتساب. لا تُعرض أسعار الباقات على المنصة.</p>' +
-      '<p>الإعلانات تظهر داخل قائمة العروض العقارية بعد موافقة الإدارة. أرسل بيانات نشاطك للمراجعة.</p>' +
+      '<p>يُحدد موضع الإعلان بعد مراجعة النشاط؛ ويمكن أن يظهر بين نتائج العقارات أو في سوق الخدمات حسب التخصص أو ضمن مساحات الصفحة الرئيسية، بعد اعتماد الإدارة والاتفاق على التفاصيل.</p>' +
       '<form class="sponsor-form">' +
       '<label>اسم النشاط<input name="business_name" required minlength="2" maxlength="120" autocomplete="organization"></label>' +
-      '<label>مجال النشاط<select name="category" required><option value="">اختر المجال</option><option>مواد بناء</option><option>تشطيبات</option><option>سيراميك وبورسلين</option><option>دهانات</option><option>أبواب وشبابيك</option><option>مطابخ وأثاث</option><option>ستائر ومفروشات</option><option>أدوات صحية</option><option>كهرباء وسباكة</option><option>مقاولات</option><option>أخرى</option></select></label>' +
+      '<label>مجال النشاط<select name="category" required><option value="">اختر المجال</option><option>مواد بناء</option><option>تشطيبات</option><option>سيراميك وبورسلين</option><option>دهانات</option><option>أبواب وشبابيك</option><option>مطابخ وأثاث</option><option>ستائر ومفروشات</option><option>أدوات صحية</option><option>كهرباء وسباكة</option><option>مقاولات</option><option>مواد البناء والتشطيب</option><option>الأثاث والفرش وتجهيز الوحدات</option><option>الصيانة وإدارة العقارات</option><option>الاستشارات والخدمات العقارية</option><option>مكاتب التصميم الهندسي</option><option>مهندسو الديكور والتصميم الداخلي</option><option>السيراميك والبورسلين والأدوات الصحية</option><option>الإضاءة ووحدات الإنارة</option><option>الستائر والمفروشات</option><option>أخرى</option></select></label>' +
       '<label>عنوان الإعلان<input name="title" required minlength="3" maxlength="140"></label>' +
       '<label>وصف مختصر<textarea name="description" required minlength="5" maxlength="500" rows="3"></textarea></label>' +
       '<label>رابط صورة الإعلان (اختياري)<input name="image_url" type="url" maxlength="1000" placeholder="https://..."></label>' +
