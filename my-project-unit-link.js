@@ -55,7 +55,7 @@ async function mountMyProjectUnitLink(options = {}) {
       requestsRoot.append(el("p","لا توجد طلبات ربط وحدات لهذا الحساب حتى الآن.","my-project-unit-muted"));
       return;
     }
-    rows.forEach(row => {
+    visibleRows.forEach(row => {
       const card = el("article",undefined,"my-project-unit-request");
       const head = el("div",undefined,"my-project-unit-request-head");
       head.append(el("strong",row.offer_title || ("إعلان رقم " + row.offer_id)));
@@ -81,7 +81,7 @@ async function mountMyProjectUnitLink(options = {}) {
     empty.disabled=true;
     empty.selected=true;
     select.append(empty);
-    visibleRows.forEach(row=>{
+    rows.forEach(row=>{
       const option=el("option",labelOf(row));
       option.value=valueOf(row);
       select.append(option);
