@@ -186,6 +186,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             <h2>وصف الإعلان</h2>
             <p class="property-description">${escapeHTML(row.description || "لا يوجد وصف إضافي من صاحب الإعلان.")}</p>
           </section>
+          <section class="property-section-card property-sponsored-section" id="propertySponsoredAds" aria-labelledby="propertySponsoredAdsTitle" hidden>
+            <div class="property-services-head"><h2 id="propertySponsoredAdsTitle">خدمات وإعلانات مميزة لهذا العقار</h2><span>مساحات إعلانية معتمدة</span></div>
+            <div class="property-sponsored-grid" id="propertySponsoredAdsGrid"></div>
+          </section>
           <section class="property-section-card property-services" aria-labelledby="propertyServicesTitle">
             <div class="property-services-head"><h2 id="propertyServicesTitle">خدمات تحتاجها لهذا العقار</h2><a href="./advertise.html">أعلن هنا</a></div>
             <div class="property-services-grid">
@@ -245,6 +249,38 @@ document.addEventListener("DOMContentLoaded", async () => {
         root.querySelectorAll("[data-property-image]").forEach(item => item.setAttribute("aria-pressed", item === button ? "true" : "false"));
       });
     });
+    loadPropertySponsoredAds();
+
+    async function loadPropertySponsoredAds() {
+      const section = root.querySelector("#propertySponsoredAds");
+      const grid = root.querySelector("#propertySponsoredAdsGrid");
+      if (!section || !grid || !base || !key) return;
+      try {
+        const response = await fetch(
+          base + "/rest/v1/public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at,placement_keys&order=created_at.desc&limit=30",
+          { headers: { apikey: key, Authorization: "Bearer " + key }, cache: "no-store" }
+        );
+        if (!response.ok) {
+          if (response.status === 400) return; // Placement migration is not active yet.
+          throw new Error("تعذر تحميل الإعلانات المناسبة.");
+        }
+        const rows = await response.json();
+        if (!Array.isArray(rows)) return;
+        const selected = rows.filter(ad =>
+          Array.isArray(ad.placement_keys) && ad.placement_keys.includes("property_details")
+        ).slice(0, 3);
+        if (!selected.length) return;
+        grid.innerHTML = selected.map(ad =>
+          window.AsyutSponsoredAd?.render
+            ? window.AsyutSponsoredAd.render(ad, { className: "property-sponsored-card" })
+            : ""
+        ).filter(Boolean).join("");
+        if (grid.children.length) section.hidden = false;
+      } catch (error) {
+        console.warn("ASYUT AQAR property sponsored ads:", error.message);
+      }
+    }
+
     root.querySelector("#sharePropertyBtn")?.addEventListener("click", share);
     root.querySelector("#mobileShareFallback")?.addEventListener("click", share);
 
