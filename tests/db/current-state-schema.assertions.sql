@@ -8,13 +8,16 @@ DECLARE
   v_count integer;
   v_old_admin_write_policies integer;
   v_owner_write_policies integer;
+  v_old_admin_storage_write_policies integer;
+  v_old_admin_write_functions integer;
+  v_owner_write_functions integer;
   v_definer boolean;
   v_invoker boolean;
   v_has_lock boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 45 THEN
-    RAISE EXCEPTION 'Expected 45 clean-install migrations (3 Nov 3 baseline files + all 42 current main migrations); found %', v_count;
+  IF v_count <> 46 THEN
+    RAISE EXCEPTION 'Expected 46 clean-install migrations (3 Nov 3 baseline files + 42 current main migrations + 1 owner-gate repair); found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
@@ -110,9 +113,29 @@ BEGIN
   WHERE schemaname='public' AND cmd <> 'SELECT'
     AND (coalesce(qual,'') || coalesce(with_check,'')) ~* 'layan_is_owner\(\)';
 
-  IF v_old_admin_write_policies <> 0 OR v_owner_write_policies = 0 THEN
-    RAISE EXCEPTION 'Owner-only admin write gate was not fully installed (old %, owner %)',
-      v_old_admin_write_policies, v_owner_write_policies;
+  SELECT count(*) INTO v_old_admin_storage_write_policies
+  FROM pg_policies
+  WHERE schemaname='storage' AND tablename='objects' AND cmd <> 'SELECT'
+    AND (coalesce(qual,'') || coalesce(with_check,'')) ~* '(^|[^a-z_])layan_is_admin\(\)';
+
+  SELECT count(*) INTO v_old_admin_write_functions
+  FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+  WHERE ((n.nspname='private' AND p.proname IN ('layan_activate_supplier_ad','layan_admin_review_property_offer'))
+      OR (n.nspname='public' AND p.proname IN ('layan_reject_supplier_ad','layan_approve_free_trial_ad')))
+    AND p.prosrc ILIKE '%private.layan_is_admin()%';
+
+  SELECT count(*) INTO v_owner_write_functions
+  FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+  WHERE ((n.nspname='private' AND p.proname IN ('layan_activate_supplier_ad','layan_admin_review_property_offer'))
+      OR (n.nspname='public' AND p.proname IN ('layan_reject_supplier_ad','layan_approve_free_trial_ad')))
+    AND p.prosrc ILIKE '%private.layan_is_owner()%';
+
+  IF v_old_admin_write_policies <> 0 OR v_owner_write_policies = 0
+     OR v_old_admin_storage_write_policies <> 0
+     OR v_old_admin_write_functions <> 0 OR v_owner_write_functions <> 4 THEN
+    RAISE EXCEPTION 'Owner-only ad management gate incomplete (public policies admin %, owner %; storage admin %; write RPCs admin %, owner %)',
+      v_old_admin_write_policies, v_owner_write_policies, v_old_admin_storage_write_policies,
+      v_old_admin_write_functions, v_owner_write_functions;
   END IF;
 
   IF NOT EXISTS (

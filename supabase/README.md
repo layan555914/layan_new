@@ -6,12 +6,13 @@ This branch tests whether a new empty local Supabase database can build the curr
 
 ## Migration chain
 
-The clean-install chain contains 45 active SQL migrations: (3 reviewed November 3 baseline files plus all 42 incremental SQL migrations currently present on main, dated November 4–19, 2026).
+The clean-install chain contains 46 active SQL migrations: (3 reviewed November 3 baseline files + 42 current main migrations + 1 follow-up owner-gate migration).
 
 1. 20261103140155_asyut_aqar_production_schema_baseline.sql — catalog-derived application schema snapshot captured on 2026-11-03.
 2. 20261103140655_seed_asyut_aqar_marketplace_categories.sql — 11 stable marketplace categories.
 3. 20261103141537_directory_admin_mutate_with_audit.sql — directory administration RPC.
 4. All 42 incremental SQL files currently present on main, including company-claim locking/reconciliation, company and project management, marketplace, rental, email-notification and weekly digest migrations.
+5. 20261120150000_enforce_owner_approval_on_admin_ad_writes.sql — restores owner-only database authorization for ad/sponsor writes and customer-image write policies introduced after the Nov 10 owner gate.
 
 The baseline is a squashed schema snapshot, not a recreation of the original 59 pre-November-3 migration bodies. Those old DDL changes are represented by the baseline snapshot. No empty no-op migration markers are added to this build chain.
 
@@ -51,5 +52,5 @@ The script creates an isolated temporary project, clears hosted Supabase access 
 - No hosted Supabase project ref, production password, API key or secret is configured in this branch.
 - The script uses explicit --local CLI operations and refuses non-loopback endpoints in its API test program.
 - It does not run supabase db push, migration repair, linked reset, or any production command.
-- The 45-migration chain is for clean-install reproducibility only. It does not rewrite or reconcile the production migration ledger.
+- The 46-migration chain is for clean-install reproducibility only. It does not rewrite or reconcile the production migration ledger.
 - No merge, production deployment, or live database change is part of this rehearsal.
