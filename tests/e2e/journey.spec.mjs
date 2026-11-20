@@ -294,4 +294,8 @@ test("a price-guide rental cadence link filters offers by the same period", asyn
   await expect(page.locator("#offersGrid .offer-card")).toHaveCount(1);
   await expect(page.locator("#offersGrid .offer-card").first()).toContainText("شقة للإيجار الشهري");
   await expect(page.locator("#offersGrid")).not.toContainText("شقة للإيجار السنوي");
+
+  await page.locator("#resetFiltersBtn").click();
+  await expect(page.locator("#offersGrid .offer-card")).toHaveCount(2);
+  expect(new URL(page.url()).searchParams.has("rental_period")).toBe(false);
 });
