@@ -269,3 +269,29 @@ test("customer can search, open, save, submit, track and admin-review a property
   await page.goto("/property.html?id=202");
   await expect(page.locator("#propertyDetailsRoot")).toContainText("إعلان اختبار رحلة المستخدم");
 });
+
+
+test("a price-guide rental cadence link filters offers by the same period", async ({ page }) => {
+  const { offers } = await installBackendMocks(page);
+  offers.splice(0, offers.length,
+    makeOffer({
+      id: "301",
+      title: "شقة للإيجار الشهري",
+      listing_purpose: "إيجار",
+      rental_period: "شهري",
+      total_price: 6000
+    }),
+    makeOffer({
+      id: "302",
+      title: "شقة للإيجار السنوي",
+      listing_purpose: "إيجار",
+      rental_period: "سنوي",
+      total_price: 60000
+    })
+  );
+
+  await page.goto("/offers.html?purpose=%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1&rental_period=%D8%B4%D9%87%D8%B1%D9%8A");
+  await expect(page.locator("#offersGrid .offer-card")).toHaveCount(1);
+  await expect(page.locator("#offersGrid .offer-card").first()).toContainText("شقة للإيجار الشهري");
+  await expect(page.locator("#offersGrid")).not.toContainText("شقة للإيجار السنوي");
+});
