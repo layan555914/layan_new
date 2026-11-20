@@ -9,7 +9,7 @@ async function mock(page) {
     { id: "s1", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
     { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
   ], ads: [
-    { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", placement_keys: ["home", "offers", "marketplace", "featured"], status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
+    { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", placement_keys: ["home", "offers", "marketplace", "featured"], placement_order: {}, status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
   ], rpc: [], patches: [], adPatches: [], posts: [] };
   const user = { id: USER_ID, email: "sponsor-admin@example.invalid", email_confirmed_at: "2026-11-01T00:00:00Z", app_metadata: {}, user_metadata: {} };
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
@@ -30,6 +30,7 @@ async function mock(page) {
       if (name === "layan_is_admin") return reply(route, true);
       if (name === "layan_admin_delete_sponsor") { state.sponsors = state.sponsors.filter(s => s.id !== body.p_id); return reply(route, "done"); }
       if (name === "layan_activate_supplier_ad") { const ad = state.ads.find(a => a.id === body.p_ad_id); if (ad) ad.status = "active"; return reply(route, { success: true }); }
+      if (name === "layan_reorder_supplier_ads") { body.p_ordered_ad_ids.forEach((id, index) => { const ad = state.ads.find(a => a.id === id); if (ad) ad.placement_order = { ...(ad.placement_order || {}), [body.p_placement_key]: index }; }); return reply(route, { success: true, updated_ads: body.p_ordered_ad_ids.length }); }
       return reply(route, null);
     }
     if (path === "/rest/v1/platform_sponsors") {
@@ -177,4 +178,40 @@ test("property detail page shows only ads explicitly assigned to the property-de
   await expect(section).toContainText("عرض تشطيب للوحدات الجديدة");
   await expect(section).toContainText("مركز تشطيب أسيوط");
   await expect(section).not.toContainText("معرض سيراميك asuit");
+});
+
+
+test("admin reorders active sponsored ads independently for each placement", async ({ page }) => {
+  const state = await mock(page);
+  state.ads.push({
+    id: "a2", owner_id: USER_ID, business_name: "معرض أحدث",
+    category: "أثاث", title: "إعلان أحدث", description: "إعلان اختبار للترتيب المستقل.",
+    image_url: null, target_url: null, contact_phone: "01022223333",
+    placement_keys: ["home", "marketplace"], placement_order: {},
+    status: "active", price: 0, created_at: "2026-11-10T10:00:00Z"
+  });
+
+  await page.goto("/admin.html");
+  await page.locator("#adminEmail").fill("sponsor-admin@example.invalid");
+  await page.locator("#adminLoginSubmit").click();
+  await expect(page.locator("#adminOtpCode")).toBeVisible();
+  await page.locator("#adminOtpCode").fill("123456");
+  await page.locator("#adminLoginSubmit").click();
+  await expect(page.locator("#adminConsole")).toBeVisible();
+  await page.locator("[data-view='sponsors']").click();
+
+  const orderList = page.locator("#adminSponsoredAdsOrderList");
+  await expect(orderList.locator("[data-order-ad-id]")).toHaveCount(2);
+  await expect(orderList.locator("[data-order-ad-id]").first()).toHaveAttribute("data-order-ad-id", "a2");
+
+  await orderList.locator("[data-order-ad-id='a1'] [data-ad-order='up']").click();
+  await expect.poll(() => state.rpc.find(rpc => rpc.name === "layan_reorder_supplier_ads")?.body.p_ordered_ad_ids)
+    .toEqual(["a1", "a2"]);
+  await expect(orderList.locator("[data-order-ad-id]").first()).toHaveAttribute("data-order-ad-id", "a1");
+
+  await page.locator("#adminSponsoredPlacementOrderFilter").selectOption("home");
+  await expect(orderList.locator("[data-order-ad-id]").first()).toHaveAttribute("data-order-ad-id", "a2");
+  expect(state.ads.find(ad => ad.id === "a1").placement_order).toMatchObject({ marketplace: 0 });
+  expect(state.ads.find(ad => ad.id === "a2").placement_order).toMatchObject({ marketplace: 1 });
+  expect(state.ads.find(ad => ad.id === "a1").placement_order).not.toHaveProperty("home");
 });
