@@ -82,6 +82,7 @@ async function mockCompanyClaimBackend(page, options = {}) {
 
     if (path === "/rest/v1/directory_entities") return reply(route, [entity]);
     if (path === "/rest/v1/directory_entity_sources") return reply(route, []);
+    if (path === "/rest/v1/company_entity_managers") return reply(route, options.verifiedManager ? [{ directory_entity_id: entity.id, owner_user_id: USER_ID, verified_at: "2026-11-17T10:00:00Z" }] : []);
 
     if (path === "/rest/v1/company_claim_requests") {
       if (method === "POST") {
@@ -243,4 +244,27 @@ test("admin can review and approve a pending company claim from the claim queue"
     p_verification_method: "official_phone",
     p_verification_note: "تم الاتصال بالرقم الرسمي والتأكد من صفة الممثل."
   });
+});
+
+
+test("marketing company claim and verified management stay inside the same company profile", async ({ page }) => {
+  await seedAuthenticatedSession(page);
+  const marketingEntity = {
+    ...ENTITY,
+    id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+    name_ar: "وكالة اختبار التسويق العقاري",
+    entity_type: "marketing",
+    service_category: "real_estate_marketing",
+    description: "ملف شركة تسويق عقاري تجريبي."
+  };
+  await mockCompanyClaimBackend(page, { entity: marketingEntity, verifiedManager: true });
+
+  await page.goto("/company.html?entity_id=" + marketingEntity.id);
+  await expect(page.locator("#companyProfileRoot h1")).toHaveText(marketingEntity.name_ar);
+  await expect(page.locator(".company-claim-panel")).toBeHidden();
+
+  const manager = page.locator("#companyProfileRoot .company-manager-panel");
+  await expect(manager).toBeVisible();
+  await expect(manager.locator("h2")).toHaveText("إدارة ملف الشركة");
+  await expect(manager).toContainText("المالك الأساسي المعتمد");
 });
