@@ -10,6 +10,7 @@ const ads = [
     image_url: null,
     target_url: "https://example.com/ceramics",
     contact_phone: "01012345678",
+    placement_keys: ["marketplace"],
     created_at: "2026-11-20T10:00:00Z"
   },
   {
@@ -21,6 +22,7 @@ const ads = [
     image_url: null,
     target_url: null,
     contact_phone: "01098765432",
+    placement_keys: ["marketplace", "featured"],
     created_at: "2026-11-19T10:00:00Z"
   },
   {
@@ -32,7 +34,20 @@ const ads = [
     image_url: null,
     target_url: null,
     contact_phone: "01011112222",
+    placement_keys: ["home", "offers", "featured"],
     created_at: "2026-11-18T10:00:00Z"
+  },
+  {
+    id: "home-only-ceramic-ad",
+    business_name: "مصنع البلاط",
+    category: "سيراميك وبورسلين",
+    title: "إعلان للصفحة الرئيسية فقط",
+    description: "إعلان غير مخصص لسوق الخدمات.",
+    image_url: null,
+    target_url: null,
+    contact_phone: "01033334444",
+    placement_keys: ["home", "featured"],
+    created_at: "2026-11-17T10:00:00Z"
   }
 ];
 
