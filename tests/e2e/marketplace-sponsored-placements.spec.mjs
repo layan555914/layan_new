@@ -90,5 +90,5 @@ test("a category without an active ad offers a clear route to request an ad", as
   const sponsoredSection = page.locator("#marketplaceFeaturedAds");
   await expect(sponsoredSection).toBeVisible();
   await expect(sponsoredSection).toContainText("لا توجد إعلانات مميزة في هذا القسم حاليًا");
-  await expect(sponsoredSection.locator("a[href='./advertise.html']")).toBeVisible();
+  await expect(sponsoredSection.locator("a[href^='https://wa.me/201007044265']")).toBeVisible();
 });
