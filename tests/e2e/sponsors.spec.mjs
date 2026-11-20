@@ -10,7 +10,7 @@ async function mock(page) {
     { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
   ], ads: [
     { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", placement_keys: ["home", "offers", "marketplace", "featured"], status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
-  ], rpc: [], patches: [], posts: [] };
+  ], rpc: [], patches: [], adPatches: [], posts: [] };
   const user = { id: USER_ID, email: "sponsor-admin@example.invalid", email_confirmed_at: "2026-11-01T00:00:00Z", app_metadata: {}, user_metadata: {} };
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
   await page.route(SUPABASE + "/**", async route => {
