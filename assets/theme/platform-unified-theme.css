@@ -471,3 +471,322 @@ html body :is(.cd-mark-approved, .cd-live-status--success, [data-state="success"
     border-bottom-color: var(--aa-line);
   }
 }
+
+
+/* ==========================================================================
+   ASYUT AQAR — sitewide visual unification + approved villa visual
+   2026-11-20
+   One palette, one hero photograph, and one image fallback across all sections.
+   Presentation only: no page structure, listings, logos, data or app behaviour
+   are changed by this layer.
+   ========================================================================== */
+
+:root {
+  --aa-page: #FAF8F5;
+  --aa-surface: #FFFFFF;
+  --aa-surface-soft: #F5F0EA;
+  --aa-surface-warm: #FCF6EF;
+  --aa-ink: #40362F;
+  --aa-muted: #786B61;
+  --aa-line: #E8DED5;
+  --aa-brand: #A65C40;
+  --aa-brand-hover: #8D4B35;
+  --aa-brand-soft: #F7ECE5;
+  --aa-accent: #D2A477;
+  --aa-accent-soft: #F2E1D0;
+  --aa-danger: #A34F3E;
+  --aa-success: #397451;
+  --aa-espresso: #514237;
+  --aa-espresso-2: #6A5445;
+  --aa-radius-sm: 10px;
+  --aa-radius: 16px;
+  --aa-radius-lg: 22px;
+  --aa-shadow: 0 8px 24px rgba(64, 54, 47, .075);
+  --aa-shadow-hover: 0 14px 30px rgba(64, 54, 47, .12);
+  --aa-font-ar: "IBM Plex Sans Arabic", "Readex Pro", "Alexandria", Tahoma, Arial, sans-serif;
+  --aa-villa-image: url("/assets/demo/hero-villa.webp?v=20261120-sitewide-villa-1");
+
+  /* Keep legacy page variables connected to the same colour system. */
+  --navy: var(--aa-espresso);
+  --blue: var(--aa-espresso-2);
+  --gold: var(--aa-accent);
+  --gold-light: var(--aa-accent-soft);
+  --red: var(--aa-danger);
+  --bg: var(--aa-page);
+  --text: var(--aa-ink);
+  --muted: var(--aa-muted);
+  --border: var(--aa-line);
+  --paper: #FFFCF8;
+  --line: var(--aa-line);
+  --ink: var(--aa-ink);
+}
+
+html,
+html body {
+  min-height: 100%;
+  color-scheme: light;
+}
+
+html body {
+  color: var(--aa-ink);
+  font-family: var(--aa-font-ar);
+  background-color: var(--aa-page) !important;
+  background-image:
+    linear-gradient(rgba(250, 248, 245, .91), rgba(250, 248, 245, .94)),
+    var(--aa-villa-image) !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
+}
+
+/* The same navigation identity on public pages, dashboards and information pages. */
+html body :is(header.topbar, header.info-topbar, .company-dashboard-page .topbar) {
+  color: #FFF9F3 !important;
+  background: linear-gradient(112deg, #514237 0%, #493A30 58%, #3D3028 100%) !important;
+  border-bottom: 2px solid rgba(210, 164, 119, .88) !important;
+  box-shadow: 0 6px 22px rgba(43, 33, 27, .16) !important;
+}
+html body :is(header.topbar, header.info-topbar) :is(.brand, .brand strong, .brand small, nav a, .info-brand) {
+  color: #FFF9F3 !important;
+}
+html body :is(header.topbar, header.info-topbar) :is(.brand small, .info-brand small) {
+  color: #EBD0B9 !important;
+}
+html body :is(header.topbar, header.info-topbar) nav a:is(:hover, .active, [aria-current="page"]) {
+  color: #FFFFFF !important;
+  background: rgba(255, 255, 255, .14) !important;
+  border-radius: 10px;
+}
+html body :is(header.topbar, header.info-topbar) .btn-outline {
+  color: #FFF9F3 !important;
+  background: rgba(255, 255, 255, .07) !important;
+  border-color: rgba(255, 249, 243, .48) !important;
+}
+
+/* All major page banners use the approved ASYUT AQAR villa photograph. */
+html body :is(
+  main > .hero,
+  main > .page-hero:not(.design-hero),
+  .companies-page .companies-hero,
+  .company-profile-hero,
+  .directory-main .directory-hero,
+  .featured-main .featured-hero,
+  .know-page .know-hero,
+  .project-hero,
+  .my-listings-hero,
+  .info-hero,
+  .marketplace-page-hero,
+  .favorites-hero,
+  .price-guide-hero
+) {
+  color: #FFF9F3 !important;
+  background-color: #514237 !important;
+  background-image:
+    linear-gradient(105deg, rgba(43, 33, 27, .82) 0%, rgba(43, 33, 27, .72) 52%, rgba(43, 33, 27, .58) 100%),
+    var(--aa-villa-image) !important;
+  background-position: center 48% !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  border-color: rgba(210, 164, 119, .34) !important;
+  box-shadow: 0 12px 30px rgba(43, 33, 27, .12) !important;
+}
+html body :is(
+  main > .hero,
+  main > .page-hero:not(.design-hero),
+  .companies-page .companies-hero,
+  .company-profile-hero,
+  .directory-main .directory-hero,
+  .featured-main .featured-hero,
+  .know-page .know-hero,
+  .project-hero,
+  .my-listings-hero,
+  .info-hero,
+  .marketplace-page-hero,
+  .favorites-hero,
+  .price-guide-hero
+) :is(h1, h2, h3, p, .eyebrow, .directory-eyebrow, .project-eyebrow, .info-eyebrow) {
+  color: #FFF9F3 !important;
+  text-shadow: 0 1px 2px rgba(43, 33, 27, .12);
+}
+html body :is(
+  main > .hero,
+  main > .page-hero:not(.design-hero),
+  .companies-page .companies-hero,
+  .company-profile-hero,
+  .directory-main .directory-hero,
+  .featured-main .featured-hero,
+  .know-page .know-hero,
+  .project-hero,
+  .my-listings-hero,
+  .info-hero,
+  .marketplace-page-hero,
+  .favorites-hero,
+  .price-guide-hero
+) .eyebrow {
+  color: #EBD0B9 !important;
+}
+
+/* Keep content surfaces bright and consistent over the shared villa background. */
+html body :is(
+  .offer-card,
+  .listing-card,
+  .featured-card,
+  .mk-card,
+  .mk-profile-card,
+  .company-directory-card,
+  .directory-card,
+  .know-card,
+  .info-card,
+  .info-doc,
+  .calculator-card,
+  .company-profile-section,
+  .property-section-card,
+  .property-summary-card,
+  .adm-card,
+  .cd-panel,
+  .my-listing-card
+) {
+  color: var(--aa-ink);
+  background-color: rgba(255, 255, 255, .97) !important;
+  border-color: var(--aa-line) !important;
+  border-radius: var(--aa-radius) !important;
+  box-shadow: var(--aa-shadow) !important;
+}
+html body :is(
+  .filters,
+  .search-panel,
+  .property-search-panel,
+  .company-search-tools,
+  .directory-filters,
+  .mk-filters,
+  .favorites-toolbar,
+  .my-project-unit-link-panel
+) {
+  color: var(--aa-ink);
+  background-color: rgba(255, 255, 255, .97) !important;
+  border-color: var(--aa-line) !important;
+  border-radius: var(--aa-radius) !important;
+  box-shadow: var(--aa-shadow) !important;
+}
+html body :is(input, select, textarea) {
+  color: var(--aa-ink) !important;
+  background-color: #FFFFFF !important;
+  border-color: var(--aa-line) !important;
+  border-radius: var(--aa-radius-sm) !important;
+  font-family: var(--aa-font-ar);
+}
+html body :is(input, select, textarea)::placeholder {
+  color: #92857A !important;
+  opacity: 1;
+}
+html body :is(input, select, textarea):focus-visible {
+  border-color: var(--aa-accent) !important;
+  outline: 2px solid rgba(210, 164, 119, .38) !important;
+  outline-offset: 2px;
+}
+
+/* One clear primary-action colour, while outline and WhatsApp actions keep their role. */
+html body :is(.btn-gold, .btn-red, .property-action-gold, .company-contact-primary, .mk-btn-primary) {
+  color: #FFFFFF !important;
+  background: var(--aa-brand) !important;
+  border-color: var(--aa-brand) !important;
+  box-shadow: 0 5px 14px rgba(166, 92, 64, .16);
+}
+html body :is(.btn-gold, .btn-red, .property-action-gold, .company-contact-primary, .mk-btn-primary):hover {
+  color: #FFFFFF !important;
+  background: var(--aa-brand-hover) !important;
+  border-color: var(--aa-brand-hover) !important;
+}
+html body :is(.btn-outline, .btn-outline-dark, .property-action-outline, .featured-card-actions a.secondary) {
+  border-color: #D8C6B6;
+  border-radius: 11px;
+}
+html body :is(.btn, button, .property-action, .mk-btn, .sp-ad-btn) {
+  font-family: var(--aa-font-ar);
+  border-radius: 11px;
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+html body :is(button, a, summary, [role="button"]):focus-visible {
+  outline: 2px solid rgba(166, 92, 64, .62);
+  outline-offset: 3px;
+}
+
+/* Use the villa as a true photo fallback only where no real image/logo exists. */
+html body :is(
+  .offer-image-placeholder,
+  .details-placeholder,
+  .mk-card-placeholder,
+  .featured-card-placeholder,
+  .property-gallery-empty,
+  .company-profile-logo .company-logo-fallback,
+  .company-directory-entity-monogram .company-logo-fallback,
+  .aq-entity-brand__fallback:not([hidden]),
+  .official-sponsor-monogram,
+  .sp-ad-monogram,
+  .os-partner-logo:not(:has(img[src]:not([src=""]))),
+  .company-card-cover:has(.company-logo-fallback):not(:has(img[src]:not([src=""]))),
+  .company-card-cover--directory:has(> span.company-logo-fallback):not(:has(img[src]:not([src=""])))
+) {
+  color: #FFFFFF !important;
+  background-color: #6B5544 !important;
+  background-image:
+    linear-gradient(rgba(49, 38, 30, .32), rgba(49, 38, 30, .32)),
+    var(--aa-villa-image) !important;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  text-shadow: 0 1px 4px rgba(35, 25, 18, .68);
+}
+
+/* Consistent photo framing without changing the image supplied by an advertiser or owner. */
+html body :is(
+  .offer-card-media,
+  .offer-image,
+  .mk-card-media,
+  .featured-card-media,
+  .property-gallery-main,
+  .company-gallery img,
+  .company-card-cover
+) {
+  overflow: hidden;
+}
+html body :is(.offer-card-media img, .mk-card-media img, .featured-card-media img, .company-gallery img) {
+  display: block;
+  max-width: 100%;
+  object-fit: cover;
+}
+html body :is(.offer-card, .listing-card, .featured-card, .mk-card, .company-directory-card, .directory-card):hover {
+  border-color: #D8B69E !important;
+  box-shadow: var(--aa-shadow-hover) !important;
+}
+
+/* Avoid fixed-photo jank on mobile and respect reduced-motion settings. */
+@media (max-width: 760px) {
+  html body {
+    background-attachment: scroll !important;
+    background-position: center top !important;
+  }
+  html body :is(
+    main > .hero,
+    main > .page-hero:not(.design-hero),
+    .companies-page .companies-hero,
+    .company-profile-hero,
+    .directory-main .directory-hero,
+    .featured-main .featured-hero,
+    .know-page .know-hero,
+    .project-hero,
+    .my-listings-hero,
+    .info-hero,
+    .marketplace-page-hero,
+    .favorites-hero,
+    .price-guide-hero
+  ) {
+    background-position: center 45% !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body :is(.btn, button, .property-action, .mk-btn, .sp-ad-btn) {
+    transition: none !important;
+  }
+}

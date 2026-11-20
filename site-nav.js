@@ -98,7 +98,7 @@
   if (!document.querySelector('link[data-asyut-unified-theme="global"]')) {
     const platformTheme = document.createElement("link");
     platformTheme.rel = "stylesheet";
-    platformTheme.href = "/assets/theme/platform-unified-theme.css?v=20261118-1";
+    platformTheme.href = "/assets/theme/platform-unified-theme.css?v=20261120-sitewide-villa-1";
     platformTheme.dataset.asyutUnifiedTheme = "global";
     document.head.appendChild(platformTheme);
   }
