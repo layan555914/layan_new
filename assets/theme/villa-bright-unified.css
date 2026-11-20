@@ -1,0 +1,338 @@
+/* ASYUT AQAR — unified bright villa identity
+   Visual-only global layer. Preserves page structure, content, data, IDs and behaviour. */
+
+:root {
+  /* Existing espresso / terracotta / copper / cream identity, lifted in brightness and saturation. */
+  --aa-page: #FBF5EE;
+  --aa-surface: #FFFEFC;
+  --aa-surface-soft: #F9EFE4;
+  --aa-surface-warm: #FFF4E8;
+  --aa-ink: #3D2F26;
+  --aa-muted: #71594A;
+  --aa-line: #E9D5C2;
+
+  --aa-brand: #B65D3D;
+  --aa-brand-hover: #984B32;
+  --aa-brand-soft: #FCE9DE;
+  --aa-accent: #E4B26E;
+  --aa-accent-soft: #F9E8CC;
+  --aa-danger: #B6503A;
+  --aa-success: #397451;
+
+  --aa-espresso: #654A37;
+  --aa-espresso-2: #7B5A42;
+  --aa-sand: #F8EDE1;
+  --aa-cream: #FFFAF4;
+  --aa-peach: #F3D5B7;
+  --aa-copper: #E4B26E;
+  --aa-terracotta: #B65D3D;
+  --aa-terracotta-dark: #984B32;
+
+  --navy: #654A37;
+  --blue: #7B5A42;
+  --gold: #E4B26E;
+  --gold-light: #F3D5B7;
+  --red: #B6503A;
+  --bg: #FBF5EE;
+  --text: #3D2F26;
+  --muted: #71594A;
+  --border: #E9D5C2;
+  --paper: #FFFCF8;
+  --line: #E9D5C2;
+  --ink: #3D2F26;
+
+  --aa-shadow: 0 9px 26px rgba(74, 48, 31, .085);
+  --aa-shadow-hover: 0 15px 34px rgba(74, 48, 31, .14);
+}
+
+/* The approved villa photo becomes the quiet, shared page backdrop.
+   A warm translucent veil keeps text and forms easy to read. */
+html {
+  background: var(--aa-page);
+  color-scheme: light;
+}
+html body {
+  color: var(--aa-ink);
+  background-color: var(--aa-page);
+  background-image:
+    linear-gradient(rgba(251, 245, 238, .87), rgba(251, 245, 238, .87)),
+    url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1");
+  background-position: center top, center top;
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Arabic type hierarchy: one family, clear weights, balanced headings and comfortable reading. */
+html body :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--aa-font-ar, "IBM Plex Sans Arabic", "Readex Pro", Tahoma, Arial, sans-serif);
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+html body main :is(h1, h2) {
+  color: var(--aa-ink);
+  font-weight: 800;
+}
+html body main h1 {
+  font-size: clamp(1.8rem, 3.2vw, 2.7rem);
+  line-height: 1.34;
+}
+html body main h2 {
+  font-size: clamp(1.35rem, 2.25vw, 1.9rem);
+  line-height: 1.42;
+}
+html body main h3 {
+  color: var(--aa-ink);
+  font-size: clamp(1.05rem, 1.55vw, 1.3rem);
+  font-weight: 700;
+  line-height: 1.5;
+}
+html body main h4 {
+  color: var(--aa-ink);
+  font-weight: 700;
+  line-height: 1.55;
+}
+html body :is(p, li, dd, dt, figcaption) {
+  line-height: 1.82;
+}
+html body :is(.eyebrow, .directory-eyebrow, .featured-eyebrow, .featured-kicker, .project-eyebrow, .info-eyebrow) {
+  color: var(--aa-brand);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+html body main :is(.section-heading, .directory-section-heading, .company-directory-group-heading) {
+  gap: 14px;
+}
+html body main :is(.section-heading h2, .directory-section-heading h2, .company-directory-group-heading h2) {
+  padding-inline-start: 12px;
+  border-inline-start: 3px solid var(--aa-accent);
+}
+html body :is(.section-heading p, .directory-section-heading p, .company-directory-group-heading p) {
+  color: var(--aa-muted);
+}
+
+/* Brighter shared navigation without changing its layout or links. */
+html body header.topbar,
+html body header.info-topbar {
+  background: linear-gradient(112deg, #76563E 0%, #684B37 58%, #5B4232 100%);
+  color: var(--aa-cream);
+  border-bottom: 2px solid var(--aa-accent);
+  box-shadow: 0 6px 22px rgba(67, 43, 28, .16);
+}
+html body header.topbar :is(.brand, .brand strong, nav a),
+html body header.info-topbar :is(.info-brand, nav a) {
+  color: var(--aa-cream);
+}
+html body header.topbar .brand small,
+html body header.info-topbar .brand small {
+  color: #F5DAB8;
+}
+html body header.topbar nav a:is(:hover, .active, [aria-current="page"]),
+html body header.info-topbar nav a:is(:hover, .active, [aria-current="page"]) {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, .16);
+}
+html body header.topbar .btn-gold,
+html body header.info-topbar .btn-gold {
+  color: #4A3526;
+  background: linear-gradient(135deg, #F1CB83 0%, #E1AB5E 100%);
+  border-color: #F1CB83;
+  box-shadow: 0 4px 12px rgba(29, 19, 12, .12);
+}
+
+/* All main section covers now use the same approved villa photograph. */
+html body :is(
+  .hero.design-hero,
+  main > .page-hero[aria-labelledby="offersPageTitle"],
+  .companies-hero,
+  main.marketplace-page > .hero,
+  .directory-hero,
+  .featured-hero,
+  .info-hero,
+  .project-hero,
+  .my-listings-hero,
+  .company-profile-hero,
+  .marketplace-page-hero,
+  .know-page .know-hero
+) {
+  color: #FFFCF8;
+  background-color: var(--aa-espresso);
+  background-image:
+    linear-gradient(270deg, rgba(66, 45, 31, .76) 0%, rgba(66, 45, 31, .60) 48%, rgba(66, 45, 31, .22) 100%),
+    url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1") !important;
+  background-position: center 48%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-color: var(--aa-accent);
+}
+html body :is(
+  .hero.design-hero,
+  main > .page-hero[aria-labelledby="offersPageTitle"],
+  .companies-hero,
+  main.marketplace-page > .hero,
+  .directory-hero,
+  .featured-hero,
+  .info-hero,
+  .project-hero,
+  .my-listings-hero,
+  .company-profile-hero,
+  .marketplace-page-hero,
+  .know-page .know-hero
+) :is(h1, h2, h3, p, .eyebrow, .directory-eyebrow, small) {
+  color: #FFFCF8;
+}
+html body :is(
+  .hero.design-hero,
+  main > .page-hero[aria-labelledby="offersPageTitle"],
+  .companies-hero,
+  main.marketplace-page > .hero,
+  .directory-hero,
+  .featured-hero,
+  .info-hero,
+  .project-hero,
+  .my-listings-hero,
+  .company-profile-hero,
+  .marketplace-page-hero,
+  .know-page .know-hero
+) :is(.eyebrow, .directory-eyebrow) {
+  color: #F4D5AC;
+}
+html body.page-home .hero.design-hero::before {
+  background-image: url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1") !important;
+  filter: saturate(1.08) brightness(1.06);
+}
+html body.page-home .hero.design-hero::after {
+  display: block !important;
+  background: linear-gradient(270deg, rgba(66, 45, 31, .62) 0%, rgba(66, 45, 31, .43) 46%, rgba(66, 45, 31, .08) 100%) !important;
+}
+html body.page-home .hero.design-hero :is(h1, p, .eyebrow) {
+  color: #FFFCF8 !important;
+}
+html body.page-home .hero.design-hero h1 span {
+  color: #F5D7A7 !important;
+}
+
+/* Empty photo/logo placeholders retain the same villa fallback, now with brighter detail. */
+html body :is(.offer-image-placeholder, .details-placeholder) {
+  filter: saturate(1.08) brightness(1.05);
+}
+
+/* Brighter premium cards, filters and content panels. Actual uploaded/listing photos remain untouched. */
+html body :is(
+  .offer-card, .listing-card, .company-directory-card, .directory-card,
+  .featured-card, .mk-profile-card, .marketplace-card, .category-tile,
+  .how-card, .audience-card, .pricing-card, .company-card,
+  .calculator-card, .details-panel, .filter-panel, .search-panel,
+  .directory-browser, .directory-method, .company-map-panel, .directory-map-panel
+) {
+  border-color: var(--aa-line);
+  box-shadow: var(--aa-shadow);
+}
+html body :is(
+  .offer-card, .listing-card, .company-directory-card, .directory-card,
+  .featured-card, .mk-profile-card, .marketplace-card, .category-tile,
+  .company-card
+):hover {
+  box-shadow: var(--aa-shadow-hover);
+}
+html body :is(.listing-card h3, .offer-card h3, .company-directory-card h3, .directory-card h3, .featured-card h3) {
+  color: var(--aa-ink);
+  font-weight: 700;
+}
+html body :is(.listing-price, .offer-price-main, .details-price-highlight, .directory-stat strong) {
+  color: var(--aa-brand);
+}
+html body :is(input, select, textarea) {
+  border-color: #E3CFBC;
+  color: var(--aa-ink);
+}
+html body :is(input, select, textarea):focus-visible {
+  border-color: var(--aa-brand);
+  box-shadow: 0 0 0 3px rgba(182, 93, 61, .16);
+}
+
+/* Buttons: copper-gold for key actions, livelier terracotta for primary alternatives. */
+html body :is(.btn-gold, .btn-primary, .cd-live-action:not(.cd-live-action--secondary), .cd-primary-link) {
+  color: #4A3526;
+  background: linear-gradient(135deg, #F1CB83 0%, #E1AB5E 100%);
+  border-color: #E1AB5E;
+  box-shadow: 0 5px 15px rgba(157, 98, 45, .18);
+}
+html body :is(.btn-red, .property-action-gold, .company-contact-primary) {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #C9704E 0%, #B65D3D 100%);
+  border-color: #B65D3D;
+  box-shadow: 0 5px 15px rgba(150, 67, 42, .16);
+}
+html body :is(.btn-gold, .btn-primary, .btn-red, .property-action-gold, .company-contact-primary):hover {
+  filter: brightness(1.04) saturate(1.07);
+}
+html body :is(.category, .detail-chip, .directory-tag, .company-service-list li, .mk-chip, .filter-chip) {
+  border-color: #E9D8C7;
+  background-color: #FFF8F0;
+  color: #654B39;
+}
+html body :is(.category.active, .category[aria-pressed="true"], .directory-tabs button.is-active, .mk-chip.is-active, .mk-chip[aria-pressed="true"], .filter-chip.is-active, .filter-chip[aria-pressed="true"]) {
+  color: #FFFFFF;
+  background: var(--aa-brand);
+  border-color: var(--aa-brand);
+}
+
+/* Keep empty states and forms clean; the villa remains visible behind page gaps and photo fallbacks. */
+html body :is(dialog, .company-dialog, .company-claim-dialog, .marketplace-form-dialog, .my-edit-dialog) {
+  color: var(--aa-ink);
+  background: rgba(255, 254, 252, .98);
+  border-color: var(--aa-line);
+}
+html body :is(.notice, .status-message, .know-note, .company-review-note, .directory-results-note, .form-note) {
+  color: #654B3A;
+  background: var(--aa-surface-warm);
+  border-color: #EBD8C5;
+}
+html body :is(.empty-state, .empty-state-card, .empty-card, .empty-results, .directory-empty, .mk-sponsored-empty) {
+  background-image:
+    linear-gradient(rgba(255, 252, 247, .84), rgba(255, 252, 247, .84)),
+    url("/assets/demo/hero-villa.webp?v=20261116-home-villa-restore-1");
+  background-position: center;
+  background-size: cover;
+  border-color: #E9D5C2;
+}
+
+/* Footer and mobile navigation keep the same brand family. */
+html body :is(footer, .footer, .footer-pro, .info-footer, .project-footer) {
+  border-top-color: rgba(228, 178, 110, .55);
+}
+html body .mobile-nav,
+html body .aa-appnav {
+  background: rgba(255, 250, 244, .98);
+  border-color: var(--aa-line);
+  box-shadow: 0 -8px 24px rgba(74, 48, 31, .11);
+}
+html body :is(.mobile-nav, .aa-appnav) :is(a.is-current, a[aria-current="page"]) {
+  color: var(--aa-brand);
+}
+
+/* Compact but readable on phones; respect reduced-motion settings. */
+@media (max-width: 760px) {
+  html body {
+    background-attachment: scroll, scroll;
+    font-size: 15px;
+  }
+  html body main h1 { font-size: clamp(1.6rem, 6vw, 2.15rem); line-height: 1.4; }
+  html body main h2 { font-size: clamp(1.25rem, 4.9vw, 1.55rem); line-height: 1.48; }
+  html body main h3 { font-size: clamp(1rem, 4vw, 1.2rem); }
+  html body :is(.hero.design-hero, .companies-hero, .directory-hero, .featured-hero, .info-hero, .page-hero) {
+    background-position: center 45%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body *, html body *::before, html body *::after {
+    scroll-behavior: auto;
+    transition-duration: .01ms;
+    animation-duration: .01ms;
+    animation-iteration-count: 1;
+  }
+}
