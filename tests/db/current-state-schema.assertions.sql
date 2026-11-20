@@ -186,8 +186,8 @@ BEGIN
   END IF;
 
   IF (SELECT count(*) FROM storage.buckets WHERE id IN ('layan_real_estat','layan-property-documents')) <> 2
-     OR (SELECT count(*) FROM pg_policies WHERE schemaname='storage' AND tablename='objects') <> 6 THEN
-    RAISE EXCEPTION 'Storage baseline must contain two app buckets and six object policies';
+     OR (SELECT count(*) FROM pg_policies WHERE schemaname='storage' AND tablename='objects') <> 10 THEN
+    RAISE EXCEPTION 'Storage baseline must contain two app buckets and ten object policies (six baseline plus four admin image policies)';
   END IF;
 
   IF (SELECT count(*) FROM public.company_claim_requests) <> 0
