@@ -184,7 +184,7 @@
     { key: "featured", label: "صفحة الإعلانات المميزة" },
     { key: "property_details", label: "داخل صفحة تفاصيل العقار" }
   ];
-  const DEFAULT_PLACEMENTS = PLACEMENT_OPTIONS.map(item => item.key);
+  const DEFAULT_PLACEMENTS = PLACEMENT_OPTIONS.filter(item => item.key !== "property_details").map(item => item.key);
   const placementLabel = keys => (Array.isArray(keys) ? keys : DEFAULT_PLACEMENTS)
     .map(key => PLACEMENT_OPTIONS.find(item => item.key === key)?.label)
     .filter(Boolean)
