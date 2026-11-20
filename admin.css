@@ -197,7 +197,7 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
 .as-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .as-grid label{display:grid;gap:5px;color:#45362C;font-size:13px;font-weight:700;min-width:0}.as-grid .is-wide{grid-column:1/-1}
 .as-grid input,.as-grid select,.as-grid textarea{width:100%;min-height:44px;padding:10px;border:1px solid #DCCBBC;border-radius:10px;background:#fff;font:inherit}
-.as-check{display:flex!important;align-items:center;gap:8px}.as-check input{width:20px!important;min-height:20px!important}
+.as-check{display:flex;align-items:center;gap:8px}.as-check input{width:20px!important;min-height:20px!important}
 .as-logo-field{display:flex;gap:14px;align-items:center;padding:12px;border:1px dashed #D6B9A1;border-radius:14px;background:#FDF9F5}
 .as-logo-field>div{display:grid;gap:8px;flex:1;min-width:0}.as-logo-field small{color:#7A6556;font-size:12px}
 .as-logo-preview{flex:0 0 96px;display:grid;place-items:center;width:96px;height:96px;overflow:hidden;border-radius:50%;background:#fff;box-shadow:0 0 0 1px #E9B08F,0 0 0 6px #FBF1E7;color:#B8A090}
@@ -259,7 +259,7 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:10px 14px;
 }
-.as-placement-options .as-check{
+.as-placement-options label.as-check{
   display:flex!important;
   align-items:center;
   gap:8px;
@@ -268,10 +268,10 @@ button.adm-todo-item:hover { transform: translateY(-2px); border-color: var(--ad
   font-size:13px;
   font-weight:700;
 }
-.as-placement-options .as-check input{
+.as-placement-options input[type="checkbox"]{
   flex:0 0 19px;
-  width:19px!important;
-  min-height:19px!important;
+  width:19px;
+  min-height:19px;
   accent-color:#A66B3F;
 }
 .as-placement-field small{
