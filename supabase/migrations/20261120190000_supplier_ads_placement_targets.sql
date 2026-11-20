@@ -25,7 +25,7 @@ ALTER TABLE public.supplier_ads
   ADD CONSTRAINT supplier_ads_placement_keys_check
   CHECK (
     cardinality(placement_keys) BETWEEN 1 AND 5
-    AND placement_keys <@ ARRAY['home', 'offers', 'marketplace', 'featured']::text[]
+    AND placement_keys <@ ARRAY['home', 'offers', 'marketplace', 'featured', 'property_details']::text[]
   );
 
 -- Placement settings are public display metadata, but only administrators may
