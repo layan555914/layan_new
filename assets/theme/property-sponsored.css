@@ -1,0 +1,8 @@
+/* ASYUT AQAR — approved sponsored ads within property details */
+.property-sponsored-section[hidden]{display:none!important}
+.property-sponsored-section{display:grid;gap:14px}
+.property-sponsored-section .property-services-head{align-items:center}
+.property-sponsored-section .property-services-head span{color:#8A7465;font-size:11px;font-weight:700}
+.property-sponsored-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px;align-items:stretch}
+.property-sponsored-grid .property-sponsored-card{min-width:0}
+@media(max-width:600px){.property-sponsored-grid{grid-template-columns:minmax(0,1fr)}}
