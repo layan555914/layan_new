@@ -135,16 +135,16 @@ BEGIN;
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$ADMIN_ID',true);
 INSERT INTO public.supplier_ads(id,owner_id,business_name,category,title,description,contact_phone,status,placement_keys)
-VALUES ('$ADMIN_AD_ID','$OWNER_ID','Admin test','Furniture','Admin ad test','Placement selection test.','01098765432','pending',ARRAY['marketplace']);
+VALUES ('$ADMIN_AD_ID','$OWNER_ID','Admin test','Furniture','Admin ad test','Placement selection test.','01098765432','pending',ARRAY['property_details']);
 UPDATE public.supplier_ads SET status='active' WHERE id='$ADMIN_AD_ID';
 DO \$admin_check\$
 DECLARE v text[];
 BEGIN
   SELECT placement_keys INTO v FROM public.supplier_ads WHERE id='$ADMIN_AD_ID';
-  IF v IS DISTINCT FROM ARRAY['marketplace']::text[] THEN RAISE EXCEPTION 'Admin selection lost: %',v; END IF;
+  IF v IS DISTINCT FROM ARRAY['property_details']::text[] THEN RAISE EXCEPTION 'Admin selection lost: %',v; END IF;
 END
 \$admin_check\$;
-UPDATE public.supplier_ads SET placement_keys=ARRAY['featured','home'] WHERE id='$ADMIN_AD_ID';
+UPDATE public.supplier_ads SET placement_keys=ARRAY['property_details','home'] WHERE id='$ADMIN_AD_ID';
 COMMIT;
 SQL
 
@@ -174,7 +174,7 @@ BEGIN
   SELECT count(*) INTO v_count FROM public.public_active_supplier_ads;
   IF v_count<>1 THEN RAISE EXCEPTION 'Expected one active public ad, got %',v_count; END IF;
   SELECT placement_keys INTO v FROM public.public_active_supplier_ads WHERE id='$ADMIN_AD_ID';
-  IF v IS DISTINCT FROM ARRAY['featured','home']::text[] THEN RAISE EXCEPTION 'Wrong public placement metadata: %',v; END IF;
+  IF v IS DISTINCT FROM ARRAY['property_details','home']::text[] THEN RAISE EXCEPTION 'Wrong public placement metadata: %',v; END IF;
   IF has_table_privilege('anon','public.supplier_ads','UPDATE') THEN RAISE EXCEPTION 'Anon unexpectedly has update rights'; END IF;
 END
 \$public_check\$;
