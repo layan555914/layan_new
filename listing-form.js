@@ -40,7 +40,7 @@
     section(3, "المواصفات", "",
       [field("area_m2"), field("bedrooms"), field("bathrooms"), field("developer_name"), field("project_name"), byId("landDetailsFields")]),
     section(4, "بيانات المعاملة والسعر", "تظهر هنا الحقول المناسبة لنوع المعاملة الذي اخترته: البيع أو الإيجار أو التنازل.",
-      [field("total_price"), field("price_on_request"), byId("saleFields"), byId("rentalFields"), byId("assignmentFields")], "lf-money"),
+      [byId("transactionPricePlaceholder"), byId("saleFields"), byId("rentalFields"), byId("assignmentFields")], "lf-money"),
     section(5, "الصور والمستندات", "صور واضحة نهارًا. يمكنك التصوير مباشرة بالكاميرا. المستندات خاصة للإدارة فقط.",
       [field("photos"), field("documents")]),
     section(6, "التواصل والوصف", "",
@@ -61,13 +61,47 @@
   const saleFields = byId("saleFields");
   const rentalFields = byId("rentalFields");
   const assignmentFields = byId("assignmentFields");
+  const pricePlaceholder = byId("transactionPricePlaceholder");
+  const priceFields = byId("transactionPriceFields");
+  const pricePrompt = byId("transactionPricePrompt");
   const paintPurpose = () => {
     const selected = String(purpose?.value || "");
+    const target = selected === "بيع" ? saleFields
+      : selected === "إيجار" ? rentalFields
+      : selected === "تنازل" ? assignmentFields
+      : null;
+
+    if (priceFields && target) {
+      // Keep the one canonical price control inside the active transaction section.
+      // This gives each transaction its own clearly labeled price field without
+      // changing the database contract (property_offers.total_price).
+      if (target === rentalFields) {
+        const periodLabel = rentalFields.querySelector('[name="rental_period"]')?.closest("label");
+        if (periodLabel) periodLabel.insertAdjacentElement("afterend", priceFields);
+        else {
+          const legend = target.querySelector("legend");
+          if (legend) legend.insertAdjacentElement("afterend", priceFields);
+          else target.appendChild(priceFields);
+        }
+      } else {
+        const legend = target.querySelector("legend");
+        if (legend) legend.insertAdjacentElement("afterend", priceFields);
+        else target.appendChild(priceFields);
+      }
+      priceFields.hidden = false;
+      if (pricePrompt) pricePrompt.hidden = true;
+    } else {
+      if (pricePlaceholder && priceFields) pricePlaceholder.appendChild(priceFields);
+      if (priceFields) priceFields.hidden = true;
+      if (pricePrompt) pricePrompt.hidden = false;
+    }
+
     if (saleFields) saleFields.hidden = selected !== "بيع";
     if (rentalFields) rentalFields.hidden = selected !== "إيجار";
     if (assignmentFields) assignmentFields.hidden = selected !== "تنازل";
   };
   purpose?.addEventListener("change", paintPurpose);
+  form.addEventListener("reset", () => window.setTimeout(paintPurpose, 0));
   paintPurpose();
 
   const title = dialog.querySelector(".dialog-header h2");

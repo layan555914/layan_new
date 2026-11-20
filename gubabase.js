@@ -499,7 +499,7 @@
   async function getOffers() {
     const fields = [
       "id","title","governorate","listing_purpose","land_ownership_authority","land_permit_details","land_utilities","land_zoning","city","area","area_m2","bedrooms","bathrooms","monthly_installment","property_type","rental_period","rental_furnishing","rental_security_deposit","rental_minimum_months","description","total_price","price_on_request",
-      "down_payment","paid_amount","remaining_amount","assignment_fee","project_name",
+      "down_payment","paid_amount","remaining_amount","remaining_installments","assignment_fee","project_name",
       "assignment_fee_percentage","discount_amount","developer_name","company_ad_id","image_urls",
       "status","featured_requested","is_featured","featured_until","promotion_status","contact_phone","contact_name","owner_id","latitude","longitude","created_at","updated_at"
     ].join(",");
@@ -805,6 +805,8 @@
       down_payment: Number(offer.down_payment || 0),
       paid_amount: Number(offer.paid_amount || 0),
       remaining_amount: Number(offer.remaining_amount ?? offer.remaining_installments ?? 0),
+      // Only new clients send both fields. Legacy clients used remaining_installments as the amount.
+      remaining_installments: offer.remaining_amount != null ? (Number(offer.remaining_installments || 0) || null) : null,
       assignment_fee: Number(offer.assignment_fee ?? offer.transfer_fee ?? 0),
       assignment_fee_percentage: Number(offer.assignment_fee_percentage ?? offer.transfer_fee_percentage ?? 0),
       discount_amount: Number(offer.discount_amount || 0),

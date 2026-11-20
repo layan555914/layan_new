@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   financeNote.className = "layan-finance-check";
   financeNote.setAttribute("role", "status");
   financeNote.setAttribute("aria-live", "polite");
-  const remainingField = form?.querySelector('[name="remaining_installments"]');
+  const remainingField = form?.querySelector('[name="remaining_amount"]');
   remainingField?.closest("label")?.insertAdjacentElement("afterend", financeNote);
   const priceOnRequestToggle = form?.querySelector('[name="price_on_request"]');
   const totalPriceInput = form?.querySelector('[name="total_price"]');
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const priceLabel = form?.querySelector("[data-price-label]");
   const priceRequestLabel = form?.querySelector("[data-price-request-label]");
   const isAssignmentFormSelection = () => listingPurposeInput?.value === "تنازل";
-  const financeFields = ["total_price", "down_payment", "paid_amount", "remaining_installments"].map(name => form?.querySelector('[name="' + name + '"]')).filter(Boolean);
+  const financeFields = ["total_price", "down_payment", "paid_amount", "remaining_amount"].map(name => form?.querySelector('[name="' + name + '"]')).filter(Boolean);
   const formatFinance = value => new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 0 }).format(value) + " جنيه";
   function updateFinanceCheck() {
     if (!financeNote || !form) return;
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     financeNote.hidden = false;
     const raw = name => String(form.querySelector('[name="' + name + '"]')?.value || "").trim();
     const read = name => Number(raw(name) || 0);
-    const total = read("total_price"), down = read("down_payment"), paid = read("paid_amount"), remaining = read("remaining_installments");
+    const total = read("total_price"), down = read("down_payment"), paid = read("paid_amount"), remaining = read("remaining_amount");
     if (raw("down_payment") !== "" && raw("paid_amount") !== "" && paid + 0.01 < down) {
       financeNote.textContent = "تنبيه: إجمالي المدفوع (شامل المقدم) لا يمكن أن يكون أقل من المقدم.";
       financeNote.dataset.state = "warning";
@@ -180,10 +180,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   function updatePriceRequestState() {
     const enabled = priceOnRequestToggle?.checked === true;
+    const purposeSelected = ["بيع", "إيجار", "تنازل"].includes(String(listingPurposeInput?.value || ""));
     if (totalPriceInput) {
-      totalPriceInput.disabled = enabled;
-      totalPriceInput.required = !enabled && kindOf(form?.querySelector('[name="property_type"]')?.value) !== "project";
+      totalPriceInput.disabled = enabled || !purposeSelected;
+      totalPriceInput.required = purposeSelected && !enabled && kindOf(form?.querySelector('[name="property_type"]')?.value) !== "project";
     }
+    if (priceOnRequestToggle) priceOnRequestToggle.disabled = !purposeSelected;
     updateFinanceCheck();
   }
   function updateTransactionFormFields() {
@@ -215,6 +217,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   listingPurposeInput?.addEventListener("change", updateTransactionFormFields);
   rentalPeriodInput?.addEventListener("change", updateTransactionFormFields);
   updateTransactionFormFields();
+  form?.addEventListener("reset", () => window.setTimeout(updateTransactionFormFields, 0));
   const photosPreview = document.createElement("div");
   photosPreview.className = "layan-photo-preview";
   photosPreview.setAttribute("aria-live", "polite");
@@ -956,6 +959,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         num(o.paid_amount) > 0 ? `<span>إجمالي المدفوع (شامل المقدم) <b>${money2(o.paid_amount)}</b></span>` : "",
         num(o.remaining_amount) > 0 ? `<span>متبقي <b>${money2(o.remaining_amount)}</b></span>` : "",
         num(o.monthly_installment) > 0 ? `<span>قسط <b>${money2(o.monthly_installment)}</b>/شهر</span>` : "",
+        num(o.remaining_installments) > 0 ? `<span>أقساط متبقية <b>${esc(o.remaining_installments)}</b></span>` : "",
         num(o.assignment_fee) > 0 ? `<span>رسوم التنازل <b>${money2(o.assignment_fee)}</b></span>` : ""
       ].filter(Boolean) : [];
       const detailsHref = "./property.html?id=" + encodeURIComponent(String(o.id));
@@ -1111,7 +1115,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const purposeText = normalizeListingPurpose(o.listing_purpose);
     const isAssignment = purposeText === "تنازل";
     const isRent = purposeText === "إيجار";
-    const displayedPriceLabel = isRent ? "الإيجار الشهري المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : purposeText === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
+    const rentalPeriod = ["يومي", "شهري", "سنوي"].includes(o.rental_period) ? o.rental_period : "شهري";
+    const rentalUnit = isRent ? (rentalPeriod === "يومي" ? " / يوم" : rentalPeriod === "سنوي" ? " / سنة" : " / شهر") : "";
+    const displayedPriceLabel = isRent ? "الإيجار " + rentalPeriod + " المعلن" : isAssignment ? "القيمة المعلنة للتنازل" : purposeText === "بيع" ? "سعر البيع المعلن" : "السعر المعلن";
     const galleryMarkup = galleryImages.length
       ? `
         <div class="details-gallery" aria-label="معرض صور الوحدة">
@@ -1131,11 +1137,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       <h2>${esc(o.title)}</h2>
       <p class="offer-code">كود الإعلان: <strong>${esc(offerCode(o))}</strong></p>
       <div class="details-price-highlight" aria-label="القيمة المعلنة">
-        <div><span>${displayedPriceLabel}</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price) + (isRent ? " / شهر" : "")}</strong></div>
+        <div><span>${displayedPriceLabel}</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price) + rentalUnit}</strong></div>
         ${isAssignment ? `
           ${num(o.down_payment) > 0 ? `<div><span>المقدم عند التعاقد</span><strong>${money(o.down_payment)}</strong></div>` : ""}
           ${num(o.paid_amount) > 0 ? `<div><span>إجمالي المدفوع</span><strong>${money(o.paid_amount)}</strong></div>` : ""}
           ${num(o.remaining_amount) > 0 ? `<div><span>المتبقي</span><strong>${money(o.remaining_amount)}</strong></div>` : ""}
+          ${num(o.remaining_installments) > 0 ? `<div><span>عدد الأقساط المتبقية</span><strong>${esc(o.remaining_installments)}</strong></div>` : ""}
         ` : ""}
       </div>
       <div class="details-info">
@@ -1151,12 +1158,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         ${o.area_m2 ? `<p><span>المساحة</span><strong>${esc(o.area_m2)} م²</strong></p>` : ""}
         ${o.bedrooms && showsBedrooms(o) ? `<p><span>غرف النوم</span><strong>${esc(o.bedrooms)}</strong></p>` : ""}
         ${o.bathrooms ? `<p><span>الحمامات</span><strong>${esc(o.bathrooms)}</strong></p>` : ""}
-        <p><span>${displayedPriceLabel}</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price) + (isRent ? " / شهر" : "")}</strong></p>
+        <p><span>${displayedPriceLabel}</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price) + rentalUnit}</strong></p>
         ${isAssignment ? `
           ${num(o.down_payment) > 0 ? `<p><span>المقدم عند التعاقد</span><strong>${money(o.down_payment)}</strong></p>` : ""}
           ${num(o.paid_amount) > 0 ? `<p><span>إجمالي المدفوع حتى الآن (شامل المقدم)</span><strong>${money(o.paid_amount)}</strong></p>` : ""}
           ${num(o.remaining_amount) > 0 ? `<p><span>المبلغ المتبقي</span><strong>${money(o.remaining_amount)}</strong></p>` : ""}
           ${num(o.monthly_installment) > 0 ? `<p><span>القسط الشهري</span><strong>${money(o.monthly_installment)}</strong></p>` : ""}
+          ${num(o.remaining_installments) > 0 ? `<p><span>عدد الأقساط المتبقية</span><strong>${esc(o.remaining_installments)}</strong></p>` : ""}
           ${num(o.assignment_fee) > 0 ? `<p><span>رسوم التنازل</span><strong>${money(o.assignment_fee)}</strong></p>` : ""}
         ` : ""}
         ${o.discount_amount ? `<p><span>قيمة الخصم</span><strong>${money(o.discount_amount)}</strong></p>` : ""}
@@ -1589,11 +1597,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       total_price: amount("total_price"),
       down_payment: value("listing_purpose") === "تنازل" ? amount("down_payment") : 0,
       paid_amount: value("listing_purpose") === "تنازل" ? amount("paid_amount") : 0,
-      remaining_amount: value("listing_purpose") === "تنازل" ? amount("remaining_installments") : 0,
-      assignment_fee: value("listing_purpose") === "تنازل" ? amount("transfer_fee") : 0,
+      remaining_amount: value("listing_purpose") === "تنازل" ? amount("remaining_amount") : 0,
+      remaining_installments: value("listing_purpose") === "تنازل" ? Math.floor(amount("remaining_installments")) : 0,
+      assignment_fee: value("listing_purpose") === "تنازل" ? amount("assignment_fee") : 0,
       assignment_fee_percentage: 0,
-      discount_amount: amount("discount_amount"),
-      discount_percent: amount("discount_percent"),
+      discount_amount: value("listing_purpose") === "بيع" ? amount("discount_amount") : 0,
+      discount_percent: value("listing_purpose") === "بيع" ? amount("discount_percent") : 0,
       contact_name: value("contact_name"),
       developer_name: value("developer_name"),
       project_name: value("project_name"),
