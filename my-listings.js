@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       '<div class="my-listing-top"><span class="my-listing-status status-' + esc(x.status) + '">' + esc(OFFER_STATUS[x.status] || x.status || "غير محدد") + "</span><small>" + esc(x.property_type || "عقار") + " · " + esc(x.listing_purpose || "تنازل") + "</small></div>" +
       "<h2>" + esc(x.title) + "</h2>" + photos(x.image_urls) +
       '<p><strong>الموقع:</strong> ' + esc(x.city || "أسيوط") + (x.area ? " · " + esc(x.area) : "") + "</p>" +
-      "<p><strong>" + (rent ? "الإيجار " + (x.rental_period || "شهري") : "السعر") + ":</strong> " + money(x.total_price) + (x.area_m2 ? " · <strong>المساحة:</strong> " + esc(x.area_m2) + " م²" : "") + "</p>" +
+      "<p><strong>" + (rent ? "الإيجار " + (x.rental_period || "شهري") : "السعر") + ":</strong> " + (x.price_on_request === true ? "السعر عند التواصل" : money(x.total_price)) + (x.area_m2 ? " · <strong>المساحة:</strong> " + esc(x.area_m2) + " م²" : "") + "</p>" +
       (rent && (x.rental_furnishing || x.rental_security_deposit != null || x.rental_minimum_months != null) ? '<p><strong>تفاصيل الإيجار:</strong> ' + esc(x.rental_furnishing || "حالة التأثيث غير محددة") + (x.rental_security_deposit != null ? " · التأمين: " + money(x.rental_security_deposit) : "") + (x.rental_minimum_months != null ? " · الحد الأدنى: " + esc(x.rental_minimum_months) + " شهر" : "") + "</p>" : "") +
       (x.contact_phone ? '<p><strong>رقم التواصل:</strong> <span dir="ltr">' + esc(x.contact_phone) + "</span></p>" : "") +
       (x.verification_notes ? '<p class="my-listing-note"><strong>ملاحظة المراجعة:</strong> ' + esc(x.verification_notes) + "</p>" : "") +
@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------- Loading ----------
   const EXTRA = ",pending_update,update_status,update_notes";
   const SERVICE_COLS = "id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,status,admin_notes,details,image_urls,created_at";
-  const OFFER_COLS = "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,remaining_installments,assignment_fee,discount_amount,discount_percent,developer_name,project_name,contact_name,contact_phone,land_area_m2,land_zoning,rental_period,rental_furnishing,rental_security_deposit,rental_minimum_months,description,image_urls,status,verification_notes,created_at";
+  const OFFER_COLS = "id,title,property_type,listing_purpose,city,area,area_m2,bedrooms,bathrooms,total_price,price_on_request,down_payment,paid_amount,remaining_amount,monthly_installment,remaining_installments,assignment_fee,discount_amount,discount_percent,developer_name,project_name,contact_name,contact_phone,land_area_m2,land_zoning,rental_period,rental_furnishing,rental_security_deposit,rental_minimum_months,description,image_urls,status,verification_notes,created_at";
   async function fetchMine(table, cols, owner) {
     const q = c => table + "?select=" + c + "&owner_id=eq." + owner + "&order=created_at.desc";
     const legacyCols = cols.split(",").filter(name =>
