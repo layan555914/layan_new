@@ -225,6 +225,5 @@ test("verified company owner is sent from the companies page to the existing com
   await page.waitForURL("**/company.html?id=" + COMPANY_ID);
 
   await expect(page).toHaveURL(new URL("./company.html?id=" + COMPANY_ID, page.url()).href);
-  await expect(page.locator(".company-topbar a[href='./company-dashboard.html']")).toHaveCount(0);") + "$"));
   await expect(page.locator(".company-topbar a[href='./company-dashboard.html']")).toHaveCount(0);
 });
