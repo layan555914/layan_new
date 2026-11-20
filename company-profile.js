@@ -92,6 +92,33 @@ document.addEventListener("DOMContentLoaded",async()=>{
    return '<li><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+esc(source.title||source.publisher||"مصدر")+' ↗</a><small>'+esc(source.publisher||"مصدر منشور")+(date?" · تاريخ الاطلاع: "+esc(date):"")+'</small></li>';
   }).join("")+'</ul>';
  }
+ async function publicProjectsMarkup(directoryEntityId){
+  try{
+   const relations=await api("directory_project_entities?select=project_id,relation_type&entity_id=eq."+encodeURIComponent(directoryEntityId));
+   const rows=Array.isArray(relations)?relations:[];
+   const projectIds=[...new Set(rows.map(row=>row.project_id).filter(Boolean))];
+   if(!projectIds.length){
+    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2><p>لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن.</p></section>';
+   }
+   const projectFilter="("+projectIds.join(",")+")";
+   const projects=await api("directory_projects?select=id,name_ar,project_type,project_status&public_visible=eq.true&verification_status=eq.published&id=in."+encodeURIComponent(projectFilter)+"&order=name_ar.asc");
+   const roleLabels={
+    developer:"المطور العقاري",land_owner:"مالك الأرض",marketing_agent:"وكيل تسويق",
+    sales_agent:"وكيل مبيعات",contractor:"مقاول",consultant:"استشاري",
+    operator:"جهة تشغيل",public_authority:"جهة عامة",other:"جهة مرتبطة"
+   };
+   const visible=(Array.isArray(projects)?projects:[]);
+   const byProject=new Map(rows.map(row=>[String(row.project_id),row.relation_type]));
+   return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2>'+
+    (visible.length
+     ?'<div class="company-linked-project-list">'+visible.map(project=>'<article class="company-linked-project"><div><strong>'+esc(project.name_ar||"مشروع عقاري")+'</strong><small>'+esc(roleLabels[byProject.get(String(project.id))]||"علاقة موثقة")+'</small></div><a href="./project.html?id='+encodeURIComponent(project.id)+'">فتح ملف المشروع ←</a></article>').join("")+'</div>'
+     :'<p>لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن. الطلبات التي ما زالت قيد المراجعة لا تظهر للعامة.</p>')+
+    '</section>';
+  }catch(error){
+   console.warn("Published company projects unavailable:",error);
+   return "";
+  }
+ }
  async function loadDirectoryEntity(){
   if(!/^[0-9a-f-]{36}$/i.test(entityId||"")){renderError("رابط ملف الجهة غير صحيح.");return;}
   const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,latitude,longitude,location_public,location_precision,location_source_id,location_verified_at,verification_status,representative_verified_at,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
@@ -145,6 +172,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     sources=Array.isArray(rows)?rows:[];
    }
   }catch(error){console.warn("Public source references unavailable:",error);}
+  const projectSectionMarkup=await publicProjectsMarkup(entity.id);
   document.title=name+" | ملف "+profileSubject+" – أسيوط عقار";
   const canonical=new URL("./company.html",location.href);
   canonical.searchParams.set("entity_id",entity.id);
@@ -181,6 +209,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   root.innerHTML=
    '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>لا يتوفر شعار موثّق</small></span>')+'</div><div><span class="eyebrow">ملف تعريفي منشور في دليل أسيوط عقار</span>'+(entity.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الجهة وصفته · لا يعني ذلك شهادة ترخيص للنشاط</span>':'')+'<h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div>'+serviceHighlightsMarkup+'<div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
    claimPanelMarkup+
+   projectSectionMarkup+
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':'')+
    contactDetailsMarkup+
    coverageMarkup+
@@ -299,6 +328,58 @@ document.addEventListener("DOMContentLoaded",async()=>{
       :"");
     const profileHero=root.querySelector(".company-profile-hero");
     if(profileHero)profileHero.insertAdjacentElement("afterend",target);else root.appendChild(target);
+
+    if(isRealEstateCompany){
+     const canManageProjects=isOwner||accessRole==="manager";
+     if(canManageProjects){
+      const tools=document.createElement("section");
+      tools.className="company-profile-managed-project-tools";
+      const isDeveloper=entity.entity_type==="developer"||entity.service_category==="real_estate_development";
+      const isMarketing=["marketing","brokerage","sales_office"].includes(entity.entity_type)||
+       ["real_estate_marketing","real_estate_brokerage","real_estate_sales"].includes(entity.service_category);
+      tools.innerHTML=
+       '<div class="company-profile-tools-heading"><span class="eyebrow">أدوات ملف الشركة</span><h3>إدارة المشروعات والوحدات والإعلانات</h3><p>كل طلب يخضع لمراجعة إدارة أسيوط عقار، ولا يظهر مشروع أو وحدة أو إعلان داخل المشروع إلا بعد اعتماد العلاقة والبيانات.</p></div>'+
+       '<section class="company-profile-tool-section"><h4>إدارة المشروعات</h4><p>'+
+        (isDeveloper?"يمكنك طلب إضافة مشروع جديد أو ربط ملف الشركة بمشروع منشور. طلب الإضافة لا ينشر المشروع تلقائيًا.":isMarketing?"يمكنك طلب ربط ملف الشركة بمشروع منشور بصفتك وكيل تسويق أو وكيل مبيعات. لا يتيح ملف التسويق إنشاء سجل مشروع جديد.":"طلبات المشروعات غير متاحة لهذا النوع من الملفات.")+
+       '</p><div id="companyProfileProjectManagementRoot"></div><div class="company-profile-tool-subheading"><strong>طلبات المشروعات</strong></div><div id="companyProfileProjectRequestsRoot" aria-live="polite"></div></section>'+
+       (isDeveloper
+        ?'<section class="company-profile-tool-section"><h4>وحدات المشروعات</h4><p>إضافة الوحدات متاحة للمالك المعتمد أو مدير الملف المفوض عندما تكون الشركة مرتبطة بالمشروع بصفة المطور أو مالك الأرض. تُراجع كل وحدة قبل ظهورها.</p><div id="companyProfileProjectUnitsRoot"></div><div class="company-profile-tool-subheading"><strong>طلبات الوحدات</strong></div><div id="companyProfileProjectUnitRequestsRoot" aria-live="polite"></div></section>'
+        :'<section class="company-profile-tool-section"><h4>وحدات المشروعات</h4><p>إضافة الوحدات ليست من صلاحيات وكيل التسويق أو المبيعات؛ يتولاها المطور أو مالك الأرض المعتمد.</p></section>')+
+       '<section class="company-profile-tool-section"><h4>ربط إعلان بوحدة منشورة</h4><p>يمكنك طلب ربط إعلان متاح تملكه أنت بوحدة منشورة في أحد مشروعات هذا الملف. لن يظهر الربط إلا بعد مراجعة الإدارة، ولا تُربط إعلانات الموظفين أو الشركة تلقائيًا.</p><div id="companyProfileOfferUnitLinkRoot"></div><div class="company-profile-tool-subheading"><strong>طلبات ربط إعلاناتك</strong></div><div id="companyProfileOfferUnitLinkRequestsRoot" aria-live="polite"></div></section>';
+      target.appendChild(tools);
+      const projectMount=window.AsyutCompanyProjectManagement?.mount;
+      if(typeof projectMount==="function"){
+       await projectMount({
+        entityId:entity.id,
+        root:tools.querySelector("#companyProfileProjectManagementRoot"),
+        requestsRoot:tools.querySelector("#companyProfileProjectRequestsRoot")
+       });
+      }
+      if(isDeveloper&&typeof window.AsyutCompanyProjectUnits?.mount==="function"){
+       await window.AsyutCompanyProjectUnits.mount({
+        entityId:entity.id,
+        root:tools.querySelector("#companyProfileProjectUnitsRoot"),
+        requestsRoot:tools.querySelector("#companyProfileProjectUnitRequestsRoot")
+       });
+      }else if(isDeveloper){
+       tools.querySelector("#companyProfileProjectUnitsRoot").textContent="أدوات إدارة الوحدات غير محملة. حدّث الصفحة وحاول مرة أخرى.";
+      }
+      if(typeof window.AsyutMyProjectUnitLink?.mount==="function"){
+       await window.AsyutMyProjectUnitLink.mount({
+        entityId:entity.id,
+        root:tools.querySelector("#companyProfileOfferUnitLinkRoot"),
+        requestsRoot:tools.querySelector("#companyProfileOfferUnitLinkRequestsRoot")
+       });
+      }else{
+       tools.querySelector("#companyProfileOfferUnitLinkRoot").textContent="أداة ربط الإعلانات غير محملة. حدّث الصفحة وحاول مرة أخرى.";
+      }
+     }else{
+      const note=document.createElement("section");
+      note.className="company-profile-section company-manager-access-note";
+      note.innerHTML='<h3>إدارة مشروعات الشركة</h3><p>تحديث بيانات الملف متاح بصلاحيتك الحالية، أما طلبات إضافة أو ربط المشروعات وإدارة الوحدات فتحتاج صفة المالك المعتمد أو مدير الملف المفوض.</p>';
+      target.appendChild(note);
+     }
+    }
 
     const directForm=target.querySelector("#companyManagerDirectForm");
     const directStatus=target.querySelector("#companyManagerStatus");
@@ -576,6 +657,10 @@ document.addEventListener("DOMContentLoaded",async()=>{
      :"");
    const profileHero=root.querySelector(".company-profile-hero");
    if(profileHero)profileHero.insertAdjacentElement("afterend",panel);else root.appendChild(panel);
+   const projectAccessNote=document.createElement("section");
+   projectAccessNote.className="company-profile-section company-manager-access-note";
+   projectAccessNote.innerHTML='<h3>المشروعات والوحدات التابعة للشركة</h3><p>إدارة المشروعات والوحدات تعتمد على سجل الشركة المنشور في الدليل العقاري والعلاقات الموثقة به. هذا الملف المقدم من الشركة لا يُربط بسجل الدليل لمجرد تشابه الاسم؛ حتى لا ننسب مشروعًا إلى جهة غير مقصودة. يمكن للإدارة مراجعة الربط الصحيح واستكماله عند التحقق.</p>';
+   panel.appendChild(projectAccessNote);
 
    const rpc=async(name,args)=>{
     const response=await auth.authedFetch(base+"/rest/v1/rpc/"+name,{
