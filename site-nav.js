@@ -108,6 +108,15 @@
   const nav = header.querySelector("nav");
   if (!nav) return;
 
+  // Final brighter villa identity: same brand family, shared background, typography and photo fallbacks.
+  if (!document.querySelector('link[data-asyut-villa-bright="global"]')) {
+    const villaBright = document.createElement("link");
+    villaBright.rel = "stylesheet";
+    villaBright.href = "/assets/theme/villa-bright-unified.css?v=20261120-1";
+    villaBright.dataset.asyutVillaBright = "global";
+    document.head.appendChild(villaBright);
+  }
+
   // ---------- 1) unified menu ----------
   const firstHref = (nav.querySelector("a") || {}).getAttribute?.("href") || "./";
   const prefix = /^\.\.\//.test(firstHref) ? "../" : "./";
