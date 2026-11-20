@@ -139,11 +139,14 @@
 
     section.hidden = false;
     if (count) count.textContent = "المساحة متاحة";
+    const inquiryUrl = "https://wa.me/201007044265?text=" + encodeURIComponent(
+      "مرحبًا، أرغب في طلب إعلان مميز داخل قسم «" + selected + "» في سوق الخدمات على منصة أسيوط عقار."
+    );
     grid.innerHTML =
       '<div class="mk-sponsored-empty">' +
       '<strong>لا توجد إعلانات مميزة في هذا القسم حاليًا</strong>' +
       '<p>يمكنك عرض نشاطك أمام العملاء الذين يبحثون عن هذه الخدمة.</p>' +
-      '<a class="btn btn-gold" href="./advertise.html">اطلب إعلانًا في هذا القسم</a>' +
+      '<a class="btn btn-gold" href="' + inquiryUrl + '" target="_blank" rel="noopener noreferrer">اطلب إعلانًا في هذا القسم</a>' +
       '</div>';
   }
 
