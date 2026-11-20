@@ -78,6 +78,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     if (params.get("kind")) activeKind = params.get("kind");
     if (params.get("deal")) activeDealKind = params.get("deal");
+    const rentalPeriod = params.get("rental_period") || "";
+    activeRentalPeriodFilter = ["يومي", "شهري", "سنوي"].includes(rentalPeriod) ? rentalPeriod : "";
     if (!params.has("purpose") && (params.has("down") || params.has("monthly")) && $("purposeFilter")) {
       $("purposeFilter").value = "تنازل";
     }
@@ -628,6 +630,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let offersPage = 1;
   const FAVORITES_KEY = "asyutAqarFavoriteOffers";
   let activeDealKind = "";
+  let activeRentalPeriodFilter = "";
   let selectedAccountType = "individual";
   let selectedPromotionDuration = 15;
   const LAYAN_PHONE = "201007044265";
@@ -842,10 +845,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Advertiser page (advertiser.html?id=<owner>&name=<advertiser name>) shows one advertiser's listings only:
     // same account AND same advertiser name, so one account posting for several companies gets a page per company.
     const pageParams = new URLSearchParams(window.location.search);
-    const requestedRentalPeriod = pageParams.get("rental_period") || "";
-    const rentalPeriodFilter = ["يومي", "شهري", "سنوي"].includes(requestedRentalPeriod)
-      ? normalizeSearch(requestedRentalPeriod)
-      : "";
+    const rentalPeriodFilter = normalizeSearch(activeRentalPeriodFilter);
     const ownerFilter = String(pageParams.get("id") || "").trim();
     const brandFilter = window.LAYAN_BRAND_KEY(pageParams.get("name") || "");
     const onAdvertiserPage = document.body.classList.contains("page-advertiser");
@@ -1457,6 +1457,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (advancedToggle) { advancedToggle.setAttribute("aria-expanded", "false"); advancedToggle.textContent = "＋ فلاتر إضافية"; }
     activeKind = "";
     activeDealKind = "";
+    activeRentalPeriodFilter = "";
+    const currentUrl = new URL(window.location.href);
+    ["q", "purpose", "type", "city", "area", "rental_period", "max", "down", "monthly", "beds", "sort", "kind", "deal"]
+      .forEach(key => currentUrl.searchParams.delete(key));
+    window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search + currentUrl.hash);
     syncPurposeFilterControls();
     document.querySelectorAll("[data-category-kind]").forEach(tile => {
       tile.classList.remove("active");
