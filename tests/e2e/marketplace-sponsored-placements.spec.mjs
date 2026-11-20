@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-const SUPABASE = "https://example-project.supabase.co";
-
 const ads = [
   {
     id: "ceramic-ad",
@@ -39,7 +37,7 @@ const ads = [
 ];
 
 test("marketplace shows active sponsored ads and filters them by the selected service category", async ({ page }) => {
-  await page.route(SUPABASE + "/**", async route => {
+  await page.route("**/rest/v1/**", async route => {
     const request = route.request();
     const url = new URL(request.url());
     const table = url.pathname.split("/").pop();
@@ -78,7 +76,7 @@ test("marketplace shows active sponsored ads and filters them by the selected se
 });
 
 test("a category without an active ad offers a clear route to request an ad", async ({ page }) => {
-  await page.route(SUPABASE + "/**", async route => {
+  await page.route("**/rest/v1/**", async route => {
     const table = new URL(route.request().url()).pathname.split("/").pop();
     if (table === "public_active_supplier_ads") {
       return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(ads) });
