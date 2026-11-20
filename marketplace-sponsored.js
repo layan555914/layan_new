@@ -64,9 +64,14 @@
   let loadFailed = false;
 
   function matchesCategory(ad, selected) {
-    if (!selected) return true;
-    const aliases = normalizedAliases[selected];
-    return !!aliases && aliases.has(normalize(ad.category));
+    const category = normalize(ad.category);
+    if (selected) {
+      const aliases = normalizedAliases[selected];
+      return !!aliases && aliases.has(category);
+    }
+    // Do not mix property-development or unrelated commercial ads into the
+    // services marketplace when the visitor has not selected a category.
+    return Object.values(normalizedAliases).some(aliases => aliases.has(category));
   }
 
   function matchesSearch(ad, query) {
