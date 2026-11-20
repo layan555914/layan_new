@@ -64,6 +64,7 @@
   let loadFailed = false;
 
   function matchesCategory(ad, selected) {
+    if (Array.isArray(ad.placement_keys) && !ad.placement_keys.includes("marketplace")) return false;
     const category = normalize(ad.category);
     if (selected) {
       const aliases = normalizedAliases[selected];
@@ -152,17 +153,32 @@
 
   async function load() {
     try {
-      const response = await fetch(
-        base + "/rest/v1/public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=50",
-        { headers: { apikey: key, Authorization: "Bearer " + key } }
-      );
-      const raw = await response.text();
-      let data = [];
-      try { data = raw ? JSON.parse(raw) : []; } catch (_) {}
-      if (!response.ok || !Array.isArray(data)) {
-        throw new Error("تعذر تحميل الإعلانات المميزة.");
+      const fetchAds = async includePlacements => {
+        const columns = "id,business_name,category,title,description,image_url,target_url,contact_phone,created_at" +
+          (includePlacements ? ",placement_keys" : "");
+        const response = await fetch(
+          base + "/rest/v1/public_active_supplier_ads?select=" + columns + "&order=created_at.desc&limit=50",
+          { headers: { apikey: key, Authorization: "Bearer " + key } }
+        );
+        const raw = await response.text();
+        let data = [];
+        try { data = raw ? JSON.parse(raw) : []; } catch (_) {}
+        if (!response.ok || !Array.isArray(data)) {
+          const error = new Error(data?.message || "تعذر تحميل الإعلانات المميزة.");
+          error.status = response.status;
+          throw error;
+        }
+        return data;
+      };
+      try {
+        ads = await fetchAds(true);
+      } catch (schemaError) {
+        const message = String(schemaError?.message || schemaError || "");
+        if (!/placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
+        ads = (await fetchAds(false)).map(item => ({
+          ...item, placement_keys: ["home", "offers", "marketplace", "featured"]
+        }));
       }
-      ads = data;
       render();
     } catch (error) {
       loadFailed = true;
