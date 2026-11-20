@@ -1,5 +1,4 @@
 async function mountMyProjectUnitLink(options = {}) {
-  "use strict";
   const profileEntityId = String(options.entityId || "");
   const root = options.root || document.getElementById("myProjectUnitLinkFormRoot");
   const requestsRoot = options.requestsRoot || document.getElementById("myProjectUnitLinkRequests");
