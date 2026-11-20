@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const contactDetailsTitle=isServiceProvider?"بيانات التواصل ومقر مقدم الخدمة":isRealEstateCompany?"بيانات التواصل ومقر الشركة":"بيانات التواصل ومقر الجهة";
   const contactDetailsMarkup=contactDetails.length
    ?'<section class="company-profile-section company-contact-details"><h2>'+contactDetailsTitle+'</h2><div class="company-detail-grid">'+contactDetails.join("")+'</div></section>'
-   :"";
+   :'<section class="company-profile-section company-contact-details"><h2>'+contactDetailsTitle+'</h2><p class="company-detail-empty">لم تُنشر بيانات التواصل أو العنوان حتى الآن.</p></section>';
   const coverageMarkup=coverage.length
    ?'<section class="company-profile-section company-coverage-section"><h2>نطاق تقديم الخدمات</h2><div class="company-coverage-list">'+coverage.map(area=>'<span>'+esc(area)+'</span>').join('')+'</div></section>'
    :"";
