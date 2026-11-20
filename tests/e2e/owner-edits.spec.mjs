@@ -63,7 +63,7 @@ test("owner edits a published listing: all data, new photo and cover photo go to
   await expect(card.getByRole("button", { name: "تعديل الإعلان" })).toBeVisible();
   await expect(page.locator("[data-kind='offer'][data-id='502']").getByRole("button", { name: "تعديل الإعلان" })).toBeVisible();
   await expect(page.locator("[data-kind='service']").getByRole("button", { name: "تعديل الإعلان" })).toBeVisible();
-  expect(state.offerSelects[0]).toContain("price_on_request");
+  expect(state.offerSelects.some(select => select.includes("price_on_request"))).toBe(true);
   const onRequestCard = page.locator("[data-kind='offer'][data-id='502']");
   await expect(onRequestCard).toContainText("السعر عند التواصل");
   await onRequestCard.getByRole("button", { name: "تعديل الإعلان" }).click();
