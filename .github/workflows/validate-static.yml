@@ -401,6 +401,16 @@ jobs:
           bash -n tests/db/supplier-ad-placement-targets-smoke.sh
           bash tests/db/supplier-ad-placement-targets-smoke.sh
 
+      - name: Test marketplace provider profile links and RLS on isolated PostgreSQL
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+        run: |
+          bash -n tests/db/marketplace-provider-link-security-smoke.sh
+          bash tests/db/marketplace-provider-link-security-smoke.sh
+
       - name: Install Playwright test runner
         run: npm install --no-save --no-package-lock @playwright/test@1.64.1
 
