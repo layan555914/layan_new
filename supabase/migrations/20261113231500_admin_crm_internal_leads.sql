@@ -126,9 +126,9 @@ BEGIN
     AND (NULLIF(p_category, '') IS NULL OR p_category = 'all' OR l.category = p_category)
     AND (
       COALESCE(p_due, 'all') = 'all'
-      OR (p_due = 'overdue' AND l.next_follow_up_at < now())
-      OR (p_due = 'today' AND (l.next_follow_up_at AT TIME ZONE 'Africa/Cairo')::date = (now() AT TIME ZONE 'Africa/Cairo')::date)
-      OR (p_due = 'upcoming' AND l.next_follow_up_at >= now())
+      OR (p_due = 'overdue' AND l.stage NOT IN ('converted','not_interested') AND l.next_follow_up_at < now())
+      OR (p_due = 'today' AND l.stage NOT IN ('converted','not_interested') AND (l.next_follow_up_at AT TIME ZONE 'Africa/Cairo')::date = (now() AT TIME ZONE 'Africa/Cairo')::date)
+      OR (p_due = 'upcoming' AND l.stage NOT IN ('converted','not_interested') AND l.next_follow_up_at >= now())
     )
   ORDER BY l.next_follow_up_at ASC NULLS LAST, l.updated_at DESC
   LIMIT LEAST(GREATEST(COALESCE(p_limit, 200), 1), 500);
