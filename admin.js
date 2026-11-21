@@ -69,6 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
     try { data = raw ? JSON.parse(raw) : null; } catch (_) { data = raw; }
     if (!response.ok) {
       const detail = data?.message || data?.error_description || data?.msg || data?.error || data?.details || data?.hint;
+      if (response.status === 401 && !isAuthEndpoint) {
+        session = null;
+        showState(false);
+        throw new Error("انتهت جلسة الإدارة أو لم تعد صالحة. سجّل الدخول مرة أخرى.");
+      }
       if (response.status === 400 && path.startsWith("/auth/v1/token")) {
         throw new Error(detail || "بيانات الدخول غير صحيحة أو لم يتم تفعيل تأكيد البريد في حساب Supabase.");
       }
@@ -204,7 +209,9 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="admin-actions"><label>الشارة <select data-trust-badge>' + option("", "بدون توثيق", x.trust_badge) + option("owner", "مالك موثّق", x.trust_badge) + option("company", "شركة موثّقة", x.trust_badge) + '</select></label>' +
         '<button type="button" class="btn btn-gold" data-trust-save>حفظ الشارة</button></div></div></article>').join("");
     } catch (error) {
-      target.innerHTML = '<p class="admin-empty">' + (/trust_badge/.test(String(error.message || "")) ? "يلزم تطبيق تحديث قاعدة البيانات الخاص بشارات التوثيق أولًا." : esc(error.message || "تعذر تحميل الإعلانات المنشورة.")) + '</p>';
+      const message = /trust_badge/.test(String(error.message || "")) ? "يلزم تطبيق تحديث قاعدة البيانات الخاص بشارات التوثيق أولًا." : (error.message || "تعذر تحميل الإعلانات المنشورة.");
+      target.innerHTML = '<p class="admin-empty">' + esc(message) + '</p>';
+      throw new Error(message);
     }
   }
   document.getElementById("trustBadgeOffers")?.addEventListener("click", async event => {
@@ -256,6 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const documentCountEl = document.getElementById("statPendingDocuments");
       if (documentCountEl) documentCountEl.textContent = "—";
       propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
+      throw error;
     }
   }
   let companyDraftSupported = false;
@@ -392,6 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
       companyClaimsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل طلبات استلام الملفات.") + '</p>';
       const countEl = document.getElementById("statPendingCompanyClaims");
       if (countEl) countEl.textContent = "—";
+      throw error;
     }
   }
 
@@ -438,6 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
       companyEntityUpdatesList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل تعديلات ملفات الجهات.") + '</p>';
       const countEl = document.getElementById("statPendingCompanyEntityUpdates");
       if (countEl) countEl.textContent = "—";
+      throw error;
     }
   }
 
@@ -471,6 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const countEl = document.getElementById("statPendingCompanyAds");
       if (countEl) countEl.textContent = "—";
       companyAdsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل إعلانات الشركات.") + '</p>';
+      throw error;
     }
   }
 
@@ -488,6 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ).join("");
     } catch (error) {
       adSlotsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل المساحات الإعلانية.") + '</p>';
+      throw error;
     }
   }
 
@@ -513,23 +525,102 @@ document.addEventListener("DOMContentLoaded", () => {
         '</tbody></table></div><p class="admin-empty">يتم عرض أول 100 حساب. لا تتوفر من هذه الشاشة إجراءات حذف أو تغيير كلمات المرور.</p>';
     } catch (error) {
       usersList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل حسابات المستخدمين.") + '</p>';
+      throw error;
     }
   }
 
   async function loadAdminStats() {
-    const panel=document.getElementById("adminStats");
-    const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value);};
-    const [properties,marketPending,companyPending,marketApproved]=await Promise.all([
+    const panel = document.getElementById("adminStats");
+    const set = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = String(value);
+    };
+    const results = await Promise.allSettled([
       request("/rest/v1/property_offers?select=id&status=eq.pending"),
       request("/rest/v1/marketplace_listings?select=id&status=eq.pending"),
-      request("/rest/v1/rpc/layan_admin_pending_company_profile_count",{method:"POST",body:"{}"}),
+      request("/rest/v1/rpc/layan_admin_pending_company_profile_count", { method: "POST", body: "{}" }),
       request("/rest/v1/marketplace_listings?select=id&status=eq.approved")
     ]);
-    set("statPendingProperties",Array.isArray(properties)?properties.length:0);
-    set("statPendingMarketplace",Array.isArray(marketPending)?marketPending.length:0);
-    set("statPendingCompanies",Number(companyPending)||0);
-    set("statApprovedMarketplace",Array.isArray(marketApproved)?marketApproved.length:0);
-    if(panel)panel.hidden=false;
+
+    const sessionFailure = results.find(result =>
+      result.status === "rejected" &&
+      /HTTP 401|انتهت جلسة الإدارة|سجّل الدخول إلى حساب الإدارة/i.test(String(result.reason?.message || result.reason))
+    );
+    if (sessionFailure || !session?.access_token) {
+      throw sessionFailure?.reason || new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
+    }
+
+    const count = result => {
+      if (result.status !== "fulfilled" || result.value == null) return "—";
+      if (Array.isArray(result.value)) return result.value.length;
+      const number = Number(result.value);
+      return Number.isFinite(number) ? number : "—";
+    };
+
+    set("statPendingProperties", count(results[0]));
+    set("statPendingMarketplace", count(results[1]));
+    set("statPendingCompanies", count(results[2]));
+    set("statApprovedMarketplace", count(results[3]));
+    if (panel) {
+      panel.hidden = false;
+      let note = panel.querySelector("[data-admin-stats-note]");
+      const failed = results.filter(result => result.status === "rejected").length;
+      if (failed) {
+        if (!note) {
+          note = document.createElement("p");
+          note.className = "admin-empty admin-pending";
+          note.dataset.adminStatsNote = "";
+          panel.appendChild(note);
+        }
+        note.textContent = "بعض المؤشرات لم تُحمّل. ستظل المؤشرات المتاحة ظاهرة، ويمكنك استخدام «تحديث البيانات» لإعادة المحاولة.";
+      } else if (note) {
+        note.remove();
+      }
+    }
+    return results.every(result => result.status === "fulfilled");
+  }
+
+  function isAdminSessionFailure(error) {
+    return /HTTP 401|invalid jwt|jwt expired|انتهت جلسة الإدارة|سجّل الدخول إلى حساب الإدارة/i
+      .test(String(error?.message || error || ""));
+  }
+
+  async function runAdminSectionSafely(targetId, label, loader) {
+    try {
+      await loader();
+      if (!session?.access_token) {
+        throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
+      }
+      return true;
+    } catch (error) {
+      if (isAdminSessionFailure(error) || !session?.access_token) throw error;
+
+      const target = document.getElementById(targetId);
+      if (target) {
+        const note = document.createElement("p");
+        note.className = "admin-empty admin-pending";
+        note.textContent = "تعذر تحميل " + label + ": " + String(error?.message || "حدث خطأ غير متوقع.");
+
+        const retry = document.createElement("button");
+        retry.type = "button";
+        retry.className = "btn btn-outline-dark";
+        retry.textContent = "إعادة المحاولة";
+        retry.addEventListener("click", async () => {
+          retry.disabled = true;
+          retry.textContent = "جارٍ إعادة المحاولة...";
+          try {
+            await runAdminSectionSafely(targetId, label, loader);
+          } catch (retryError) {
+            showState(false);
+            setStatus(retryError.message || "انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
+          }
+        });
+        target.replaceChildren(note, retry);
+      }
+
+      console.error("ASYUT AQAR admin section failed:", label, error);
+      return false;
+    }
   }
 
   async function loadPending() {
@@ -552,26 +643,51 @@ document.addEventListener("DOMContentLoaded", () => {
         return false;
       }
 
-      const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
-      const supplierCountEl = document.getElementById("statPendingSupplierAds");
-      if (supplierCountEl) supplierCountEl.textContent = String(Array.isArray(rows) ? rows.length : 0);
-      render(rows);
-      await loadAdminStats();
-      await loadPendingCompanyProfiles();
-      await loadPendingCompanyClaims();
-      await loadPendingCompanyEntityUpdates();
-      await loadPendingMarketplaceListings();
-      await loadPendingPropertyOffers();
-      await loadPendingPropertyDocuments();
-      await loadTrustBadgeOffers();
-      await loadPendingCompanyAds();
-      await loadPendingAdSlots();
-      await loadAdminUsers();
       showState(true);
-      // admin-console.js (users, activity, admins, exports) starts once the admin check passed.
+      // Admin authentication is complete. Initialize the console before loading its independent sections.
       window.AsyutAdmin = { request, setStatus, esc, reload: () => document.getElementById("reloadPending")?.click() };
       window.dispatchEvent(new CustomEvent("asyut:admin-ready"));
-      setStatus("تم التحقق من صلاحية الإدارة وتحميل طلبات الإعلانات والشركات ومستندات العقارات.");
+
+      const sections = [
+        {
+          target: "pendingAds",
+          label: "طلبات الإعلانات الممولة",
+          load: async () => {
+            const rows = await request("/rest/v1/supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,plan_code,requested_days,created_at&status=eq.pending&order=created_at.asc");
+            const supplierCountEl = document.getElementById("statPendingSupplierAds");
+            if (supplierCountEl) supplierCountEl.textContent = String(Array.isArray(rows) ? rows.length : 0);
+            render(rows);
+          }
+        },
+        { target: "pendingCompanyProfiles", label: "ملفات الشركات", load: loadPendingCompanyProfiles },
+        { target: "pendingCompanyClaims", label: "طلبات استلام ملفات الجهات", load: loadPendingCompanyClaims },
+        { target: "pendingCompanyEntityUpdates", label: "تعديلات ملفات الجهات", load: loadPendingCompanyEntityUpdates },
+        { target: "pendingMarketplaceListings", label: "إعلانات سوق الخدمات", load: loadPendingMarketplaceListings },
+        { target: "pendingPropertyOffers", label: "إعلانات العقارات", load: loadPendingPropertyOffers },
+        { target: "pendingPropertyDocuments", label: "مستندات العقارات", load: loadPendingPropertyDocuments },
+        { target: "trustBadgeOffers", label: "شارات توثيق المعلنين", load: loadTrustBadgeOffers },
+        { target: "pendingCompanyAds", label: "إعلانات الشركات", load: loadPendingCompanyAds },
+        { target: "pendingAdSlots", label: "مساحات الإعلانات", load: loadPendingAdSlots },
+        { target: "adminUsers", label: "قائمة الحسابات الأساسية", load: loadAdminUsers }
+      ];
+
+      const [sectionResults, statsLoaded] = await Promise.all([
+        Promise.all(sections.map(section =>
+          runAdminSectionSafely(section.target, section.label, section.load)
+        )),
+        loadAdminStats()
+      ]);
+
+      if (!session?.access_token) {
+        throw new Error("انتهت جلسة الإدارة. سجّل الدخول مرة أخرى.");
+      }
+
+      const failedSections = sectionResults.filter(loaded => !loaded).length;
+      const failedStats = statsLoaded ? 0 : 1;
+      const totalFailures = failedSections + failedStats;
+      setStatus(totalFailures
+        ? "تم التحقق من صلاحية الإدارة وفتح اللوحة. تعذر تحميل " + totalFailures + " من أقسام البيانات؛ استخدم «إعادة المحاولة» داخل القسم أو «تحديث البيانات»."
+        : "تم التحقق من صلاحية الإدارة وتحميل أقسام لوحة الإدارة.");
       return true;
     } catch (error) {
       showState(false);
