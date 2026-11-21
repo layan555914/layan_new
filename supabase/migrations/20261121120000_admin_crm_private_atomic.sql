@@ -506,7 +506,7 @@ REVOKE ALL ON FUNCTION private.layan_admin_list_crm_archived(text,text,text,inte
 REVOKE ALL ON FUNCTION private.layan_admin_list_crm_summary() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION private.layan_admin_list_crm_activities(uuid,integer) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION private.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text) FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION private.layan_admin_crm_log_activity(uuid,text,text,timestamptz) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_crm_log_activity(uuid,text,text,text,timestamptz) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION private.layan_admin_crm_archive_lead(uuid) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION private.layan_admin_crm_restore_lead(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION private.layan_admin_list_crm_leads(text,text,text,text,integer) TO authenticated;
@@ -514,7 +514,7 @@ GRANT EXECUTE ON FUNCTION private.layan_admin_list_crm_archived(text,text,text,i
 GRANT EXECUTE ON FUNCTION private.layan_admin_list_crm_summary() TO authenticated;
 GRANT EXECUTE ON FUNCTION private.layan_admin_list_crm_activities(uuid,integer) TO authenticated;
 GRANT EXECUTE ON FUNCTION private.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text) TO authenticated;
-GRANT EXECUTE ON FUNCTION private.layan_admin_crm_log_activity(uuid,text,text,timestamptz) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_crm_log_activity(uuid,text,text,text,timestamptz) TO authenticated;
 GRANT EXECUTE ON FUNCTION private.layan_admin_crm_archive_lead(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION private.layan_admin_crm_restore_lead(uuid) TO authenticated;
 
