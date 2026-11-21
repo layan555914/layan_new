@@ -121,8 +121,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
  }
  async function publicServiceOffersMarkup(directoryEntityId){
   try{
-   const rows=await api("marketplace_listings?select=id,title,description,category,city,area,price,price_period,created_at&status=eq.approved&details->>provider_entity_id=eq."+encodeURIComponent(directoryEntityId)+"&order=created_at.desc&limit=30");
-   const offers=Array.isArray(rows)?rows:[];
+   const rows=await api("marketplace_listing_provider_links?select=listing:marketplace_listings!inner(id,title,description,category,city,area,price,price_period,created_at)&directory_entity_id=eq."+encodeURIComponent(directoryEntityId)+"&listing.status=eq.approved&order=created_at.desc&limit=30");
+   const offers=(Array.isArray(rows)?rows:[]).map(row=>row.listing).filter(Boolean);
    const cards=offers.map(item=>{
     const price=item.price!==null&&item.price!==undefined?Number(item.price).toLocaleString("ar-EG")+" ج.م"+(item.price_period?" "+esc(item.price_period):""):"السعر عند التواصل";
     const place=[item.city,item.area].filter(Boolean).join("، ")||"أسيوط";
