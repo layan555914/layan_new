@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const money = v => v == null || v === "" ? "—" : Number(v).toLocaleString("ar-EG-u-nu-latn") + " جنيه";
   const MAX_OFFER_PHOTOS = 10, MAX_SERVICE_PHOTOS = 5;
-  let offers = [], services = [];
+  let offers = [], services = [], managedServiceProfiles = [];
 
   async function api(path, options = {}) {
     const session = await auth.requireAuthenticated();
@@ -60,6 +60,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function serviceCard(x) {
     const details = Object.entries(x.details || {}).filter(([, v]) => String(v ?? "").trim()).slice(0, 10);
+    const providerId = String(x.provider_link?.directory_entity_id || "");
+    const provider = managedServiceProfiles.find(item => String(item.id) === providerId);
+    const providerSection = providerId
+      ? '<p class="my-provider-link-state">مرتبط بملف مقدم الخدمة: <strong>' + esc(provider?.name_ar || provider?.name_en || "ملف مقدم الخدمة") + "</strong></p>" +
+        '<a class="my-provider-link-open" href="./company.html?entity_id=' + encodeURIComponent(providerId) + '">عرض ملف مقدم الخدمة ←</a>'
+      : managedServiceProfiles.length
+        ? '<div class="my-listing-actions"><button type="button" class="btn btn-outline" data-act="link-provider">ربط الإعلان بملف نشاطك</button></div>'
+        : '<p class="my-provider-link-hint">لربط الإعلان بملف مقدم الخدمة، استلم الملف أولًا من <a href="./marketplace.html">سوق الخدمات</a>.</p>';
     return '<article class="my-listing-card" data-kind="service" data-id="' + esc(x.id) + '">' +
       '<div class="my-listing-top"><span class="my-listing-status status-' + esc(x.status) + '">' + esc(SERVICE_STATUS[x.status] || x.status) + "</span><small>" + esc(x.category) + " · " + esc(x.listing_type) + "</small></div>" +
       "<h2>" + esc(x.title) + "</h2>" + photos(x.image_urls) + "<p>" + esc(x.description) + "</p>" +
@@ -67,8 +75,111 @@ document.addEventListener("DOMContentLoaded", () => {
       "<p><strong>السعر:</strong> " + (x.price == null ? "عند التواصل" : money(x.price) + " " + esc(x.price_period || "")) + "</p>" +
       (details.length ? '<div class="my-listing-detail-chips">' + details.map(([k, v]) => "<span>" + esc(k.replace(/_/g, " ")) + ": " + esc(v) + "</span>").join("") + "</div>" : "") +
       (x.admin_notes ? '<p class="my-listing-note"><strong>ملاحظة الإدارة:</strong> ' + esc(x.admin_notes) + "</p>" : "") +
-      editState(x) +
+      providerSection + editState(x) +
       '<div class="my-listing-actions"><button type="button" class="btn btn-gold" data-act="edit">تعديل الإعلان</button><button type="button" class="btn btn-danger-soft" data-act="delete">حذف</button></div></article>';
+  }
+
+  async function loadManagedServiceProfiles(owner) {
+    managedServiceProfiles = [];
+    const ids = new Set();
+    try {
+      const managers = await api("company_entity_managers?select=directory_entity_id&owner_user_id=eq." + owner + "&verified_at=not.is.null");
+      (Array.isArray(managers) ? managers : []).forEach(row => { if (row.directory_entity_id) ids.add(String(row.directory_entity_id)); });
+    } catch (error) {
+      console.warn("Verified provider profile lookup unavailable:", error);
+    }
+    try {
+      const members = await api("company_entity_manager_members?select=directory_entity_id,member_role&user_id=eq." + owner + "&revoked_at=is.null&member_role=in.(manager,editor)");
+      (Array.isArray(members) ? members : []).forEach(row => {
+        if (row.directory_entity_id && ["manager", "editor"].includes(row.member_role)) ids.add(String(row.directory_entity_id));
+      });
+    } catch (error) {
+      console.warn("Provider profile membership lookup unavailable:", error);
+    }
+    const safeIds = [...ids].filter(id => /^[0-9a-f-]{36}$/i.test(id));
+    if (!safeIds.length) return;
+    try {
+      const profiles = await api("directory_entities?select=id,name_ar,name_en&public_visible=eq.true&verification_status=eq.published&id=in.(" + safeIds.join(",") + ")");
+      managedServiceProfiles = Array.isArray(profiles) ? profiles : [];
+    } catch (error) {
+      console.warn("Published provider profile lookup unavailable:", error);
+      managedServiceProfiles = [];
+    }
+  }
+
+  async function loadMyServiceProviderLinks() {
+    if (!services.length) return;
+    const ids = services.map(row => String(row.id)).filter(id => /^[0-9a-f-]{36}$/i.test(id));
+    if (!ids.length) return;
+    try {
+      const links = await api("marketplace_listing_provider_links?select=listing_id,directory_entity_id&listing_id=in.(" + ids.join(",") + ")");
+      const byListing = new Map((Array.isArray(links) ? links : []).map(link => [String(link.listing_id), String(link.directory_entity_id)]));
+      services.forEach(row => { row.provider_link = byListing.has(String(row.id)) ? { directory_entity_id: byListing.get(String(row.id)) } : null; });
+    } catch (error) {
+      console.warn("Existing marketplace provider links unavailable:", error);
+    }
+  }
+
+  async function openProviderLink(row, button) {
+    if (!managedServiceProfiles.length) {
+      say("لا يوجد ملف مقدم خدمة معتمد مرتبط بحسابك. استلم الملف أولًا من سوق الخدمات.");
+      return;
+    }
+    if (row.provider_link?.directory_entity_id) {
+      say("الإعلان مرتبط بالفعل بملف مقدم خدمة.");
+      return;
+    }
+    const picker = document.createElement("dialog");
+    picker.className = "my-edit-dialog";
+    picker.innerHTML = '<form method="dialog" class="my-edit-form" novalidate>' +
+      '<div class="my-edit-head"><h2>ربط الإعلان بملف مقدم الخدمة</h2><button type="button" class="my-edit-close" data-close aria-label="إغلاق">×</button></div>' +
+      '<p class="my-edit-intro">سيظهر الإعلان داخل ملف النشاط بعد تأكيد الربط. لا يمكنك اختيار ملف إلا إذا كانت صفتك معتمدة وكنت صاحب الإعلان.</p>' +
+      '<div class="my-edit-fields"><label class="is-wide">اختر ملف النشاط<select name="provider_entity_id" required>' +
+      managedServiceProfiles.map(item => '<option value="' + esc(item.id) + '">' + esc(item.name_ar || item.name_en || "ملف مقدم خدمة") + '</option>').join("") +
+      '</select></label></div><p class="my-edit-status" role="status" aria-live="polite"></p>' +
+      '<div class="my-edit-foot"><button type="submit" class="btn btn-gold">تأكيد الربط</button><button type="button" class="btn btn-outline" data-close>إلغاء</button></div></form>';
+    document.body.appendChild(picker);
+    const pickerForm = picker.querySelector("form");
+    const message = picker.querySelector('[role="status"]');
+    picker.addEventListener("click", event => {
+      if (event.target === picker || event.target.closest("[data-close]")) {
+        picker.close();
+        picker.remove();
+      }
+    });
+    pickerForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const submit = pickerForm.querySelector('button[type="submit"]');
+      const profileId = String(new FormData(pickerForm).get("provider_entity_id") || "");
+      if (!managedServiceProfiles.some(item => String(item.id) === profileId)) {
+        message.textContent = "اختيار الملف غير صالح. حدّث الصفحة وحاول مرة أخرى.";
+        return;
+      }
+      submit.disabled = true;
+      if (button?.isConnected) button.disabled = true;
+      message.textContent = "جارٍ تأكيد الربط...";
+      try {
+        const session = await auth.requireAuthenticated();
+        await api("marketplace_listing_provider_links", {
+          method: "POST",
+          headers: { Prefer: "return=minimal" },
+          body: JSON.stringify({ listing_id: row.id, directory_entity_id: profileId, linked_by: session.user.id })
+        });
+        picker.close();
+        picker.remove();
+        say("تم ربط الإعلان بملف مقدم الخدمة بنجاح. لم تتغير بيانات الإعلان أو حالة نشره.");
+        await load();
+      } catch (error) {
+        message.textContent = error?.code === "42501" || error?.status === 403
+          ? "تعذر الربط: يجب أن تكون صفتك معتمدة للملف وأن يكون الإعلان مملوكًا لحسابك."
+          : error?.code === "23505"
+            ? "هذا الإعلان مرتبط بالفعل بملف مقدم خدمة."
+            : error.message || "تعذر ربط الإعلان الآن.";
+        submit.disabled = false;
+        if (button?.isConnected) button.disabled = false;
+      }
+    });
+    picker.showModal();
   }
 
   // ---------- Edit dialog ----------
@@ -318,6 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!row) return;
     const act = btn.dataset.act;
     if (act === "edit") return openEdit(kind, row);
+    if (act === "link-provider" && kind === "service") return openProviderLink(row, btn);
     if (act === "delete" && btn.dataset.confirm !== "1") {
       btn.dataset.confirm = "1"; btn.textContent = "اضغط مرة تانية لتأكيد الحذف";
       setTimeout(() => { if (btn.isConnected) { btn.dataset.confirm = ""; btn.textContent = "حذف"; } }, 5000);
@@ -365,6 +477,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const session = await auth.requireAuthenticated();
       const owner = encodeURIComponent(session.user.id);
       [services, offers] = await Promise.all([fetchMine("marketplace_listings", SERVICE_COLS, owner), fetchMine("property_offers", OFFER_COLS, owner)]);
+      await loadManagedServiceProfiles(owner);
+      await loadMyServiceProviderLinks();
       grid.innerHTML = services.length ? services.map(serviceCard).join("") : '<p class="my-listings-empty">لا توجد إعلانات في سوق الخدمات حتى الآن. <a href="./marketplace.html">أضف خدمة</a></p>';
       if (propertyGrid) propertyGrid.innerHTML = offers.length ? offers.map(offerCard).join("") : '<p class="my-listings-empty">لا توجد إعلانات عقارية مرتبطة بحسابك حتى الآن. <a href="./?add=1">أضف عقارك</a></p>';
       if (!/✓|تم /.test(status.textContent)) status.textContent = "دي إعلاناتك أنت بس — تقدر تعدّلها أو تحذفها في أي وقت.";
