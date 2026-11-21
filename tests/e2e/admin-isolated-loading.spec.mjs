@@ -42,7 +42,10 @@ async function mockAdminWithOneBrokenSection(page) {
       if (name === "layan_is_admin") return reply(route, true);
       if (name === "layan_admin_list_company_profiles") {
         state.companyProfileListCalls += 1;
-        return reply(route, { message: "simulated company-list outage" }, 503);
+        if (state.companyProfileListCalls === 1) {
+          return reply(route, { message: "simulated company-list outage" }, 503);
+        }
+        return reply(route, []);
       }
       if (name === "layan_admin_activity_summary") {
         return reply(route, {
@@ -68,7 +71,7 @@ async function mockAdminWithOneBrokenSection(page) {
   return state;
 }
 
-test("admin console stays available when one review section fails and offers a retry", async ({ page }) => {
+test("admin console survives an isolated section failure and recovers on retry", async ({ page }) => {
   const state = await mockAdminWithOneBrokenSection(page);
 
   await page.goto("/admin.html");
@@ -93,6 +96,7 @@ test("admin console stays available when one review section fails and offers a r
 
   await page.locator("#pendingCompanyProfiles button").click();
   await expect.poll(() => state.companyProfileListCalls).toBe(2);
-  await expect(page.locator("#pendingCompanyProfiles button")).toHaveText("إعادة المحاولة");
+  await expect(page.locator("#pendingCompanyProfiles")).toContainText("لا توجد طلبات ملفات شركات معلقة.");
+  await expect(page.locator("#pendingCompanyProfiles button")).toHaveCount(0);
   await expect(page.locator("#adminConsole")).toBeVisible();
 });
