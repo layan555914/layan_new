@@ -494,6 +494,11 @@ BEGIN
 END
 $function$;
 
+COMMENT ON TABLE private.admin_crm_leads IS
+  'Internal ASYUT AQAR prospective advertiser and sponsor CRM. Never exposed as a public API table.';
+COMMENT ON TABLE private.admin_crm_activities IS
+  'Append-only internal CRM communication timeline. Never exposed as a public API table.';
+
 -- Authenticated callers reach private implementations only through invoker facades; implementations enforce role checks.
 GRANT USAGE ON SCHEMA private TO authenticated;
 REVOKE ALL ON FUNCTION private.layan_admin_list_crm_leads(text,text,text,text,integer) FROM PUBLIC, anon, authenticated;
