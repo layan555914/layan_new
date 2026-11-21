@@ -22,6 +22,10 @@ assert.ok(crm.includes('archivedView ? "layan_admin_list_crm_archived" : "layan_
   "The archive view must use the dedicated archived-record RPC.");
 assert.ok(crm.includes("data-crm-restore") && crm.includes("layan_admin_crm_restore_lead"),
   "Archived CRM records must have a wired restore action.");
+assert.ok(crm.includes('if (stage === "converted" || stage === "not_interested") return "";'),
+  "Converted and not-interested leads must not be marked as overdue.");
+assert.ok(migration.includes("p_due = 'overdue' AND l.stage NOT IN ('converted','not_interested')"),
+  "Due filters must exclude terminal lead stages consistently with the summary.");
 assert.ok(html.includes('id="crmToggleArchived"'),
   "The admin page must expose the archive switch.");
 assert.ok(migration.includes("CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_archived"),
