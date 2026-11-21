@@ -9,7 +9,7 @@ const authDialog=$("authDialog"),listingDialog=$("marketplaceListingDialog");
 const authForm=$("authForm"),listingForm=$("marketplaceListingForm");
 const authStatus=$("authStatus"),listingStatus=$("marketplaceFormStatus");
 const categoryFilter=$("marketplaceCategoryFilter"),listingGrid=$("marketplaceListings");
-let authMode="login",currentSession=null,listings=[],shouldOpenListingAfterAuth=false,marketplacePage=1,pendingMarketplaceOtp=null,marketplaceOtpTimer=null;const MARKETPLACE_PER_PAGE=12;
+let authMode="login",currentSession=null,listings=[],shouldOpenListingAfterAuth=false,marketplacePage=1,pendingMarketplaceOtp=null,marketplaceOtpTimer=null,managedServiceProfileIds=new Set();const MARKETPLACE_PER_PAGE=12;
 let categories=["مواد البناء والتشطيب","الأثاث والفرش وتجهيز الوحدات","الصيانة وإدارة العقارات","الاستشارات والخدمات العقارية","مكاتب التصميم الهندسي","مهندسو الديكور والتصميم الداخلي","السيراميك والبورسلين والأدوات الصحية","الإضاءة ووحدات الإنارة","الستائر والمفروشات"];
 const specs={
 "سوق العقارات":[["نوع العقار","property_kind","select","شقة|فيلا|محل تجاري|مكتب|عيادة|مخزن|مبنى"],["الغرض","purpose","select","بيع|إيجار"],["المساحة بالمتر","area_m2","number"],["عدد الغرف","bedrooms","number"],["عدد الحمامات","bathrooms","number"],["التشطيب","finishing","text"]],
@@ -160,6 +160,33 @@ async function loadServiceProfiles(){
  }
 }
 
+async function loadManagedServiceProfiles(){
+ managedServiceProfileIds=new Set();
+ const session=await getSession();
+ if(!session?.user?.id)return;
+ const userId=encodeURIComponent(session.user.id);
+ const queries=[
+  "company_entity_managers?select=directory_entity_id&owner_user_id=eq."+userId,
+  "company_entity_manager_members?select=directory_entity_id&user_id=eq."+userId+"&revoked_at=is.null"
+ ];
+ for(const path of queries){
+  try{
+   const rows=await api(path);
+   (Array.isArray(rows)?rows:[]).forEach(row=>{if(row.directory_entity_id)managedServiceProfileIds.add(String(row.directory_entity_id))});
+  }catch(error){console.warn("Managed service profile lookup unavailable:",error)}
+ }
+}
+function populateManagedServiceProfileSelect(){
+ const wrapper=$("marketplaceProviderProfileField");
+ const select=listingForm?.elements?.provider_entity_id;
+ if(!wrapper||!select)return;
+ const available=serviceProfiles.filter(item=>managedServiceProfileIds.has(String(item.id)));
+ if(!available.length){wrapper.hidden=true;select.innerHTML='<option value="">إعلان مستقل</option>';return}
+ wrapper.hidden=false;
+ select.innerHTML='<option value="">إعلان مستقل</option>'+available.map(item=>'<option value="'+esc(item.id)+'">'+esc(item.name_ar||item.name_en||"ملف مقدم خدمة")+'</option>').join("");
+ const requested=new URLSearchParams(location.search).get("provider");
+ if(requested&&available.some(item=>String(item.id)===requested))select.value=requested;
+}
 function renderListings(){
  const selected=categoryFilter.value;
  const query=normText($("marketplaceSearch")?.value||"").trim();
@@ -179,14 +206,17 @@ function renderListings(){
   const summary=String(item.details?.services||item.details?.specialty||item.listing_type||"").trim();
   const desc=String(item.description||"").split(/[.\n،]/)[0].slice(0,90);
   const id=encodeURIComponent(String(item.id));
+  const providerId=String(item.details?.provider_entity_id||"");
+  const provider=serviceProfiles.find(profile=>String(profile.id)===providerId);
+  const providerLink=provider?'<a class="mk-provider-profile-link" href="./company.html?entity_id='+encodeURIComponent(provider.id)+'">ملف مقدم الخدمة: '+esc(provider.name_ar||provider.name_en||"عرض الملف")+' ←</a>':"";
   return '<article class="mk-card" id="marketplace-listing-'+id+'" data-share-url="'+esc(new URL("#marketplace-listing-"+id,window.location.href).href)+'">'+
    '<div class="mk-card-media">'+(image?'<img src="'+esc(image)+'" alt="'+esc(item.title)+'" loading="lazy">':'<div class="mk-card-placeholder" aria-hidden="true">'+esc(item.category.split(" ")[0])+'</div>')+'<span class="mk-card-label">'+(item.is_featured?'<strong class="mk-featured-label">★ إعلان مميز</strong> · ':'')+esc(item.category)+'</span></div>'+
-   '<div class="mk-card-body"><h3>'+esc(item.title)+'</h3><p class="mk-card-desc">'+esc(summary&&summary!=="خدمة"?summary:desc)+'</p><p class="mk-card-place"><span aria-hidden="true">⌖</span>'+esc(item.area||item.city||"أسيوط")+'</p>'+
+   '<div class="mk-card-body"><h3>'+esc(item.title)+'</h3><p class="mk-card-desc">'+esc(summary&&summary!=="خدمة"?summary:desc)+'</p><p class="mk-card-place"><span aria-hidden="true">⌖</span>'+esc(item.area||item.city||"أسيوط")+'</p>'+providerLink+
    '<div class="mk-card-actions">'+(phone?'<a class="mk-btn mk-call" href="tel:'+phone+'" data-contact="call"><span aria-hidden="true">✆</span> اتصال</a>':'')+(wa?'<a class="mk-btn mk-wa" href="https://wa.me/2'+wa+'?text='+encodeURIComponent("مرحبًا، رأيت إعلانك «"+String(item.title||"")+"» على أسيوط عقار.")+'" target="_blank" rel="noopener noreferrer" data-contact="whatsapp"><span aria-hidden="true">◉</span> واتساب</a>':'')+'<button type="button" class="mk-btn mk-more" data-market-details="'+esc(item.id)+'"><span aria-hidden="true">ⓘ</span> التفاصيل</button></div></div></article>';
  }).join("");
  const sharedListingId = decodeURIComponent(window.location.hash.slice(1));
  if (sharedListingId.startsWith("marketplace-listing-")) {
-  window.requestAnimationFrame(() => document.getElementById(sharedListingId)?.scrollIntoView({behavior:"smooth",block:"center"}));
+  window.requestAnimationFrame(() => {document.getElementById(sharedListingId)?.scrollIntoView({behavior:"smooth",block:"center"});openServiceDetails(sharedListingId.slice("marketplace-listing-".length));});
  }
 }
 function openServiceDetails(id){
@@ -197,8 +227,12 @@ function openServiceDetails(id){
  const price=item.price!==null&&item.price!==undefined?Number(item.price).toLocaleString("en-US")+" ج.م"+(item.price_period?" "+esc(item.price_period):""):"السعر عند التواصل";
  const phone=egPhone(item.contact_phone),wa=egPhone(item.whatsapp)||phone;
  const images=(Array.isArray(item.image_urls)?item.image_urls:[]).filter(v=>typeof v==="string"&&(v.startsWith("data:image/")||v.startsWith("https://"))).slice(0,5);
+ const providerId=String(item.details?.provider_entity_id||"");
+ const provider=serviceProfiles.find(profile=>String(profile.id)===providerId);
+ const providerMarkup=provider?'<p><a class="mk-provider-profile-link" href="./company.html?entity_id='+encodeURIComponent(provider.id)+'">عرض ملف مقدم الخدمة: '+esc(provider.name_ar||provider.name_en||"مقدم الخدمة")+' ←</a></p>':"";
  dialog.innerHTML='<div class="mk-details"><button type="button" class="mk-details-close" data-close-mk aria-label="إغلاق">×</button>'+(images.length?'<div class="mk-details-gallery">'+images.map(src=>'<div class="mk-card-media"><img src="'+esc(src)+'" alt=""></div>').join("")+'</div>':'')+
   '<span class="mk-card-label is-static">'+esc(item.category)+'</span><h2>'+esc(item.title)+'</h2><p class="mk-card-place"><span aria-hidden="true">⌖</span>'+esc([item.city,item.area].filter(Boolean).join("، "))+'</p><p>'+esc(item.description||"")+'</p><p class="mk-details-price">'+price+'</p>'+(details?'<ul class="mk-details-list">'+details+'</ul>':'')+
+  providerMarkup+
   (item.latitude!=null&&item.longitude!=null?'<p><a href="https://www.google.com/maps?q='+encodeURIComponent(Number(item.latitude)+","+Number(item.longitude))+'" target="_blank" rel="noopener noreferrer">عرض الموقع على الخريطة</a></p>':'')+
   '<div class="mk-card-actions">'+(phone?'<a class="mk-btn mk-call" href="tel:'+phone+'" data-contact="call">✆ اتصال</a>':'')+(wa?'<a class="mk-btn mk-wa" href="https://wa.me/2'+wa+'" target="_blank" rel="noopener noreferrer" data-contact="whatsapp">◉ واتساب</a>':'')+'</div></div>';
  dialog.showModal();
@@ -206,8 +240,8 @@ function openServiceDetails(id){
 document.addEventListener("click",e=>{const b=e.target.closest("[data-market-details]");if(b)openServiceDetails(b.dataset.marketDetails)});
 async function loadListings(){listingGrid.innerHTML='<p class="muted">جارٍ تحميل الإعلانات...</p>';try{listings=await api("marketplace_listings?select=id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,image_urls,details,latitude,longitude,created_at,is_featured&status=eq.approved&order=is_featured.desc,created_at.desc&limit=100")||[];renderListings()}catch(error){listingGrid.innerHTML='<p class="muted">تعذر تحميل الإعلانات: '+esc(error.message)+'</p>';$("marketplaceCount").textContent="تعذر التحميل";console.error("Marketplace load error:",error)}}
 function openListing(){if(!currentSession?.user?.id){shouldOpenListingAfterAuth=true;openAuth();authStatus.textContent="سجّل الدخول أولًا حتى تتمكن من إرسال إعلان.";return}shouldOpenListingAfterAuth=false;listingStatus.textContent="";listingDialog.showModal()}
-async function submitListing(event){event.preventDefault();listingStatus.textContent="جارٍ تجهيز الإعلان وإرساله للمراجعة...";const session=await getSession();if(!session?.user?.id){listingStatus.textContent="انتهت جلسة الدخول. سجّل الدخول ثم أعد المحاولة.";openAuth();return}const formData=new FormData(listingForm);const latitudeText=String(formData.get("latitude")||"").trim(),longitudeText=String(formData.get("longitude")||"").trim();if(Boolean(latitudeText)!==Boolean(longitudeText)){listingStatus.textContent="أدخل خط العرض والطول معًا، أو اترك الاثنين فارغين.";return}const latitude=latitudeText?Number(latitudeText):null,longitude=longitudeText?Number(longitudeText):null;if(latitudeText&&(!Number.isFinite(latitude)||latitude < -90||latitude > 90||!Number.isFinite(longitude)||longitude < -180||longitude > 180)){listingStatus.textContent="إحداثيات الموقع غير صحيحة.";return}const files=Array.from(listingForm.elements.images.files||[]);if(files.length>5){listingStatus.textContent="يمكن إضافة 5 صور كحد أقصى.";return}let imageUrls=[];try{for(const file of files)imageUrls.push(await compressImage(file))}catch(error){listingStatus.textContent=error.message;return}const priceText=String(formData.get("price")||"").trim();const details=Object.fromEntries(Array.from(listingForm.querySelectorAll("[name^=detail_]")).map(el=>[el.name.slice(7),String(el.value||"").trim()]).filter(([,value])=>value));const payload={owner_id:session.user.id,latitude,longitude,category:String(formData.get("category")),listing_type:String(formData.get("listing_type")||"خدمة"),title:String(formData.get("title")||"").trim(),description:String(formData.get("description")||"").trim(),city:String(formData.get("city")||"أسيوط").trim(),area:String(formData.get("area")||"").trim()||null,property_type:String(formData.get("property_type")||"").trim()||null,price:priceText?Number(priceText):null,price_period:String(formData.get("price_period")||"").trim()||null,contact_phone:String(formData.get("contact_phone")||"").trim(),whatsapp:String(formData.get("whatsapp")||"").trim()||null,image_urls:imageUrls,details,status:"pending"};try{await api("marketplace_listings",{method:"POST",body:JSON.stringify(payload)});listingStatus.textContent="تم استلام إعلانك وإرساله للمراجعة. سيظهر بعد اعتماد الإدارة.";listingForm.reset();renderCategoryFields();setTimeout(()=>listingDialog.close(),1400)}catch(error){listingStatus.textContent="لم يتم إرسال الإعلان: "+error.message;console.error("Marketplace insert error:",error)}}
-async function init(){currentSession=readSession();updateAuthButton();if(currentSession)await getSession();updateAuthButton();await loadCategories();const requested=new URLSearchParams(location.search).get("category");if(requested&&categories.includes(requested)){categoryFilter.value=requested;listingForm.elements.category.value=requested}renderCategoryFields();await Promise.all([loadListings(),loadServiceProfiles()])}
+async function submitListing(event){event.preventDefault();listingStatus.textContent="جارٍ تجهيز الإعلان وإرساله للمراجعة...";const session=await getSession();if(!session?.user?.id){listingStatus.textContent="انتهت جلسة الدخول. سجّل الدخول ثم أعد المحاولة.";openAuth();return}const formData=new FormData(listingForm);const latitudeText=String(formData.get("latitude")||"").trim(),longitudeText=String(formData.get("longitude")||"").trim();if(Boolean(latitudeText)!==Boolean(longitudeText)){listingStatus.textContent="أدخل خط العرض والطول معًا، أو اترك الاثنين فارغين.";return}const latitude=latitudeText?Number(latitudeText):null,longitude=longitudeText?Number(longitudeText):null;if(latitudeText&&(!Number.isFinite(latitude)||latitude < -90||latitude > 90||!Number.isFinite(longitude)||longitude < -180||longitude > 180)){listingStatus.textContent="إحداثيات الموقع غير صحيحة.";return}const files=Array.from(listingForm.elements.images.files||[]);if(files.length>5){listingStatus.textContent="يمكن إضافة 5 صور كحد أقصى.";return}let imageUrls=[];try{for(const file of files)imageUrls.push(await compressImage(file))}catch(error){listingStatus.textContent=error.message;return}const priceText=String(formData.get("price")||"").trim();const details=Object.fromEntries(Array.from(listingForm.querySelectorAll("[name^=detail_]")).map(el=>[el.name.slice(7),String(el.value||"").trim()]).filter(([,value])=>value));const providerEntityId=String(formData.get("provider_entity_id")||"").trim();if(providerEntityId&&managedServiceProfileIds.has(providerEntityId))details.provider_entity_id=providerEntityId;const payload={owner_id:session.user.id,latitude,longitude,category:String(formData.get("category")),listing_type:String(formData.get("listing_type")||"خدمة"),title:String(formData.get("title")||"").trim(),description:String(formData.get("description")||"").trim(),city:String(formData.get("city")||"أسيوط").trim(),area:String(formData.get("area")||"").trim()||null,property_type:String(formData.get("property_type")||"").trim()||null,price:priceText?Number(priceText):null,price_period:String(formData.get("price_period")||"").trim()||null,contact_phone:String(formData.get("contact_phone")||"").trim(),whatsapp:String(formData.get("whatsapp")||"").trim()||null,image_urls:imageUrls,details,status:"pending"};try{await api("marketplace_listings",{method:"POST",body:JSON.stringify(payload)});listingStatus.textContent="تم استلام إعلانك وإرساله للمراجعة. سيظهر بعد اعتماد الإدارة.";listingForm.reset();renderCategoryFields();setTimeout(()=>listingDialog.close(),1400)}catch(error){listingStatus.textContent="لم يتم إرسال الإعلان: "+error.message;console.error("Marketplace insert error:",error)}}
+async function init(){currentSession=readSession();updateAuthButton();if(currentSession)await getSession();updateAuthButton();await loadCategories();const requested=new URLSearchParams(location.search).get("category");if(requested&&categories.includes(requested)){categoryFilter.value=requested;listingForm.elements.category.value=requested}renderCategoryFields();await Promise.all([loadListings(),loadServiceProfiles()]);await loadManagedServiceProfiles();populateManagedServiceProfileSelect()}
 $("authOpen").addEventListener("click",async()=>{if(currentSession?.user?.id){if(confirm("هل تريد تسجيل الخروج؟")){try{await auth()?.signOut?.()}catch(error){authStatus.textContent=error.message||"تعذر تسجيل الخروج.";return}saveSession(null)}return}shouldOpenListingAfterAuth=false;openAuth()});
 $("switchAuth").addEventListener("click",()=>setAuthMode(authMode==="login"?"signup":"login"));
 $("marketplaceOtpVerify").addEventListener("click",verifyMarketplaceOtp);
