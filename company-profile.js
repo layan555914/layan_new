@@ -119,6 +119,22 @@ document.addEventListener("DOMContentLoaded",async()=>{
    return "";
   }
  }
+ async function publicServiceOffersMarkup(directoryEntityId){
+  try{
+   const links=await api("marketplace_listing_provider_links?select=listing_id&directory_entity_id=eq."+encodeURIComponent(directoryEntityId));
+   const ids=(Array.isArray(links)?links:[]).map(row=>row.listing_id).filter(Boolean);
+   const offers=ids.length?await api("marketplace_listings?select=id,title,description,category,city,area,price,price_period,created_at&status=eq.approved&id=in.("+ids.join(",")+")&order=created_at.desc&limit=30"):[];
+   const cards=offers.map(item=>{
+    const price=item.price!==null&&item.price!==undefined?Number(item.price).toLocaleString("ar-EG")+" ج.م"+(item.price_period?" "+esc(item.price_period):""):"السعر عند التواصل";
+    const place=[item.city,item.area].filter(Boolean).join("، ")||"أسيوط";
+    return '<article class="company-service-offer-card"><div><small>'+esc(item.category||"خدمة")+'</small><h3>'+esc(item.title||"عرض خدمة")+'</h3><p>'+esc(String(item.description||"").slice(0,180))+'</p><span>'+esc(place)+'</span><strong>'+esc(price)+'</strong></div><a href="./marketplace.html#marketplace-listing-'+encodeURIComponent(item.id)+'">تفاصيل العرض ←</a></article>';
+   }).join("");
+   return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2>'+(offers.length?'<div class="company-service-offers-grid">'+cards+'</div>':'<p>لا توجد عروض منشورة مرتبطة بهذا الملف حاليًا. ستظهر هنا العروض بعد اعتمادها وربطها بملف مقدم الخدمة.</p>')+'</section>';
+  }catch(error){
+   console.warn("Published service provider offers unavailable:",error);
+   return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2><p>تعذر تحميل العروض حاليًا. يمكنك تصفح <a href="./marketplace.html">سوق الخدمات</a>.</p></section>';
+  }
+ }
  async function loadDirectoryEntity(){
   if(!/^[0-9a-f-]{36}$/i.test(entityId||"")){renderError("رابط ملف الجهة غير صحيح.");return;}
   const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,latitude,longitude,location_public,location_precision,location_source_id,location_verified_at,verification_status,representative_verified_at,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
@@ -185,6 +201,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    }
   }catch(error){console.warn("Public source references unavailable:",error);}
   const projectSectionMarkup=await publicProjectsMarkup(entity.id);
+  const serviceOffersMarkup=isServiceProvider?await publicServiceOffersMarkup(entity.id):"";
   document.title=name+" | ملف "+profileSubject+" – أسيوط عقار";
   const canonical=new URL("./company.html",location.href);
   canonical.searchParams.set("entity_id",entity.id);
@@ -222,6 +239,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>لا يتوفر شعار موثّق</small></span>')+'</div><div><span class="eyebrow">ملف تعريفي منشور في دليل أسيوط عقار</span>'+(entity.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الجهة وصفته · لا يعني ذلك شهادة ترخيص للنشاط</span>':'')+'<h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div>'+serviceHighlightsMarkup+'<div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
    claimPanelMarkup+
    projectSectionMarkup+
+   serviceOffersMarkup+
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':'')+
    contactDetailsMarkup+
    coverageMarkup+
