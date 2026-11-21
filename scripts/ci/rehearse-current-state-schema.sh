@@ -55,7 +55,7 @@ for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" 
 done
 
 # Never inherit credentials capable of linking this rehearsal to hosted Supabase.
-unset SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD
+unset SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_DB_URL SUPABASE_PROJECT_ID
 mkdir -p "$TEST_DIR"
 cd "$TEST_DIR"
 
@@ -150,8 +150,7 @@ fi
 
 export API_URL ANON_KEY SERVICE_ROLE_KEY
 export DATABASE_URL="$DB_URL"
-export MAILPIT_URL="http://127.0.0.1:54324"
 node "$CRM_API_TEST"
-unset MAILPIT_URL DATABASE_URL SERVICE_ROLE_KEY ANON_KEY
+unset DATABASE_URL SERVICE_ROLE_KEY ANON_KEY
 
-echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local CRM API checks."
+echo "PASS: current-main clean local schema, CRM table isolation/RLS and RPC grants, fail-closed admin approval, owner-only writes, activity timeline and archive/restore."
