@@ -144,14 +144,15 @@ function renderServiceProfiles(){
 async function loadServiceProfiles(){
  const target=$("marketplaceServiceProfiles");
  if(!target)return;
- const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,website_url,public_address,public_logo_url,public_services&public_visible=eq.true&verification_status=eq.published&or=(service_category.not.is.null,marketplace_category.not.is.null)&order=name_ar.asc&limit=150";
- const core="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,website_url,public_address,public_logo_url&public_visible=eq.true&verification_status=eq.published&or=(service_category.not.is.null,marketplace_category.not.is.null)&order=name_ar.asc&limit=150";
+ const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,website_url,public_address,public_logo_url,public_services&public_visible=eq.true&verification_status=eq.published&or=(service_category.not.is.null,marketplace_category.not.is.null,entity_type.eq.contractor,entity_type.eq.consultant)&order=name_ar.asc&limit=150";
+ const core="directory_entities?select=id,name_ar,name_en,entity_type,service_category,marketplace_category,description,website_url,public_address,public_logo_url&public_visible=eq.true&verification_status=eq.published&or=(service_category.not.is.null,marketplace_category.not.is.null,entity_type.eq.contractor,entity_type.eq.consultant)&order=name_ar.asc&limit=150";
  try{
   let rows;
   try{rows=await api(extended)}catch(_){rows=await api(core)}
   if(!Array.isArray(rows))throw new Error("استجابة ملفات مقدمي الخدمات غير صالحة.");
   serviceProfiles=rows;
   renderServiceProfiles();
+  if(listings.length)renderListings();
  }catch(error){
   serviceProfiles=[];
   if($("marketplaceServiceProfilesCount"))$("marketplaceServiceProfilesCount").textContent="تعذر التحميل";
