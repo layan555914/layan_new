@@ -209,7 +209,9 @@ document.addEventListener("DOMContentLoaded", () => {
         '<div class="admin-actions"><label>الشارة <select data-trust-badge>' + option("", "بدون توثيق", x.trust_badge) + option("owner", "مالك موثّق", x.trust_badge) + option("company", "شركة موثّقة", x.trust_badge) + '</select></label>' +
         '<button type="button" class="btn btn-gold" data-trust-save>حفظ الشارة</button></div></div></article>').join("");
     } catch (error) {
-      target.innerHTML = '<p class="admin-empty">' + (/trust_badge/.test(String(error.message || "")) ? "يلزم تطبيق تحديث قاعدة البيانات الخاص بشارات التوثيق أولًا." : esc(error.message || "تعذر تحميل الإعلانات المنشورة.")) + '</p>';
+      const message = /trust_badge/.test(String(error.message || "")) ? "يلزم تطبيق تحديث قاعدة البيانات الخاص بشارات التوثيق أولًا." : (error.message || "تعذر تحميل الإعلانات المنشورة.");
+      target.innerHTML = '<p class="admin-empty">' + esc(message) + '</p>';
+      throw new Error(message);
     }
   }
   document.getElementById("trustBadgeOffers")?.addEventListener("click", async event => {
@@ -261,6 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const documentCountEl = document.getElementById("statPendingDocuments");
       if (documentCountEl) documentCountEl.textContent = "—";
       propertyDocsList.innerHTML = '<p class="admin-empty">'+esc(error.message || "تعذر تحميل مستندات العقارات.")+'</p>';
+      throw error;
     }
   }
   let companyDraftSupported = false;
@@ -397,6 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
       companyClaimsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل طلبات استلام الملفات.") + '</p>';
       const countEl = document.getElementById("statPendingCompanyClaims");
       if (countEl) countEl.textContent = "—";
+      throw error;
     }
   }
 
@@ -443,6 +447,7 @@ document.addEventListener("DOMContentLoaded", () => {
       companyEntityUpdatesList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل تعديلات ملفات الجهات.") + '</p>';
       const countEl = document.getElementById("statPendingCompanyEntityUpdates");
       if (countEl) countEl.textContent = "—";
+      throw error;
     }
   }
 
@@ -476,6 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const countEl = document.getElementById("statPendingCompanyAds");
       if (countEl) countEl.textContent = "—";
       companyAdsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل إعلانات الشركات.") + '</p>';
+      throw error;
     }
   }
 
@@ -493,6 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ).join("");
     } catch (error) {
       adSlotsList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل المساحات الإعلانية.") + '</p>';
+      throw error;
     }
   }
 
@@ -518,6 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
         '</tbody></table></div><p class="admin-empty">يتم عرض أول 100 حساب. لا تتوفر من هذه الشاشة إجراءات حذف أو تغيير كلمات المرور.</p>';
     } catch (error) {
       usersList.innerHTML = '<p class="admin-empty">' + esc(error.message || "تعذر تحميل حسابات المستخدمين.") + '</p>';
+      throw error;
     }
   }
 
