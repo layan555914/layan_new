@@ -160,7 +160,9 @@ expect_denied() {
   local user_id="$1"
   local listing_id="$2"
   local entity_id="$3"
-  if psql -v ON_ERROR_STOP=1 >/dev/null <<SQL
+  local output
+  output="$(mktemp)"
+  if psql -v ON_ERROR_STOP=1 >"$output" 2>&1 <<SQL
 BEGIN;
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub', '$user_id', true);
@@ -169,9 +171,17 @@ VALUES ('$listing_id', '$entity_id', '$user_id');
 COMMIT;
 SQL
   then
+    rm -f "$output"
     echo "ERROR: unauthorized provider-link insert unexpectedly succeeded for $user_id" >&2
     exit 1
   fi
+  if ! grep -q 'new row violates row-level security policy for table "marketplace_listing_provider_links"' "$output"; then
+    cat "$output" >&2
+    rm -f "$output"
+    echo "ERROR: provider-link write failed for a reason other than the expected RLS rejection" >&2
+    exit 1
+  fi
+  rm -f "$output"
 }
 
 # A profile manager cannot link a listing owned by a different user.
