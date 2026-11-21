@@ -10,8 +10,8 @@ DECLARE
   v_private_empty_path boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 54 THEN
-    RAISE EXCEPTION 'Expected 54 clean-install migrations (3 CI-only baseline fixtures + 49 current-main migrations + CRM schema + private RPC facades), found %', v_count;
+  IF v_count <> 53 THEN
+    RAISE EXCEPTION 'Expected 53 clean-install migrations (3 CI-only baseline fixtures + 49 current-main migrations + one atomic CRM migration), found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
