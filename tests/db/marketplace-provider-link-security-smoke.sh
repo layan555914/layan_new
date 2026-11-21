@@ -154,6 +154,19 @@ VALUES ('a0000000-0000-4000-8000-000000000003',
 COMMIT;
 SQL
 
+# A hidden provider profile can have an owner link, but the public policy must hide it.
+psql -v ON_ERROR_STOP=1 <<'SQL'
+BEGIN;
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub', 'b0000000-0000-4000-8000-000000000001', true);
+INSERT INTO public.marketplace_listing_provider_links(listing_id, directory_entity_id, linked_by)
+VALUES ('a0000000-0000-4000-8000-000000000004',
+        'c0000000-0000-4000-8000-000000000003',
+        'b0000000-0000-4000-8000-000000000001');
+COMMIT;
+SQL
+
+
 # Every negative case below must be rejected by RLS.
 expect_denied() {
   local user_id="$1"
@@ -217,6 +230,10 @@ fi
 psql -v ON_ERROR_STOP=1 -At <<'SQL' | grep -qx 'f'
 SELECT has_table_privilege('authenticated',
   'public.marketplace_listing_provider_links', 'UPDATE');
+SQL
+psql -v ON_ERROR_STOP=1 -At <<'SQL' | grep -qx 'f'
+SELECT has_table_privilege('anon',
+  'public.marketplace_listing_provider_links', 'INSERT');
 SQL
 
 # Anonymous reads include only approved listings attached to published, visible provider profiles.
