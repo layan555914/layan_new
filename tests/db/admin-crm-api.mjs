@@ -26,6 +26,8 @@ const runId = randomUUID();
 const password = "Crm!9" + randomBytes(24).toString("hex");
 const users = [];
 let ownerId = null;
+let ownerIds = [];
+let extraOwnerLeadIds = [];
 let adminId = null;
 let leadId = null;
 let approvalLeadId = null;
@@ -124,22 +126,40 @@ async function deleteUser(id) {
 }
 
 try {
-  const owner = await createUser("owner");
+  const owner = await createUser("owner-one");
+  const ownerTwo = await createUser("owner-two");
+  const ownerThree = await createUser("owner-three");
   const admin = await createUser("admin");
   const regular = await createUser("regular");
   ownerId = owner.id;
+  ownerIds = [owner.id, ownerTwo.id, ownerThree.id];
   adminId = admin.id;
 
   runLocalSql(
-    "INSERT INTO private.layan_admins(user_id) VALUES (" + safeUuid(ownerId) + ") ON CONFLICT DO NOTHING; " +
+    "INSERT INTO private.layan_admins(user_id) VALUES " + ownerIds.map(id => "(" + safeUuid(id) + ")").join(",") + " ON CONFLICT DO NOTHING; " +
     "INSERT INTO private.layan_admin_members(user_id, added_by) VALUES (" + safeUuid(adminId) + "," + safeUuid(ownerId) + ") ON CONFLICT DO NOTHING;"
   );
 
-  const [ownerToken, adminToken, regularToken] = await Promise.all([
+  const [ownerToken, ownerTwoToken, ownerThreeToken, adminToken, regularToken] = await Promise.all([
     signIn(owner.email),
+    signIn(ownerTwo.email),
+    signIn(ownerThree.email),
     signIn(admin.email),
     signIn(regular.email),
   ]);
+
+  // Production has three owner accounts; each must retain direct CRM manager access.
+  for (const [label, token] of [["owner one", ownerToken], ["owner two", ownerTwoToken], ["owner three", ownerThreeToken]]) {
+    const role = await rpc("layan_admin_whoami", {}, token);
+    assert(role.response.ok && role.body === "owner", label + " was not recognized as an owner.");
+    const ownerList = await rpc("layan_admin_list_crm_leads", listBody, token);
+    assert(ownerList.response.ok && Array.isArray(ownerList.body), label + " could not read CRM leads.");
+    const ownerLead = await rpc("layan_admin_crm_save_lead", {
+      ...leadPayload(), p_name: "CRM " + label + " " + runId.slice(0, 8),
+    }, token);
+    assert(ownerLead.response.ok && typeof ownerLead.body === "string", label + " could not create a CRM lead.");
+    extraOwnerLeadIds.push(ownerLead.body);
+  }
 
   const listBody = { p_search: "CRM Test " + runId.slice(0, 8), p_stage: null, p_category: null, p_due: "all", p_limit: 50 };
 
@@ -313,10 +333,10 @@ try {
   assert(restoredTimeline.response.ok && restoredTimeline.body.some(item => item.activity_type === "restored"),
     "The restoration event was not recorded in the CRM timeline.");
 
-  console.log("PASS: CRM isolation, owner-only writes, supervisor approval/rejection, activity history, archive visibility, archived timeline and owner-only restore all work locally.");
+  console.log("PASS: CRM isolation, all three owner accounts, owner-only writes, supervisor approval/rejection, activity history, archive visibility, archived timeline and owner-only restore all work locally.");
 } finally {
-  if (leadId || approvalLeadId) {
-    const ids = [leadId, approvalLeadId].filter(Boolean).map(safeUuid).join(",");
+  if (leadId || approvalLeadId || extraOwnerLeadIds.length) {
+    const ids = [leadId, approvalLeadId, ...extraOwnerLeadIds].filter(Boolean).map(safeUuid).join(",");
     try { runLocalSql("DELETE FROM private.admin_crm_leads WHERE id IN (" + ids + ");"); } catch (_) {}
   }
   if (approvalRequestIds.length) {
@@ -328,8 +348,8 @@ try {
   if (adminId) {
     try { runLocalSql("DELETE FROM private.layan_admin_members WHERE user_id = " + safeUuid(adminId) + ";"); } catch (_) {}
   }
-  if (ownerId) {
-    try { runLocalSql("DELETE FROM private.layan_admins WHERE user_id = " + safeUuid(ownerId) + ";"); } catch (_) {}
+  if (ownerIds.length) {
+    try { runLocalSql("DELETE FROM private.layan_admins WHERE user_id IN (" + ownerIds.map(safeUuid).join(",") + ");"); } catch (_) {}
   }
   for (const id of users.reverse()) {
     try { await deleteUser(id); } catch (error) {
