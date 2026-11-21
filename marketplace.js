@@ -245,7 +245,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-market-det
 async function loadListings(){
  listingGrid.innerHTML='<p class="muted">جارٍ تحميل الإعلانات...</p>';
  try{
-  listings=await api("marketplace_listings?select=id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,image_urls,details,latitude,longitude,created_at,is_featured&status=eq.approved&order=is_featured.desc,created_at.desc&limit=100')||[];
+  listings=await api("marketplace_listings?select=id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,image_urls,details,latitude,longitude,created_at,is_featured&status=eq.approved&order=is_featured.desc,created_at.desc&limit=100")||[];
   if(listings.length){
    try{
     const links=await api("marketplace_listing_provider_links?select=listing_id,directory_entity_id&listing_id=in.("+listings.map(item=>item.id).join(",")+")");
