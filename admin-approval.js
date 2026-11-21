@@ -97,6 +97,12 @@
     if (rpcName && PASS_RPC.test(rpcName)) return nativeFetch(input, init);
     const auth = headerOf(init.headers, "Authorization");
     const role = await roleFor(auth);
+    if (role === "unknown") {
+      return new Response(JSON.stringify({
+        code: "ROLE_CHECK_FAILED",
+        message: "تعذر التحقق من صلاحيات الحساب؛ لم يتم تنفيذ التعديل. حاول مرة أخرى."
+      }), { status: 503, headers: { "Content-Type": "application/json" } });
+    }
     if (role !== "admin") return nativeFetch(input, init);
 
     let body = null;
