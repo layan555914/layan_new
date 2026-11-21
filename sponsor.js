@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function placeAds() {
     if (!grid) return;
     grid.querySelectorAll("[data-sponsor-card], [data-partner-slot], .sponsor-slot").forEach(node => node.remove());
-    const homeAds = ads.filter(ad => hasPlacement(ad, "home"));
+    const homeAds = window.AsyutSponsoredAd?.sortForPlacement?.(ads.filter(ad => hasPlacement(ad, "home")), "home") || ads.filter(ad => hasPlacement(ad, "home"));
     homeAds.forEach(ad => grid.insertAdjacentHTML("beforeend", renderCard(ad)));
     // Until each place is booked, show the service it is meant for, with a photo of that service,
     // so the section always looks complete: 3 on top, 3 below (approved ads come first).
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const slots = [];
     for (let i = 6; i <= listings.length && slots.length < 2; i += 6) slots.push(i);
     if (!slots.length) slots.push(listings.length);
-    const offersAds = ads.filter(ad => hasPlacement(ad, "offers"));
+    const offersAds = window.AsyutSponsoredAd?.sortForPlacement?.(ads.filter(ad => hasPlacement(ad, "offers")), "offers") || ads.filter(ad => hasPlacement(ad, "offers"));
     slots.forEach((position, index) => {
       const html = offersAds.length
         ? inlineCard(offersAds[index % offersAds.length])
@@ -129,15 +129,23 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadAds() {
     if (!base || !key) return;
     try {
+      const headers = { Authorization: "Bearer " + key };
+      const baseSelect = "id,business_name,category,title,description,image_url,target_url,contact_phone,created_at";
       let rows;
       try {
-        rows = await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at,placement_keys&order=created_at.desc&limit=12", { headers: { Authorization: "Bearer " + key } });
+        rows = await api("public_active_supplier_ads?select=" + baseSelect + ",placement_keys,placement_order&order=created_at.desc&limit=200", { headers });
       } catch (schemaError) {
         const message = String(schemaError?.message || schemaError || "");
-        if (!/placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
-        // Before the placement migration is applied, preserve the previous all-surfaces behavior.
-        rows = await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at&order=created_at.desc&limit=12", { headers: { Authorization: "Bearer " + key } });
-        rows = (Array.isArray(rows) ? rows : []).map(item => ({ ...item, placement_keys: DEFAULT_PLACEMENTS }));
+        if (!/placement_order|placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
+        try {
+          rows = await api("public_active_supplier_ads?select=" + baseSelect + ",placement_keys&order=created_at.desc&limit=200", { headers });
+          rows = (Array.isArray(rows) ? rows : []).map(item => ({ ...item, placement_order: {} }));
+        } catch (placementError) {
+          const placementMessage = String(placementError?.message || placementError || "");
+          if (!/placement_keys|PGRST204|42703/i.test(placementMessage)) throw placementError;
+          rows = await api("public_active_supplier_ads?select=" + baseSelect + "&order=created_at.desc&limit=200", { headers });
+          rows = (Array.isArray(rows) ? rows : []).map(item => ({ ...item, placement_keys: DEFAULT_PLACEMENTS, placement_order: {} }));
+        }
       }
       const approvedAds = Array.isArray(rows) ? rows : [];
       // Only show real advertisements that have been approved by ASYUT AQAR administration.

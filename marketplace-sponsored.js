@@ -154,11 +154,12 @@
 
   async function load() {
     try {
-      const fetchAds = async includePlacements => {
+      const fetchAds = async fields => {
         const columns = "id,business_name,category,title,description,image_url,target_url,contact_phone,created_at" +
-          (includePlacements ? ",placement_keys" : "");
+          (fields.includes("placement_keys") ? ",placement_keys" : "") +
+          (fields.includes("placement_order") ? ",placement_order" : "");
         const response = await fetch(
-          base + "/rest/v1/public_active_supplier_ads?select=" + columns + "&order=created_at.desc&limit=50",
+          base + "/rest/v1/public_active_supplier_ads?select=" + columns + "&order=created_at.desc&limit=200",
           { headers: { apikey: key, Authorization: "Bearer " + key } }
         );
         const raw = await response.text();
@@ -172,14 +173,22 @@
         return data;
       };
       try {
-        ads = await fetchAds(true);
+        ads = await fetchAds(["placement_keys", "placement_order"]);
       } catch (schemaError) {
         const message = String(schemaError?.message || schemaError || "");
-        if (!/placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
-        ads = (await fetchAds(false)).map(item => ({
-          ...item, placement_keys: ["home", "offers", "marketplace", "featured"]
-        }));
+        if (!/placement_order|placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
+        try {
+          ads = (await fetchAds(["placement_keys"])).map(item => ({ ...item, placement_order: {} }));
+        } catch (placementError) {
+          const placementMessage = String(placementError?.message || placementError || "");
+          if (!/placement_keys|PGRST204|42703/i.test(placementMessage)) throw placementError;
+          ads = (await fetchAds([])).map(item => ({
+            ...item, placement_keys: ["home", "offers", "marketplace", "featured"], placement_order: {}
+          }));
+        }
       }
+      // Keep the marketplace order independent from created_at and from other placements.
+      ads = window.AsyutSponsoredAd?.sortForPlacement?.(ads, "marketplace") || ads;
       render();
     } catch (error) {
       loadFailed = true;
