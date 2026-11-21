@@ -148,6 +148,8 @@ try {
     signIn(regular.email),
   ]);
 
+  const listBody = { p_search: "CRM Test " + runId.slice(0, 8), p_stage: null, p_category: null, p_due: "all", p_limit: 50 };
+
   // Production has three owner accounts; each must retain direct CRM manager access.
   for (const [label, token] of [["owner one", ownerToken], ["owner two", ownerTwoToken], ["owner three", ownerThreeToken]]) {
     const role = await rpc("layan_admin_whoami", {}, token);
@@ -161,7 +163,6 @@ try {
     extraOwnerLeadIds.push(ownerLead.body);
   }
 
-  const listBody = { p_search: "CRM Test " + runId.slice(0, 8), p_stage: null, p_category: null, p_due: "all", p_limit: 50 };
 
   const anonList = await rpc("layan_admin_list_crm_leads", listBody, anonKey);
   assert(!anonList.response.ok, "Anonymous visitor unexpectedly read internal CRM leads.");
