@@ -1,16 +1,18 @@
 # Supabase migration source reconciliation
 
-> **Deployment safety hold — do not run `supabase db push`, `migration repair`, or apply a baseline against production until this audit is resolved and explicitly reviewed.**
+> **Deployment safety hold — do not run `supabase db push`, `migration repair`, or apply a baseline against production until the migration-source gap is independently reviewed and explicitly approved.**
+>
+> **Latest authoritative snapshot:** see “Current reconciliation addendum — November 21, 2026” at the end of this document (106 production ledger records; 42 source-name matches; 64 source-name gaps). The earlier section below is retained as historical context and must not be read as the current ledger state.
 
-Audit date: 2026-11-15 (updated after forward migrations)
+Original audit date: 2026-11-15 (historical snapshot)
 Repository: `layan555914/layan_new`
-Branch audited: `feature/service-provider-claim-review-final-20261114`
+Historical branch audited: `feature/service-provider-claim-review-final-20261114`
 Production project: `ebyhwqkmhxbgocngpqfe`
 Test project: `wisnmlbefdrkcbbqvdlg`
 
-## Current source coverage
+## Historical source coverage — November 15, 2026
 
-| Environment | Recorded migration versions | Matching SQL files in this branch | Recorded versions without a matching SQL file |
+| Environment | Recorded migration versions at that snapshot | Matching SQL files in the then-audited branch | Recorded versions without a matching SQL file |
 |---|---:|---:|---:|
 | Production | 91 | 26 | 65 |
 | Test | 48 | 18 | 30 |
