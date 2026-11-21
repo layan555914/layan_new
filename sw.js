@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v184-brand-identity-20261118";
+const CACHE_NAME = "asyut-aqar-shell-v185-crm-20261121";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,9 +7,11 @@ const APP_SHELL = [
   "./property.css",
   "./property.js",
   "./admin.html",
+  "./admin-crm.css?v=20261121-1",
+  "./admin-crm.js?v=20261121-1",
   "./admin.js?v=20261114-service-claims-2",
-  "./admin-layout.js?v=20261114-service-profiles-1",
-  "./admin-approval.js?v=20261114-service-profiles-1",
+  "./admin-layout.js?v=20261121-crm-view-1",
+  "./admin-approval.js?v=20261121-crm-fail-closed-1",
   "./admin-entry.js",
   "./companies.html",
   "./assets/theme/company-type-sections.css?v=20261115-1",
