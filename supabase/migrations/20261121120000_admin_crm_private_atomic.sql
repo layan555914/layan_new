@@ -1,3 +1,7 @@
+-- ASYUT AQAR internal CRM: atomic private implementation + authenticated invoker facades.
+
+-- One forward-only migration; no existing platform roles or production data are modified.
+
 -- ASYUT AQAR internal CRM for prospective advertisers and sponsors.
 -- Additive only: private admin data, isolated from customer accounts and visitor activity.
 -- Deploy only after the production migration-ledger reconciliation is separately approved.
@@ -62,7 +66,7 @@ REVOKE ALL ON TABLE private.admin_crm_leads FROM PUBLIC, anon, authenticated, se
 REVOKE ALL ON TABLE private.admin_crm_activities FROM PUBLIC, anon, authenticated, service_role;
 
 -- Read RPC: both owners and added administrators may see the internal CRM.
-CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_leads(
+CREATE OR REPLACE FUNCTION private.layan_admin_list_crm_leads(
   p_search text DEFAULT NULL,
   p_stage text DEFAULT NULL,
   p_category text DEFAULT NULL,
@@ -136,7 +140,7 @@ END
 $function$;
 
 -- Read RPC: archived leads are searchable and their complete timeline remains reviewable.
-CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_archived(
+CREATE OR REPLACE FUNCTION private.layan_admin_list_crm_archived(
   p_search text DEFAULT NULL, p_stage text DEFAULT NULL,
   p_category text DEFAULT NULL, p_limit integer DEFAULT 200
 )
@@ -176,7 +180,7 @@ END
 $function$;
 
 -- Summary RPC: counts are calculated over all active leads, not just the visible page.
-CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_summary()
+CREATE OR REPLACE FUNCTION private.layan_admin_list_crm_summary()
 RETURNS jsonb
 LANGUAGE plpgsql
 STABLE
@@ -206,7 +210,7 @@ END
 $function$;
 
 -- Read RPC: immutable timeline entries for an individual lead.
-CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_activities(
+CREATE OR REPLACE FUNCTION private.layan_admin_list_crm_activities(
   p_lead_id uuid,
   p_limit integer DEFAULT 100
 )
@@ -248,7 +252,7 @@ $function$;
 
 -- Write RPCs are owner-only. admin-approval.js routes an added administrator's
 -- write request through the existing manager-approval queue before execution.
-CREATE OR REPLACE FUNCTION public.layan_admin_crm_save_lead(
+CREATE OR REPLACE FUNCTION private.layan_admin_crm_save_lead(
   p_id uuid,
   p_category text,
   p_name text,
@@ -386,7 +390,7 @@ BEGIN
 END
 $function$;
 
-CREATE OR REPLACE FUNCTION public.layan_admin_crm_log_activity(
+CREATE OR REPLACE FUNCTION private.layan_admin_crm_log_activity(
   p_lead_id uuid,
   p_activity_type text,
   p_outcome text,
@@ -442,7 +446,7 @@ BEGIN
 END
 $function$;
 
-CREATE OR REPLACE FUNCTION public.layan_admin_crm_archive_lead(p_id uuid)
+CREATE OR REPLACE FUNCTION private.layan_admin_crm_archive_lead(p_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -470,7 +474,7 @@ END
 $function$;
 
 -- Restore RPC: only the platform owner can return an archived lead to active follow-up.
-CREATE OR REPLACE FUNCTION public.layan_admin_crm_restore_lead(p_id uuid)
+CREATE OR REPLACE FUNCTION private.layan_admin_crm_restore_lead(p_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = ''
 AS $function$
@@ -490,25 +494,127 @@ BEGIN
 END
 $function$;
 
-REVOKE ALL ON FUNCTION public.layan_admin_list_crm_leads(text, text, text, text, integer) FROM PUBLIC, anon;
-REVOKE ALL ON FUNCTION public.layan_admin_list_crm_archived(text, text, text, integer) FROM PUBLIC, anon;
-REVOKE ALL ON FUNCTION public.layan_admin_crm_restore_lead(uuid) FROM PUBLIC, anon;
-REVOKE ALL ON FUNCTION public.layan_admin_list_crm_summary() FROM PUBLIC, anon;
-REVOKE ALL ON FUNCTION public.layan_admin_list_crm_activities(uuid, integer) FROM PUBLIC, anon;
-REVOKE ALL ON FUNCTION public.layan_admin_crm_save_lead(uuid, text, text, text, text, text, text, text, text, text, text, text, text, uuid, timestamptz, text) FROM PUBLIC, anon;
-REVOKE ALL ON FUNCTION public.layan_admin_crm_log_activity(uuid, text, text, text, timestamptz) FROM PUBLIC, anon;
-REVOKE ALL ON FUNCTION public.layan_admin_crm_archive_lead(uuid) FROM PUBLIC, anon;
+-- Authenticated callers reach private implementations only through invoker facades; implementations enforce role checks.
+GRANT USAGE ON SCHEMA private TO authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_list_crm_leads(text,text,text,text,integer) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_list_crm_archived(text,text,text,integer) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_list_crm_summary() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_list_crm_activities(uuid,integer) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_crm_log_activity(uuid,text,text,timestamptz) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_crm_archive_lead(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION private.layan_admin_crm_restore_lead(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_list_crm_leads(text,text,text,text,integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_list_crm_archived(text,text,text,integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_list_crm_summary() TO authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_list_crm_activities(uuid,integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_crm_log_activity(uuid,text,text,timestamptz) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_crm_archive_lead(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION private.layan_admin_crm_restore_lead(uuid) TO authenticated;
 
-GRANT EXECUTE ON FUNCTION public.layan_admin_list_crm_leads(text, text, text, text, integer) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.layan_admin_list_crm_archived(text, text, text, integer) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.layan_admin_crm_restore_lead(uuid) TO authenticated;
+-- Public facades use invoker rights and preserve the RPC contract consumed by admin-crm.js.
+CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_leads(
+  p_search text DEFAULT NULL,p_stage text DEFAULT NULL,p_category text DEFAULT NULL,
+  p_due text DEFAULT 'all',p_limit integer DEFAULT 200
+)
+RETURNS TABLE (
+  id uuid,category text,name text,contact_name text,phone text,whatsapp text,email text,
+  website text,region text,source text,interest text,suitable_offer text,stage text,
+  assigned_to uuid,assigned_to_email text,next_follow_up_at timestamptz,last_contact_at timestamptz,
+  notes text,created_at timestamptz,updated_at timestamptz,activities_count bigint
+)
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path=''
+AS $function$
+  SELECT * FROM private.layan_admin_list_crm_leads(p_search,p_stage,p_category,p_due,p_limit);
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_archived(
+  p_search text DEFAULT NULL,p_stage text DEFAULT NULL,p_category text DEFAULT NULL,p_limit integer DEFAULT 200
+)
+RETURNS TABLE (
+  id uuid,category text,name text,contact_name text,phone text,whatsapp text,email text,
+  website text,region text,source text,interest text,suitable_offer text,stage text,
+  assigned_to uuid,assigned_to_email text,next_follow_up_at timestamptz,last_contact_at timestamptz,
+  notes text,created_at timestamptz,updated_at timestamptz,activities_count bigint
+)
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path=''
+AS $function$
+  SELECT * FROM private.layan_admin_list_crm_archived(p_search,p_stage,p_category,p_limit);
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_summary()
+RETURNS jsonb
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path=''
+AS $function$
+  SELECT private.layan_admin_list_crm_summary();
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_list_crm_activities(p_lead_id uuid,p_limit integer DEFAULT 100)
+RETURNS TABLE (
+  id uuid,activity_type text,outcome text,notes text,occurred_at timestamptz,created_by uuid,actor_email text
+)
+LANGUAGE sql STABLE SECURITY INVOKER SET search_path=''
+AS $function$
+  SELECT * FROM private.layan_admin_list_crm_activities(p_lead_id,p_limit);
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_crm_save_lead(
+  p_id uuid,p_category text,p_name text,p_contact_name text,p_phone text,p_whatsapp text,
+  p_email text,p_website text,p_region text,p_source text,p_interest text,p_suitable_offer text,
+  p_stage text,p_assigned_to uuid,p_next_follow_up_at timestamptz,p_notes text
+)
+RETURNS uuid
+LANGUAGE sql SECURITY INVOKER SET search_path=''
+AS $function$
+  SELECT private.layan_admin_crm_save_lead(
+    p_id,p_category,p_name,p_contact_name,p_phone,p_whatsapp,p_email,p_website,p_region,
+    p_source,p_interest,p_suitable_offer,p_stage,p_assigned_to,p_next_follow_up_at,p_notes
+  );
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_crm_log_activity(
+  p_lead_id uuid,p_activity_type text,p_outcome text,p_notes text,p_occurred_at timestamptz DEFAULT now()
+)
+RETURNS uuid
+LANGUAGE sql SECURITY INVOKER SET search_path=''
+AS $function$
+  SELECT private.layan_admin_crm_log_activity(p_lead_id,p_activity_type,p_outcome,p_notes,p_occurred_at);
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_crm_archive_lead(p_id uuid)
+RETURNS boolean
+LANGUAGE sql SECURITY INVOKER SET search_path=''
+AS $function$
+  SELECT private.layan_admin_crm_archive_lead(p_id);
+$function$;
+
+CREATE OR REPLACE FUNCTION public.layan_admin_crm_restore_lead(p_id uuid)
+RETURNS boolean
+LANGUAGE sql SECURITY INVOKER SET search_path=''
+AS $function$
+  SELECT private.layan_admin_crm_restore_lead(p_id);
+$function$;
+
+REVOKE ALL ON FUNCTION public.layan_admin_list_crm_leads(text,text,text,text,integer) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION public.layan_admin_list_crm_archived(text,text,text,integer) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION public.layan_admin_list_crm_summary() FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION public.layan_admin_list_crm_activities(uuid,integer) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION public.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION public.layan_admin_crm_log_activity(uuid,text,text,text,timestamptz) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION public.layan_admin_crm_archive_lead(uuid) FROM PUBLIC,anon;
+REVOKE ALL ON FUNCTION public.layan_admin_crm_restore_lead(uuid) FROM PUBLIC,anon;
+
+GRANT EXECUTE ON FUNCTION public.layan_admin_list_crm_leads(text,text,text,text,integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.layan_admin_list_crm_archived(text,text,text,integer) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.layan_admin_list_crm_summary() TO authenticated;
-GRANT EXECUTE ON FUNCTION public.layan_admin_list_crm_activities(uuid, integer) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.layan_admin_crm_save_lead(uuid, text, text, text, text, text, text, text, text, text, text, text, text, uuid, timestamptz, text) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.layan_admin_crm_log_activity(uuid, text, text, text, timestamptz) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.layan_admin_list_crm_activities(uuid,integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.layan_admin_crm_log_activity(uuid,text,text,text,timestamptz) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.layan_admin_crm_archive_lead(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.layan_admin_crm_restore_lead(uuid) TO authenticated;
 
-COMMENT ON TABLE private.admin_crm_leads IS
-  'Internal ASYUT AQAR prospective advertiser and sponsor CRM. Never exposed as a public API table.';
-COMMENT ON TABLE private.admin_crm_activities IS
-  'Append-only internal CRM communication timeline. Never exposed as a public API table.';
+COMMENT ON FUNCTION public.layan_admin_list_crm_leads(text,text,text,text,integer) IS
+  'Authenticated invoker facade; privileged CRM read logic lives in private schema.';
+COMMENT ON FUNCTION public.layan_admin_crm_save_lead(uuid,text,text,text,text,text,text,text,text,text,text,text,text,uuid,timestamptz,text) IS
+  'Authenticated invoker facade; owner-only CRM write logic lives in private schema.';
