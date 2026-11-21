@@ -54,8 +54,11 @@
     if (!roles.has(auth)) {
       roles.set(auth, nativeFetch(base + "/rest/v1/rpc/layan_admin_whoami", {
         method: "POST", headers: { apikey: key, Authorization: auth, "Content-Type": "application/json" }, body: "{}"
-      }).then(r => r.ok ? r.json() : "owner") // not deployed yet: behave exactly as before
-        .catch(() => "owner"));
+      }).then(async r => {
+        if (!r.ok) return "unknown";
+        const role = await r.json().catch(() => null);
+        return role === "owner" || role === "admin" ? role : "none";
+      }).catch(() => "unknown"));
     }
     return roles.get(auth);
   }
