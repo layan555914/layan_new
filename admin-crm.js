@@ -113,7 +113,8 @@
     }
   }
 
-  function dueState(value) {
+  function dueState(value, stage) {
+    if (stage === "converted" || stage === "not_interested") return "";
     if (!value) return "";
     const time = new Date(value).getTime();
     if (!Number.isFinite(time)) return "";
@@ -138,7 +139,7 @@
     }
     list.innerHTML = leads.map(lead => {
       const assigned = admins.find(item => item.user_id === lead.assigned_to);
-      const dueClass = dueState(lead.next_follow_up_at);
+      const dueClass = dueState(lead.next_follow_up_at, lead.stage);
       const expanded = expandedLeadId === lead.id;
       return `
         <article class="admin-crm-lead ${dueClass}" data-crm-lead="${esc(lead.id)}">
