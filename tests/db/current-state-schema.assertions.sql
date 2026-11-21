@@ -6,10 +6,12 @@ DECLARE
   v_fn text;
   v_definer boolean;
   v_empty_path boolean;
+  v_private_definer boolean;
+  v_private_empty_path boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 53 THEN
-    RAISE EXCEPTION 'Expected 53 clean-install migrations (3 CI-only baseline fixtures + 49 current-main migrations + CRM), found %', v_count;
+  IF v_count <> 54 THEN
+    RAISE EXCEPTION 'Expected 54 clean-install migrations (3 CI-only baseline fixtures + 49 current-main migrations + CRM schema + private RPC facades), found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
@@ -60,8 +62,22 @@ BEGIN
       FROM pg_proc p
       JOIN pg_namespace n ON n.oid=p.pronamespace
      WHERE n.nspname='public' AND p.oid=to_regprocedure('public.' || v_fn);
-    IF v_definer IS DISTINCT FROM true OR v_empty_path IS DISTINCT FROM true THEN
-      RAISE EXCEPTION 'CRM RPC % must be SECURITY DEFINER with an empty search_path', v_fn;
+    IF v_definer IS DISTINCT FROM false OR v_empty_path IS DISTINCT FROM true THEN
+      RAISE EXCEPTION 'Public CRM RPC facade % must be SECURITY INVOKER with an empty search_path', v_fn;
+    END IF;
+
+    IF has_function_privilege('anon','private.' || v_fn,'EXECUTE')
+       OR NOT has_function_privilege('authenticated','private.' || v_fn,'EXECUTE') THEN
+      RAISE EXCEPTION 'Private CRM helper grants are incorrect for %', v_fn;
+    END IF;
+
+    SELECT p.prosecdef, p.proconfig @> ARRAY['search_path=""']
+      INTO v_private_definer, v_private_empty_path
+      FROM pg_proc p
+      JOIN pg_namespace n ON n.oid=p.pronamespace
+     WHERE n.nspname='private' AND p.oid=to_regprocedure('private.' || v_fn);
+    IF v_private_definer IS DISTINCT FROM true OR v_private_empty_path IS DISTINCT FROM true THEN
+      RAISE EXCEPTION 'Private CRM helper % must remain SECURITY DEFINER with an empty search_path', v_fn;
     END IF;
   END LOOP;
 
