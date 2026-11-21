@@ -29,13 +29,13 @@ node "$CRM_UI_TEST"
 
 if ! grep -Fq 'id="adminCrm"' "$ROOT_DIR/admin.html" \
   || ! grep -Fq './admin-crm.js?v=20261121-1' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-crm.js?v=20261120-1' "$ROOT_DIR/sw.js" \
-  || ! grep -Fq './admin-crm.css?v=20261120-1' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-crm.css?v=20261120-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-crm.js?v=20261121-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-crm.css?v=20261121-1' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-crm.css?v=20261121-1' "$ROOT_DIR/sw.js" \
   || ! grep -Fq './admin-approval.js?v=20261121-crm-fail-closed-1' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-approval.js?v=20261120-crm-fail-closed-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-approval.js?v=20261121-crm-fail-closed-1' "$ROOT_DIR/sw.js" \
   || ! grep -Fq './admin-layout.js?v=20261121-crm-view-1' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-layout.js?v=20261120-crm-view-1' "$ROOT_DIR/sw.js"; then
+  || ! grep -Fq './admin-layout.js?v=20261121-crm-view-1' "$ROOT_DIR/sw.js"; then
   echo "The CRM admin workspace is not fully wired into the admin page and PWA shell." >&2
   exit 1
 fi
@@ -154,4 +154,4 @@ export MAILPIT_URL="http://127.0.0.1:54324"
 node "$CRM_API_TEST"
 unset MAILPIT_URL DATABASE_URL SERVICE_ROLE_KEY ANON_KEY
 
-echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local Storage/Auth/CRM API checks."
+echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local CRM API checks."
