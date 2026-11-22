@@ -6,7 +6,9 @@ const fixtures = {
   directory_entities: [
     { id:"entity-1",name_ar:"شركة اختبار التطوير",entity_type:"developer",description:"مطور عقاري تجريبي",website_url:"https://developer.example",primary_area_id:"area-1",latitude:27.2050,longitude:31.1540,location_precision:"street",location_source_id:"source-1",location_verified_at:"2026-11-04",location_public:true,verification_status:"published",public_visible:true },
     { id:"entity-2",name_ar:"هيئة اختبار عامة",entity_type:"public_authority",description:"جهة عامة تجريبية",website_url:"https://authority.example",primary_area_id:"area-1",verification_status:"published",public_visible:true },
-    { id:"entity-3",name_ar:"مكتب استشارات تجريبي",entity_type:"consultant",description:"استشارات عقارية",website_url:"",primary_area_id:"area-1",verification_status:"published",public_visible:true }
+    { id:"entity-3",name_ar:"مكتب استشارات تجريبي",entity_type:"consultant",service_category:"engineering_design",description:"استشارات هندسية",website_url:"",primary_area_id:"area-1",verification_status:"published",public_visible:true },
+    { id:"entity-4",name_ar:"مكتب تسويق تجريبي",entity_type:"marketing",service_category:"real_estate_marketing",description:"تسويق ووساطة عقارية",website_url:"",primary_area_id:"area-1",verification_status:"published",public_visible:true },
+    { id:"entity-5",name_ar:"مقاولات تجريبية",entity_type:"contractor",service_category:"contracting_construction",description:"مقاولات وتشطيبات",website_url:"",primary_area_id:"area-1",verification_status:"published",public_visible:true }
   ],
   directory_projects: [
     { id:"project-1",name_ar:"مشروع اختبار النخيل",project_type:"residential",description:"مشروع سكني تجريبي",location_text:"أسيوط الجديدة",project_status:"unknown",area_id:"area-1",verification_status:"published",public_visible:true }
@@ -38,21 +40,23 @@ async function mockDirectoryApi(page) {
   });
 }
 
-test("directory labels and complete entity classification filter work", async ({page})=>{
+test("directory shows reference entities only and excludes companies and service providers", async ({page})=>{
   await mockDirectoryApi(page);
   await page.goto("/directory.html");
-  await expect(page.locator(".directory-tabs button[data-view='entities']")).toHaveText("الجهات والشركات");
-  await expect(page.locator("#directoryResults .directory-card")).toHaveCount(3);
+  await expect(page.locator(".directory-tabs button[data-view='entities']")).toHaveText("الجهات المرجعية");
+  await expect(page.locator("#directoryResults .directory-card")).toHaveCount(2);
   const options=await page.locator("#directoryTypeFilter option").allTextContents();
-  for(const expected of ["مطور عقاري","مطور عقاري","جهة حكومية / عامة","مكتب مبيعات","مقاولات","استشارات عقارية"]) {
-    expect(options.join(" ")).toContain(expected);
+  expect(options.join(" ")).toContain("مطور عقاري");
+  expect(options.join(" ")).toContain("جهة حكومية / عامة");
+  for(const excluded of ["تسويق عقاري","وساطة ومكتب عقاري","مقاولات","استشارات عقارية","مكتب مبيعات"]) {
+    expect(options.join(" ")).not.toContain(excluded);
   }
+  await expect(page.locator("#directoryResults")).not.toContainText("مكتب استشارات تجريبي");
+  await expect(page.locator("#directoryResults")).not.toContainText("مكتب تسويق تجريبي");
+  await expect(page.locator("#directoryResults")).not.toContainText("مقاولات تجريبية");
   await page.locator("#directoryTypeFilter").selectOption("public_authority");
   await expect(page.locator("#directoryResults .directory-card")).toHaveCount(1);
   await expect(page.locator("#directoryResults")).toContainText("هيئة اختبار عامة");
-  await page.locator("#directoryTypeFilter").selectOption("consultant");
-  await expect(page.locator("#directoryResults .directory-card")).toHaveCount(1);
-  await expect(page.locator("#directoryResults")).toContainText("مكتب استشارات تجريبي");
 });
 
 test("all five directory tabs search, filter and open sources correctly", async ({page})=>{
