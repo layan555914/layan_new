@@ -1,0 +1,45 @@
+name: Rehearse ASYUT AQAR current-state schema
+
+on:
+  pull_request:
+    branches:
+      - main
+      - recovery/current-state-schema-rehearsal-20261113
+    paths:
+      - "supabase/config.toml"
+      - "supabase/bootstrap/**"
+      - "supabase/migrations/**"
+      - "supabase/README.md"
+      - "scripts/ci/rehearse-current-state-schema.sh"
+      - "tests/db/current-state-schema.assertions.sql"
+      - "tests/db/storage-api-baseline.mjs"
+      - ".github/workflows/rehearse-current-state-schema.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clean-install:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out current-state rehearsal branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pinned Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 2.84.2
+
+      - name: Confirm disposable Docker runtime
+        run: docker version
+
+      - name: Rebuild clean local Supabase and verify current schema
+        shell: bash
+        run: bash scripts/ci/rehearse-current-state-schema.sh
