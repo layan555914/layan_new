@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v184-brand-identity-20261118";
+const CACHE_NAME = "asyut-aqar-shell-v185-directory-reference-separation-20261122";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -22,7 +22,7 @@ const APP_SHELL = [
   "./directory-admin.html",
   "./directory-admin.js?v=20261114-service-profiles-1",
   "./directory.css",
-  "./directory.js?v=20261115-unified-entity-brand-1",
+  "./directory.js?v=20261122-directory-reference-separation-1",
   "./project.html",
   "./project.css?v=project-profile-v1-20261115",
   "./project.js?v=project-profile-v1-20261115",

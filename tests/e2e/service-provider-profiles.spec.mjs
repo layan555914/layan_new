@@ -309,6 +309,7 @@ test("admin can approve a service provider profile update from the dedicated rev
 
   const card = page.locator("#pendingCompanyEntityUpdates [data-company-entity-update-id]");
   await expect(card).toHaveCount(1, { timeout: 15000 });
+  await expect(page.locator("#adminStatus")).toContainText("تم التحقق من صلاحية الإدارة وفتح اللوحة");
   await expect(card).toContainText(ENTITY.name_ar);
   await expect(card).toContainText("اسم جديد بعد المراجعة");
   await card.locator("[data-entity-profile-update-action='approve']").click();
