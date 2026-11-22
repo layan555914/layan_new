@@ -103,9 +103,21 @@ BEGIN
     RAISE EXCEPTION 'Private admin workflow tables must not be directly exposed';
   END IF;
 
+  -- Scope this assertion to the 13 ad/sponsor write policies explicitly
+  -- converted by the owner-gate repair. Other workflows (for example, a
+  -- verified directory-manager link cleanup policy) may intentionally retain
+  -- an admin alternative and must not be mistaken for an ad-write bypass.
   SELECT count(*) INTO v_old_admin_write_policies
   FROM pg_policies
   WHERE schemaname='public' AND cmd <> 'SELECT'
+    AND policyname = ANY(ARRAY[
+      'property_offers_admin_insert_for_customer','property_offers_admin_update_all',
+      'marketplace_listings_admin_insert_for_customer','marketplace_listings_admin_update_all',
+      'supplier_ads_admin_insert_for_customer','supplier_ads_admin_update_all',
+      'company_property_ads_admin_insert_for_customer','company_property_ads_admin_update_all',
+      'partner_ad_slots_admin_insert','partner_ad_slots_admin_update_all','partner_ad_slots_admin_delete',
+      'platform_sponsors_admin_insert_all','platform_sponsors_admin_update_all'
+    ])
     AND (coalesce(qual,'') || coalesce(with_check,'')) ~* '(^|[^a-z_])layan_is_admin\(\)';
 
   SELECT count(*) INTO v_owner_write_policies
