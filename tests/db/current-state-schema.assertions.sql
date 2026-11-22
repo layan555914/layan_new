@@ -16,8 +16,8 @@ DECLARE
   v_has_lock boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 46 THEN
-    RAISE EXCEPTION 'Expected 46 clean-install migrations (3 Nov 3 baseline files + 42 current main migrations + 1 owner-gate repair); found %', v_count;
+  IF v_count <> 53 THEN
+    RAISE EXCEPTION 'Expected 53 clean-install migrations (3 Nov 3 baseline files + 42 current main migrations + 1 owner-gate repair + 7 reviewed branch migrations); found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
