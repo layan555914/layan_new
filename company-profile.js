@@ -119,6 +119,22 @@ document.addEventListener("DOMContentLoaded",async()=>{
    return "";
   }
  }
+ async function publicServiceOffersMarkup(directoryEntityId){
+  try{
+   const links=await api("marketplace_listing_provider_links?select=listing_id&directory_entity_id=eq."+encodeURIComponent(directoryEntityId));
+   const ids=(Array.isArray(links)?links:[]).map(row=>row.listing_id).filter(Boolean);
+   const offers=ids.length?await api("marketplace_listings?select=id,title,description,category,city,area,price,price_period,created_at&status=eq.approved&id=in.("+ids.join(",")+")&order=created_at.desc&limit=30"):[];
+   const cards=offers.map(item=>{
+    const price=item.price!==null&&item.price!==undefined?Number(item.price).toLocaleString("ar-EG")+" ج.م"+(item.price_period?" "+esc(item.price_period):""):"السعر عند التواصل";
+    const place=[item.city,item.area].filter(Boolean).join("، ")||"أسيوط";
+    return '<article class="company-service-offer-card"><div><small>'+esc(item.category||"خدمة")+'</small><h3>'+esc(item.title||"عرض خدمة")+'</h3><p>'+esc(String(item.description||"").slice(0,180))+'</p><span>'+esc(place)+'</span><strong>'+esc(price)+'</strong></div><a href="./marketplace.html#marketplace-listing-'+encodeURIComponent(item.id)+'">تفاصيل العرض ←</a></article>';
+   }).join("");
+   return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2>'+(offers.length?'<div class="company-service-offers-grid">'+cards+'</div>':'<p>لا توجد عروض منشورة مرتبطة بهذا الملف حاليًا. ستظهر هنا العروض بعد اعتمادها وربطها بملف مقدم الخدمة.</p>')+'</section>';
+  }catch(error){
+   console.warn("Published service provider offers unavailable:",error);
+   return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2><p>تعذر تحميل العروض حاليًا. يمكنك تصفح <a href="./marketplace.html">سوق الخدمات</a>.</p></section>';
+  }
+ }
  async function loadDirectoryEntity(){
   if(!/^[0-9a-f-]{36}$/i.test(entityId||"")){renderError("رابط ملف الجهة غير صحيح.");return;}
   const extended="directory_entities?select=id,name_ar,name_en,entity_type,service_category,description,website_url,public_phone,public_email,public_address,public_whatsapp,public_logo_url,public_services,public_gallery_urls,public_business_hours,public_coverage_areas,primary_area_id,latitude,longitude,location_public,location_precision,location_source_id,location_verified_at,verification_status,representative_verified_at,public_visible&id=eq."+encodeURIComponent(entityId)+"&public_visible=eq.true&verification_status=eq.published";
@@ -140,6 +156,18 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const name=entity.name_ar||entity.name_en||"جهة عقارية";
   const type=categoryLabel(entity.entity_type,entity.service_category);
   const website=safeUrl(entity.website_url);
+  // A promotional social post is separate from the entity's official website.
+  let promoUrl="";
+  try{
+   const promoRows=await api("supplier_ads?select=id,title,promo_url,ends_at&business_name=eq."+encodeURIComponent(name)+"&status=eq.active&order=created_at.desc&limit=10");
+   const now=Date.now();
+   const promo=(Array.isArray(promoRows)?promoRows:[]).find(row=>{
+    const url=safeUrl(row.promo_url);
+    if(!url||(row.ends_at&&(!Number.isFinite(Date.parse(row.ends_at))||Date.parse(row.ends_at)<=now)))return false;
+    try{return /(^|\.)facebook\.com$/i.test(new URL(url).hostname);}catch(_){return false;}
+   });
+   promoUrl=safeUrl(promo?.promo_url);
+  }catch(error){console.warn("Public promotional link unavailable:",error);}
   const officialBrand=officialBrandProfile(website);
   const logo=safeUrl(entity.public_logo_url)||ENTITY_LOGO_ASSETS[entity.id]||safeUrl(officialBrand?.logoUrl)||"";
   const publishedPhone=String(entity.public_phone||"").trim();
@@ -173,6 +201,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    }
   }catch(error){console.warn("Public source references unavailable:",error);}
   const projectSectionMarkup=await publicProjectsMarkup(entity.id);
+  const serviceOffersMarkup=isServiceProvider?await publicServiceOffersMarkup(entity.id):"";
   document.title=name+" | ملف "+profileSubject+" – أسيوط عقار";
   const canonical=new URL("./company.html",location.href);
   canonical.searchParams.set("entity_id",entity.id);
@@ -187,6 +216,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(whatsapp){const wa=whatsapp.startsWith("0")?"2"+whatsapp.slice(1):whatsapp;contact.push('<a class="company-contact-secondary" href="https://wa.me/'+esc(wa)+'" target="_blank" rel="noopener noreferrer">واتساب</a>');}
   if(entity.public_email)contact.push('<a class="company-contact-secondary" href="mailto:'+esc(entity.public_email)+'">البريد الإلكتروني</a>');
   if(website){const isFacebook=/^(?:www\.)?facebook\.com$/i.test(new URL(website).hostname);const websiteLabel=isFacebook?"صفحة الجهة على فيسبوك ↗":"الموقع الإلكتروني ↗";contact.push('<a class="company-contact-secondary" href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">'+websiteLabel+'</a>');}
+  if(promoUrl)contact.push('<a class="company-contact-secondary company-promo-link" href="'+esc(promoUrl)+'" target="_blank" rel="noopener noreferrer">شاهد إعلان النشاط على فيسبوك ↗</a>');
   if(mapUrl)contact.push('<a class="company-contact-secondary" href="'+esc(mapUrl)+'" target="_blank" rel="noopener noreferrer">بحث العنوان على الخريطة ↗</a>');
   const serviceHighlightsMarkup=services.length
    ?'<div class="company-profile-highlights" aria-label="أبرز الخدمات">'+services.slice(0,4).map(item=>'<span>'+esc(item)+'</span>').join('')+'</div>'
@@ -197,11 +227,10 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(whatsapp){const waNumber=whatsapp.startsWith("0")?"2"+whatsapp.slice(1):whatsapp;contactDetails.push('<div class="company-detail-item"><strong>واتساب</strong><a href="https://wa.me/'+esc(waNumber)+'" target="_blank" rel="noopener noreferrer">مراسلة الشركة أو مقدم الخدمة</a></div>');}
   if(entity.public_email)contactDetails.push('<div class="company-detail-item"><strong>البريد الإلكتروني</strong><a href="mailto:'+esc(entity.public_email)+'">'+esc(entity.public_email)+'</a></div>');
   if(entity.public_business_hours)contactDetails.push('<div class="company-detail-item"><strong>مواعيد العمل</strong><span>'+esc(entity.public_business_hours)+'</span></div>');
-  if(website)contactDetails.push('<div class="company-detail-item"><strong>الصفحة الرسمية</strong><a href="'+esc(website)+'" target="_blank" rel="noopener noreferrer">زيارة الصفحة الرسمية ↗</a></div>');
   const contactDetailsTitle=isServiceProvider?"بيانات التواصل ومقر مقدم الخدمة":isRealEstateCompany?"بيانات التواصل ومقر الشركة":"بيانات التواصل ومقر الجهة";
-  const contactDetailsMarkup='<section class="company-profile-section company-contact-details"><h2>'+contactDetailsTitle+'</h2>'+
-   (contactDetails.length?'<div class="company-detail-grid">'+contactDetails.join("")+'</div>':'<p class="company-detail-empty">لم تُنشر بيانات التواصل أو العنوان لهذه الجهة حتى الآن. يمكن لممثلها طلب استلام الملف وتحديث البيانات بعد التحقق.</p>')+
-   '</section>';
+  const contactDetailsMarkup=contactDetails.length
+   ?'<section class="company-profile-section company-contact-details"><h2>'+contactDetailsTitle+'</h2><div class="company-detail-grid">'+contactDetails.join("")+'</div></section>'
+   :'<section class="company-profile-section company-contact-details"><h2>'+contactDetailsTitle+'</h2><p class="company-detail-empty">لم تُنشر بيانات التواصل أو العنوان حتى الآن.</p></section>';
   const coverageMarkup=coverage.length
    ?'<section class="company-profile-section company-coverage-section"><h2>نطاق تقديم الخدمات</h2><div class="company-coverage-list">'+coverage.map(area=>'<span>'+esc(area)+'</span>').join('')+'</div></section>'
    :"";
@@ -210,6 +239,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>لا يتوفر شعار موثّق</small></span>')+'</div><div><span class="eyebrow">ملف تعريفي منشور في دليل أسيوط عقار</span>'+(entity.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الجهة وصفته · لا يعني ذلك شهادة ترخيص للنشاط</span>':'')+'<h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div>'+serviceHighlightsMarkup+'<div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
    claimPanelMarkup+
    projectSectionMarkup+
+   serviceOffersMarkup+
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':'')+
    contactDetailsMarkup+
    coverageMarkup+

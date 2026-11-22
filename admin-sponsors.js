@@ -176,6 +176,20 @@
 
   // ===================== Sponsored ads =====================
   let ads = [];
+  let placementsSchemaReady = false;
+  let placementOrderSchemaReady = false;
+  const PLACEMENT_OPTIONS = [
+    { key: "home", label: "الصفحة الرئيسية" },
+    { key: "offers", label: "صفحة العقارات" },
+    { key: "marketplace", label: "سوق الخدمات" },
+    { key: "featured", label: "صفحة الإعلانات المميزة" },
+    { key: "property_details", label: "داخل صفحة تفاصيل العقار" }
+  ];
+  const DEFAULT_PLACEMENTS = PLACEMENT_OPTIONS.filter(item => item.key !== "property_details").map(item => item.key);
+  const placementLabel = keys => (Array.isArray(keys) ? keys : DEFAULT_PLACEMENTS)
+    .map(key => PLACEMENT_OPTIONS.find(item => item.key === key)?.label)
+    .filter(Boolean)
+    .join(" · ");
   const STATUS = { pending: ["بانتظار التفعيل", "is-wait"], active: ["منشور", "is-live"], paused: ["موقوف مؤقتًا", "is-off"], expired: ["منتهي", "is-off"], rejected: ["مرفوض", "is-off"] };
   function adState(a) {
     if (a.status === "active" && a.ends_at && new Date(a.ends_at) <= new Date()) return "expired";
@@ -194,21 +208,123 @@
       '<span class="as-thumb">' + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : esc(String(a.business_name || "؟").slice(0, 1))) + '</span>' +
       '<div class="as-info"><strong>' + esc(a.title) + '</strong><span class="as-chips"><b class="as-chip ' + cls + '">' + esc(label) + '</b><b class="as-chip">' + esc(a.category) + '</b></span>' +
         '<small>' + esc(a.business_name) + ' · <span dir="ltr">' + esc(a.contact_phone) + '</span></small>' +
-        '<small>' + (a.starts_at ? "من " + fmtDate(a.starts_at) : "أُرسل " + fmtDate(a.created_at)) + (a.ends_at ? " حتى " + fmtDate(a.ends_at) : "") + (Number(a.price) ? " · " + Number(a.price).toLocaleString("ar-EG") + " جنيه" : "") + '</small></div>' +
+        '<small>' + (a.starts_at ? "من " + fmtDate(a.starts_at) : "أُرسل " + fmtDate(a.created_at)) + (a.ends_at ? " حتى " + fmtDate(a.ends_at) : "") + (Number(a.price) ? " · " + Number(a.price).toLocaleString("ar-EG") + " جنيه" : "") + '</small>' +
+        '<small class="as-ad-placements">أماكن الظهور: ' + esc(placementLabel(a.placement_keys) || "غير محدد") + '</small></div>' +
       '<div class="as-actions">' + buttons.join("") + '</div></article>';
   }
+  function orderedAdsForPlacement(key) {
+    return ads.filter(ad =>
+      adState(ad) === "active" &&
+      (!Array.isArray(ad.placement_keys) || ad.placement_keys.includes(key))
+    ).slice().sort((a, b) => {
+      const aHas = Object.prototype.hasOwnProperty.call(a.placement_order || {}, key);
+      const bHas = Object.prototype.hasOwnProperty.call(b.placement_order || {}, key);
+      const aOrder = aHas ? Number(a.placement_order[key]) : Number.POSITIVE_INFINITY;
+      const bOrder = bHas ? Number(b.placement_order[key]) : Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    });
+  }
+
+  function renderAdsOrderPanel() {
+    const box = $("adminSponsoredAdsOrderList");
+    if (!box) return;
+    if (!placementOrderSchemaReady) {
+      box.innerHTML = '<p class="admin-empty admin-pending">الترتيب اليدوي ينتظر تطبيق تحديث قاعدة البيانات الخاص بترتيب الإعلانات. لن يتغير ترتيب العرض الحالي قبل تطبيقه.</p>';
+      return;
+    }
+    const key = $("adminSponsoredPlacementOrderFilter")?.value || "marketplace";
+    const rows = orderedAdsForPlacement(key);
+    if (!rows.length) {
+      box.innerHTML = '<p class="admin-empty">لا توجد إعلانات نشطة في هذه المساحة حاليًا. الإعلانات الموقوفة أو قيد المراجعة لا تظهر للزوار.</p>';
+      return;
+    }
+    box.innerHTML = rows.map((ad, index) =>
+      '<article class="as-item" data-order-ad-id="' + esc(ad.id) + '">' +
+        '<div class="as-info"><strong>' + esc(ad.title) + '</strong>' +
+          '<small>' + esc(ad.business_name) + ' · ' + esc(ad.category) + '</small>' +
+          '<small>الترتيب الحالي: ' + (index + 1) + '</small></div>' +
+        '<div class="as-actions">' +
+          '<button type="button" class="as-icon" data-ad-order="up" ' + (index === 0 ? "disabled" : "") + ' aria-label="تقديم الإعلان">▲</button>' +
+          '<button type="button" class="as-icon" data-ad-order="down" ' + (index === rows.length - 1 ? "disabled" : "") + ' aria-label="تأخير الإعلان">▼</button>' +
+        '</div></article>'
+    ).join("");
+  }
+
   async function loadAds() {
     const box = $("adminSponsoredAdsList");
     if (!box) return;
     try {
-      ads = await req("supplier_ads?select=id,owner_id,business_name,category,title,description,image_url,target_url,contact_phone,status,price,starts_at,ends_at,created_at&order=created_at.desc") || [];
+      const baseSelect = "id,owner_id,business_name,category,title,description,image_url,target_url,contact_phone,status,price,starts_at,ends_at,created_at";
+      try {
+        ads = await req("supplier_ads?select=" + baseSelect + ",placement_keys,placement_order&order=created_at.desc") || [];
+        placementsSchemaReady = true;
+        placementOrderSchemaReady = true;
+      } catch (schemaError) {
+        const message = String(schemaError?.message || schemaError || "");
+        if (/placement_order|PGRST204|42703/i.test(message)) {
+          placementOrderSchemaReady = false;
+          try {
+            ads = await req("supplier_ads?select=" + baseSelect + ",placement_keys&order=created_at.desc") || [];
+            ads = ads.map(item => ({ ...item, placement_order: {} }));
+            placementsSchemaReady = true;
+          } catch (placementError) {
+            const placementMessage = String(placementError?.message || placementError || "");
+            if (!/placement_keys|PGRST204|42703/i.test(placementMessage)) throw placementError;
+            ads = await req("supplier_ads?select=" + baseSelect + "&order=created_at.desc") || [];
+            ads = ads.map(item => ({ ...item, placement_keys: DEFAULT_PLACEMENTS, placement_order: {} }));
+            placementsSchemaReady = false;
+          }
+        } else if (/placement_keys|PGRST204|42703/i.test(message)) {
+          ads = await req("supplier_ads?select=" + baseSelect + "&order=created_at.desc") || [];
+          ads = ads.map(item => ({ ...item, placement_keys: DEFAULT_PLACEMENTS, placement_order: {} }));
+          placementsSchemaReady = false;
+          placementOrderSchemaReady = false;
+        } else {
+          throw schemaError;
+        }
+      }
       const order = { active: 0, pending: 1, paused: 2, expired: 3, rejected: 4 };
       ads.sort((x, y) => (order[adState(x)] ?? 9) - (order[adState(y)] ?? 9));
       box.innerHTML = ads.length ? ads.map(adRow).join("") : '<p class="admin-empty">لا توجد إعلانات ممولة بعد. أضف إعلانًا من الزر أعلاه.</p>';
-    } catch (e) { box.innerHTML = '<p class="admin-empty">' + esc(e.message) + "</p>"; }
+      renderAdsOrderPanel();
+    } catch (e) {
+      box.innerHTML = '<p class="admin-empty">' + esc(e.message) + "</p>";
+      const orderBox = $("adminSponsoredAdsOrderList");
+      if (orderBox) orderBox.innerHTML = '<p class="admin-empty">' + esc(e.message) + "</p>";
+    }
   }
 
-  const CATEGORIES = ["مواد بناء", "تشطيبات", "سيراميك وبورسلين", "دهانات", "أبواب وشبابيك", "مطابخ وأثاث", "ستائر ومفروشات", "أدوات صحية", "كهرباء وسباكة", "مقاولات", "مطور عقاري / مشروع", "أخرى"];
+  async function moveSponsoredAd(btn) {
+    const key = $("adminSponsoredPlacementOrderFilter")?.value || "marketplace";
+    const rows = orderedAdsForPlacement(key);
+    const item = btn.closest("[data-order-ad-id]");
+    const currentIndex = rows.findIndex(ad => ad.id === item?.dataset.orderAdId);
+    if (currentIndex < 0) return;
+    const nextIndex = currentIndex + (btn.dataset.adOrder === "up" ? -1 : 1);
+    if (nextIndex < 0 || nextIndex >= rows.length) return;
+    const reordered = rows.slice();
+    [reordered[currentIndex], reordered[nextIndex]] = [reordered[nextIndex], reordered[currentIndex]];
+    btn.disabled = true;
+    try {
+      await rpc("layan_reorder_supplier_ads", {
+        p_placement_key: key,
+        p_ordered_ad_ids: reordered.map(ad => ad.id)
+      });
+      say("تم حفظ ترتيب إعلانات هذه المساحة.");
+      await loadAds();
+    } catch (error) {
+      say(/Could not find|PGRST202/.test(error.message || "")
+        ? "تحتاج هذه الخاصية تطبيق تحديث قاعدة البيانات الخاص بالترتيب اليدوي."
+        : (error.message || "تعذر حفظ ترتيب الإعلانات."));
+    } finally {
+      if (btn.isConnected) btn.disabled = false;
+    }
+  }
+
+  $("adminSponsoredPlacementOrderFilter")?.addEventListener("change", renderAdsOrderPanel);
+
+  const CATEGORIES = ["مواد بناء", "تشطيبات", "سيراميك وبورسلين", "دهانات", "أبواب وشبابيك", "مطابخ وأثاث", "ستائر ومفروشات", "أدوات صحية", "كهرباء وسباكة", "مقاولات", "مطور عقاري / مشروع", "أخرى", "مواد البناء والتشطيب", "الأثاث والفرش وتجهيز الوحدات", "الصيانة وإدارة العقارات", "الاستشارات والخدمات العقارية", "مكاتب التصميم الهندسي", "مهندسو الديكور والتصميم الداخلي", "السيراميك والبورسلين والأدوات الصحية", "الإضاءة ووحدات الإنارة", "الستائر والمفروشات"];
   const adDialog = document.createElement("dialog");
   adDialog.className = "as-dialog";
   adDialog.innerHTML = '<form class="as-form" novalidate>' +
@@ -217,6 +333,12 @@
       '<label>اسم النشاط *<input name="business_name" required minlength="2" maxlength="120"></label>' +
       '<label data-new-only>بريد العميل (اختياري)<input name="owner_email" type="email" maxlength="255" placeholder="اتركه فارغًا لحساب الإدارة"><small>اكتب بريد العميل لربط الإعلان بحسابه، أو اتركه فارغًا لو الإعلان تابع لحساب الإدارة.</small></label>' +
       '<label>المجال *<select name="category" required>' + CATEGORIES.map(c => "<option>" + c + "</option>").join("") + '</select></label>' +
+      '<fieldset class="as-placement-field is-wide" data-placement-set>' +
+        '<legend>أماكن ظهور الإعلان *</legend>' +
+        '<div class="as-placement-options">' + PLACEMENT_OPTIONS.map(item => '<label class="as-check"><input type="checkbox" name="placement_keys" value="' + item.key + '"><span>' + item.label + '</span></label>').join("") + '</div>' +
+        '<small data-placement-help>اختر مكانًا واحدًا على الأقل. يمكن اختيار أكثر من مكان.</small>' +
+        '<small>يظهر الإعلان داخل تفاصيل العقارات المنشورة عند اختيار هذا الموضع، في مساحة مستقلة عن بيانات العقار.</small>' +
+      '</fieldset>' +
       '<label class="is-wide">عنوان الإعلان *<input name="title" required minlength="3" maxlength="140"></label>' +
       '<label class="is-wide">الوصف *<textarea name="description" required minlength="5" maxlength="500" rows="3"></textarea></label>' +
       '<label>رقم التواصل *<input name="contact_phone" type="tel" dir="ltr" required minlength="7" maxlength="30"></label>' +
@@ -232,6 +354,8 @@
     '<div class="as-foot"><button type="submit" class="btn btn-gold">حفظ</button><button type="button" class="btn btn-outline-dark" data-close>إلغاء</button></div></form>';
   document.body.appendChild(adDialog);
   const aForm = adDialog.querySelector("form");
+  const placementFieldset = adDialog.querySelector("[data-placement-set]");
+  const placementHelp = adDialog.querySelector("[data-placement-help]");
   let editingAd = null, pendingAdFile = null;
   const paintAd = src => { adDialog.querySelector("[data-ad-preview]").innerHTML = src ? '<img src="' + esc(src) + '" alt="">' : "—"; };
   adDialog.addEventListener("click", e => { if (e.target.closest("[data-close]") || e.target === adDialog) adDialog.close(); });
@@ -248,6 +372,14 @@
       aForm.category.value = a.category;
     }
     if (!a) aForm.owner_email.value = "";
+    const selectedPlacements = Array.isArray(a?.placement_keys) ? a.placement_keys : (placementsSchemaReady ? [] : DEFAULT_PLACEMENTS);
+    aForm.querySelectorAll("input[name='placement_keys']").forEach(input => {
+      input.checked = selectedPlacements.includes(input.value);
+    });
+    placementFieldset.disabled = !placementsSchemaReady;
+    placementHelp.textContent = placementsSchemaReady
+      ? "اختر مكانًا واحدًا على الأقل. يمكن اختيار أكثر من مكان."
+      : "اختيار مواضع الظهور يحتاج تحديث قاعدة البيانات؛ الإعلانات الحالية تواصل الظهور بالطريقة السابقة.";
     paintAd(a ? httpUrl(a.image_url) : "");
     adDialog.querySelector("[data-status]").textContent = "";
     adDialog.showModal();
@@ -258,6 +390,11 @@
     if (!aForm.reportValidity()) return;
     const target = aForm.target_url.value.trim();
     if (target && !httpUrl(target)) { status.textContent = "رابط النشاط غير صحيح."; return; }
+    const selectedPlacements = Array.from(aForm.querySelectorAll("input[name='placement_keys']:checked")).map(input => input.value);
+    if (placementsSchemaReady && !selectedPlacements.length) {
+      status.textContent = "اختر مكان ظهور واحدًا على الأقل للإعلان.";
+      return;
+    }
     btn.disabled = true;
     try {
       let ownerId = editingAd?.owner_id || "";
@@ -278,7 +415,8 @@
       const row = {
         business_name: aForm.business_name.value.trim(), category: aForm.category.value, title: aForm.title.value.trim(),
         description: aForm.description.value.trim(), contact_phone: aForm.contact_phone.value.trim(),
-        target_url: target || null, image_url: image || null
+        target_url: target || null, image_url: image || null,
+        ...(placementsSchemaReady ? { placement_keys: selectedPlacements } : {})
       };
       if (editingAd) {
         await req("supplier_ads?id=eq." + editingAd.id, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ ...row, updated_at: new Date().toISOString() }) });
@@ -343,6 +481,8 @@
   }
 
   document.addEventListener("click", e => {
+    const orderButton = e.target.closest("[data-ad-order]");
+    if (orderButton && orderButton.closest("#adminSponsoredAdsOrderList")) return moveSponsoredAd(orderButton);
     const b = e.target.closest("[data-sp]"); if (b && b.closest("#adminSponsorsList")) return sponsorAction(b);
     const c = e.target.closest("[data-ad]"); if (c && c.closest("#adminSponsoredAdsList")) return adAction(c);
     if (e.target.closest("#addSponsorBtn")) return openSponsor(null);

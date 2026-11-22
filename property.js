@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "land_permit_details","land_utilities","land_zoning","city","area","area_m2",
     "bedrooms","bathrooms","monthly_installment","property_type","rental_period","rental_furnishing",
     "rental_security_deposit","rental_minimum_months","description",
-    "total_price","price_on_request","down_payment","paid_amount","remaining_amount","assignment_fee",
+    "total_price","price_on_request","down_payment","paid_amount","remaining_amount","remaining_installments","assignment_fee",
     "assignment_fee_percentage","discount_amount","discount_percent","developer_name",
     "project_name","image_urls","is_featured","featured_until","contact_phone",
     "latitude","longitude","created_at","updated_at"
@@ -160,6 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeFact("المقدم عند التعاقد", isAssignment && Number(row.down_payment) > 0 ? money(row.down_payment) : ""),
       makeFact("إجمالي المدفوع (شامل المقدم)", isAssignment && Number(row.paid_amount) > 0 ? money(row.paid_amount) : ""),
       makeFact("المبلغ المتبقي", isAssignment && Number(row.remaining_amount) > 0 ? money(row.remaining_amount) : ""),
+      makeFact("عدد الأقساط المتبقية", isAssignment && Number(row.remaining_installments) > 0 ? row.remaining_installments : ""),
       makeFact("القسط الشهري", isAssignment && Number(row.monthly_installment) > 0 ? money(row.monthly_installment) : ""),
       makeFact("رسوم التنازل", isAssignment && Number(row.assignment_fee) > 0 ? money(row.assignment_fee) : ""),
       makeFact("قيمة الخصم", Number(row.discount_amount) > 0 ? money(row.discount_amount) : ""),
@@ -184,6 +185,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           <section class="property-section-card">
             <h2>وصف الإعلان</h2>
             <p class="property-description">${escapeHTML(row.description || "لا يوجد وصف إضافي من صاحب الإعلان.")}</p>
+          </section>
+          <section class="property-section-card property-sponsored-section" id="propertySponsoredAds" aria-labelledby="propertySponsoredAdsTitle" hidden>
+            <div class="property-services-head"><h2 id="propertySponsoredAdsTitle">خدمات وإعلانات مميزة لهذا العقار</h2><span>مساحات إعلانية معتمدة</span></div>
+            <div class="property-sponsored-grid" id="propertySponsoredAdsGrid"></div>
           </section>
           <section class="property-section-card property-services" aria-labelledby="propertyServicesTitle">
             <div class="property-services-head"><h2 id="propertyServicesTitle">خدمات تحتاجها لهذا العقار</h2><a href="./advertise.html">أعلن هنا</a></div>
@@ -244,6 +249,65 @@ document.addEventListener("DOMContentLoaded", async () => {
         root.querySelectorAll("[data-property-image]").forEach(item => item.setAttribute("aria-pressed", item === button ? "true" : "false"));
       });
     });
+    loadPropertySponsoredAds();
+
+    async function loadPropertySponsoredAds() {
+      const section = root.querySelector("#propertySponsoredAds");
+      const grid = root.querySelector("#propertySponsoredAdsGrid");
+      if (!section || !grid || !base || !key) return;
+      try {
+        const baseSelect = "id,business_name,category,title,description,image_url,target_url,contact_phone,created_at";
+        const fetchRows = async fields => {
+          const columns = baseSelect +
+            (fields.includes("placement_keys") ? ",placement_keys" : "") +
+            (fields.includes("placement_order") ? ",placement_order" : "");
+          const response = await fetch(
+            base + "/rest/v1/public_active_supplier_ads?select=" + columns + "&order=created_at.desc&limit=200",
+            { headers: { apikey: key, Authorization: "Bearer " + key }, cache: "no-store" }
+          );
+          const raw = await response.text();
+          let data = [];
+          try { data = raw ? JSON.parse(raw) : []; } catch (_) {}
+          if (!response.ok || !Array.isArray(data)) {
+            const error = new Error(data?.message || "تعذر تحميل الإعلانات المناسبة.");
+            error.status = response.status;
+            throw error;
+          }
+          return data;
+        };
+        let rows;
+        try {
+          rows = await fetchRows(["placement_keys", "placement_order"]);
+        } catch (schemaError) {
+          const message = String(schemaError?.message || schemaError || "");
+          if (!/placement_order|placement_keys|PGRST204|42703/i.test(message)) throw schemaError;
+          try {
+            rows = (await fetchRows(["placement_keys"])).map(ad => ({ ...ad, placement_order: {} }));
+          } catch (placementError) {
+            // Do not show a generic all-surfaces ad in the property-details slot.
+            const placementMessage = String(placementError?.message || placementError || "");
+            if (/placement_keys|PGRST204|42703/i.test(placementMessage)) return;
+            throw placementError;
+          }
+        }
+        if (!Array.isArray(rows)) return;
+        const matching = rows.filter(ad =>
+          Array.isArray(ad.placement_keys) && ad.placement_keys.includes("property_details")
+        );
+        const ordered = window.AsyutSponsoredAd?.sortForPlacement?.(matching, "property_details") || matching;
+        const selected = ordered.slice(0, 3);
+        if (!selected.length) return;
+        grid.innerHTML = selected.map(ad =>
+          window.AsyutSponsoredAd?.render
+            ? window.AsyutSponsoredAd.render(ad, { className: "property-sponsored-card" })
+            : ""
+        ).filter(Boolean).join("");
+        if (grid.children.length) section.hidden = false;
+      } catch (error) {
+        console.warn("ASYUT AQAR property sponsored ads:", error.message);
+      }
+    }
+
     root.querySelector("#sharePropertyBtn")?.addEventListener("click", share);
     root.querySelector("#mobileShareFallback")?.addEventListener("click", share);
 

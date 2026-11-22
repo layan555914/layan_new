@@ -13,7 +13,7 @@
 .price-guide-purpose-tabs{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0 16px}
 .price-guide-purpose-tabs button{min-height:42px;padding:9px 22px;border:1px solid var(--border);border-radius:999px;background:var(--white);color:var(--navy);font:inherit;font-weight:700;cursor:pointer}
 .price-guide-purpose-tabs button[aria-pressed="true"]{background:var(--navy);color:var(--white);border-color:var(--navy)}
-.price-guide-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:end;gap:12px}
+.price-guide-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;align-items:end;gap:12px}
 .price-guide-filters label{display:grid;gap:6px;font-weight:700;color:var(--text)}
 .price-guide-filters select{width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font:inherit}
 .price-guide-reset{min-height:44px;padding:9px 15px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--navy);font:inherit;font-weight:700;cursor:pointer}
@@ -24,6 +24,7 @@
 .price-guide-card{padding:18px;border:1px solid var(--border);border-radius:14px;background:#fff;min-width:0}
 .price-guide-card h3{margin:0 0 5px;color:var(--navy);font-size:18px}
 .price-guide-card-location{margin:0 0 13px;color:var(--muted);font-size:13px}
+.price-guide-card-period{margin:-7px 0 13px;color:var(--muted);font-size:12px;font-weight:700}
 .price-guide-median{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px;margin-bottom:12px}
 .price-guide-median strong{font-size:clamp(24px,3vw,32px);color:var(--navy);line-height:1.4}
 .price-guide-median span{color:var(--muted);font-size:13px}

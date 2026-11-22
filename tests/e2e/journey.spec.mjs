@@ -222,15 +222,38 @@ test("customer can search, open, save, submit, track and admin-review a property
   const form = page.locator("#offerForm");
   await expect(page.locator("#offerDialog")).toBeVisible();
   await form.locator("[name='title']").fill("إعلان اختبار رحلة المستخدم");
-  await form.locator("[name='listing_purpose']").selectOption("تنازل");
   await form.locator("[name='property_type']").selectOption("شقة");
+
+  // Each transaction gets its own visible price control and only its own details.
+  await form.locator("[name='listing_purpose']").selectOption("بيع");
+  await expect(form.locator("#saleFields")).toBeVisible();
+  await expect(form.locator("#saleFields #transactionPriceFields")).toBeVisible();
+  await expect(form.locator("#rentalFields")).toBeHidden();
+  await expect(form.locator("#assignmentFields [name='down_payment']")).toBeDisabled();
+
+  await form.locator("[name='listing_purpose']").selectOption("إيجار");
+  await expect(form.locator("#rentalFields")).toBeVisible();
+  await expect(form.locator("#rentalFields #transactionPriceFields")).toBeVisible();
+  await expect(form.locator("[name='rental_period']")).toBeEnabled();
+  await expect(form.locator("#saleFields [name='discount_amount']")).toBeDisabled();
+  await expect(form.locator("#assignmentFields [name='down_payment']")).toBeDisabled();
+
+  await form.locator("[name='listing_purpose']").selectOption("تنازل");
+  await expect(form.locator("#assignmentFields")).toBeVisible();
+  await expect(form.locator("#assignmentFields #transactionPriceFields")).toBeVisible();
+  await expect(form.locator("#saleFields")).toBeHidden();
+  await expect(form.locator("#rentalFields")).toBeHidden();
+  await expect(form.locator("#rentalFields [name='rental_period']")).toBeDisabled();
+
   await form.locator("[name='city']").fill("أسيوط الجديدة");
   await form.locator("[name='area']").fill("الهضبة");
   await form.locator("[name='total_price']").fill("1200000");
   await form.locator("[name='down_payment']").fill("200000");
   await form.locator("[name='paid_amount']").fill("400000");
-  await form.locator("[name='remaining_installments']").fill("800000");
+  await form.locator("[name='remaining_amount']").fill("800000");
+  await form.locator("[name='remaining_installments']").fill("80");
   await form.locator("[name='monthly_installment']").fill("10000");
+  await form.locator("[name='assignment_fee']").fill("25000");
   await form.locator("[name='contact_phone']").fill("01012345678");
   await form.locator("[name='contact_consent']").check();
   await form.locator("[name='description']").fill("إعلان تجريبي للتأكد من استلام المنصة بيانات العقار وإرساله إلى قائمة مراجعة الإدارة.");
@@ -243,6 +266,10 @@ test("customer can search, open, save, submit, track and admin-review a property
   expect(state.createdPayload.owner_id).toBe(USER_ID);
   expect(state.createdPayload.total_price).toBe(1200000);
   expect(state.createdPayload.paid_amount + state.createdPayload.remaining_amount).toBe(1200000);
+  expect(state.createdPayload.remaining_amount).toBe(800000);
+  expect(state.createdPayload.remaining_installments).toBe(80);
+  expect(state.createdPayload.assignment_fee).toBe(25000);
+  expect(state.createdPayload.rental_period).toBeNull();
 
   // 5. The advertiser sees the pending state in My Listings.
   await page.goto("/my-listings.html");
@@ -267,5 +294,47 @@ test("customer can search, open, save, submit, track and admin-review a property
 
   // 7. A newly published listing can now be opened from its public details URL.
   await page.goto("/property.html?id=202");
-  await expect(page.locator("#propertyDetailsRoot")).toContainText("إعلان اختبار رحلة المستخدم");
+  const propertyDetails = page.locator("#propertyDetailsRoot");
+  await expect(propertyDetails).toContainText("إعلان اختبار رحلة المستخدم");
+  await expect(propertyDetails).toContainText("القيمة المعلنة للتنازل");
+  await expect(propertyDetails).toContainText("المقدم عند التعاقد");
+  await expect(propertyDetails).toContainText("إجمالي المدفوع (شامل المقدم)");
+  await expect(propertyDetails).toContainText("المبلغ المتبقي");
+  await expect(propertyDetails).toContainText("عدد الأقساط المتبقية");
+  await expect(propertyDetails).toContainText("القسط الشهري");
+  await expect(propertyDetails).toContainText("رسوم التنازل");
+  const assignmentFigures = (await propertyDetails.locator(".property-facts-grid").innerText()).replace(/[^\d]/g, "");
+  for (const amount of ["200000", "400000", "800000", "80", "10000", "25000"]) {
+    expect(assignmentFigures).toContain(amount);
+  }
+});
+
+
+test("a price-guide rental cadence link filters offers by the same period", async ({ page }) => {
+  const { offers } = await installBackendMocks(page);
+  offers.splice(0, offers.length,
+    makeOffer({
+      id: "301",
+      title: "شقة للإيجار الشهري",
+      listing_purpose: "إيجار",
+      rental_period: "شهري",
+      total_price: 6000
+    }),
+    makeOffer({
+      id: "302",
+      title: "شقة للإيجار السنوي",
+      listing_purpose: "إيجار",
+      rental_period: "سنوي",
+      total_price: 60000
+    })
+  );
+
+  await page.goto("/offers.html?purpose=%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1&rental_period=%D8%B4%D9%87%D8%B1%D9%8A");
+  await expect(page.locator("#offersGrid .offer-card")).toHaveCount(1);
+  await expect(page.locator("#offersGrid .offer-card").first()).toContainText("شقة للإيجار الشهري");
+  await expect(page.locator("#offersGrid")).not.toContainText("شقة للإيجار السنوي");
+
+  await page.locator("#resetFiltersBtn").click();
+  await expect(page.locator("#offersGrid .offer-card")).toHaveCount(2);
+  expect(new URL(page.url()).searchParams.has("rental_period")).toBe(false);
 });

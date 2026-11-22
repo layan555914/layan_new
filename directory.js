@@ -15,6 +15,11 @@ const labels={
 const setStatus=m=>{const el=$("#directoryStatus");if(el)el.textContent=m;};
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const safeUrl=v=>{try{const u=new URL(v);return["https:","http:"].includes(u.protocol)?u.href:"";}catch(_){return"";}};
+function isDirectoryReferenceEntity(entity){
+ const kind=String(entity?.entity_type||"");
+ const category=String(entity?.service_category||"");
+ return kind==="public_authority"||kind==="developer"||category==="real_estate_development";
+}
 const ENTITY_LOGO_ASSETS=Object.freeze({
  "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
 });
@@ -54,7 +59,7 @@ async function refresh(){
  try{
   const d=await staticData();
   const [e,p,a,s,o,es,ps,os]=await Promise.all([
-   table("directory_entities","select=id,name_ar,entity_type,description,website_url,public_logo_url,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
+   table("directory_entities","select=id,name_ar,entity_type,service_category,description,website_url,public_logo_url,primary_area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&or=(entity_type.eq.developer,entity_type.eq.public_authority,service_category.eq.real_estate_development)&order=name_ar.asc"),
    table("directory_projects","select=id,name_ar,project_type,description,location_text,project_status,area_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible&public_visible=eq.true&verification_status=eq.published&order=name_ar.asc"),
    table("directory_areas","select=id,slug,name_ar,name_en,area_type,parent_id,latitude,longitude,location_precision,location_source_id,location_verified_at,location_public,verification_status,public_visible,is_active&public_visible=eq.true&verification_status=eq.published&is_active=eq.true&order=name_ar.asc"),
    table("directory_sources","select=id,title,publisher,source_type,source_url,accessed_at,confidence_level,is_public&is_public=eq.true&order=accessed_at.desc"),
@@ -63,7 +68,7 @@ async function refresh(){
    table("directory_project_sources","select=project_id,source_id,claim_key"),
    table("directory_opportunity_sources","select=opportunity_id,source_id,claim_key")
   ]);
-  d.entities=e??d.entities??[];
+  d.entities=(e??d.entities??[]).filter(isDirectoryReferenceEntity);
   d.projects=p??d.projects??[];
   d.areas=a??d.areas??[];
   d.sources=s??d.sources??[];

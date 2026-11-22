@@ -9,8 +9,8 @@ async function mock(page) {
     { id: "s1", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
     { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
   ], ads: [
-    { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
-  ], rpc: [], patches: [], posts: [] };
+    { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", placement_keys: ["home", "offers", "marketplace", "featured"], placement_order: {}, status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
+  ], rpc: [], patches: [], adPatches: [], posts: [] };
   const user = { id: USER_ID, email: "sponsor-admin@example.invalid", email_confirmed_at: "2026-11-01T00:00:00Z", app_metadata: {}, user_metadata: {} };
   const reply = (route, body, status = 200) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify(body) });
   await page.route(SUPABASE + "/**", async route => {
@@ -30,6 +30,7 @@ async function mock(page) {
       if (name === "layan_is_admin") return reply(route, true);
       if (name === "layan_admin_delete_sponsor") { state.sponsors = state.sponsors.filter(s => s.id !== body.p_id); return reply(route, "done"); }
       if (name === "layan_activate_supplier_ad") { const ad = state.ads.find(a => a.id === body.p_ad_id); if (ad) ad.status = "active"; return reply(route, { success: true }); }
+      if (name === "layan_reorder_supplier_ads") { body.p_ordered_ad_ids.forEach((id, index) => { const ad = state.ads.find(a => a.id === id); if (ad) ad.placement_order = { ...(ad.placement_order || {}), [body.p_placement_key]: index }; }); return reply(route, { success: true, updated_ads: body.p_ordered_ad_ids.length }); }
       return reply(route, null);
     }
     if (path === "/rest/v1/platform_sponsors") {
@@ -37,10 +38,17 @@ async function mock(page) {
       if (method === "PATCH") { const id = url.searchParams.get("id").replace("eq.", ""); const body = req.postDataJSON(); state.patches.push({ id, ...body }); Object.assign(state.sponsors.find(s => s.id === id) || {}, body); return route.fulfill({ status: 204, body: "" }); }
       return reply(route, state.sponsors);
     }
+    if (path === "/rest/v1/property_offers") return reply(route, [{
+      id: 101, title: "شقة اختبار في أسيوط", listing_purpose: "بيع", property_type: "شقة",
+      city: "أسيوط", area: "حي شرق", area_m2: 120, total_price: 1500000,
+      price_on_request: false, description: "تفاصيل عقار لاختبار موضع الإعلان المميز.",
+      image_urls: [], contact_phone: "01012345678", is_featured: false,
+      created_at: "2026-11-20T10:00:00Z", updated_at: "2026-11-20T10:00:00Z"
+    }]);
     if (path === "/rest/v1/public_active_supplier_ads") return reply(route, state.ads.filter(a => a.status === "active"));
     if (path === "/rest/v1/supplier_ads") {
       if (method === "POST") { const row = { id: "a" + (state.ads.length + 10), created_at: new Date().toISOString(), ...req.postDataJSON() }; state.ads.push(row); return reply(route, [{ id: row.id }], 201); }
-      if (method === "PATCH") { const id = url.searchParams.get("id").replace("eq.", ""); Object.assign(state.ads.find(a => a.id === id) || {}, req.postDataJSON()); return route.fulfill({ status: 204, body: "" }); }
+      if (method === "PATCH") { const id = url.searchParams.get("id").replace("eq.", ""); const body = req.postDataJSON(); state.adPatches.push({ id, ...body }); Object.assign(state.ads.find(a => a.id === id) || {}, body); return route.fulfill({ status: 204, body: "" }); }
       return reply(route, state.ads);
     }
     if (method === "GET") return reply(route, []);
@@ -100,6 +108,15 @@ test("admin adds, hides and deletes sponsors and publishes a sponsored ad", asyn
 
   await page.locator("#addSponsoredAdBtn").click();
   const ad = page.locator(".as-dialog[open]");
+  const availableAdCategories = await ad.locator("[name='category'] option").allTextContents();
+  expect(availableAdCategories).toEqual(expect.arrayContaining([
+    "الإضاءة ووحدات الإنارة",
+    "السيراميك والبورسلين والأدوات الصحية",
+    "مكاتب التصميم الهندسي"
+  ]));
+  await ad.locator("[name='category']").selectOption({ label: "السيراميك والبورسلين والأدوات الصحية" });
+  await ad.locator("[name='placement_keys'][value='marketplace']").check();
+  await ad.locator("[name='placement_keys'][value='featured']").check();
   await ad.locator("[name='business_name']").fill("مصنع النيل");
   await ad.locator("[name='title']").fill("خصم 20% على البورسلين");
   await ad.locator("[name='description']").fill("عرض لفترة محدودة لعملاء أسيوط عقار.");
@@ -107,5 +124,94 @@ test("admin adds, hides and deletes sponsors and publishes a sponsored ad", asyn
   await ad.locator("[name='days']").fill("15");
   await ad.locator("button[type='submit']").click();
   await expect.poll(() => state.rpc.find(r => r.name === "layan_activate_supplier_ad")?.body.p_days).toBe(15);
-  expect(state.ads.at(-1)).toMatchObject({ business_name: "مصنع النيل", status: "active", owner_id: USER_ID });
+  expect(state.ads.at(-1)).toMatchObject({ business_name: "مصنع النيل", status: "active", owner_id: USER_ID, placement_keys: ["marketplace", "featured"] });
+});
+
+
+test("featured commercial ads only include ads assigned to the featured page", async ({ page }) => {
+  const state = await mock(page);
+  state.ads[0].placement_keys = ["home", "marketplace"];
+  state.ads.push({
+    id: "featured-only",
+    owner_id: USER_ID,
+    business_name: "شركة الظهور المميز",
+    category: "مواد البناء والتشطيب",
+    title: "إعلان مخصص لصفحة الإعلانات المميزة",
+    description: "إعلان اختبار لموضع الصفحة المميزة.",
+    image_url: null,
+    target_url: null,
+    contact_phone: "01022223333",
+    placement_keys: ["featured"],
+    status: "active",
+    price: 0,
+    created_at: "2026-11-10T10:00:00Z"
+  });
+
+  await page.goto("/featured.html");
+  const grid = page.locator("#featuredSponsorsGrid");
+  await expect(grid).toContainText("إعلان مخصص لصفحة الإعلانات المميزة");
+  await expect(grid).not.toContainText("معرض سيراميك asuit");
+});
+
+
+test("property detail page shows only ads explicitly assigned to the property-details placement", async ({ page }) => {
+  const state = await mock(page);
+  state.ads.push({
+    id: "property-details-only",
+    owner_id: USER_ID,
+    business_name: "مركز تشطيب أسيوط",
+    category: "مواد البناء والتشطيب",
+    title: "عرض تشطيب للوحدات الجديدة",
+    description: "خدمات تشطيب ومواد بناء لأصحاب الوحدات.",
+    image_url: null,
+    target_url: null,
+    contact_phone: "01033334444",
+    placement_keys: ["property_details"],
+    status: "active",
+    price: 0,
+    created_at: "2026-11-20T11:00:00Z"
+  });
+
+  await page.goto("/property.html?id=101");
+  const section = page.locator("#propertySponsoredAds");
+  await expect(section).toBeVisible();
+  await expect(section).toContainText("عرض تشطيب للوحدات الجديدة");
+  await expect(section).toContainText("مركز تشطيب أسيوط");
+  await expect(section).not.toContainText("معرض سيراميك asuit");
+});
+
+
+test("admin reorders active sponsored ads independently for each placement", async ({ page }) => {
+  const state = await mock(page);
+  state.ads.push({
+    id: "a2", owner_id: USER_ID, business_name: "معرض أحدث",
+    category: "أثاث", title: "إعلان أحدث", description: "إعلان اختبار للترتيب المستقل.",
+    image_url: null, target_url: null, contact_phone: "01022223333",
+    placement_keys: ["home", "marketplace"], placement_order: {},
+    status: "active", price: 0, created_at: "2026-11-10T10:00:00Z"
+  });
+
+  await page.goto("/admin.html");
+  await page.locator("#adminEmail").fill("sponsor-admin@example.invalid");
+  await page.locator("#adminLoginSubmit").click();
+  await expect(page.locator("#adminOtpCode")).toBeVisible();
+  await page.locator("#adminOtpCode").fill("123456");
+  await page.locator("#adminLoginSubmit").click();
+  await expect(page.locator("#adminConsole")).toBeVisible();
+  await page.locator("[data-view='sponsors']").click();
+
+  const orderList = page.locator("#adminSponsoredAdsOrderList");
+  await expect(orderList.locator("[data-order-ad-id]")).toHaveCount(2);
+  await expect(orderList.locator("[data-order-ad-id]").first()).toHaveAttribute("data-order-ad-id", "a2");
+
+  await orderList.locator("[data-order-ad-id='a1'] [data-ad-order='up']").click();
+  await expect.poll(() => state.rpc.find(rpc => rpc.name === "layan_reorder_supplier_ads")?.body.p_ordered_ad_ids)
+    .toEqual(["a1", "a2"]);
+  await expect(orderList.locator("[data-order-ad-id]").first()).toHaveAttribute("data-order-ad-id", "a1");
+
+  await page.locator("#adminSponsoredPlacementOrderFilter").selectOption("home");
+  await expect(orderList.locator("[data-order-ad-id]").first()).toHaveAttribute("data-order-ad-id", "a2");
+  expect(state.ads.find(ad => ad.id === "a1").placement_order).toMatchObject({ marketplace: 0 });
+  expect(state.ads.find(ad => ad.id === "a2").placement_order).toMatchObject({ marketplace: 1 });
+  expect(state.ads.find(ad => ad.id === "a1").placement_order).not.toHaveProperty("home");
 });
