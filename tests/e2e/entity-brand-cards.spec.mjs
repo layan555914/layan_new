@@ -80,21 +80,21 @@ test("services marketplace shows provider and official Prime logos in the shared
   await expect(entityCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
 });
 
-test("real-estate directory displays public and official logos plus a labeled fallback when missing", async ({ page }) => {
+test("real-estate reference directory displays developer logos and excludes sales offices", async ({ page }) => {
+  const fallbackDeveloper = {
+    ...DEVELOPER, id: "c3333333-3333-4333-8333-333333333333",
+    name_ar: "مطور بلا شعار", public_logo_url: null, website_url: null
+  };
   await page.route(SUPABASE + "/rest/v1/**", async route => {
     const table = new URL(route.request().url()).pathname.split("/").pop();
-    if (table === "directory_entities") return reply(route, [
-      ENTITY, PRIME,
-      { ...ENTITY, id: "c3333333-3333-4333-8333-333333333333", name_ar: "مكتب بلا شعار", public_logo_url: null, website_url: null }
-    ]);
+    if (table === "directory_entities") return reply(route, [DEVELOPER, PRIME, fallbackDeveloper]);
     return reply(route, []);
   });
   await page.goto("/directory.html");
-  const logoCard = page.locator("#directoryResults .directory-card").filter({ hasText: ENTITY.name_ar });
-  const primeCard = page.locator("#directoryResults .directory-card").filter({ hasText: PRIME.name_ar });
-  const fallbackCard = page.locator("#directoryResults .directory-card").filter({ hasText: "مكتب بلا شعار" });
-  await expect(logoCard.locator(".aq-entity-brand img")).toHaveAttribute("src", ENTITY.public_logo_url);
-  await expect(primeCard.locator(".aq-entity-brand img")).toHaveAttribute("src", PRIME_LOGO);
+  const logoCard = page.locator("#directoryResults .directory-card").filter({ hasText: DEVELOPER.name_ar });
+  const fallbackCard = page.locator("#directoryResults .directory-card").filter({ hasText: "مطور بلا شعار" });
+  await expect(logoCard.locator(".aq-entity-brand img")).toHaveAttribute("src", DEVELOPER.public_logo_url);
+  await expect(page.locator("#directoryResults")).not.toContainText(PRIME.name_ar);
   await expect(logoCard.locator(".aq-entity-brand")).toHaveCSS("width", expectedBrandWidth(page));
   await expect(fallbackCard.locator(".aq-entity-brand__fallback")).toBeVisible();
   await expect(fallbackCard.locator(".aq-entity-brand__fallback strong")).toHaveText("م");
