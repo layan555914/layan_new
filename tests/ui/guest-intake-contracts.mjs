@@ -75,3 +75,4 @@ assert.ok(offers.includes("gubabase.js?v=20261123-guest-intake-2") &&
 
 
 console.log("PASS: guest property/buyer intake, private storage, rate limiting, owner moderation, OTP-preserving client routing and admin PWA contracts.");
+// Keep the paginated cleanup and nullable storage metadata contract covered by CI.
