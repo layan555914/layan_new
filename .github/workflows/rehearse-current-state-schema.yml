@@ -13,6 +13,15 @@ on:
       - "scripts/ci/rehearse-current-state-schema.sh"
       - "tests/db/current-state-schema.assertions.sql"
       - "tests/db/storage-api-baseline.mjs"
+      - "admin-crm.js"
+      - "admin-crm.css"
+      - "admin.html"
+      - "admin-layout.js"
+      - "admin-approval.js"
+      - "sw.js"
+      - "tests/db/admin-crm-api.mjs"
+      - "tests/ui/admin-approval-gate.mjs"
+      - "tests/ui/admin-crm-regressions.mjs"
       - ".github/workflows/rehearse-current-state-schema.yml"
   workflow_dispatch:
 
