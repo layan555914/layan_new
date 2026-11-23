@@ -137,7 +137,9 @@
       const allowedResources = new Set([
         "platform_sponsors", "supplier_ads", "property_offers", "marketplace_listings",
         "company_profiles", "company_property_ads", "company_entity_profile_update_requests",
-        "partner_ad_slots", "directory_sources", "directory_change_log"
+        "partner_ad_slots", "directory_sources", "directory_change_log", "directory_entities",
+        "directory_projects", "directory_areas", "directory_opportunities", "directory_entity_sources",
+        "directory_project_sources", "directory_opportunity_sources"
       ]);
       const allowedRpcs = new Set([
         "layan_admin_crm_save_lead", "layan_admin_crm_log_activity",
