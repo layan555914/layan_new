@@ -511,4 +511,63 @@ BEGIN
 END;
 $owner_policy_assertions$;
 
+
+DO $directory_media_assertions$
+DECLARE
+  v_policy_count integer;
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM storage.buckets
+    WHERE id='asyut-directory-media'
+      AND public=false
+      AND file_size_limit=10485760
+      AND allowed_mime_types @> ARRAY['image/jpeg','image/png','image/webp','image/avif']::text[]
+  ) THEN
+    RAISE EXCEPTION 'Directory media bucket must be private, 10 MiB max, and restricted to approved image MIME types';
+  END IF;
+
+  IF to_regclass('public.directory_media_assets') IS NULL
+     OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='public.directory_media_assets'::regclass) THEN
+    RAISE EXCEPTION 'Directory media metadata table or RLS is missing';
+  END IF;
+
+  IF has_table_privilege('anon','public.directory_media_assets','INSERT')
+     OR has_table_privilege('anon','public.directory_media_assets','UPDATE')
+     OR has_table_privilege('anon','public.directory_media_assets','DELETE')
+     OR has_table_privilege('authenticated','public.directory_media_assets','TRUNCATE')
+     OR NOT has_column_privilege('authenticated','public.directory_media_assets','status','UPDATE') THEN
+    RAISE EXCEPTION 'Directory media table grants do not match the reviewed RLS model';
+  END IF;
+
+  SELECT count(*) INTO v_policy_count
+  FROM pg_policies
+  WHERE (schemaname='public' AND tablename='directory_media_assets'
+         AND policyname LIKE 'directory_media_%')
+     OR (schemaname='storage' AND tablename='objects'
+         AND policyname LIKE 'directory_media_storage_%');
+  IF v_policy_count < 14 THEN
+    RAISE EXCEPTION 'Expected the complete directory media metadata and Storage RLS policy set; found %',v_policy_count;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname='storage' AND tablename='objects'
+      AND policyname='directory_media_storage_review_read'
+      AND coalesce(qual,'') ~* 'layan_is_admin'
+  ) THEN
+    RAISE EXCEPTION 'Anonymous approved-media read policy must not invoke a private admin authorization function';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname='storage' AND tablename='objects'
+      AND policyname='directory_media_storage_admin_read'
+      AND roles @> ARRAY['authenticated']::name[]
+      AND coalesce(qual,'') ~* 'layan_is_admin'
+  ) THEN
+    RAISE EXCEPTION 'Administrator review read policy is missing or not restricted to authenticated users';
+  END IF;
+END;
+$directory_media_assertions$;
+
 ROLLBACK;
