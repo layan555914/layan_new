@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const allowedOrigins = new Set(["https://layan-eg.com", "https://www.layan-eg.com"]);
+const allowedOrigins = new Set(["https://asyutq.com", "https://www.asyutq.com", "https://layan-eg.com", "https://www.layan-eg.com"]);
 
 function corsHeaders(origin: string | null) {
   const headers: Record<string, string> = {
