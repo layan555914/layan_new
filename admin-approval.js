@@ -130,12 +130,28 @@
     async perform(payload, authHeader) {
       const auth = authHeader || lastAuth;
       if (!auth) throw new Error("سجّل الدخول مرة أخرى ثم أعد المحاولة.");
+      const allowedResources = new Set([
+        "platform_sponsors", "supplier_ads", "property_offers", "marketplace_listings",
+        "company_profiles", "company_property_ads", "company_entity_profile_update_requests",
+        "partner_ad_slots", "directory_sources", "directory_change_log"
+      ]);
+      const method = String(payload?.method || "").toUpperCase();
+      const target = new URL(String(payload?.path || ""), base);
+      const resourceMatch = target.pathname.match(/^\\/rest\\/v1\\/([a-z_]+)$/);
+      if (!["POST", "PATCH", "DELETE"].includes(method)
+          || target.origin !== new URL(base).origin
+          || !resourceMatch || !allowedResources.has(resourceMatch[1])
+          || (method !== "POST" && !/(^|&)id=eq\\.[0-9a-fA-F-]+(&|$)/.test(target.search.slice(1)))
+          || (payload.body != null && (typeof payload.body !== "object" || Array.isArray(payload.body)))) {
+        throw new Error("العملية المطلوبة لا تطابق قائمة التعديلات المسموح بها؛ تم إيقاف التنفيذ.");
+      }
       const headers = { apikey: key, Authorization: auth, "Content-Type": "application/json" };
-      headers.Prefer = payload.prefer || "return=minimal";
-      const res = await nativeFetch(base + payload.path, {
-        method: payload.method,
+      headers.Prefer = "return=minimal";
+      const res = await nativeFetch(target.href, {
+        method,
         headers,
-        body: payload.body == null ? undefined : (typeof payload.body === "string" ? payload.body : JSON.stringify(payload.body))
+        redirect: "error",
+        body: payload.body == null ? undefined : JSON.stringify(payload.body)
       });
       const text = await res.text();
       if (!res.ok) {
