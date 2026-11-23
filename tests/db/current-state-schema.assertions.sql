@@ -263,8 +263,9 @@ BEGIN
     WHERE i.indexrelid='private.layan_admin_requests_one_active_change'::regclass
       AND i.indisunique
       AND pg_get_expr(i.indpred,i.indrelid) ILIKE '%executing%'
-  ) THEN
-    RAISE EXCEPTION 'Pending and executing admin changes must share one unique active-request key';
+      AND pg_get_expr(i.indpred,i.indrelid) ILIKE '%change%'
+  ) OR to_regclass('private.layan_admin_requests_one_pending') IS NULL THEN
+    RAISE EXCEPTION 'Change execution uniqueness or legacy destructive-action pending uniqueness is missing';
   END IF;
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns
