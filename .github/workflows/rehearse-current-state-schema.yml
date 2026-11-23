@@ -6,6 +6,15 @@ on:
       - main
       - recovery/current-state-schema-rehearsal-20261113
     paths:
+      - "admin-crm.js"
+      - "admin-crm.css"
+      - "admin-approval.js"
+      - "admin.html"
+      - "admin-layout.js"
+      - "sw.js"
+      - "tests/db/admin-crm-api.mjs"
+      - "tests/ui/admin-approval-gate.mjs"
+      - "tests/ui/admin-crm-regressions.mjs"
       - "supabase/config.toml"
       - "supabase/bootstrap/**"
       - "supabase/migrations/**"

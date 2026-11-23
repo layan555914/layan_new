@@ -1,16 +1,18 @@
 # Supabase migration source reconciliation
 
-> **Deployment safety hold — do not run `supabase db push`, `migration repair`, or apply a baseline against production until this audit is resolved and explicitly reviewed.**
+> **Deployment safety hold — do not run `supabase db push`, `migration repair`, or apply a baseline against production until the migration-source gap is independently reviewed and explicitly approved.**
+>
+> **Latest authoritative snapshot:** see “Current reconciliation addendum — November 21, 2026” at the end of this document (106 production ledger records; 42 source-name matches; 64 source-name gaps). The earlier section below is retained as historical context and must not be read as the current ledger state.
 
-Audit date: 2026-11-15 (updated after forward migrations)
+Original audit date: 2026-11-15 (historical snapshot)
 Repository: `layan555914/layan_new`
-Branch audited: `feature/service-provider-claim-review-final-20261114`
+Historical branch audited: `feature/service-provider-claim-review-final-20261114`
 Production project: `ebyhwqkmhxbgocngpqfe`
 Test project: `wisnmlbefdrkcbbqvdlg`
 
-## Current source coverage
+## Historical source coverage — November 15, 2026
 
-| Environment | Recorded migration versions | Matching SQL files in this branch | Recorded versions without a matching SQL file |
+| Environment | Recorded migration versions at that snapshot | Matching SQL files in the then-audited branch | Recorded versions without a matching SQL file |
 |---|---:|---:|---:|
 | Production | 91 | 26 | 65 |
 | Test | 48 | 18 | 30 |
@@ -134,3 +136,12 @@ PostgreSQL 16 smoke tests and the current GitHub Actions workflow passed on the 
 ## Important distinction
 
 The remaining 65 missing historical sources are a repository traceability/reproducibility problem. They do not by themselves prove that the current production schema is broken, and they do not prevent an independently reviewed static front-end release once all required forward migrations are already applied. They do prevent safe reconstruction of the entire database migration history from this repository and block any use of `db push`, migration repair, or baseline operations until the source gap is resolved.
+
+
+## Current reconciliation addendum — November 21, 2026
+
+A read-only comparison against the production migration ledger on November 21 found 106 recorded production versions, with latest version `20261121103120`. Matching by migration name (not timestamp) found 42 production records with a source match and 64 recorded production migrations without a matching source file. Nine repository migration files were not recorded in production before CRM consolidation, including the two separate CRM files.
+
+The CRM development branch now uses one proposed forward-only migration, `20261121120000_admin_crm_private_atomic.sql`, to create the private CRM tables, private `SECURITY DEFINER` implementations, and authenticated public `SECURITY INVOKER` facades in one migration. It replaces the two separate development-only CRM migration files and is intended for isolated clean-install rehearsal only. It is **not applied to production** and does not repair the historical migration ledger.
+
+Do not run `supabase db push`, `migration repair`, or apply this migration to production as part of this change. Production rollout requires a separate reviewed, targeted migration procedure, verified backup, and explicit owner approval.

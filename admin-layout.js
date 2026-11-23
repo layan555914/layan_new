@@ -15,6 +15,7 @@
     buttons.forEach(b => b.toggleAttribute("aria-current", b.dataset.view === name));
     shell.querySelector(`[data-view="${name}"]`)?.scrollIntoView({ block: "nearest", inline: "center" });
     if (TAB_OF[name] && window.AsyutConsole?.open) window.AsyutConsole.open(TAB_OF[name]);
+    window.dispatchEvent(new CustomEvent("asyut:admin-view", { detail: { name, anchor: anchor || null } }));
     try { history.replaceState(null, "", "#" + name); } catch (_) {}
     const target = anchor && document.getElementById(anchor);
     (target || document.querySelector(".adm-main")).scrollIntoView({ behavior: "smooth", block: "start" });
