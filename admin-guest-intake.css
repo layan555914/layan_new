@@ -10,6 +10,7 @@
 .agi-section>h2{font-size:18px;color:#102746;margin:0}
 .agi-card{display:grid;gap:10px;padding:16px;border:1px solid #dfe5ec;border-radius:14px;background:#fff}
 .agi-card p{margin:0;line-height:1.8;overflow-wrap:anywhere}
+.agi-review-details{display:grid;gap:12px;border:1px solid #e5eaf0;border-radius:10px;padding:10px}.agi-review-details>summary{cursor:pointer;font-weight:700;color:#102746}.agi-review-body{display:grid;gap:10px}.agi-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.agi-details>span{padding:7px;background:#f7f8fa;border-radius:8px;overflow-wrap:anywhere}
 .agi-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .agi-card-head h3{font-size:17px;margin:3px 0;color:#102746}
 .agi-state{font-size:12px;padding:5px 9px;border-radius:20px;background:#fff5e5;color:#8b5b12}
