@@ -53,6 +53,51 @@ BEGIN
     EXECUTE v_sql;
   END LOOP;
 
+  -- Verify every targeted policy individually after rewriting; counts alone can hide a missing owner gate.
+  IF EXISTS (
+    WITH expected(policyname, cmd) AS (VALUES
+      ('property_offers_admin_insert_for_customer','INSERT'),
+      ('property_offers_admin_update_all','UPDATE'),
+      ('marketplace_listings_admin_insert_for_customer','INSERT'),
+      ('marketplace_listings_admin_update_all','UPDATE'),
+      ('supplier_ads_admin_insert_for_customer','INSERT'),
+      ('supplier_ads_admin_update_all','UPDATE'),
+      ('company_property_ads_admin_insert_for_customer','INSERT'),
+      ('company_property_ads_admin_update_all','UPDATE'),
+      ('partner_ad_slots_admin_insert','INSERT'),
+      ('partner_ad_slots_admin_update_all','UPDATE'),
+      ('partner_ad_slots_admin_delete','DELETE'),
+      ('platform_sponsors_admin_insert_all','INSERT'),
+      ('platform_sponsors_admin_update_all','UPDATE')
+    )
+    SELECT 1 FROM expected e LEFT JOIN pg_policies p
+      ON p.schemaname='public' AND p.policyname=e.policyname
+    WHERE p.policyname IS NULL OR p.cmd IS DISTINCT FROM e.cmd
+       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(p.qual,'') !~* 'layan_is_owner\\(\\)')
+       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(p.with_check,'') !~* 'layan_is_owner\\(\\)')
+       OR coalesce(p.qual,'') ~* 'layan_is_admin\\(\\)'
+       OR coalesce(p.with_check,'') ~* 'layan_is_admin\\(\\)'
+  ) THEN
+    RAISE EXCEPTION 'One or more of the 13 public ad/sponsor policies did not become owner-only';
+  END IF;
+
+  IF EXISTS (
+    WITH expected(policyname, cmd) AS (VALUES
+      ('asyut_admin_upload_customer_offer_images','INSERT'),
+      ('asyut_admin_replace_customer_offer_images','UPDATE'),
+      ('asyut_admin_delete_customer_offer_images','DELETE')
+    )
+    SELECT 1 FROM expected e LEFT JOIN pg_policies p
+      ON p.schemaname='storage' AND p.tablename='objects' AND p.policyname=e.policyname
+    WHERE p.policyname IS NULL OR p.cmd IS DISTINCT FROM e.cmd
+       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(p.qual,'') !~* 'layan_is_owner\\(\\)')
+       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(p.with_check,'') !~* 'layan_is_owner\\(\\)')
+       OR coalesce(p.qual,'') ~* 'layan_is_admin\\(\\)'
+       OR coalesce(p.with_check,'') ~* 'layan_is_admin\\(\\)'
+  ) THEN
+    RAISE EXCEPTION 'One or more of the 3 customer-image Storage policies did not become owner-only';
+  END IF;
+
   v_count := 0;
   FOR f IN SELECT proc_row.oid
     FROM pg_proc AS proc_row
