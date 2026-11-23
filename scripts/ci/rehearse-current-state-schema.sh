@@ -22,6 +22,7 @@ trap cleanup EXIT
 node --check "$ROOT_DIR/admin-crm.js"
 node --check "$ROOT_DIR/admin-approval.js"
 node --check "$ROOT_DIR/admin-guest-intake.js"
+node --check "$ROOT_DIR/tests/ui/guest-intake-contracts.mjs"
 
 if ! grep -Fq 'id="adminGuestIntake"' "$ROOT_DIR/admin.html" \
   || ! grep -Fq './admin-guest-intake.js?v=20261123-1' "$ROOT_DIR/admin.html" \
@@ -36,6 +37,7 @@ node --check "$CRM_API_TEST"
 node --check "$APPROVAL_GATE_TEST"
 node --check "$CRM_UI_TEST"
 node --check "$STORAGE_API_TEST"
+node "$ROOT_DIR/tests/ui/guest-intake-contracts.mjs"
 node "$APPROVAL_GATE_TEST"
 node "$CRM_UI_TEST"
 
