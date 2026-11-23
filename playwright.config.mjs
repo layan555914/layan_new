@@ -3,8 +3,14 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests/e2e",
   testMatch: "**/*.spec.mjs",
-  fullyParallel: false,
+  // Each test gets an isolated browser context; parallel files and tests to avoid
+  // serially replaying the complete desktop + mobile suite on CI.
+  fullyParallel: true,
+  workers: process.env.CI ? 3 : undefined,
   retries: 0,
+  timeout: 30_000,
+  globalTimeout: process.env.CI ? 20 * 60 * 1000 : 0,
+  expect: { timeout: 8_000 },
   reporter: "list",
   use: {
     baseURL: "http://127.0.0.1:4173",
