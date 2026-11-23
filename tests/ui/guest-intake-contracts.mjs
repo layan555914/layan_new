@@ -31,7 +31,7 @@ assert.ok(edge.includes('requestUrl.searchParams.get("action") === "upload-file"
   "Guest files must be validated and uploaded by the rate-limited Edge Function, not directly by anonymous clients.");
 assert.ok(edge.includes("auth.getUser(token)") && edge.includes('role !== "owner"'),
   "Admin review must verify the caller session and restrict public listing to the owner.");
-assert.ok(edge.includes("createSignedUrl(path, 300)") && edge.includes("temporary_image_cleanup_pending"),
+assert.ok(edge.includes("createSignedUrl(path, 300)") && edge.includes("temporary_file_cleanup_pending"),
   "Admin file previews must be signed and temporary-file cleanup failures must be reported.");
 assert.ok(client.includes("async function submitGuestProperty") && client.includes("async function submitGuestBuyer"),
   "The shared client must expose guest property and buyer submission helpers.");
