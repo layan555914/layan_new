@@ -81,7 +81,7 @@ function renderGroup(type,ownerRows,entityRows,gridElement,countElement,q){
   ...owners.map(c=>({name:c.company_name,html:card(c,type)})),
   ...entities.map(c=>({name:c.name_ar||c.name_en,html:directoryCard(c,type)}))
  ].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ar"));
- gridElement.innerHTML=items.length?items.map(x=>x.html).join(""):'<p class="company-directory-state">لا توجد ملفات منشورة في هذا القسم تطابق البحث حاليًا.</p>';
+ gridElement.innerHTML=items.length?items.map(x=>x.html).join(""):'<p class="company-directory-state">لا توجد شركات تطابق البحث حاليًا.</p>';
  countElement.textContent=items.length+" ملف";
  return items.length;
 }
