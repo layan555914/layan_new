@@ -137,7 +137,13 @@
       ]);
       const allowedRpcs = new Set([
         "layan_admin_crm_save_lead", "layan_admin_crm_log_activity",
-        "layan_admin_crm_restore_lead", "layan_admin_crm_archive_lead"
+        "layan_admin_crm_restore_lead", "layan_admin_crm_archive_lead",
+        "layan_admin_review_property_offer", "layan_activate_supplier_ad",
+        "layan_reject_supplier_ad", "layan_admin_set_offer_trust_badge",
+        "layan_review_company_profile", "layan_admin_review_edit",
+        "directory_admin_mutate_with_audit", "layan_approve_free_trial_ad",
+        "layan_admin_review_logo", "company_claim_admin_review",
+        "company_entity_profile_update_admin_review"
       ]);
       const method = String(payload?.method || "").toUpperCase();
       const target = new URL(String(payload?.path || ""), base);
