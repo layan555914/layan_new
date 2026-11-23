@@ -138,7 +138,7 @@ BEGIN
     p_payload - 'status' - 'owner_id' - 'company_ad_id' - 'is_featured' - 'featured_until',
     COALESCE(p_image_paths,'{}'), COALESCE(p_document_paths,'{}'),
     v_name,v_phone,COALESCE((p_payload->>'contact_consent')::boolean,false),p_fingerprint_hash
-  );
+  ) ON CONFLICT (id) DO NOTHING;
   RETURN p_id;
 END
 $function$;
@@ -172,7 +172,7 @@ BEGIN
     trim(p_payload->>'contact_name'),
     regexp_replace(p_payload->>'contact_phone','\s','','g'),
     p_fingerprint_hash
-  );
+  ) ON CONFLICT (id) DO NOTHING;
   RETURN p_id;
 END
 $function$;
