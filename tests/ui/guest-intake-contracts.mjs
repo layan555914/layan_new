@@ -47,14 +47,14 @@ assert.ok(offers.includes('name="website"') && buyer.includes('name="website"'),
   "Both public intake forms must include a honeypot field.");
 assert.ok(adminHtml.includes('id="adminGuestIntake"') && admin.includes('call("admin-list")'),
   "The admin dashboard must expose a working guest moderation workspace.");
-assert.ok(config.includes("[functions.guest-intake]") && sw.includes("./admin-guest-intake.js?v=20261123-1"),
+assert.ok(config.includes("[functions.guest-intake]") && sw.includes("./admin-guest-intake.js?v=20261123-2"),
   "The Edge Function and admin moderation PWA assets must be configured.");
-assert.ok(offers.includes("gubabase.js?v=20261123-guest-intake-1") &&
-  offers.includes("app.js?v=20261123-guest-property-1") &&
-  index.includes("buyer.js?v=20261123-guest-buyer-1") &&
-  sw.includes("./gubabase.js?v=20261123-guest-intake-1") &&
-  sw.includes("./app.js?v=20261123-guest-property-1") &&
-  sw.includes("./buyer.js?v=20261123-guest-buyer-1"),
+assert.ok(offers.includes("gubabase.js?v=20261123-guest-intake-2") &&
+  offers.includes("app.js?v=20261123-guest-property-2") &&
+  index.includes("buyer.js?v=20261123-guest-buyer-2") &&
+  sw.includes("./gubabase.js?v=20261123-guest-intake-2") &&
+  sw.includes("./app.js?v=20261123-guest-property-2") &&
+  sw.includes("./buyer.js?v=20261123-guest-buyer-2"),
   "Guest submission helpers and forms must use matching versioned PWA assets.");
 
 
