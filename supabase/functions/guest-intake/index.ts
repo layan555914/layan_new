@@ -228,9 +228,9 @@ Deno.serve(async (req: Request) => {
     if (action === "admin-cleanup") {
       const { userClient, role } = await adminContext(req, supabaseUrl, publicKey);
       if (role !== "owner") return json({ error: "تنظيف الملفات المؤقتة متاح لمالك المنصة فقط." }, 403, origin);
-      const { data: pendingRows, error: pendingError } = await userClient.rpc("layan_admin_list_guest_property_submissions", { p_limit: 200 });
+      const { data: pendingIdsData, error: pendingError } = await service.rpc("layan_guest_pending_property_ids");
       if (pendingError) return json({ error: "تعذر تحديد الطلبات التي ما زالت قيد المراجعة." }, 500, origin);
-      const pendingIds = new Set((pendingRows || []).map((row: { id: string }) => String(row.id)));
+      const pendingIds = new Set((pendingIdsData || []).map((id: string) => String(id)));
       const { data: folders, error: folderError } = await service.storage.from(BUCKET).list("pending", { limit: 1000 });
       if (folderError) return json({ error: "تعذر فحص مساحة الملفات المؤقتة." }, 500, origin);
       const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
