@@ -37,7 +37,7 @@ async function localFetch(target, options = {}, expectedOrigin = parsedUrl.origi
   if (parsed.origin !== expectedOrigin || parsed.protocol !== 'http:' || !isLoopbackHost(parsed.hostname)) {
     throw new Error('Refusing to fetch outside the explicitly configured local test service.');
   }
-  return fetch(parsed, { ...options, redirect: options.redirect || 'error' });
+  return fetch(parsed, { ...options, redirect: options.redirect === 'manual' ? 'manual' : 'error' });
 }
 
 const bucketPhotos = 'layan_real_estat';
