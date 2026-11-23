@@ -292,6 +292,28 @@ Deno.serve(async (req: Request) => {
             p_id: id, p_image_urls: publicUrls,
           });
           if (publishError) throw new Error(publishError.message || "تعذر نشر إعلان الزائر.");
+
+          // Concurrent approvals are serialized by the publish RPC. If another
+          // request won the race, this call returns the existing offer ID; remove
+          // only the public objects uploaded by this losing request.
+          if (publicPaths.length) {
+            const { data: publishedOffer, error: publishedOfferError } = await service
+              .from("property_offers")
+              .select("image_urls")
+              .eq("id", offerId)
+              .maybeSingle();
+            if (!publishedOfferError && publishedOffer) {
+              const storedUrls = Array.isArray(publishedOffer.image_urls)
+                ? publishedOffer.image_urls.map(String)
+                : [];
+              const thisRequestWon = publicUrls.every(url => storedUrls.includes(url));
+              if (!thisRequestWon) {
+                const { error: orphanCleanupError } = await service.storage.from(PUBLIC_BUCKET).remove(publicPaths);
+                if (!orphanCleanupError) publicPaths.length = 0;
+              }
+            }
+          }
+
           const approvedTempPaths = [...(submission.image_paths || []), ...(submission.document_paths || [])] as string[];
           const { error: cleanupError } = approvedTempPaths.length
             ? await service.storage.from(BUCKET).remove(approvedTempPaths)
