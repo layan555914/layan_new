@@ -272,8 +272,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         '<div class="project-actions"><a class="btn btn-gold" href="./directory.html?view=projects">العودة إلى المشروعات</a>' +
         '<a class="btn btn-outline" style="background:#2B211B" href="./offers.html">تصفح العقارات المنشورة</a></div>';
       if (window.AsyutDirectoryMedia) {
-        try { await window.AsyutDirectoryMedia.renderGallery({ projectId: project.id, root }); }
-        catch (error) { console.warn("Project media gallery unavailable:", error); }
+        window.AsyutDirectoryMedia.renderGallery({ projectId: project.id, root })
+          .catch(error => console.warn("Project media gallery unavailable:", error));
       }
     } catch (error) {
       stateMessage("تعذر تحميل ملف المشروع", error && error.message ? error.message : "حدث خطأ أثناء تحميل بيانات المشروع.");
