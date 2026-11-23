@@ -33,6 +33,10 @@ assert.ok(edge.includes('requestUrl.searchParams.get("action") === "upload-file"
   edge.includes("totalBytes > maxSize") &&
   edge.includes("reader.cancel()"),
   "Guest files must be validated, streamed with a hard byte cap before buffering, and uploaded by the rate-limited Edge Function.");
+const uploadRateLimitAt = edge.indexOf('p_kind: "upload"');
+const uploadReaderAt = edge.indexOf("req.body?.getReader()");
+assert.ok(uploadRateLimitAt >= 0 && uploadReaderAt > uploadRateLimitAt,
+  "Guest upload rate limits must be checked before the request body is read.");
 assert.ok(edge.includes("auth.getUser(token)") && edge.includes('role !== "owner"'),
   "Admin review must verify the caller session and restrict public listing to the owner.");
 assert.ok(edge.includes('userClient.rpc("layan_admin_publish_guest_property_submission"') && edge.includes('userClient.rpc("layan_admin_review_guest_buyer_request"'),
