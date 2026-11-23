@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2>'+
     (visible.length
      ?'<div class="company-linked-project-list">'+visible.map(project=>'<article class="company-linked-project"><div><strong>'+esc(project.name_ar||"مشروع عقاري")+'</strong><small>'+esc(roleLabels[byProject.get(String(project.id))]||"علاقة موثقة")+'</small></div><a href="./project.html?id='+encodeURIComponent(project.id)+'">فتح ملف المشروع ←</a></article>').join("")+'</div>'
-     :'<p>لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن. الطلبات التي ما زالت قيد المراجعة لا تظهر للعامة.</p>')+
+     :'<p>لا توجد مشروعات مرتبطة بهذا الملف حتى الآن.</p>')+
     '</section>';
   }catch(error){
    console.warn("Published company projects unavailable:",error);
@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const mapQuery=hasVerifiedMapPoint?String(latitude+","+longitude):(address?address+", محافظة أسيوط، مصر":"");
   const mapUrl=mapQuery?"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(mapQuery):"";
   const mapEmbedUrl=mapQuery?"https://maps.google.com/maps?q="+encodeURIComponent(mapQuery)+"&output=embed":"";
-  const mapNote=hasVerifiedMapPoint?"دبوس الموقع مبني على إحداثيات منشورة في الدليل بعد مراجعة مصدرها.":"هذا بحث استرشادي عن العنوان، وليس دبوسًا جغرافيًا معتمدًا للجهة.";
+  const mapNote="استكشف موقع النشاط على الخريطة.";
   const mapSubject=isServiceProvider?"مقدم الخدمة":isRealEstateCompany?"الشركة":"الجهة";
   const mapMarkup=mapQuery
    ? '<section class="company-map-panel" aria-labelledby="companyProviderMapTitle"><div><span class="eyebrow">الموقع الجغرافي</span><h2 id="companyProviderMapTitle">موقع '+mapSubject+' على الخريطة</h2><p>'+esc(mapNote)+'</p></div><div class="company-map-frame"><iframe title="خريطة موقع '+mapSubject+'" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="'+esc(mapEmbedUrl)+'"></iframe></div><a href="'+esc(mapUrl)+'" target="_blank" rel="noopener noreferrer">فتح الموقع على خرائط Google ↗</a></section>'
