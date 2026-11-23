@@ -107,7 +107,11 @@ Deno.serve(async (req: Request) => {
   }
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405, origin);
   if (origin && !allowedOrigins.has(origin)) return json({ error: "Origin not allowed" }, 403, origin);
-  if (Number(req.headers.get("content-length") || 0) > 1024 * 1024) return json({ error: "حجم الطلب أكبر من المسموح." }, 413, origin);
+  const requestUrl = new URL(req.url);
+  const isRawUpload = requestUrl.searchParams.get("action") === "upload-file";
+  if (Number(req.headers.get("content-length") || 0) > (isRawUpload ? 5 * 1024 * 1024 : 1024 * 1024)) {
+    return json({ error: "حجم الطلب أكبر من المسموح." }, 413, origin);
+  }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
   const publicKey = publicKeyFromEnv();
@@ -118,10 +122,10 @@ Deno.serve(async (req: Request) => {
   const service = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
   try {
-    const requestUrl = new URL(req.url);
     if (requestUrl.searchParams.get("action") === "upload-file") {
       const submissionId = String(requestUrl.searchParams.get("submission_id") || "");
       const kind = String(requestUrl.searchParams.get("kind") || "");
+      if (cleanString(requestUrl.searchParams.get("honeypot"), 200) !== "") return json({ error: "تعذر التحقق من الطلب." }, 400, origin);
       const mime = String(req.headers.get("content-type") || "").split(";")[0].trim();
       const ext = extFor(mime);
       if (!uuidPattern.test(submissionId) || !["images", "documents"].includes(kind)) {
