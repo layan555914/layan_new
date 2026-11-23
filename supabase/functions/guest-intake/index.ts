@@ -61,7 +61,7 @@ function validPropertyPayload(p: Record<string, unknown>) {
     && numericOk
     && (priceOnRequest || project || Number(p.total_price) > 0)
     && (p.listing_purpose !== "تنازل" || Number(p.paid_amount || 0) >= Number(p.down_payment || 0))
-    && ((lat === null && lng === null) || (Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180));
+    && ((lat === null && lng === null) || (lat !== null && lng !== null && Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180));
 }
 function validBuyerPayload(p: Record<string, unknown>) {
   return cleanString(p.contact_name, 120).length >= 2
@@ -138,6 +138,7 @@ Deno.serve(async (req: Request) => {
           ? bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
           : bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
       if (!validSignature) return json({ error: "محتوى الملف لا يطابق نوعه الحقيقي." }, 400, origin);
+      const fp = await fingerprint(req, serviceKey);
       const { data: allowed, error: limitError } = await service.rpc("layan_guest_take_rate_slot", {
         p_kind: "upload", p_fingerprint_hash: fp, p_limit: 15, p_window_minutes: 60,
       });
@@ -233,10 +234,10 @@ Deno.serve(async (req: Request) => {
           const prefix = "pending/" + folder.name + "/" + kind;
           const { data: files, error } = await service.storage.from(BUCKET).list(prefix, { limit: 100 });
           if (error) continue;
-          const expired = (files || []).filter((file: { name: string; created_at?: string; updated_at?: string }) => {
+          const expired = (files || []).filter(file =>
             const timestamp = Date.parse(file.created_at || file.updated_at || "");
             return Number.isFinite(timestamp) && timestamp < cutoff;
-          }).map((file: { name: string }) => prefix + "/" + file.name);
+          }).map(file => prefix + "/" + file.name);
           if (expired.length) {
             const { error: removeError } = await service.storage.from(BUCKET).remove(expired);
             if (!removeError) removed += expired.length;
@@ -257,11 +258,11 @@ Deno.serve(async (req: Request) => {
         const imagePaths = Array.isArray(row.image_paths) ? row.image_paths as string[] : [];
         const documentPaths = Array.isArray(row.document_paths) ? row.document_paths as string[] : [];
         const [images, documents] = await Promise.all([
-          Promise.all(imagePaths.map(async path => {
+          Promise.all(imagePaths.map(async (path: string) => {
             const { data } = await service.storage.from(BUCKET).createSignedUrl(path, 300);
             return data?.signedUrl || null;
           })),
-          Promise.all(documentPaths.map(async path => {
+          Promise.all(documentPaths.map(async (path: string) => {
             const { data } = await service.storage.from(BUCKET).createSignedUrl(path, 300);
             return data?.signedUrl || null;
           })),
