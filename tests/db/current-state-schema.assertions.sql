@@ -289,6 +289,12 @@ BEGIN
   END IF;
   SELECT pg_get_functiondef('public.layan_admin_request_change(text,jsonb)'::regprocedure) INTO v_definition;
   IF v_definition NOT ILIKE '%layan_admin_crm_save_lead%'
+     OR v_definition NOT ILIKE '%layan_admin_review_property_offer%'
+     OR v_definition NOT ILIKE '%layan_admin_review_edit%'
+     OR v_definition NOT ILIKE '%layan_admin_review_logo%'
+     OR v_definition NOT ILIKE '%directory_admin_mutate_with_audit%'
+     OR v_definition NOT ILIKE '%company_claim_admin_review%'
+     OR v_definition NOT ILIKE '%company_entity_profile_update_admin_review%'
      OR v_definition NOT ILIKE '%platform_sponsors%'
      OR v_definition NOT ILIKE '%v_resource NOT IN%'
      OR v_definition NOT ILIKE '%split_part(v_resource%' THEN
