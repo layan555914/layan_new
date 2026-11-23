@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const guestContactFields = $("buyerGuestContactFields");
   function updateGuestContactFields() {
     const isGuest = !auth();
+    if (loginNote) loginNote.hidden = !isGuest;
     if (guestContactFields) {
       guestContactFields.hidden = !isGuest;
       guestContactFields.querySelectorAll("input[name='contact_name'], input[name='contact_phone']").forEach(el => { el.required = isGuest; });
