@@ -228,17 +228,27 @@ Deno.serve(async (req: Request) => {
       const { data: pendingIdsData, error: pendingError } = await service.rpc("layan_guest_pending_property_ids");
       if (pendingError) return json({ error: "تعذر تحديد الطلبات التي ما زالت قيد المراجعة." }, 500, origin);
       const pendingIds = new Set((pendingIdsData || []).map((id: string) => String(id)));
-      const { data: folders, error: folderError } = await service.storage.from(BUCKET).list("pending", { limit: 1000 });
-      if (folderError) return json({ error: "تعذر فحص مساحة الملفات المؤقتة." }, 500, origin);
+      const folders: { name: string }[] = [];
+      for (let offset = 0; ; offset += 1000) {
+        const { data: page, error: folderError } = await service.storage.from(BUCKET).list("pending", { limit: 1000, offset });
+        if (folderError) return json({ error: "تعذر فحص مساحة الملفات المؤقتة." }, 500, origin);
+        folders.push(...(page || []));
+        if (!page || page.length < 1000) break;
+      }
       const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
       let removed = 0;
-      for (const folder of folders || []) {
+      for (const folder of folders) {
         if (!uuidPattern.test(String(folder.name || "")) || pendingIds.has(String(folder.name))) continue;
         for (const kind of ["images", "documents"]) {
           const prefix = "pending/" + folder.name + "/" + kind;
-          const { data: files, error } = await service.storage.from(BUCKET).list(prefix, { limit: 100 });
-          if (error) continue;
-          const expired = (files || []).filter(file => {
+          const files: { name: string; created_at?: string; updated_at?: string }[] = [];
+          for (let offset = 0; ; offset += 100) {
+            const { data: page, error } = await service.storage.from(BUCKET).list(prefix, { limit: 100, offset });
+            if (error) break;
+            files.push(...(page || []));
+            if (!page || page.length < 100) break;
+          }
+          const expired = files.filter(file => {
             const timestamp = Date.parse(file.created_at || file.updated_at || "");
             return Number.isFinite(timestamp) && timestamp < cutoff;
           }).map(file => prefix + "/" + file.name);
