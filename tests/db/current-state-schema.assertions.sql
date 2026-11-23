@@ -243,4 +243,61 @@ BEGIN
 END;
 $current_state_assertions$;
 
+
+DO $owner_policy_assertions$
+DECLARE
+  v_bad text;
+BEGIN
+  WITH expected(policyname, cmd) AS (VALUES
+    ('property_offers_admin_insert_for_customer','INSERT'),
+    ('property_offers_admin_update_all','UPDATE'),
+    ('marketplace_listings_admin_insert_for_customer','INSERT'),
+    ('marketplace_listings_admin_update_all','UPDATE'),
+    ('supplier_ads_admin_insert_for_customer','INSERT'),
+    ('supplier_ads_admin_update_all','UPDATE'),
+    ('company_property_ads_admin_insert_for_customer','INSERT'),
+    ('company_property_ads_admin_update_all','UPDATE'),
+    ('partner_ad_slots_admin_insert','INSERT'),
+    ('partner_ad_slots_admin_update_all','UPDATE'),
+    ('partner_ad_slots_admin_delete','DELETE'),
+    ('platform_sponsors_admin_insert_all','INSERT'),
+    ('platform_sponsors_admin_update_all','UPDATE')
+  ), checked AS (
+    SELECT e.policyname, e.cmd, p.cmd AS actual_cmd, p.qual, p.with_check
+    FROM expected e LEFT JOIN pg_policies p
+      ON p.schemaname='public' AND p.policyname=e.policyname
+  )
+  SELECT string_agg(policyname, ', ' ORDER BY policyname) INTO v_bad
+  FROM checked
+  WHERE actual_cmd IS DISTINCT FROM cmd
+     OR (cmd IN ('UPDATE','DELETE') AND coalesce(qual,'') !~* 'layan_is_owner\\(\\)')
+     OR (cmd IN ('INSERT','UPDATE') AND coalesce(with_check,'') !~* 'layan_is_owner\\(\\)')
+     OR coalesce(qual,'') ~* 'layan_is_admin\\(\\)'
+     OR coalesce(with_check,'') ~* 'layan_is_admin\\(\\)';
+  IF v_bad IS NOT NULL THEN
+    RAISE EXCEPTION 'Owner-only public ad/sponsor write policies are incomplete or unsafe: %', v_bad;
+  END IF;
+
+  WITH expected(policyname, cmd) AS (VALUES
+    ('asyut_admin_upload_customer_offer_images','INSERT'),
+    ('asyut_admin_replace_customer_offer_images','UPDATE'),
+    ('asyut_admin_delete_customer_offer_images','DELETE')
+  ), checked AS (
+    SELECT e.policyname, e.cmd, p.cmd AS actual_cmd, p.qual, p.with_check
+    FROM expected e LEFT JOIN pg_policies p
+      ON p.schemaname='storage' AND p.tablename='objects' AND p.policyname=e.policyname
+  )
+  SELECT string_agg(policyname, ', ' ORDER BY policyname) INTO v_bad
+  FROM checked
+  WHERE actual_cmd IS DISTINCT FROM cmd
+     OR (cmd IN ('UPDATE','DELETE') AND coalesce(qual,'') !~* 'layan_is_owner\\(\\)')
+     OR (cmd IN ('INSERT','UPDATE') AND coalesce(with_check,'') !~* 'layan_is_owner\\(\\)')
+     OR coalesce(qual,'') ~* 'layan_is_admin\\(\\)'
+     OR coalesce(with_check,'') ~* 'layan_is_admin\\(\\)';
+  IF v_bad IS NOT NULL THEN
+    RAISE EXCEPTION 'Owner-only customer-image Storage policies are incomplete or unsafe: %', v_bad;
+  END IF;
+END;
+$owner_policy_assertions$;
+
 ROLLBACK;
