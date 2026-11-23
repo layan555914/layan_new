@@ -6,8 +6,8 @@ const USER_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 
 async function mock(page, { adminAllowed = true } = {}) {
   const state = { authRequests: [], sponsors: [
-    { id: "s1", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
-    { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
+    { id: "11111111-1111-4111-8111-111111111111", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
+    { id: "22222222-2222-4222-8222-222222222222", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
   ], ads: [
     { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
   ], rpc: [], patches: [], posts: [], changes: [], finished: [] };
@@ -83,11 +83,11 @@ test("added admin change goes to the owner, owner approves and it is performed",
   ]);
   await page.locator("[data-view='sponsors']").click();
   await expect(page.locator("#adminSponsorsList")).toContainText("Rahma Builders");
-  await page.locator("[data-sponsor-id='s1'] [data-sp='toggle']").click();
+  await page.locator("[data-sponsor-id='11111111-1111-4111-8111-111111111111'] [data-sp='toggle']").click();
   await expect.poll(() => state.changes.length).toBe(1);
   expect(state.patches.length).toBe(0); // nothing written directly
   expect(state.changes[0].p_payload).toMatchObject({ method: "PATCH", body: { is_active: false } });
-  expect(state.changes[0].p_payload.path).toContain("/rest/v1/platform_sponsors?id=eq.s1");
+  expect(state.changes[0].p_payload.path).toContain("/rest/v1/platform_sponsors?id=eq.11111111-1111-4111-8111-111111111111");
   expect(state.changes[0].p_label).toContain("الرعاة الرسميين");
   await expect(page.locator("#asyutApprovalToast")).toContainText("للموافقة");
 
@@ -107,7 +107,7 @@ test("added admin change goes to the owner, owner approves and it is performed",
   await row.locator("[data-request-decide='1']").click();
   await expect.poll(() => state.owner.finished.length).toBe(1);
   expect(state.owner.finished[0]).toMatchObject({ p_id: 1, p_ok: true });
-  expect(state.owner.patches.find(p => p.id === "s1")).toMatchObject({ is_active: false });
+  expect(state.owner.patches.find(p => p.id === "11111111-1111-4111-8111-111111111111")).toMatchObject({ is_active: false });
   await page2Context.close();
 });
 
