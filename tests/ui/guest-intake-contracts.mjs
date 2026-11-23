@@ -47,6 +47,9 @@ assert.ok(edge.includes("createSignedUrl(path, 300)") && edge.includes("temporar
   "Admin file previews must be signed and temporary-file cleanup failures must be reported.");
 assert.ok(!edge.includes('action === "cleanup-upload"') && client.includes("Guest browsers cannot delete objects from the private bucket."),
   "Anonymous guest requests must never delete temporary objects; only the owner-only expiry cleanup may remove them.");
+assert.ok(edge.includes('list("pending", { limit: 1000, offset })') &&
+  edge.includes('list(prefix, { limit: 100, offset })'),
+  "Owner cleanup must paginate through all pending folders and files instead of stopping at the first page.");
 assert.ok(edge.includes('action === "admin-cleanup"') && edge.includes("7 * 24 * 60 * 60 * 1000") && admin.includes('call("admin-cleanup")'),
   "The owner must be able to clean expired private uploads without touching pending moderation records.");
 assert.ok(client.includes("async function submitGuestProperty") && client.includes("async function submitGuestBuyer"),
