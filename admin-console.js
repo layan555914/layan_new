@@ -261,7 +261,7 @@
 
   // ---- Owner approval requests ----
   const ACTIONS = { delete_user: "حذف حساب", suspend_user: "إيقاف حساب", unsuspend_user: "إعادة تفعيل حساب", delete_offer: "حذف إعلان عقار", delete_service: "حذف خدمة", delete_company: "حذف ملف شركة", delete_supplier_ad: "حذف إعلان ممول", delete_sponsor: "حذف راعٍ رسمي", change: "إضافة / تعديل" };
-  const STATES = { pending: "بانتظار المدير", approved: "تم الاعتماد والتنفيذ", rejected: "مرفوض", failed: "تعذر التنفيذ" };
+  const STATES = { pending: "بانتظار المدير", executing: "محجوز — يلزم فحص النتيجة يدويًا", approved: "تم الاعتماد والتنفيذ", rejected: "مرفوض", failed: "تعذر التنفيذ" };
   const done = (result, doneText) => result === "pending"
     ? "تم إرسال الطلب إلى المدير للاعتماد. سيُنفَّذ بعد موافقته."
     : doneText;
@@ -281,8 +281,8 @@
       const rows = await rpc("layan_admin_list_requests", { p_status: status || null }) || [];
       const isOwner = rows.some(r => r.can_decide);
       panel.innerHTML = `<p>أي إضافة أو تعديل أو حذف أو إيقاف يقوم به مشرف يصل هنا أولًا، ولا يُنفَّذ إلا بعد اعتماد المدير. اضغط «التفاصيل» لترى التعديل المطلوب بالضبط قبل الاعتماد. ما ينفذه المدير بنفسه يُنفَّذ مباشرة.</p>` +
-        toolbar(`<label>العرض <select data-requests-status>${[["pending", "بانتظار الاعتماد"], ["", "كل الطلبات"], ["approved", "المعتمدة"], ["rejected", "المرفوضة"]].map(([v, l]) => `<option value="${v}" ${v === status ? "selected" : ""}>${l}</option>`).join("")}</select></label>`) +
-        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>الطلب</th><th>العنصر</th><th>مقدم الطلب</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr data-request="${esc(r.id)}" data-request-action="${esc(r.action)}"><td>${esc(ACTIONS[r.action] || r.action)}</td><td>${esc(r.target_label || r.target)}${r.action === "change" && r.payload ? `<details class="adm-change"><summary>التفاصيل</summary><pre dir="ltr">${esc(r.payload.method + " " + r.payload.path + (r.payload.body != null ? "\n" + JSON.stringify(r.payload.body, null, 2) : ""))}</pre></details>` : ""}</td><td>${esc(r.requested_by_email || "")}</td><td>${date(r.created_at)}</td><td>${esc(STATES[r.status] || r.status)}${r.note ? `<br><small>${esc(r.note)}</small>` : ""}</td><td>${r.can_decide ? `<button type="button" class="btn btn-gold" data-request-decide="1">اعتماد وتنفيذ</button> <button type="button" class="is-danger" data-request-decide="0">رفض</button>` : (r.status === "pending" ? "بانتظار المدير" : (r.decided_by_email ? esc(r.decided_by_email) : ""))}</td></tr>`).join("") || '<tr><td colspan="6">لا توجد طلبات.</td></tr>'}</tbody></table></div>` +
+        toolbar(`<label>العرض <select data-requests-status>${[["pending", "بانتظار الاعتماد"], ["executing", "محجوزة وتحتاج مراجعة"], ["", "كل الطلبات"], ["approved", "المعتمدة"], ["rejected", "المرفوضة"], ["failed", "تعذر التنفيذ"]].map(([v, l]) => `<option value="${v}" ${v === status ? "selected" : ""}>${l}</option>`).join("")}</select></label>`) +
+        `<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>الطلب</th><th>العنصر</th><th>مقدم الطلب</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${rows.map(r => `<tr data-request="${esc(r.id)}" data-request-action="${esc(r.action)}"><td>${esc(ACTIONS[r.action] || r.action)}</td><td>${esc(r.target_label || r.target)}${r.action === "change" && r.payload ? `<details class="adm-change"><summary>التفاصيل</summary><pre dir="ltr">${esc(r.payload.method + " " + r.payload.path + (r.payload.body != null ? "\n" + JSON.stringify(r.payload.body, null, 2) : ""))}</pre></details>` : ""}</td><td>${esc(r.requested_by_email || "")}</td><td>${date(r.created_at)}</td><td>${esc(STATES[r.status] || r.status)}${r.note ? `<br><small>${esc(r.note)}</small>` : ""}</td><td>${r.can_decide ? `<button type="button" class="btn btn-gold" data-request-decide="1">اعتماد وتنفيذ</button> <button type="button" class="is-danger" data-request-decide="0">رفض</button>` : (r.status === "pending" ? "بانتظار المدير" : r.status === "executing" ? "لا تعِد التنفيذ — راجع أثر العملية أولًا" : (r.decided_by_email ? esc(r.decided_by_email) : ""))}</td></tr>`).join("") || '<tr><td colspan="6">لا توجد طلبات.</td></tr>'}</tbody></table></div>` +
         (isOwner || !rows.length ? "" : '<p class="admin-empty">الاعتماد متاح لحسابات المدير فقط.</p>');
       refreshRequestsBadge();
     } catch (error) {
@@ -342,14 +342,35 @@
       const note = approve ? null : (prompt("سبب الرفض (اختياري)") || null);
       const row = dec.closest("[data-request]");
       if (approve && row.dataset.requestAction === "change") {
+        const details = row.querySelector("details.adm-change");
+        if (!details?.open) {
+          A.setStatus("افتح «التفاصيل» وراجع المورد والعملية والبيانات كاملة قبل الاعتماد.");
+          return;
+        }
         try {
-          const all = await rpc("layan_admin_list_requests", { p_status: "pending" }) || [];
-          const req = all.find(x => Number(x.id) === id);
-          if (!req || !req.payload) throw new Error("الطلب غير موجود أو تم البت فيه.");
-          let ok = true, err = null;
-          try { await window.AsyutApproval.perform(req.payload); } catch (e) { ok = false; err = e.message; }
-          await rpc("layan_admin_finish_change", { p_id: id, p_ok: ok, p_note: err });
-          A.setStatus(ok ? "تم اعتماد التعديل وتنفيذه." : "تعذر تنفيذ التعديل: " + err);
+          const claim = await rpc("layan_admin_claim_change", { p_id: id });
+          if (!claim?.execution_token || !claim?.payload) throw new Error("تعذر حجز الطلب بأمان. لم يتم تنفيذ أي تغيير.");
+          let ok = false;
+          let err = null;
+          try {
+            await window.AsyutApproval.perform(claim.payload);
+            ok = true;
+          } catch (e) {
+            err = String(e?.message || e).slice(0, 280);
+          }
+          try {
+            await rpc("layan_admin_finish_change", {
+              p_id: id,
+              p_execution_token: claim.execution_token,
+              p_ok: ok,
+              p_note: err
+            });
+          } catch (finishError) {
+            A.setStatus("تم حجز الطلب، لكن تعذر تثبيت النتيجة في سجل الموافقات. لا تعِد التنفيذ؛ افحص العنصر في المنصة أولًا ثم سوِّ حالة الطلب يدويًا من الإدارة.");
+            loadRequests();
+            return;
+          }
+          A.setStatus(ok ? "تم اعتماد التعديل وتنفيذه وتسجيل النتيجة." : "لم ينجح التنفيذ وتم تسجيل فشله: " + err);
           loadRequests(); loaded.delete("users"); loaded.delete("listings");
           window.AsyutAdmin?.reload?.();
         } catch (e) { A.setStatus(e.message); }
