@@ -10,6 +10,20 @@ import vm from "node:vm";
 const source = await readFile(new URL("../../admin-approval.js", import.meta.url), "utf8");
 const base = "https://supabase.test";
 
+const consoleSource = await readFile(new URL("../../admin-console.js", import.meta.url), "utf8");
+assert.ok(source.includes("layan_admin_crm_archive_lead") && source.includes("allowedResources"),
+  "Approved writes must be restricted to explicit table and CRM RPC allowlists.");
+assert.ok(source.includes('redirect: "error"'),
+  "Approved REST writes must reject redirects.");
+assert.ok(consoleSource.includes('rpc("layan_admin_claim_change"'),
+  "The owner must reserve a change request before performing its side effect.");
+assert.ok(consoleSource.includes("p_execution_token: claim.execution_token"),
+  "The completion RPC must prove possession of the exact execution token.");
+assert.ok(consoleSource.includes('if (!details?.open)'),
+  "The owner must open and review the complete change details before approval.");
+assert.ok(consoleSource.includes('executing: "محجوز'),
+  "Requests stranded during a network interruption must remain visible for manual reconciliation.");
+
 async function scenario({ role = "owner", roleStatus = 200, roleThrows = false } = {}) {
   const calls = [];
   const elements = new Map();
