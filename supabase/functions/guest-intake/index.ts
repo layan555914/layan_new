@@ -118,31 +118,46 @@ Deno.serve(async (req: Request) => {
   const service = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
   try {
-    const input = await req.json();
-    const action = String(input?.action || "");
-    const id = String(input?.submission_id || input?.id || "");
-    const fp = await fingerprint(req, serviceKey);
-
-    if (action === "upload-ticket") {
-      if (!uuidPattern.test(id)) return json({ error: "رقم الطلب غير صالح." }, 400, origin);
-      if (!["images", "documents"].includes(String(input.kind))) return json({ error: "نوع الملف غير صالح." }, 400, origin);
-      const kind = input.kind as "images" | "documents";
-      const mime = String(input.content_type || "");
+    const requestUrl = new URL(req.url);
+    if (requestUrl.searchParams.get("action") === "upload-file") {
+      const submissionId = String(requestUrl.searchParams.get("submission_id") || "");
+      const kind = String(requestUrl.searchParams.get("kind") || "");
+      const mime = String(req.headers.get("content-type") || "").split(";")[0].trim();
       const ext = extFor(mime);
-      const size = Number(input.size || 0);
-      const maxSize = kind === "images" ? 15 * 1024 * 1024 : 10 * 1024 * 1024;
-      if (!ext || (kind === "images" && mime !== "image/jpeg") || size < (kind === "images" ? 4 : 8) || size > maxSize) {
-        return json({ error: "نوع الملف أو حجمه غير مسموح." }, 400, origin);
+      if (!uuidPattern.test(submissionId) || !["images", "documents"].includes(kind)) {
+        return json({ error: "بيانات رفع الملف غير صالحة." }, 400, origin);
       }
+      const isImage = kind === "images";
+      if (!ext || (isImage && mime !== "image/jpeg") || (!isImage && !["application/pdf","image/jpeg","image/png"].includes(mime))) {
+        return json({ error: "نوع الملف غير مسموح." }, 400, origin);
+      }
+      const bytes = new Uint8Array(await req.arrayBuffer());
+      const maxSize = 5 * 1024 * 1024;
+      if (bytes.length < (isImage ? 4 : 8) || bytes.length > maxSize) {
+        return json({ error: "حجم الملف يجب ألا يتجاوز 5 ميجابايت." }, 413, origin);
+      }
+      const validSignature = mime === "image/jpeg"
+        ? bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
+        : mime === "image/png"
+          ? bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
+          : bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
+      if (!validSignature) return json({ error: "محتوى الملف لا يطابق نوعه الحقيقي." }, 400, origin);
       const { data: allowed, error: limitError } = await service.rpc("layan_guest_take_rate_slot", {
         p_kind: "upload", p_fingerprint_hash: fp, p_limit: 15, p_window_minutes: 60,
       });
       if (limitError || allowed !== true) return json({ error: "تم تجاوز عدد محاولات رفع الملفات. حاول لاحقًا." }, 429, origin);
-      const path = "pending/" + id + "/" + kind + "/" + crypto.randomUUID() + "." + ext;
-      const { data, error } = await service.storage.from(BUCKET).createSignedUploadUrl(path, { upsert: false });
-      if (error || !data?.signedUrl || !data?.token) return json({ error: "تعذر تجهيز رفع الملف المؤقت." }, 500, origin);
-      return json({ path, signedUrl: data.signedUrl, token: data.token }, 200, origin);
+      const objectPath = "pending/" + submissionId + "/" + kind + "/" + crypto.randomUUID() + "." + ext;
+      const { error: uploadError } = await service.storage.from(BUCKET).upload(objectPath, bytes, {
+        contentType: mime, upsert: false,
+      });
+      if (uploadError) return json({ error: "تعذر حفظ الملف المؤقت." }, 500, origin);
+      return json({ path: objectPath }, 201, origin);
     }
+
+    const input = await req.json();
+    const action = String(input?.action || "");
+    const id = String(input?.submission_id || input?.id || "");
+    const fp = await fingerprint(req, serviceKey);
 
     if (action === "cleanup-upload") {
       if (!uuidPattern.test(id)) return json({ error: "رقم الطلب غير صالح." }, 400, origin);
