@@ -11,7 +11,7 @@ const read = path => readFile(new URL(path, root), "utf8");
 const [crm, html, migration] = await Promise.all([
   read("admin-crm.js"),
   read("admin.html"),
-  read("supabase/migrations/20261121120000_admin_crm_private_atomic.sql"),
+  read("supabase/migrations/20261123120000_admin_crm_private_atomic.sql"),
 ]);
 
 assert.ok(crm.includes('data-lead-id="${esc(lead?.id || "")}"'),
