@@ -259,6 +259,14 @@ BEGIN
     RAISE EXCEPTION 'Admin request status constraint does not support the reserved executing state';
   END IF;
   IF NOT EXISTS (
+    SELECT 1 FROM pg_index i
+    WHERE i.indexrelid='private.layan_admin_requests_one_active_change'::regclass
+      AND i.indisunique
+      AND pg_get_expr(i.indpred,i.indrelid) ILIKE '%executing%'
+  ) THEN
+    RAISE EXCEPTION 'Pending and executing admin changes must share one unique active-request key';
+  END IF;
+  IF NOT EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_schema='private' AND table_name='layan_admin_requests'
       AND column_name='execution_token' AND data_type='uuid'
