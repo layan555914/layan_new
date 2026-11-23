@@ -121,6 +121,30 @@ BEGIN
   IF v_count <> 10 THEN
     RAISE EXCEPTION 'Expected 10 administrative write/review RPCs to repair; found %',v_count;
   END IF;
+
+  -- Re-read each exact function OID after replacement and fail if any overload retained an admin gate.
+  v_count := 0;
+  FOR f IN SELECT proc_row.oid
+    FROM pg_proc AS proc_row
+    JOIN pg_namespace AS schema_row ON schema_row.oid=proc_row.pronamespace
+    WHERE (schema_row.nspname='private' AND proc_row.proname IN (
+      'layan_activate_supplier_ad','layan_admin_review_property_offer',
+      'company_entity_profile_update_admin_review','company_claim_admin_review',
+      'layan_review_company_profile','company_project_request_admin_review',
+      'company_project_unit_request_admin_review','property_offer_project_unit_request_admin_review'
+    ))
+       OR (schema_row.nspname='public' AND proc_row.proname IN ('layan_reject_supplier_ad','layan_approve_free_trial_ad'))
+  LOOP
+    v_definition := pg_get_functiondef(f.oid);
+    IF position('private.layan_is_owner()' IN v_definition)=0
+       OR position('private.layan_is_admin()' IN v_definition)>0 THEN
+      RAISE EXCEPTION 'Administrative write/review RPC % is not owner-only after repair',f.oid;
+    END IF;
+    v_count := v_count + 1;
+  END LOOP;
+  IF v_count <> 10 THEN
+    RAISE EXCEPTION 'Expected to verify 10 owner-only administrative write/review RPCs; found %',v_count;
+  END IF;
 END;
 $owner_gate$;
 
