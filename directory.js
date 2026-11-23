@@ -113,7 +113,7 @@ function verifiedLocationHtml(record){
  const source=state.data.sources.find(item=>String(item.id)===String(record.location_source_id));
  const query=String(record.latitude)+","+String(record.longitude);
  const href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(query);
- return '<div class="directory-verified-location"><a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">عرض الموقع المعتمد على الخريطة ↗</a><small>الدقة: '+esc(precisionLabel(record.location_precision))+' · المصدر: '+esc(source?.title||"مصدر عام موثوق")+' · تحقق: '+esc(record.location_verified_at||"غير مسجل")+'</small></div>';
+ return '<div class="directory-verified-location"><a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer">عرض الموقع على الخريطة ↗</a></div>';
 }
 function updateDirectoryMap(){
  const select=$("#directoryMapArea");
@@ -139,7 +139,7 @@ function updateDirectoryMap(){
   note.textContent="مركز منطقة موثق وفق مصدر "+(source?.confidence_level==="official"?"رسمي":"عالي الثقة")+" («"+(source?.title||"مصدر عام")+"»)، بدقة "+precisionLabel(chosen.location_precision)+" وتحقق بتاريخ "+chosen.location_verified_at+".";
  }else{
   note.textContent=chosen
-   ?("يعرض Google Maps نتائج بحث باسم «"+chosen.name_ar+"» داخل نطاق أسيوط. هذا بحث استرشادي وليس دبوسًا جغرافيًا معتمدًا أو تأكيدًا لمقر شركة أو مشروع.")
+   ?("يعرض Google Maps نتائج بحث باسم «"+chosen.name_ar+"» داخل نطاق أسيوط. عرض نتائج الخريطة للمنطقة المختارة.")
    :"الخريطة تعرض بحثًا عامًا في نطاق أسيوط. لا تُنشأ علامات لمواقع غير موثقة.";
  }
 }
@@ -259,15 +259,15 @@ function render(){
  setFilterAvailability();
  if(rows.length===0){
   const messages={
-   entities:"لا توجد جهات أو شركات منشورة للعامة حاليًا؛ البيانات الأولية محفوظة للمراجعة الداخلية فقط.",
-   projects:"لا توجد مشروعات منشورة للعامة حاليًا؛ لن تظهر المشروعات قبل مراجعة مصادرها واعتمادها.",
+   entities:"لا توجد جهات متاحة في هذا التصنيف حاليًا.",
+   projects:"لا توجد مشروعات متاحة في هذا التصنيف حاليًا.",
    areas:"لا توجد مناطق مطابقة للبحث الحالي.",
-   opportunities:"لا توجد طروحات منشورة للعامة حاليًا؛ السجلات المؤرشفة لا تعني توافر الفرص حاليًا.",
+   opportunities:"لا توجد طروحات حكومية متاحة حاليًا.",
    sources:"لا توجد مصادر مطابقة للبحث الحالي."
   };
   setStatus(messages[state.view]||"لا توجد نتائج.");
  }else{
-  setStatus("عدد النتائج: "+rows.length+" · السجلات المعروضة منشورة ومعتمدة فقط.");
+  setStatus("عدد النتائج: "+rows.length+"");
  }
 }
 const requestedView=new URLSearchParams(location.search).get("view");
