@@ -349,6 +349,7 @@ DECLARE
   v_allowed boolean;
   v_count integer;
 BEGIN
+  PERFORM set_config('request.jwt.claim.role','service_role',true);
   PERFORM set_config('request.jwt.claims','{"role":"service_role"}',true);
   v_allowed := public.layan_guest_take_rate_slot('property',repeat('b',64),2,60);
   IF v_allowed IS DISTINCT FROM true THEN RAISE EXCEPTION 'First guest rate slot should be available'; END IF;
