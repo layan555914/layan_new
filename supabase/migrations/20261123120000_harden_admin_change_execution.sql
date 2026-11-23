@@ -3,6 +3,11 @@
 -- loses connectivity after the side effect, the request remains locked for manual reconciliation;
 -- this intentionally favors preventing duplicate destructive writes over automatic replay.
 
+DROP INDEX IF EXISTS private.layan_admin_requests_one_pending;
+CREATE UNIQUE INDEX layan_admin_requests_one_active_change
+  ON private.layan_admin_requests (action, target)
+  WHERE status IN ('pending','executing');
+
 ALTER TABLE private.layan_admin_requests
   ADD COLUMN IF NOT EXISTS execution_token uuid,
   ADD COLUMN IF NOT EXISTS execution_started_at timestamptz,
