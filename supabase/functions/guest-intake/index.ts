@@ -125,7 +125,8 @@ Deno.serve(async (req: Request) => {
 
     if (action === "upload-ticket") {
       if (!uuidPattern.test(id)) return json({ error: "رقم الطلب غير صالح." }, 400, origin);
-      if (!["images", "documents"].includes(String(input.kind))) return json({ error: "نوع الملف غير صالح." }, 400, origin);\n      const kind = input.kind as "images" | "documents";
+      if (!["images", "documents"].includes(String(input.kind))) return json({ error: "نوع الملف غير صالح." }, 400, origin);
+      const kind = input.kind as "images" | "documents";
       const mime = String(input.content_type || "");
       const ext = extFor(mime);
       const size = Number(input.size || 0);
@@ -150,6 +151,7 @@ Deno.serve(async (req: Request) => {
       const imagePaths = Array.isArray(input.image_paths) ? input.image_paths.map(String) : [];
       const documentPaths = Array.isArray(input.document_paths) ? input.document_paths.map(String) : [];
       if (imagePaths.length > 8 || documentPaths.length > 5
+          || new Set(imagePaths).size !== imagePaths.length || new Set(documentPaths).size !== documentPaths.length
           || imagePaths.some((p: string) => !allowedPath(p, id, "images"))
           || documentPaths.some((p: string) => !allowedPath(p, id, "documents"))) {
         return json({ error: "قائمة الصور أو المستندات غير صالحة." }, 400, origin);
