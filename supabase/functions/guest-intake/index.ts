@@ -225,6 +225,35 @@ Deno.serve(async (req: Request) => {
       return json({ id: data, status: "pending" }, 201, origin);
     }
 
+    if (action === "admin-cleanup") {
+      const { userClient, role } = await adminContext(req, supabaseUrl, publicKey);
+      if (role !== "owner") return json({ error: "تنظيف الملفات المؤقتة متاح لمالك المنصة فقط." }, 403, origin);
+      const { data: pendingRows, error: pendingError } = await userClient.rpc("layan_admin_list_guest_property_submissions", { p_limit: 200 });
+      if (pendingError) return json({ error: "تعذر تحديد الطلبات التي ما زالت قيد المراجعة." }, 500, origin);
+      const pendingIds = new Set((pendingRows || []).map((row: { id: string }) => String(row.id)));
+      const { data: folders, error: folderError } = await service.storage.from(BUCKET).list("pending", { limit: 1000 });
+      if (folderError) return json({ error: "تعذر فحص مساحة الملفات المؤقتة." }, 500, origin);
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      let removed = 0;
+      for (const folder of folders || []) {
+        if (!uuidPattern.test(String(folder.name || "")) || pendingIds.has(String(folder.name))) continue;
+        for (const kind of ["images", "documents"]) {
+          const prefix = "pending/" + folder.name + "/" + kind;
+          const { data: files, error } = await service.storage.from(BUCKET).list(prefix, { limit: 100 });
+          if (error) continue;
+          const expired = (files || []).filter((file: { name: string; created_at?: string; updated_at?: string }) => {
+            const timestamp = Date.parse(file.created_at || file.updated_at || "");
+            return Number.isFinite(timestamp) && timestamp < cutoff;
+          }).map((file: { name: string }) => prefix + "/" + file.name);
+          if (expired.length) {
+            const { error: removeError } = await service.storage.from(BUCKET).remove(expired);
+            if (!removeError) removed += expired.length;
+          }
+        }
+      }
+      return json({ removed, message: "تم تنظيف الملفات الخاصة الأقدم من 7 أيام خارج الطلبات التي ما زالت قيد المراجعة." }, 200, origin);
+    }
+
     if (action === "admin-list") {
       const { userClient, role } = await adminContext(req, supabaseUrl, publicKey);
       const [properties, buyers] = await Promise.all([
