@@ -32,7 +32,7 @@ BEGIN
   IF jsonb_typeof(p_payload) <> 'object'
      OR (p_payload->'body' IS NOT NULL AND p_payload->'body' <> 'null'::jsonb AND jsonb_typeof(p_payload->'body') <> 'object')
      OR v_method NOT IN ('POST', 'PATCH', 'DELETE')
-     OR v_path !~ '^/rest/v1/[a-z_]+(\?[A-Za-z0-9_.,=()!_:*+&%~-]*)?$'
+     OR v_path !~ '^/rest/v1/([a-z_]+|rpc/[a-z_]+)(\?[A-Za-z0-9_.,=()!_:*+&%~-]*)?$'
      OR char_length(p_payload::text) > 20000 THEN
     RAISE EXCEPTION 'طلب تعديل غير صالح' USING ERRCODE = '22023';
   END IF;
