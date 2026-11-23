@@ -792,7 +792,7 @@
     return data;
   }
 
-  async function uploadGuestFiles(submissionId, files, kind) {
+  async function uploadGuestFiles(submissionId, files, kind, honeypot = "") {
     const uploaded = [];
     for (const file of files || []) {
       const isImage = kind === "images";
@@ -809,7 +809,7 @@
           : head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46;
       if (!valid) throw new Error("محتوى أحد الملفات لا يطابق نوعه الحقيقي.");
       const endpoint = url.replace(/\/$/, "") + "/functions/v1/guest-intake?action=upload-file&submission_id="
-        + encodeURIComponent(submissionId) + "&kind=" + encodeURIComponent(kind);
+        + encodeURIComponent(submissionId) + "&kind=" + encodeURIComponent(kind) + "&honeypot=" + encodeURIComponent(honeypot);
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": file.type },
@@ -842,8 +842,8 @@
     const submissionId = crypto.randomUUID();
     let imagePaths = [], documentPaths = [];
     try {
-      imagePaths = await uploadGuestFiles(submissionId, imageFiles, "images");
-      documentPaths = await uploadGuestFiles(submissionId, documentFiles, "documents");
+      imagePaths = await uploadGuestFiles(submissionId, imageFiles, "images", honeypot);
+      documentPaths = await uploadGuestFiles(submissionId, documentFiles, "documents", honeypot);
     } catch (error) {
       await cleanupGuestUploads(submissionId, imagePaths, documentPaths);
       throw error;
