@@ -34,6 +34,8 @@ assert.ok(edge.includes("auth.getUser(token)") && edge.includes('role !== "owner
   "Admin review must verify the caller session and restrict public listing to the owner.");
 assert.ok(edge.includes('userClient.rpc("layan_admin_publish_guest_property_submission"') && edge.includes('userClient.rpc("layan_admin_review_guest_buyer_request"'),
   "Moderation RPCs must retain the authenticated owner/admin JWT rather than execute as service role.");
+assert.ok(edge.includes('.select("image_urls")') && edge.includes("thisRequestWon") && edge.includes('remove(publicPaths)'),
+  "A concurrent approval that reuses an already-published offer must clean up only its own unused public image uploads.");
 assert.ok(edge.includes("createSignedUrl(path, 300)") && edge.includes("temporary_file_cleanup_pending"),
   "Admin file previews must be signed and temporary-file cleanup failures must be reported.");
 assert.ok(!edge.includes('action === "cleanup-upload"') && client.includes("Guest browsers cannot delete objects from the private bucket."),
