@@ -3,12 +3,11 @@
 -- loses connectivity after the side effect, the request remains locked for manual reconciliation;
 -- this intentionally favors preventing duplicate destructive writes over automatic replay.
 
+DROP INDEX IF EXISTS private.layan_admin_requests_one_pending;
 DROP INDEX IF EXISTS private.layan_admin_requests_one_active_change;
-CREATE UNIQUE INDEX IF NOT EXISTS layan_admin_requests_one_pending
-  ON private.layan_admin_requests (action, target) WHERE status='pending';
-CREATE UNIQUE INDEX layan_admin_requests_one_active_change
+CREATE UNIQUE INDEX layan_admin_requests_one_active
   ON private.layan_admin_requests (action, target)
-  WHERE action='change' AND status IN ('pending','executing');
+  WHERE status IN ('pending','executing');
 
 ALTER TABLE private.layan_admin_requests
   ADD COLUMN IF NOT EXISTS execution_token uuid,
@@ -20,6 +19,31 @@ ALTER TABLE private.layan_admin_requests
 ALTER TABLE private.layan_admin_requests
   ADD CONSTRAINT layan_admin_requests_status_check
   CHECK (status IN ('pending','executing','approved','rejected','failed'));
+
+-- Keep the original destructive-action queue compatible with the widened active-request index.
+CREATE OR REPLACE FUNCTION private.layan_admin_act(p_action text, p_target text, p_label text)
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $function$
+BEGIN
+  IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
+    RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING ERRCODE = '42501';
+  END IF;
+  IF p_action IN ('delete_user','suspend_user') AND p_target = auth.uid()::text THEN
+    RAISE EXCEPTION 'لا يمكنك تنفيذ هذا الإجراء على حسابك' USING ERRCODE = '22023';
+  END IF;
+  IF COALESCE(private.layan_is_admin_base(), false) THEN
+    PERFORM private.layan_admin_perform(p_action, p_target);
+    RETURN 'done';
+  END IF;
+  INSERT INTO private.layan_admin_requests (action, target, target_label, requested_by)
+  VALUES (p_action, p_target, left(p_label, 200), auth.uid())
+  ON CONFLICT (action, target) WHERE status IN ('pending','executing') DO NOTHING;
+  RETURN 'pending';
+END
+$function$;
 
 CREATE OR REPLACE FUNCTION public.layan_admin_request_change(p_label text, p_payload jsonb)
 RETURNS text
@@ -216,7 +240,7 @@ BEGIN
   VALUES ('change', v_target, left(COALESCE(p_label, 'تعديل'), 200), auth.uid(),
           jsonb_build_object('method', v_method, 'path', v_path, 'body', v_body,
                              'prefer', 'return=minimal'))
-  ON CONFLICT (action,target) WHERE action='change' AND status IN ('pending','executing') DO NOTHING;
+  ON CONFLICT (action,target) WHERE status IN ('pending','executing') DO NOTHING;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'يوجد طلب تعديل نشط بالفعل على نفس العنصر. راجع الطلب السابق قبل تكرار العملية.' USING ERRCODE='23505';
   END IF;
