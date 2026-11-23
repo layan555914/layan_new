@@ -143,7 +143,8 @@
         "layan_review_company_profile", "layan_admin_review_edit",
         "directory_admin_mutate_with_audit", "layan_approve_free_trial_ad",
         "layan_admin_review_logo", "company_claim_admin_review",
-        "company_entity_profile_update_admin_review"
+        "company_entity_profile_update_admin_review", "company_project_request_admin_review",
+        "company_project_unit_request_admin_review", "property_offer_project_unit_request_admin_review"
       ]);
       const method = String(payload?.method || "").toUpperCase();
       const target = new URL(String(payload?.path || ""), base);
