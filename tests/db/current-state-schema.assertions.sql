@@ -307,6 +307,7 @@ BEGIN
      OR v_definition NOT ILIKE '%company_project_request_admin_review%'
      OR v_definition NOT ILIKE '%company_project_unit_request_admin_review%'
      OR v_definition NOT ILIKE '%property_offer_project_unit_request_admin_review%'
+     OR v_definition NOT ILIKE '%layan_reorder_supplier_ads%'
      OR v_definition NOT ILIKE '%platform_sponsors%'
      OR v_definition NOT ILIKE '%v_resource NOT IN%'
      OR v_definition NOT ILIKE '%split_part(v_resource%' THEN
