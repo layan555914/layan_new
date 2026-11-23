@@ -15,7 +15,8 @@ async function verifiedSession(){const auth=window.LAYAN_SUPABASE;if(!auth?.requ
 async function api(path,options={}){if(!base||!key)throw Error("إعدادات الاتصال بقاعدة البيانات غير مكتملة.");const s=session();const r=await fetch(base+"/rest/v1/"+path,{...options,headers:{apikey:key,Authorization:"Bearer "+(s?.access_token||key),"Content-Type":"application/json",...(options.headers||{})}});const raw=await r.text();let d=null;try{d=raw?JSON.parse(raw):null}catch(_){}if(!r.ok)throw Error(d?.message||d?.details||"تعذر تنفيذ الطلب.");return d}
 let companies=[],directoryEntities=[],existingProfileId=null,existingStatus=null,supportsDraft=false,submissionSaved=false,profileLookupComplete=false,existingProfileSnapshot=null,existingVerifiedAt=null;
 const ENTITY_LOGO_ASSETS=Object.freeze({
- "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
+ "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp",
+ "810cc5ae-2e02-4418-8ee8-c681668723b6":"./assets/brand/diar-asyut-logo-temp.svg"
 });
 const OFFICIAL_ENTITY_LOGOS=Object.freeze({
  "primedev-eg.com":"https://www.primedev-eg.com/assets/img/logo-prime.png"
