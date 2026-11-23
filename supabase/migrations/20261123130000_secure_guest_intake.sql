@@ -209,14 +209,14 @@ REVOKE ALL ON FUNCTION public.layan_admin_list_guest_buyer_requests(integer) FRO
 GRANT EXECUTE ON FUNCTION public.layan_admin_list_guest_buyer_requests(integer) TO authenticated;
 
 CREATE OR REPLACE FUNCTION public.layan_guest_get_property_submission(p_id uuid)
-RETURNS TABLE(id uuid,payload jsonb,image_paths text[],document_paths text[],contact_name text,contact_phone text,contact_consent boolean,status text)
+RETURNS TABLE(id uuid,payload jsonb,image_paths text[],document_paths text[],contact_name text,contact_phone text,contact_consent boolean,status text,published_offer_id bigint)
 LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path=''
 AS $function$
 BEGIN
   IF auth.role() IS DISTINCT FROM 'service_role' THEN
     RAISE EXCEPTION 'Service role required' USING ERRCODE='42501';
   END IF;
-  RETURN QUERY SELECT s.id,s.payload,s.image_paths,s.document_paths,s.contact_name,s.contact_phone,s.contact_consent,s.status
+  RETURN QUERY SELECT s.id,s.payload,s.image_paths,s.document_paths,s.contact_name,s.contact_phone,s.contact_consent,s.status,s.published_offer_id
   FROM private.guest_property_submissions s WHERE s.id=p_id;
 END
 $function$;
@@ -232,8 +232,10 @@ BEGIN
   IF auth.uid() IS NULL OR NOT private.layan_is_owner() THEN
     RAISE EXCEPTION 'نشر إعلانات الزوار متاح لمالك المنصة فقط' USING ERRCODE='42501';
   END IF;
-  SELECT * INTO s FROM private.guest_property_submissions WHERE id=p_id AND status='pending' FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'طلب الزائر غير موجود أو تمت مراجعته بالفعل' USING ERRCODE='P0002'; END IF;
+  SELECT * INTO s FROM private.guest_property_submissions WHERE id=p_id FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'طلب الزائر غير موجود' USING ERRCODE='P0002'; END IF;
+  IF s.status='approved' AND s.published_offer_id IS NOT NULL THEN RETURN s.published_offer_id; END IF;
+  IF s.status <> 'pending' THEN RAISE EXCEPTION 'طلب الزائر تمت مراجعته بالفعل' USING ERRCODE='P0002'; END IF;
   IF cardinality(COALESCE(p_image_urls,'{}')) > 8
      OR EXISTS (SELECT 1 FROM unnest(COALESCE(p_image_urls,'{}')) AS x(url)
                 WHERE url !~ '^https://[^/]+/storage/v1/object/public/layan_real_estat/offers/guest/[0-9a-f-]{36}/[0-9a-f-]{36}\.jpg$') THEN
