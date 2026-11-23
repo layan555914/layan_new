@@ -244,7 +244,7 @@ Deno.serve(async (req: Request) => {
           const files: { name: string; created_at?: string | null; updated_at?: string | null }[] = [];
           for (let offset = 0; ; offset += 100) {
             const { data: page, error } = await service.storage.from(BUCKET).list(prefix, { limit: 100, offset });
-            if (error) break;
+            if (error) return json({ error: "تعذر قراءة ملفات أحد الطلبات أثناء التنظيف؛ لم يكتمل الفحص." }, 500, origin);
             files.push(...(page || []));
             if (!page || page.length < 100) break;
           }
