@@ -42,8 +42,22 @@ async function fingerprint(req: Request, secret: string) {
   const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(source));
   return [...new Uint8Array(signature)].map(x => x.toString(16).padStart(2, "0")).join("");
 }
+function nonNegative(p: Record<string, unknown>, key: string, max = 1000000000) {
+  if (p[key] === undefined || p[key] === null || p[key] === "") return true;
+  const n = Number(p[key]);
+  return Number.isFinite(n) && n >= 0 && n <= max;
+}
 function validPropertyPayload(p: Record<string, unknown>) {
+  const project = /مشروع/.test(String(p.property_type || ""));
+  const priceOnRequest = p.price_on_request === true;
+  const numericOk = ["area_m2","bedrooms","bathrooms","monthly_installment","rental_security_deposit",
+    "rental_minimum_months","total_price","down_payment","paid_amount","remaining_amount",
+    "remaining_installments","assignment_fee","assignment_fee_percentage","discount_amount","discount_percent"]
+    .every(key => nonNegative(p,key));
+  const lat = p.latitude == null || p.latitude === "" ? null : Number(p.latitude);
+  const lng = p.longitude == null || p.longitude === "" ? null : Number(p.longitude);
   return cleanString(p.title, 180).length >= 5
+    && String(p.title || "").length <= 180
     && ["بيع", "إيجار", "تنازل"].includes(String(p.listing_purpose))
     && cleanString(p.property_type, 80).length >= 2
     && cleanString(p.city, 100).length >= 2
@@ -51,7 +65,11 @@ function validPropertyPayload(p: Record<string, unknown>) {
     && cleanString(p.contact_name, 120).length >= 2
     && phonePattern.test(cleanString(p.contact_phone, 20))
     && typeof p.contact_consent === "boolean"
-    && cleanString(p.description, 3000).length <= 3000;
+    && String(p.description || "").length <= 3000
+    && numericOk
+    && (priceOnRequest || project || Number(p.total_price) > 0)
+    && (p.listing_purpose !== "تنازل" || Number(p.paid_amount || 0) >= Number(p.down_payment || 0))
+    && ((lat === null && lng === null) || (Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180));
 }
 function validBuyerPayload(p: Record<string, unknown>) {
   return cleanString(p.contact_name, 120).length >= 2
@@ -59,7 +77,8 @@ function validBuyerPayload(p: Record<string, unknown>) {
     && cleanString(p.property_type, 80).length >= 2
     && cleanString(p.city, 100).length <= 100
     && cleanString(p.area, 100).length <= 100
-    && cleanString(p.notes, 500).length <= 500;
+    && String(p.notes || "").length <= 500
+    && ["max_total_price","max_upfront","max_monthly_installment","min_bedrooms"].every(key => nonNegative(p,key,1000000000));
 }
 function allowedPath(path: string, id: string, kind: "images" | "documents") {
   const ext = kind === "images" ? "jpg" : "(pdf|jpg|png)";
@@ -106,16 +125,16 @@ Deno.serve(async (req: Request) => {
 
     if (action === "upload-ticket") {
       if (!uuidPattern.test(id)) return json({ error: "رقم الطلب غير صالح." }, 400, origin);
-      const kind = input.kind === "documents" ? "documents" : "images";
+      if (!["images", "documents"].includes(String(input.kind))) return json({ error: "نوع الملف غير صالح." }, 400, origin);\n      const kind = input.kind as "images" | "documents";
       const mime = String(input.content_type || "");
       const ext = extFor(mime);
       const size = Number(input.size || 0);
       const maxSize = kind === "images" ? 15 * 1024 * 1024 : 10 * 1024 * 1024;
-      if (!ext || (kind === "images" && mime !== "image/jpeg") || size < 8 || size > maxSize) {
+      if (!ext || (kind === "images" && mime !== "image/jpeg") || size < (kind === "images" ? 4 : 8) || size > maxSize) {
         return json({ error: "نوع الملف أو حجمه غير مسموح." }, 400, origin);
       }
       const { data: allowed, error: limitError } = await service.rpc("layan_guest_take_rate_slot", {
-        p_kind: "upload", p_fingerprint_hash: fp, p_limit: 12, p_window_minutes: 60,
+        p_kind: "upload", p_fingerprint_hash: fp, p_limit: 15, p_window_minutes: 60,
       });
       if (limitError || allowed !== true) return json({ error: "تم تجاوز عدد محاولات رفع الملفات. حاول لاحقًا." }, 429, origin);
       const path = "pending/" + id + "/" + kind + "/" + crypto.randomUUID() + "." + ext;
@@ -125,7 +144,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === "submit-property") {
-      if (!uuidPattern.test(id) || !input.payload || typeof input.payload !== "object" || Array.isArray(input.payload) || !validPropertyPayload(input.payload)) {
+      if (!uuidPattern.test(id) || cleanString(input.honeypot, 200) !== "" || !input.payload || typeof input.payload !== "object" || Array.isArray(input.payload) || !validPropertyPayload(input.payload)) {
         return json({ error: "راجع بيانات العقار وبيانات التواصل قبل الإرسال." }, 400, origin);
       }
       const imagePaths = Array.isArray(input.image_paths) ? input.image_paths.map(String) : [];
@@ -155,7 +174,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === "submit-buyer") {
-      if (!uuidPattern.test(id) || !input.payload || typeof input.payload !== "object" || Array.isArray(input.payload) || !validBuyerPayload(input.payload)) {
+      if (!uuidPattern.test(id) || cleanString(input.honeypot, 200) !== "" || !input.payload || typeof input.payload !== "object" || Array.isArray(input.payload) || !validBuyerPayload(input.payload)) {
         return json({ error: "أكمل بيانات طلب البحث ووسيلة التواصل." }, 400, origin);
       }
       const { data: allowed, error: limitError } = await service.rpc("layan_guest_take_rate_slot", {
