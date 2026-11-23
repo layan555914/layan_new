@@ -96,7 +96,7 @@ BEGIN
       'supplier_ads','property_offers','marketplace_listings','company_property_ads','partner_ad_slots',
       'directory_sources','directory_change_log','directory_entities','directory_projects',
       'directory_areas','directory_opportunities','directory_entity_sources',
-      'directory_project_sources','directory_opportunity_sources'
+      'directory_project_sources','directory_opportunity_sources','platform_sponsors'
     ) THEN
       RAISE EXCEPTION 'المورد المطلوب غير مسموح بمراجعته' USING ERRCODE = '22023';
     END IF;
@@ -110,6 +110,7 @@ BEGIN
     IF (v_resource IN ('directory_entities','directory_projects','directory_areas','directory_opportunities') AND v_method <> 'PATCH')
        OR (v_resource IN ('directory_entity_sources','directory_project_sources','directory_opportunity_sources','directory_change_log') AND v_method <> 'POST')
        OR (v_resource = 'partner_ad_slots' AND v_method <> 'PATCH')
+       OR (v_resource = 'platform_sponsors' AND v_method <> 'PATCH')
        OR (v_resource IN ('property_offers','marketplace_listings','supplier_ads','company_property_ads') AND v_method NOT IN ('POST','PATCH'))
        OR (v_resource = 'directory_sources' AND v_method NOT IN ('POST','PATCH')) THEN
       RAISE EXCEPTION 'طريقة الكتابة غير مسموح بها لهذا المورد' USING ERRCODE = '22023';
@@ -136,6 +137,10 @@ BEGIN
         'business_name','plan_code','owner_id','status','starts_at','ends_at','updated_at'
       ]
       WHEN 'partner_ad_slots' THEN ARRAY['status']
+      WHEN 'platform_sponsors' THEN ARRAY[
+        'name','tier','kicker','tagline','subline','logo_url','link_url','link_label',
+        'sort_order','is_active','starts_at','ends_at','updated_at'
+      ]
       WHEN 'directory_entities' THEN ARRAY[
         'name_ar','name_en','service_category','marketplace_category','description','website_url','public_phone',
         'public_whatsapp','public_email','public_address','public_logo_url','public_business_hours','public_services',
