@@ -103,7 +103,7 @@ BEGIN
     IF v_method IN ('PATCH','DELETE') AND (v_query = '' OR v_query !~ '(^|&)id=eq\.[0-9a-fA-F-]+(&|$)') THEN
       RAISE EXCEPTION 'تعديل أو حذف السجل يتطلب معرّفًا محددًا' USING ERRCODE = '22023';
     END IF;
-    IF v_method = 'POST' AND v_query <> '' AND v_query !~ '^(select=id|on_conflict=[a-z_,]+)
+    IF v_method = 'POST' AND v_query <> '' AND v_query !~ '^(select=id|on_conflict=[a-z_,]+)$' THEN
       RAISE EXCEPTION 'خيارات الإضافة غير مسموح بها' USING ERRCODE = '22023';
     END IF;
 
