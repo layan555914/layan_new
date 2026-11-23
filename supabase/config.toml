@@ -21,3 +21,5 @@ sql_paths = []
 verify_jwt = false
 [functions.guest-intake]
 verify_jwt = false
+[functions.admin-media]
+verify_jwt = false
