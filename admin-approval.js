@@ -135,13 +135,21 @@
         "company_profiles", "company_property_ads", "company_entity_profile_update_requests",
         "partner_ad_slots", "directory_sources", "directory_change_log"
       ]);
+      const allowedRpcs = new Set([
+        "layan_admin_crm_save_lead", "layan_admin_crm_log_activity",
+        "layan_admin_crm_restore_lead", "layan_admin_crm_archive_lead"
+      ]);
       const method = String(payload?.method || "").toUpperCase();
       const target = new URL(String(payload?.path || ""), base);
-      const resourceMatch = target.pathname.match(/^\\/rest\\/v1\\/([a-z_]+)$/);
+      const resourceMatch = target.pathname.match(/^\/rest\/v1\/([a-z_]+)$/);
+      const rpcMatch = target.pathname.match(/^\/rest\/v1\/rpc\/([a-z_]+)$/);
+      const isTableWrite = resourceMatch && allowedResources.has(resourceMatch[1])
+        && (method === "POST" || ((method === "PATCH" || method === "DELETE")
+          && /(^|&)id=eq\.[0-9a-fA-F-]+(&|$)/.test(target.search.slice(1))));
+      const isCrmRpc = rpcMatch && allowedRpcs.has(rpcMatch[1]) && method === "POST" && !target.search;
       if (!["POST", "PATCH", "DELETE"].includes(method)
           || target.origin !== new URL(base).origin
-          || !resourceMatch || !allowedResources.has(resourceMatch[1])
-          || (method !== "POST" && !/(^|&)id=eq\\.[0-9a-fA-F-]+(&|$)/.test(target.search.slice(1)))
+          || (!isTableWrite && !isCrmRpc)
           || (payload.body != null && (typeof payload.body !== "object" || Array.isArray(payload.body)))) {
         throw new Error("العملية المطلوبة لا تطابق قائمة التعديلات المسموح بها؛ تم إيقاف التنفيذ.");
       }
