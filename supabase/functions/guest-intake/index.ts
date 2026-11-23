@@ -18,14 +18,6 @@ const phonePattern = /^[0-9+() -]{7,20}$/;
 const cleanString = (v: unknown, max: number) => String(v ?? "").trim().slice(0, max);
 const extFor = (mime: string) => mime === "image/jpeg" ? "jpg" : mime === "image/png" ? "png" : mime === "application/pdf" ? "pdf" : "";
 
-function publicKeyFromEnv() {
-  try {
-    const keys = JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") || "{}");
-    return keys.default || Deno.env.get("SUPABASE_ANON_KEY") || "";
-  } catch {
-    return Deno.env.get("SUPABASE_ANON_KEY") || "";
-  }
-}
 function serviceKeyFromEnv() {
   try {
     const keys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}");
@@ -114,9 +106,9 @@ Deno.serve(async (req: Request) => {
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-  const publicKey = publicKeyFromEnv();
+  const publicKey = String(req.headers.get("apikey") || "");
   const serviceKey = serviceKeyFromEnv();
-  if (!supabaseUrl || !publicKey || !serviceKey || req.headers.get("apikey") !== publicKey) {
+  if (!supabaseUrl || !publicKey || !serviceKey) {
     return json({ error: "تعذر التحقق من إعدادات الاتصال." }, 401, origin);
   }
   const service = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
