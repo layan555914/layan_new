@@ -29,7 +29,10 @@
     directory_admin_mutate_with_audit: "تعديل في الدليل العقاري", layan_approve_free_trial_ad: "اعتماد إعلان تجريبي",
     layan_admin_review_logo: "مراجعة شعار معلن",
     company_claim_admin_review: "مراجعة طلب استلام ملف جهة",
-    company_entity_profile_update_admin_review: "مراجعة تعديل ملف جهة"
+    company_entity_profile_update_admin_review: "مراجعة تعديل ملف جهة",
+    company_project_request_admin_review: "مراجعة طلب إدارة مشروع",
+    company_project_unit_request_admin_review: "مراجعة طلب وحدة مشروع",
+    property_offer_project_unit_request_admin_review: "مراجعة ربط عقار بوحدة مشروع"
   };
   const VERB = { POST: "إضافة", PATCH: "تعديل", DELETE: "حذف", PUT: "تعديل" };
 
