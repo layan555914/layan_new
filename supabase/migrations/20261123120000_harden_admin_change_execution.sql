@@ -30,6 +30,8 @@ DECLARE
   v_path text := COALESCE(p_payload->>'path', '');
   v_resource text;
   v_query text;
+  v_target text;
+  v_target_id text;
 BEGIN
   IF auth.uid() IS NULL OR NOT private.layan_is_admin() THEN
     RAISE EXCEPTION 'هذا الإجراء متاح لإدارة أسيوط عقار فقط' USING ERRCODE = '42501';
@@ -75,10 +77,33 @@ BEGIN
     END IF;
   END IF;
 
+  -- Stable target keys prevent a second pending/executing request for the same write.
+  IF v_resource LIKE 'rpc/%' THEN
+    v_target_id := COALESCE(
+      p_payload->'body'->>'p_request_id', p_payload->'body'->>'p_id',
+      p_payload->'body'->>'p_ad_id', p_payload->'body'->>'p_offer_id',
+      p_payload->'body'->>'p_edit_id', p_payload->'body'->>'p_lead_id',
+      p_payload->'body'->>'p_entity_id', p_payload->'body'->>'p_project_id',
+      p_payload->'body'->>'p_company_id'
+    );
+    v_target := 'chg:rpc:' || left(split_part(v_resource,'/',2),35) || ':' ||
+      md5(COALESCE(v_target_id, jsonb_build_object('path',v_path,'body',p_payload->'body')::text));
+  ELSIF v_method IN ('PATCH','DELETE') THEN
+    v_target_id := (regexp_match(v_query,'(^|&)id=eq\.([^&]+)'))[2];
+    v_target := 'chg:' || v_method || ':' || left(v_resource,30) || ':' || md5(COALESCE(v_target_id,''));
+  ELSE
+    v_target := 'chg:post:' || left(v_resource,30) || ':' ||
+      md5(jsonb_build_object('path',v_path,'body',p_payload->'body')::text);
+  END IF;
+
   INSERT INTO private.layan_admin_requests (action, target, target_label, requested_by, payload)
-  VALUES ('change', 'chg-' || gen_random_uuid()::text, left(COALESCE(p_label, 'تعديل'), 200), auth.uid(),
+  VALUES ('change', v_target, left(COALESCE(p_label, 'تعديل'), 200), auth.uid(),
           jsonb_build_object('method', v_method, 'path', v_path, 'body', p_payload->'body',
-                             'prefer', 'return=minimal'));
+                             'prefer', 'return=minimal'))
+  ON CONFLICT (action,target) WHERE status IN ('pending','executing') DO NOTHING;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'يوجد طلب تعديل نشط بالفعل على نفس العنصر. راجع الطلب السابق قبل تكرار العملية.' USING ERRCODE='23505';
+  END IF;
   RETURN 'pending';
 END
 $function$;
