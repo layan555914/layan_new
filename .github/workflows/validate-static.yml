@@ -90,6 +90,9 @@ jobs:
       - name: Validate admin media authorization and storage boundary
         run: node tests/ui/admin-media-contracts.mjs
 
+      - name: Validate directory media upload, review and gallery contracts
+        run: node tests/ui/directory-media-contracts.mjs
+
       - name: Validate pages, local assets, PWA shell and auth UI contracts
         run: |
           node --input-type=commonjs <<'NODE'
