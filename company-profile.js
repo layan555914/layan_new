@@ -336,7 +336,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
       '<label>مواعيد العمل<input name="public_business_hours" maxlength="240" value="'+esc(entity.public_business_hours||"")+'"></label>'+
       '<label class="wide">الخدمات والتخصصات (كل خدمة في سطر)<textarea name="public_services" rows="3">'+esc(list(entity.public_services))+'</textarea></label>'+
       '<label class="wide">مناطق التغطية (كل منطقة في سطر)<textarea name="public_coverage_areas" rows="2">'+esc(list(entity.public_coverage_areas))+'</textarea></label>'+
-      '<label class="wide">روابط صور الأعمال (رابط آمن في كل سطر)<textarea name="public_gallery_urls" rows="3">'+esc(list(entity.public_gallery_urls))+'</textarea></label>'+
       '<button class="btn btn-gold" type="submit">حفظ التحديثات مباشرة</button></form>'+
      (isOwner?
       '<h3>تغييرات تتطلب موافقة الإدارة</h3><p>اسم الجهة، مجال النشاط، الهاتف، واتساب، البريد، الموقع، العنوان والشعار لا تتغير للزوار إلا بعد مراجعة الإدارة.</p>'+
@@ -359,6 +358,14 @@ document.addEventListener("DOMContentLoaded",async()=>{
       :"");
     const profileHero=root.querySelector(".company-profile-hero");
     if(profileHero)profileHero.insertAdjacentElement("afterend",target);else root.appendChild(target);
+    if(window.AsyutDirectoryMedia){
+     try{
+      await window.AsyutDirectoryMedia.renderGallery({entityId:entity.id,root});
+      if(isOwner||accessRole==="manager"){
+       await window.AsyutDirectoryMedia.mountManager({entityId:entity.id,root:target,isServiceProvider});
+      }
+     }catch(error){console.warn("Directory media interface unavailable:",error);}
+    }
 
     if(isRealEstateCompany){
      const canManageProjects=isOwner||accessRole==="manager";
@@ -420,20 +427,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
      const data=new FormData(directForm);
      const value=name=>String(data.get(name)||"").trim();
      const lines=name=>value(name).split(/\n+/).map(item=>item.trim()).filter(Boolean);
-     let gallery;
-     try{
-      gallery=lines("public_gallery_urls").map(item=>{
-       const url=safeUrl(item);
-       if(!url)throw new Error("روابط صور الأعمال يجب أن تبدأ بـ http:// أو https://.");
-       return url;
-      });
-     }catch(error){directStatus.textContent=error.message;return;}
      const payload={
       description:value("description")||null,
       public_business_hours:value("public_business_hours")||null,
       public_services:lines("public_services"),
-      public_coverage_areas:lines("public_coverage_areas"),
-      public_gallery_urls:gallery
+      public_coverage_areas:lines("public_coverage_areas")
      };
      const button=directForm.querySelector('button[type="submit"]');
      button.disabled=true;
