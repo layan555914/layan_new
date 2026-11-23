@@ -16,8 +16,8 @@ DECLARE
   v_has_lock boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 53 THEN
-    RAISE EXCEPTION 'Expected 53 clean-install migrations (3 Nov 3 baseline files + 42 current main migrations + 1 owner-gate repair + 7 reviewed branch migrations); found %', v_count;
+  IF v_count <> 54 THEN
+    RAISE EXCEPTION 'Expected 54 clean-install migrations after adding the reviewed private CRM migration; found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
@@ -200,6 +200,40 @@ BEGIN
   IF (SELECT count(*) FROM storage.buckets WHERE id IN ('layan_real_estat','layan-property-documents')) <> 2
      OR (SELECT count(*) FROM pg_policies WHERE schemaname='storage' AND tablename='objects') <> 10 THEN
     RAISE EXCEPTION 'Storage baseline must contain two app buckets and ten object policies (six baseline plus four admin image policies)';
+  END IF;
+
+  IF to_regclass('private.admin_crm_leads') IS NULL
+     OR to_regclass('private.admin_crm_activities') IS NULL THEN
+    RAISE EXCEPTION 'Private CRM lead and activity tables are missing';
+  END IF;
+
+  IF NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.admin_crm_leads'::regclass)
+     OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.admin_crm_activities'::regclass)
+     OR has_table_privilege('anon','private.admin_crm_activities','SELECT')
+     OR has_table_privilege('authenticated','private.admin_crm_activities','UPDATE')
+     OR has_table_privilege('authenticated','private.admin_crm_activities','DELETE') THEN
+    RAISE EXCEPTION 'Private CRM tables must remain RLS-enabled and unavailable through direct table grants';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger t
+    JOIN pg_class c ON c.oid=t.tgrelid
+    JOIN pg_namespace n ON n.oid=c.relnamespace
+    WHERE n.nspname='private' AND c.relname='admin_crm_activities'
+      AND t.tgname='admin_crm_activities_append_only'
+      AND NOT t.tgisinternal AND t.tgenabled='O'
+      AND (t.tgtype & 16)=16 AND (t.tgtype & 8)=8
+  ) THEN
+    RAISE EXCEPTION 'CRM activity history must reject both UPDATE and DELETE, including lead-delete cascades';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+    WHERE n.nspname='private' AND p.proname='layan_admin_crm_reject_activity_mutation'
+      AND p.proconfig @> ARRAY['search_path=""']
+      AND pg_get_functiondef(p.oid) ILIKE '%UPDATE and DELETE are prohibited%'
+  ) THEN
+    RAISE EXCEPTION 'CRM append-only trigger function is missing or unsafe';
   END IF;
 
   IF (SELECT count(*) FROM public.company_claim_requests) <> 0
