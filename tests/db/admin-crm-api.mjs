@@ -380,8 +380,20 @@ try {
     try { runLocalSql("DELETE FROM private.layan_admins WHERE user_id IN (" + ownerIds.map(safeUuid).join(",") + ");"); } catch (_) {}
   }
   for (const id of users.reverse()) {
-    try { await deleteUser(id); } catch (error) {
-      throw new Error("CRM local test cleanup failed: " + error.message);
+    try {
+      await deleteUser(id);
+    } catch (error) {
+      // The entire test is restricted to loopback Supabase. If the local Auth
+      // admin endpoint fails during teardown, remove only these disposable
+      // users directly so a transient GoTrue 500 does not fail an otherwise
+      // successful CRM contract test or leave test identities in the stack.
+      try {
+        runLocalSql("DELETE FROM auth.users WHERE id = " + safeUuid(id) + ";");
+        const remaining = runLocalSql("SELECT count(*) FROM auth.users WHERE id = " + safeUuid(id) + ";");
+        if (remaining !== "0") throw new Error("Local Auth user still exists after SQL cleanup.");
+      } catch (cleanupError) {
+        throw new Error("CRM local test cleanup failed: " + error.message + "; SQL fallback: " + cleanupError.message);
+      }
     }
   }
 }
