@@ -101,6 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loginNote) loginNote.textContent = isGuest
       ? "تقدر ترسل طلب البحث كزائر دون إنشاء حساب. سجّل الدخول فقط لو عايز تحفظ اختياراتك وتفعّل التنبيهات."
       : "طلبك واختيارات التنبيه محفوظة داخل حسابك.";
+    const notificationChoices=form?.querySelector(".buyer-notify-choice");
+    if(notificationChoices) notificationChoices.hidden=isGuest;
+    ["buyerPushSubscribe","buyerPushUnsubscribe"].forEach(id=>{const button=$(id);if(button)button.hidden=isGuest;});
+    const pushHelp=form?.querySelector(".buyer-push-help"); if(pushHelp)pushHelp.hidden=isGuest;
     const submitButton = form?.querySelector('button[type="submit"]');
     if (submitButton) submitButton.textContent = isGuest ? "أرسل طلب البحث كزائر" : "احفظ طلبي وابحث عن المناسب";
   }
