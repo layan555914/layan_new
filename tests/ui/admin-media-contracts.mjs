@@ -8,6 +8,8 @@ const workflow = fs.readFileSync(".github/workflows/validate-static.yml", "utf8"
 
 assert.match(edge, /auth\.getUser\(token\)/, "admin-media must validate the caller's JWT");
 assert.match(edge, /rpc\("layan_is_admin"\)/, "admin-media must require an admin role");
+assert.match(edge, /rpc\("layan_admin_whoami"\)/, "admin-media must inspect the exact administrative role");
+assert.match(edge, /role !== "owner"/, "non-owner administrators must not bypass owner-only storage policies");
 assert.match(edge, /auth\.admin\.getUserById\(ownerId\)/, "admin-media must verify the target customer account");
 assert.match(edge, /bytes\.length > MAX_BYTES/, "admin-media must enforce the upload size limit");
 assert.match(edge, /bytes\[0\] !== 0xff[\s\S]*bytes\[2\] !== 0xff/, "admin-media must validate JPEG file signatures");
