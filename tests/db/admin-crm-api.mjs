@@ -234,6 +234,13 @@ try {
   assert(queued.response.ok && queued.body === "pending",
     "An added administrator could not submit a CRM change for owner approval: " + JSON.stringify(queued.body));
 
+  const disallowed = await rpc("layan_admin_request_change", {
+    p_label: "Blocked arbitrary RPC " + runId,
+    p_payload: { method: "POST", path: "/rest/v1/rpc/layan_admin_set_admin", body: { p_email: admin.email, p_enabled: true } },
+  }, adminToken);
+  assert(!disallowed.response.ok,
+    "An added administrator queued a privileged RPC outside the explicit approval allowlist.");
+
   const pendingRequests = await rpc("layan_admin_list_requests", { p_status: "pending" }, ownerToken);
   assert(pendingRequests.response.ok && Array.isArray(pendingRequests.body),
     "The owner could not load pending approval requests.");
@@ -244,20 +251,33 @@ try {
     "The CRM approval request or its operation payload was not available to the owner.");
   approvalRequestIds.push(Number(pendingApproval.id));
 
-  const ownerExecution = await request(pendingApproval.payload.path, {
-    method: pendingApproval.payload.method,
+  const claimed = await rpc("layan_admin_claim_change", { p_id: pendingApproval.id }, ownerToken);
+  assert(claimed.response.ok && claimed.body?.execution_token && claimed.body?.payload?.path === approvalPayload.path,
+    "The owner could not atomically reserve the pending change before execution.");
+  const duplicateClaim = await rpc("layan_admin_claim_change", { p_id: pendingApproval.id }, ownerToken);
+  assert(!duplicateClaim.response.ok,
+    "The same owner-approved change was claimable twice; replay protection failed.");
+  const executingRequest = await rpc("layan_admin_list_requests", { p_status: "executing" }, ownerToken);
+  assert(executingRequest.response.ok && executingRequest.body.some(item => Number(item.id) === Number(pendingApproval.id)),
+    "The reserved change was not visible in the executing/reconciliation queue.");
+
+  const ownerExecution = await request(claimed.body.payload.path, {
+    method: claimed.body.payload.method,
     headers: authHeaders(anonKey, ownerToken, {
       "content-type": "application/json",
-      Prefer: pendingApproval.payload.prefer || "return=minimal",
+      Prefer: claimed.body.payload.prefer || "return=minimal",
     }),
-    body: JSON.stringify(pendingApproval.payload.body),
+    body: JSON.stringify(claimed.body.payload.body),
   });
   assert(ownerExecution.response.ok && typeof ownerExecution.body === "string",
     "The owner could not execute the approved CRM change: " + JSON.stringify(ownerExecution.body));
   approvalLeadId = ownerExecution.body;
 
   const finished = await rpc("layan_admin_finish_change", {
-    p_id: pendingApproval.id, p_ok: true, p_note: null,
+    p_id: pendingApproval.id,
+    p_execution_token: claimed.body.execution_token,
+    p_ok: true,
+    p_note: null,
   }, ownerToken);
   assert(finished.response.ok && finished.body === "approved",
     "The owner could not mark the executed CRM request as approved.");
