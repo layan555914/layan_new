@@ -127,6 +127,11 @@ Deno.serve(async (req: Request) => {
       if (!ext || (isImage && mime !== "image/jpeg") || (!isImage && !["application/pdf","image/jpeg","image/png"].includes(mime))) {
         return json({ error: "نوع الملف غير مسموح." }, 400, origin);
       }
+      const fp = await fingerprint(req, serviceKey);
+      const { data: allowed, error: limitError } = await service.rpc("layan_guest_take_rate_slot", {
+        p_kind: "upload", p_fingerprint_hash: fp, p_limit: 15, p_window_minutes: 60,
+      });
+      if (limitError || allowed !== true) return json({ error: "تم تجاوز عدد محاولات رفع الملفات. حاول لاحقًا." }, 429, origin);
       const maxSize = 5 * 1024 * 1024;
       const reader = req.body?.getReader();
       if (!reader) return json({ error: "ملف الرفع غير موجود." }, 400, origin);
@@ -158,11 +163,6 @@ Deno.serve(async (req: Request) => {
           ? bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47
           : bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
       if (!validSignature) return json({ error: "محتوى الملف لا يطابق نوعه الحقيقي." }, 400, origin);
-      const fp = await fingerprint(req, serviceKey);
-      const { data: allowed, error: limitError } = await service.rpc("layan_guest_take_rate_slot", {
-        p_kind: "upload", p_fingerprint_hash: fp, p_limit: 15, p_window_minutes: 60,
-      });
-      if (limitError || allowed !== true) return json({ error: "تم تجاوز عدد محاولات رفع الملفات. حاول لاحقًا." }, 429, origin);
       const objectPath = "pending/" + submissionId + "/" + kind + "/" + crypto.randomUUID() + "." + ext;
       const { error: uploadError } = await service.storage.from(BUCKET).upload(objectPath, bytes, {
         contentType: mime, upsert: false,
