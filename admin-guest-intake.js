@@ -76,7 +76,7 @@
     try {
       if(pd) {
         const result=await call("admin-review-property",{id,decision:pd});
-        status(result.status==="approved"?"تم نشر إعلان الزائر بنجاح.":"تم رفض طلب الإعلان.");
+        status(result.status==="approved"?(result.temporary_image_cleanup_pending?"تم نشر الإعلان، لكن بقيت صور مؤقتة تحتاج تنظيفًا آمنًا.":"تم نشر إعلان الزائر بنجاح."):(result.temporary_file_cleanup_pending?"تم رفض الطلب، لكن بقيت ملفات مؤقتة تحتاج تنظيفًا.":"تم رفض طلب الإعلان."));
       } else {
         await call("admin-review-buyer",{id,decision:bd});
         status(bd==="contacted"?"تم تسجيل التواصل مع الباحث.":"تم إغلاق طلب الباحث.");
