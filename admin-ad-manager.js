@@ -1,6 +1,6 @@
 // ASYUT AQAR admin — direct ad creation and editing on behalf of existing customer accounts.
-// All writes still pass through Supabase RLS. The database migration grants these paths
-// only to layan_is_admin(), and blocks owner_id reassignment after a row is created.
+// Database writes remain protected by Supabase RLS and owner_id cannot be reassigned.
+// Image uploads/deletes use the admin-media Edge Function with a verified admin session.
 (() => {
   "use strict";
   let A = null;
