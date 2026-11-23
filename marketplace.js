@@ -125,7 +125,7 @@ function renderServiceProfiles(){
  });
  if(count)count.textContent=rows.length+" ملف";
  if(!rows.length){
-  target.innerHTML='<div class="mk-profile-status">لا توجد ملفات لمقدمي الخدمات منشورة في هذا المجال حتى الآن. تبحث عن شركة تسويق أو مطور عقاري؟ <a href="./companies.html">اذهب إلى دليل الشركات العقارية</a>.</div>';
+  target.innerHTML='<div class="mk-profile-status">لا توجد ملفات لمقدمي الخدمات في هذا المجال حاليًا. تبحث عن شركة تسويق أو مطور عقاري؟ <a href="./companies.html">اذهب إلى دليل الشركات العقارية</a>.</div>';
   return;
  }
  target.innerHTML=rows.map(item=>{
@@ -156,7 +156,7 @@ async function loadServiceProfiles(){
  }catch(error){
   serviceProfiles=[];
   if($("marketplaceServiceProfilesCount"))$("marketplaceServiceProfilesCount").textContent="تعذر التحميل";
-  target.innerHTML='<div class="mk-profile-status">تعذر تحميل الملفات التعريفية المعتمدة. لم نعرض سجلات غير مصنفة بدلًا منها. تظل إعلانات الخدمات المنشورة أدناه متاحة.</div>';
+  target.innerHTML='<div class="mk-profile-status">تعذر تحميل ملفات مقدمي الخدمات حاليًا. يمكنك تصفح إعلانات الخدمات أدناه.</div>';
   console.warn("Service provider profiles unavailable:",error);
  }
 }
