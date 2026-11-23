@@ -241,7 +241,7 @@ Deno.serve(async (req: Request) => {
         if (!uuidPattern.test(String(folder.name || "")) || pendingIds.has(String(folder.name))) continue;
         for (const kind of ["images", "documents"]) {
           const prefix = "pending/" + folder.name + "/" + kind;
-          const files: { name: string; created_at?: string; updated_at?: string }[] = [];
+          const files: { name: string; created_at?: string | null; updated_at?: string | null }[] = [];
           for (let offset = 0; ; offset += 100) {
             const { data: page, error } = await service.storage.from(BUCKET).list(prefix, { limit: 100, offset });
             if (error) break;
