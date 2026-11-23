@@ -335,7 +335,8 @@ BEGIN
   END IF;
   IF to_regprocedure('public.layan_admin_publish_guest_property_submission(uuid,text[])') IS NULL
      OR to_regprocedure('public.layan_admin_list_guest_property_submissions(integer)') IS NULL
-     OR to_regprocedure('public.layan_admin_list_guest_buyer_requests(integer)') IS NULL THEN
+     OR to_regprocedure('public.layan_admin_list_guest_buyer_requests(integer)') IS NULL
+     OR to_regprocedure('public.layan_guest_pending_property_ids()') IS NULL THEN
     RAISE EXCEPTION 'Guest moderation RPCs are incomplete';
   END IF;
 END;
