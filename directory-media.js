@@ -54,19 +54,20 @@
     const root = options?.root;
     const entityId = String(options?.entityId || "");
     const projectId = String(options?.projectId || "");
-    if (!root || !base || !key || !/^[0-9a-f-]{36}$/i.test(entityId)) return;
+    if (!root || !base || !key) return;
+    if (projectId && !/^[0-9a-f-]{36}$/i.test(projectId)) return;
+    if (!projectId && !/^[0-9a-f-]{36}$/i.test(entityId)) return;
     const query = new URLSearchParams({
       select:"id,media_kind,storage_path,caption,sort_order,created_at",
       status:"eq.approved",
-      directory_entity_id:"eq." + entityId,
       order:"sort_order.asc,created_at.asc",
       limit:"60"
     });
     if (projectId) {
-      if (!/^[0-9a-f-]{36}$/i.test(projectId)) return;
       query.set("project_id", "eq." + projectId);
       query.set("media_kind", "eq.project_gallery");
     } else {
+      query.set("directory_entity_id", "eq." + entityId);
       query.set("project_id", "is.null");
       query.set("media_kind", "in.(entity_cover,entity_gallery,service_gallery)");
     }
