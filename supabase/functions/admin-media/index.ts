@@ -47,7 +47,7 @@ async function requireAdmin(req: Request, url: string, publishableKey: string) {
   return data.user;
 }
 
-async function verifyOwner(service: ReturnType<typeof createClient>, ownerId: string) {
+async function verifyOwner(service: { auth: { admin: { getUserById: (id: string) => Promise<{ data: { user: unknown }; error: unknown }> } } }, ownerId: string) {
   if (!uuidPattern.test(ownerId)) throw new Error("معرّف صاحب الإعلان غير صالح.");
   const { data, error } = await service.auth.admin.getUserById(ownerId);
   if (error || !data.user) throw new Error("حساب صاحب الإعلان غير موجود.");
