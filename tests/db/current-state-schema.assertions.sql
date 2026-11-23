@@ -341,6 +341,48 @@ BEGIN
 END;
 $guest_intake_assertions$;
 
+
+DO $guest_intake_behavior$
+DECLARE
+  v_property_id uuid := gen_random_uuid();
+  v_buyer_id uuid := gen_random_uuid();
+  v_allowed boolean;
+  v_count integer;
+BEGIN
+  PERFORM set_config('request.jwt.claims','{"role":"service_role"}',true);
+  v_allowed := public.layan_guest_take_rate_slot('property',repeat('b',64),2,60);
+  IF v_allowed IS DISTINCT FROM true THEN RAISE EXCEPTION 'First guest rate slot should be available'; END IF;
+  v_allowed := public.layan_guest_take_rate_slot('property',repeat('b',64),2,60);
+  IF v_allowed IS DISTINCT FROM true THEN RAISE EXCEPTION 'Second guest rate slot should be available'; END IF;
+  v_allowed := public.layan_guest_take_rate_slot('property',repeat('b',64),2,60);
+  IF v_allowed IS DISTINCT FROM false THEN RAISE EXCEPTION 'Guest rate limit did not reject the third request'; END IF;
+
+  PERFORM public.layan_guest_submit_property(v_property_id,
+    jsonb_build_object(
+      'title','Guest intake SQL fixture','listing_purpose','بيع','property_type','شقة',
+      'city','مدينة أسيوط','area','الهضبة','contact_name','زائر الاختبار',
+      'contact_phone','01012345678','contact_consent',false,'status','available',
+      'owner_id',gen_random_uuid(),'is_featured',true
+    ),'{}'::text[],'{}'::text[],repeat('c',64));
+  SELECT count(*) INTO v_count FROM private.guest_property_submissions
+   WHERE id=v_property_id AND status='pending' AND contact_consent=false
+     AND NOT (payload ? 'status') AND NOT (payload ? 'owner_id') AND NOT (payload ? 'is_featured');
+  IF v_count <> 1 THEN RAISE EXCEPTION 'Guest property submission did not remain private and pending with privileged fields stripped'; END IF;
+
+  PERFORM public.layan_guest_submit_buyer(v_buyer_id,
+    jsonb_build_object('contact_name','باحث اختبار','contact_phone','01012345678',
+      'property_type','شقة','city','مدينة أسيوط','area','','notes','طلب اختبار',
+      'notifications_enabled',true,'owner_id',gen_random_uuid()),repeat('d',64));
+  SELECT count(*) INTO v_count FROM private.guest_buyer_requests
+   WHERE id=v_buyer_id AND status='pending' AND NOT (payload ? 'owner_id')
+     AND NOT (payload ? 'notifications_enabled');
+  IF v_count <> 1 THEN RAISE EXCEPTION 'Guest buyer request was not isolated in the private pending queue'; END IF;
+
+  DELETE FROM private.guest_property_submissions WHERE id=v_property_id;
+  DELETE FROM private.guest_buyer_requests WHERE id=v_buyer_id;
+END;
+$guest_intake_behavior$;
+
 DO $crm_append_only_behavior$
 DECLARE
   v_lead uuid;
