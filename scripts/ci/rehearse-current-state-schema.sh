@@ -21,6 +21,7 @@ trap cleanup EXIT
 
 node --check "$ROOT_DIR/admin-crm.js"
 node --check "$ROOT_DIR/admin-approval.js"
+node --check "$ROOT_DIR/admin-guest-intake.js"
 node --check "$CRM_API_TEST"
 node --check "$APPROVAL_GATE_TEST"
 node --check "$CRM_UI_TEST"
