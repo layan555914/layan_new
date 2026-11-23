@@ -48,7 +48,7 @@
     }, token);
     const signed = result?.signedURL || result?.signedUrl;
     if (!signed) throw new Error("تعذر تجهيز رابط عرض الصورة.");
-    return /^https?:\/\//i.test(signed) ? signed : base + (signed.startsWith("/") ? signed : "/" + signed);
+    return /^https?:\/\//i.test(signed) ? signed : base + (signed.startsWith("/storage/v1/") ? signed : "/storage/v1" + (signed.startsWith("/") ? signed : "/" + signed));
   }
   async function renderGallery(options) {
     const root = options?.root;
