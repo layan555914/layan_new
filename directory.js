@@ -140,7 +140,7 @@ function updateDirectoryMap(){
  }else{
   note.textContent=chosen
    ?("يعرض Google Maps نتائج بحث باسم «"+chosen.name_ar+"» داخل نطاق أسيوط. عرض نتائج الخريطة للمنطقة المختارة.")
-   :"الخريطة تعرض بحثًا عامًا في نطاق أسيوط. لا تُنشأ علامات لمواقع غير موثقة.";
+   :"اختر منطقة لاستكشاف نطاقها على الخريطة.";
  }
 }
 function mapAreaOptions(){
