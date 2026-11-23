@@ -101,6 +101,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loginNote) loginNote.textContent = isGuest
       ? "تقدر ترسل طلب البحث كزائر دون إنشاء حساب. سجّل الدخول فقط لو عايز تحفظ اختياراتك وتفعّل التنبيهات."
       : "طلبك واختيارات التنبيه محفوظة داخل حسابك.";
+    const submitButton = form?.querySelector('button[type="submit"]');
+    if (submitButton) submitButton.textContent = isGuest ? "أرسل طلب البحث كزائر" : "احفظ طلبي وابحث عن المناسب";
   }
   async function requireSession() {
     const service=authService();
