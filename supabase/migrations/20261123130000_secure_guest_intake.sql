@@ -212,6 +212,20 @@ $function$;
 REVOKE ALL ON FUNCTION public.layan_admin_list_guest_buyer_requests(integer) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.layan_admin_list_guest_buyer_requests(integer) TO authenticated;
 
+CREATE OR REPLACE FUNCTION public.layan_guest_pending_property_ids()
+RETURNS uuid[]
+LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path=''
+AS $function$
+BEGIN
+  IF auth.role() IS DISTINCT FROM 'service_role' THEN
+    RAISE EXCEPTION 'Service role required' USING ERRCODE='42501';
+  END IF;
+  RETURN COALESCE((SELECT array_agg(id) FROM private.guest_property_submissions WHERE status='pending'),'{}'::uuid[]);
+END
+$function$;
+REVOKE ALL ON FUNCTION public.layan_guest_pending_property_ids() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.layan_guest_pending_property_ids() TO service_role;
+
 CREATE OR REPLACE FUNCTION public.layan_guest_get_property_submission(p_id uuid)
 RETURNS TABLE(id uuid,payload jsonb,image_paths text[],document_paths text[],contact_name text,contact_phone text,contact_consent boolean,status text,published_offer_id bigint)
 LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path=''
