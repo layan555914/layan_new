@@ -270,10 +270,10 @@ BEGIN
   SELECT string_agg(policyname, ', ' ORDER BY policyname) INTO v_bad
   FROM checked
   WHERE actual_cmd IS DISTINCT FROM cmd
-     OR (cmd IN ('UPDATE','DELETE') AND coalesce(qual,'') !~* 'layan_is_owner\\(\\)')
-     OR (cmd IN ('INSERT','UPDATE') AND coalesce(with_check,'') !~* 'layan_is_owner\\(\\)')
-     OR coalesce(qual,'') ~* 'layan_is_admin\\(\\)'
-     OR coalesce(with_check,'') ~* 'layan_is_admin\\(\\)';
+     OR (cmd IN ('UPDATE','DELETE') AND coalesce(qual,'') !~* 'layan_is_owner\(\)')
+     OR (cmd IN ('INSERT','UPDATE') AND coalesce(with_check,'') !~* 'layan_is_owner\(\)')
+     OR coalesce(qual,'') ~* 'layan_is_admin\(\)'
+     OR coalesce(with_check,'') ~* 'layan_is_admin\(\)';
   IF v_bad IS NOT NULL THEN
     RAISE EXCEPTION 'Owner-only public ad/sponsor write policies are incomplete or unsafe: %', v_bad;
   END IF;
@@ -290,10 +290,10 @@ BEGIN
   SELECT string_agg(policyname, ', ' ORDER BY policyname) INTO v_bad
   FROM checked
   WHERE actual_cmd IS DISTINCT FROM cmd
-     OR (cmd IN ('UPDATE','DELETE') AND coalesce(qual,'') !~* 'layan_is_owner\\(\\)')
-     OR (cmd IN ('INSERT','UPDATE') AND coalesce(with_check,'') !~* 'layan_is_owner\\(\\)')
-     OR coalesce(qual,'') ~* 'layan_is_admin\\(\\)'
-     OR coalesce(with_check,'') ~* 'layan_is_admin\\(\\)';
+     OR (cmd IN ('UPDATE','DELETE') AND coalesce(qual,'') !~* 'layan_is_owner\(\)')
+     OR (cmd IN ('INSERT','UPDATE') AND coalesce(with_check,'') !~* 'layan_is_owner\(\)')
+     OR coalesce(qual,'') ~* 'layan_is_admin\(\)'
+     OR coalesce(with_check,'') ~* 'layan_is_admin\(\)';
   IF v_bad IS NOT NULL THEN
     RAISE EXCEPTION 'Owner-only customer-image Storage policies are incomplete or unsafe: %', v_bad;
   END IF;
