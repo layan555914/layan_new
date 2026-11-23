@@ -32,6 +32,8 @@ assert.ok(edge.includes('requestUrl.searchParams.get("action") === "upload-file"
   "Guest files must be validated and uploaded by the rate-limited Edge Function, not directly by anonymous clients.");
 assert.ok(edge.includes("auth.getUser(token)") && edge.includes('role !== "owner"'),
   "Admin review must verify the caller session and restrict public listing to the owner.");
+assert.ok(edge.includes('userClient.rpc("layan_admin_publish_guest_property_submission"') && edge.includes('userClient.rpc("layan_admin_review_guest_buyer_request"'),
+  "Moderation RPCs must retain the authenticated owner/admin JWT rather than execute as service role.");
 assert.ok(edge.includes("createSignedUrl(path, 300)") && edge.includes("temporary_file_cleanup_pending"),
   "Admin file previews must be signed and temporary-file cleanup failures must be reported.");
 assert.ok(edge.includes('action === "admin-cleanup"') && edge.includes("7 * 24 * 60 * 60 * 1000") && admin.includes('call("admin-cleanup")'),
