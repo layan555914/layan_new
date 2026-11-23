@@ -286,8 +286,11 @@ Deno.serve(async (req: Request) => {
             p_id: id, p_image_urls: publicUrls,
           });
           if (publishError) throw new Error(publishError.message || "تعذر نشر إعلان الزائر.");
-          const { error: cleanupError } = await service.storage.from(BUCKET).remove((submission.image_paths || []) as string[]);
-          return json({ status: "approved", offer_id: offerId, temporary_image_cleanup_pending: Boolean(cleanupError) }, 200, origin);
+          const approvedTempPaths = [...(submission.image_paths || []), ...(submission.document_paths || [])] as string[];
+          const { error: cleanupError } = approvedTempPaths.length
+            ? await service.storage.from(BUCKET).remove(approvedTempPaths)
+            : { error: null };
+          return json({ status: "approved", offer_id: offerId, temporary_file_cleanup_pending: Boolean(cleanupError) }, 200, origin);
         } catch (error) {
           const { data: latestRows } = await service.rpc("layan_guest_get_property_submission", { p_id: id });
           const latest = Array.isArray(latestRows) ? latestRows[0] : null;
