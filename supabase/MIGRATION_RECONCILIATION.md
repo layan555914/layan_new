@@ -137,7 +137,7 @@ The remaining 65 missing historical sources are a repository traceability/reprod
 
 ## Pre-release hardening additions — November 23, 2026
 
-The following forward migrations are present on the isolated pre-release work branch only. They have **not** been applied to production and must not be treated as part of the production migration ledger:
+The following forward migrations are included in the current pre-release review set (some already exist on the repository's main branch). Their presence in Git does **not** mean they have been applied to production; they must not be treated as part of the production migration ledger:
 
 - `20261121120000_admin_crm_private_atomic.sql` — private CRM tables and owner-only CRM operations.
 - `20261122191600_enforce_owner_approval_on_admin_ad_writes.sql` — owner-only gates for the enumerated ad, sponsor, and Storage write policies and review RPCs.
