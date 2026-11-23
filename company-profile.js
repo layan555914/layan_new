@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    const rows=Array.isArray(relations)?relations:[];
    const projectIds=[...new Set(rows.map(row=>row.project_id).filter(Boolean))];
    if(!projectIds.length){
-    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2><p>لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن.</p></section>';
+    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2><p>لا توجد مشروعات مرتبطة بالشركة حاليًا.</p></section>';
    }
    const projectFilter="("+projectIds.join(",")+")";
    const projects=await api("directory_projects?select=id,name_ar,project_type,project_status&public_visible=eq.true&verification_status=eq.published&id=in."+encodeURIComponent(projectFilter)+"&order=name_ar.asc");
