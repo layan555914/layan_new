@@ -283,7 +283,8 @@ BEGIN
   SELECT pg_get_functiondef('public.layan_admin_request_change(text,jsonb)'::regprocedure) INTO v_definition;
   IF v_definition NOT ILIKE '%layan_admin_crm_save_lead%'
      OR v_definition NOT ILIKE '%platform_sponsors%'
-     OR v_definition ILIKE '%^/rest/v1/[a-z_]+' THEN
+     OR v_definition NOT ILIKE '%v_resource NOT IN%'
+     OR v_definition NOT ILIKE '%split_part(v_resource%' THEN
     RAISE EXCEPTION 'Admin change request RPC does not enforce its explicit resource allowlist';
   END IF;
   IF has_function_privilege('anon','public.layan_admin_claim_change(bigint)','EXECUTE')
