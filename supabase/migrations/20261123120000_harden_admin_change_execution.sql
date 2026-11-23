@@ -5,7 +5,8 @@
 
 ALTER TABLE private.layan_admin_requests
   ADD COLUMN IF NOT EXISTS execution_token uuid,
-  ADD COLUMN IF NOT EXISTS execution_started_at timestamptz;
+  ADD COLUMN IF NOT EXISTS execution_started_at timestamptz,
+  ADD COLUMN IF NOT EXISTS execution_started_by uuid REFERENCES auth.users(id) ON DELETE SET NULL;
 
 ALTER TABLE private.layan_admin_requests
   DROP CONSTRAINT IF EXISTS layan_admin_requests_status_check;
@@ -89,7 +90,7 @@ BEGIN
      SET status = 'executing',
          execution_token = v_token,
          execution_started_at = now(),
-         decided_by = auth.uid(),
+         execution_started_by = auth.uid(),
          note = NULL
    WHERE id = p_id AND action = 'change' AND status = 'pending'
   RETURNING payload INTO v_payload;
