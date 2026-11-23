@@ -18,9 +18,13 @@
   // RPCs that only read, or already have their own owner-approval flow, or are owner-only on the server.
   const PASS_RPC = /^(layan_is_admin|layan_admin_whoami|layan_admin_list_[a-z_]+|layan_admin_activity(_summary)?|layan_admin_pending_[a-z_]+|layan_track_event|layan_admin_request_change|layan_admin_finish_change|layan_admin_decide_request|company_claim_admin_list|company_entity_profile_update_admin_list|layan_admin_delete_[a-z_]+|layan_admin_set_user_suspended|layan_admin_set_admin|layan_list_[a-z_]+|layan_get_[a-z_]+|directory_admin_list[a-z_]*)$/;
   const TABLES = {
-    platform_sponsors: "الرعاة الرسميين", supplier_ads: "الإعلانات الممولة", property_offers: "إعلانات العقارات",
-    marketplace_listings: "خدمات السوق", company_profiles: "ملفات الشركات", company_property_ads: "إعلانات الشركات", company_entity_profile_update_requests: "تعديلات ملفات الجهات",
-    partner_ad_slots: "مساحات الإعلانات", directory_sources: "مصادر الدليل العقاري", directory_change_log: "سجل الدليل العقاري"
+    supplier_ads: "الإعلانات الممولة", property_offers: "إعلانات العقارات",
+    marketplace_listings: "خدمات السوق", company_property_ads: "إعلانات الشركات",
+    partner_ad_slots: "مساحات الإعلانات", directory_sources: "مصادر الدليل العقاري",
+    directory_change_log: "سجل الدليل العقاري", directory_entities: "جهات الدليل العقاري",
+    directory_projects: "مشروعات الدليل العقاري", directory_areas: "مناطق الدليل العقاري",
+    directory_opportunities: "الفرص والطرحات", directory_entity_sources: "مصادر الجهات",
+    directory_project_sources: "مصادر المشروعات", directory_opportunity_sources: "مصادر الفرص"
   };
   const RPCS = {
     layan_admin_review_property_offer: "مراجعة إعلان عقار", layan_activate_supplier_ad: "تفعيل إعلان ممول",
