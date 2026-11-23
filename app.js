@@ -1554,6 +1554,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   [calcContract, calcPaid, calcFees].forEach((input) => input?.addEventListener("input", updateCalculator));
   updateCalculator();
 
+  let pendingGuestSubmissionId = null;
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
@@ -1717,7 +1718,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!api.submitGuestProperty) throw new Error("خدمة استقبال إعلانات الزوار غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
         if (!offer.contact_name || !offer.contact_phone) throw new Error("لإرسال إعلان دون حساب، اكتب اسم صاحب العرض ورقم تواصل صحيحًا.");
         setStatus("جارٍ رفع الصور والمستندات إلى مساحة خاصة...");
-        await api.submitGuestProperty(offer, files, documentFiles, value("website"));
+        if (!pendingGuestSubmissionId) pendingGuestSubmissionId = crypto.randomUUID();
+        await api.submitGuestProperty(offer, files, documentFiles, value("website"), pendingGuestSubmissionId);
+        pendingGuestSubmissionId = null;
         guestSubmission = true;
       } else {
         if (files.length) {
