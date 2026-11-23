@@ -124,6 +124,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   const formStatusBox = $("formStatusMessage");
   const photosInput = $("photosInput");
   const documentsInput = $("documentsInput");
+
+  // Guest intake is protected by a 5 MiB server-side upload cap. Keep the
+  // authenticated listing flow unchanged, but compress guest JPEGs below that cap.
+  async function compressGuestImage(file) {
+    const maxBytes = Math.floor(4.5 * 1024 * 1024);
+    if (file.size <= maxBytes) return file;
+    if (typeof createImageBitmap !== "function" || typeof document === "undefined") {
+      throw new Error("تعذر ضغط الصورة على هذا الجهاز. جرّب صورة أصغر من 5 ميجابايت.");
+    }
+    let bitmap;
+    try {
+      bitmap = await createImageBitmap(file);
+      let scale = Math.min(1, 2000 / Math.max(bitmap.width, bitmap.height));
+      for (let attempt = 0; attempt < 6; attempt += 1) {
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+        const context = canvas.getContext("2d");
+        if (!context) throw new Error("تعذر تجهيز الصورة للضغط.");
+        context.fillStyle = "#fff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        for (const quality of [0.84, 0.76, 0.68, 0.60]) {
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", quality));
+          if (blob && blob.size <= maxBytes) {
+            const baseName = String(file.name || "property-photo").replace(/\.[^.]+$/, "");
+            return new File([blob], baseName + ".jpg", { type: "image/jpeg" });
+          }
+        }
+        scale *= 0.82;
+      }
+      throw new Error("تعذر ضغط الصورة إلى أقل من 5 ميجابايت. اختر صورة أصغر.");
+    } finally {
+      bitmap?.close?.();
+    }
+  }
   // Live financial cross-check helps catch amount-entry mistakes before submission.
   const financeNote = document.createElement("p");
   financeNote.className = "layan-finance-check";
@@ -1717,9 +1753,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (selectedAccountType === "company") throw new Error("إعلانات الشركات تتطلب تسجيل الدخول بالبريد الإلكتروني وكود التحقق. يمكنك إرسال إعلان فردي كزائر.");
         if (!api.submitGuestProperty) throw new Error("خدمة استقبال إعلانات الزوار غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
         if (!offer.contact_name || !offer.contact_phone) throw new Error("لإرسال إعلان دون حساب، اكتب اسم صاحب العرض ورقم تواصل صحيحًا.");
+        setStatus("جارٍ ضغط الصور وتجهيز الملفات للرفع الآمن...");
+        const guestImages = await Promise.all(files.map(compressGuestImage));
+        const guestDocumentMaxBytes = 5 * 1024 * 1024;
+        if (documentFiles.some(file => file.size > guestDocumentMaxBytes)) {
+          throw new Error("حجم كل مستند عند الإرسال كزائر يجب ألا يتجاوز 5 ميجابايت. احذف المستند الكبير أو قلّل حجمه.");
+        }
         setStatus("جارٍ رفع الصور والمستندات إلى مساحة خاصة...");
         if (!pendingGuestSubmissionId) pendingGuestSubmissionId = crypto.randomUUID();
-        await api.submitGuestProperty(offer, files, documentFiles, value("website"), pendingGuestSubmissionId);
+        await api.submitGuestProperty(offer, guestImages, documentFiles, value("website"), pendingGuestSubmissionId);
         pendingGuestSubmissionId = null;
         guestSubmission = true;
       } else {
