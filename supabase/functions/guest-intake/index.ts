@@ -201,7 +201,11 @@ Deno.serve(async (req: Request) => {
       }
       const { data: rows, error: getError } = await service.rpc("layan_guest_get_property_submission", { p_id: id });
       const submission = Array.isArray(rows) ? rows[0] : null;
-      if (getError || !submission || submission.status !== "pending") return json({ error: "الطلب غير موجود أو تمت مراجعته بالفعل." }, 404, origin);
+      if (getError || !submission) return json({ error: "الطلب غير موجود." }, 404, origin);
+      if (submission.status === "approved" && submission.published_offer_id) {
+        return json({ status: "approved", offer_id: submission.published_offer_id, already_processed: true }, 200, origin);
+      }
+      if (submission.status !== "pending") return json({ error: "الطلب تمت مراجعته بالفعل." }, 409, origin);
       if (input.decision === "reject") {
         const { error } = await userClient.rpc("layan_admin_reject_guest_property_submission", { p_id: id, p_note: cleanString(input.note, 300) || null });
         if (error) return json({ error: error.message }, 400, origin);
@@ -227,16 +231,22 @@ Deno.serve(async (req: Request) => {
           });
           if (publishError) throw new Error(publishError.message || "تعذر نشر إعلان الزائر.");
           const { error: cleanupError } = await service.storage.from(BUCKET).remove((submission.image_paths || []) as string[]);
-          if (cleanupError) throw new Error("تم النشر لكن تعذر تنظيف الصور المؤقتة؛ راجع سجل التنظيف.");
-          return json({ status: "approved", offer_id: offerId }, 200, origin);
+          return json({ status: "approved", offer_id: offerId, temporary_image_cleanup_pending: Boolean(cleanupError) }, 200, origin);
         } catch (error) {
+          const { data: latestRows } = await service.rpc("layan_guest_get_property_submission", { p_id: id });
+          const latest = Array.isArray(latestRows) ? latestRows[0] : null;
+          if (latest?.status === "approved" && latest?.published_offer_id) {
+            return json({ status: "approved", offer_id: latest.published_offer_id, recovered_after_connection_error: true }, 200, origin);
+          }
           if (publicPaths.length) await service.storage.from(PUBLIC_BUCKET).remove(publicPaths);
           return json({ error: String(error instanceof Error ? error.message : error) }, 400, origin);
         }
       }
       const paths = [...(submission.image_paths || []), ...(submission.document_paths || [])] as string[];
-      if (paths.length) await service.storage.from(BUCKET).remove(paths);
-      return json({ status: "rejected" }, 200, origin);
+      const { error: cleanupError } = paths.length
+        ? await service.storage.from(BUCKET).remove(paths)
+        : { error: null };
+      return json({ status: "rejected", temporary_file_cleanup_pending: Boolean(cleanupError) }, 200, origin);
     }
 
     if (action === "admin-review-buyer") {
