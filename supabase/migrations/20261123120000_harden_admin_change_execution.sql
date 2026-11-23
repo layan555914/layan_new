@@ -38,18 +38,28 @@ BEGIN
 
   v_resource := split_part(split_part(v_path, '/rest/v1/', 2), '?', 1);
   v_query := CASE WHEN position('?' IN v_path) > 0 THEN split_part(v_path, '?', 2) ELSE '' END;
-  IF v_resource NOT IN (
-    'platform_sponsors','supplier_ads','property_offers','marketplace_listings',
-    'company_profiles','company_property_ads','company_entity_profile_update_requests',
-    'partner_ad_slots','directory_sources','directory_change_log'
-  ) THEN
-    RAISE EXCEPTION 'المورد المطلوب غير مسموح بمراجعته' USING ERRCODE = '22023';
-  END IF;
-  IF v_method IN ('PATCH','DELETE') AND (v_query = '' OR v_query !~ '(^|&)id=eq\.[0-9a-fA-F-]+(&|$)') THEN
-    RAISE EXCEPTION 'تعديل أو حذف السجل يتطلب معرّفًا محددًا' USING ERRCODE = '22023';
-  END IF;
-  IF v_method = 'POST' AND v_query <> '' AND v_query !~ '^on_conflict=[a-z_,]+$' THEN
-    RAISE EXCEPTION 'خيارات الإضافة غير مسموح بها' USING ERRCODE = '22023';
+  IF v_resource LIKE 'rpc/%' THEN
+    IF v_method <> 'POST' OR v_query <> ''
+       OR split_part(v_resource, '/', 2) NOT IN (
+         'layan_admin_crm_save_lead','layan_admin_crm_log_activity',
+         'layan_admin_crm_restore_lead','layan_admin_crm_archive_lead'
+       ) THEN
+      RAISE EXCEPTION 'إجراء الإدارة المطلوب غير مسموح بمراجعته' USING ERRCODE = '22023';
+    END IF;
+  ELSE
+    IF v_resource NOT IN (
+      'platform_sponsors','supplier_ads','property_offers','marketplace_listings',
+      'company_profiles','company_property_ads','company_entity_profile_update_requests',
+      'partner_ad_slots','directory_sources','directory_change_log'
+    ) THEN
+      RAISE EXCEPTION 'المورد المطلوب غير مسموح بمراجعته' USING ERRCODE = '22023';
+    END IF;
+    IF v_method IN ('PATCH','DELETE') AND (v_query = '' OR v_query !~ '(^|&)id=eq\.[0-9a-fA-F-]+(&|$)') THEN
+      RAISE EXCEPTION 'تعديل أو حذف السجل يتطلب معرّفًا محددًا' USING ERRCODE = '22023';
+    END IF;
+    IF v_method = 'POST' AND v_query <> '' AND v_query !~ '^on_conflict=[a-z_,]+$' THEN
+      RAISE EXCEPTION 'خيارات الإضافة غير مسموح بها' USING ERRCODE = '22023';
+    END IF;
   END IF;
 
   INSERT INTO private.layan_admin_requests (action, target, target_label, requested_by, payload)
