@@ -25,10 +25,10 @@ node --check "$ROOT_DIR/admin-guest-intake.js"
 node --check "$ROOT_DIR/tests/ui/guest-intake-contracts.mjs"
 
 if ! grep -Fq 'id="adminGuestIntake"' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-guest-intake.js?v=20261123-1' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-guest-intake.js?v=20261123-1' "$ROOT_DIR/sw.js" \
-  || ! grep -Fq './admin-guest-intake.css?v=20261123-1' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-guest-intake.css?v=20261123-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-guest-intake.js?v=20261123-2' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-guest-intake.js?v=20261123-2' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-guest-intake.css?v=20261123-2' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-guest-intake.css?v=20261123-2' "$ROOT_DIR/sw.js" \
   || ! grep -Fq '[functions.guest-intake]' "$CONFIG_FILE"; then
   echo "The guest-intake admin workspace, PWA assets, or Edge Function config is incomplete." >&2
   exit 1
