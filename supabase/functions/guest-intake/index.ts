@@ -189,7 +189,7 @@ Deno.serve(async (req: Request) => {
         const { data: files, error } = await service.storage.from(BUCKET).list("pending/" + id + "/" + kind, { limit: 20 });
         if (error) return json({ error: "تعذر التحقق من الملفات المرفوعة." }, 500, origin);
         const found = new Set((files || []).map((file: { name: string }) => "pending/" + id + "/" + kind + "/" + file.name));
-        if (paths.some(path => !found.has(path))) return json({ error: "لم يكتمل رفع إحدى الصور أو المستندات." }, 400, origin);
+        if (paths.some((path: string) => !found.has(path))) return json({ error: "لم يكتمل رفع إحدى الصور أو المستندات." }, 400, origin);
       }
       const { data: allowed, error: limitError } = await service.rpc("layan_guest_take_rate_slot", {
         p_kind: "property", p_fingerprint_hash: fp, p_limit: 3, p_window_minutes: 60,
