@@ -73,10 +73,10 @@ BEGIN
     SELECT 1 FROM expected e LEFT JOIN pg_policies p
       ON p.schemaname='public' AND p.policyname=e.policyname
     WHERE p.policyname IS NULL OR p.cmd IS DISTINCT FROM e.cmd
-       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(p.qual,'') !~* 'layan_is_owner\\(\\)')
-       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(p.with_check,'') !~* 'layan_is_owner\\(\\)')
-       OR coalesce(p.qual,'') ~* 'layan_is_admin\\(\\)'
-       OR coalesce(p.with_check,'') ~* 'layan_is_admin\\(\\)'
+       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(p.qual,'') !~* 'layan_is_owner\(\)')
+       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(p.with_check,'') !~* 'layan_is_owner\(\)')
+       OR coalesce(p.qual,'') ~* 'layan_is_admin\(\)'
+       OR coalesce(p.with_check,'') ~* 'layan_is_admin\(\)'
   ) THEN
     RAISE EXCEPTION 'One or more of the 13 public ad/sponsor policies did not become owner-only';
   END IF;
@@ -90,10 +90,10 @@ BEGIN
     SELECT 1 FROM expected e LEFT JOIN pg_policies p
       ON p.schemaname='storage' AND p.tablename='objects' AND p.policyname=e.policyname
     WHERE p.policyname IS NULL OR p.cmd IS DISTINCT FROM e.cmd
-       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(p.qual,'') !~* 'layan_is_owner\\(\\)')
-       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(p.with_check,'') !~* 'layan_is_owner\\(\\)')
-       OR coalesce(p.qual,'') ~* 'layan_is_admin\\(\\)'
-       OR coalesce(p.with_check,'') ~* 'layan_is_admin\\(\\)'
+       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(p.qual,'') !~* 'layan_is_owner\(\)')
+       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(p.with_check,'') !~* 'layan_is_owner\(\)')
+       OR coalesce(p.qual,'') ~* 'layan_is_admin\(\)'
+       OR coalesce(p.with_check,'') ~* 'layan_is_admin\(\)'
   ) THEN
     RAISE EXCEPTION 'One or more of the 3 customer-image Storage policies did not become owner-only';
   END IF;
