@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
-const migration = fs.readFileSync("supabase/migrations/20261123170000_secure_directory_media.sql", "utf8");
+const migration = fs.readFileSync("supabase/migrations/20261123212148_secure_directory_media.sql", "utf8");
 const media = fs.readFileSync("directory-media.js", "utf8");
 const admin = fs.readFileSync("directory-media-admin.js", "utf8");
 const company = fs.readFileSync("company-profile.js", "utf8");
