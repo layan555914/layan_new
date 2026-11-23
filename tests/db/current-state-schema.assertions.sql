@@ -16,8 +16,8 @@ DECLARE
   v_has_lock boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 54 THEN
-    RAISE EXCEPTION 'Expected 54 clean-install migrations after adding the reviewed private CRM migration; found %', v_count;
+  IF v_count <> 55 THEN
+    RAISE EXCEPTION 'Expected 55 clean-install migrations after adding the owner-approval execution hardening migration; found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
@@ -244,6 +244,54 @@ END;
 $current_state_assertions$;
 
 
+
+
+DO $admin_change_execution_assertions$
+DECLARE
+  v_definition text;
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid='private.layan_admin_requests'::regclass
+      AND conname='layan_admin_requests_status_check'
+      AND pg_get_constraintdef(oid) ILIKE '%executing%'
+  ) THEN
+    RAISE EXCEPTION 'Admin request status constraint does not support the reserved executing state';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='private' AND table_name='layan_admin_requests'
+      AND column_name='execution_token' AND data_type='uuid'
+  ) OR NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='private' AND table_name='layan_admin_requests'
+      AND column_name='execution_started_at' AND data_type='timestamp with time zone'
+  ) THEN
+    RAISE EXCEPTION 'Admin request execution reservation columns are missing';
+  END IF;
+  IF to_regprocedure('public.layan_admin_claim_change(bigint)') IS NULL
+     OR to_regprocedure('public.layan_admin_finish_change(bigint,uuid,boolean,text)') IS NULL
+     OR to_regprocedure('public.layan_admin_finish_change(bigint,boolean,text)') IS NOT NULL THEN
+    RAISE EXCEPTION 'Owner claim/finish RPC signatures do not enforce the execution token contract';
+  END IF;
+  SELECT pg_get_functiondef('public.layan_admin_claim_change(bigint)'::regprocedure) INTO v_definition;
+  IF v_definition NOT ILIKE '%status = ''pending''%'
+     OR v_definition NOT ILIKE '%status = ''executing''%'
+     OR v_definition NOT ILIKE '%layan_is_owner%' THEN
+    RAISE EXCEPTION 'Admin change claim RPC does not atomically reserve pending requests for the owner';
+  END IF;
+  SELECT pg_get_functiondef('public.layan_admin_request_change(text,jsonb)'::regprocedure) INTO v_definition;
+  IF v_definition NOT ILIKE '%layan_admin_crm_save_lead%'
+     OR v_definition NOT ILIKE '%platform_sponsors%'
+     OR v_definition ILIKE '%^/rest/v1/[a-z_]+' THEN
+    RAISE EXCEPTION 'Admin change request RPC does not enforce its explicit resource allowlist';
+  END IF;
+  IF has_function_privilege('anon','public.layan_admin_claim_change(bigint)','EXECUTE')
+     OR has_function_privilege('anon','public.layan_admin_finish_change(bigint,uuid,boolean,text)','EXECUTE') THEN
+    RAISE EXCEPTION 'Anonymous users must not execute owner approval claim/finish RPCs';
+  END IF;
+END;
+$admin_change_execution_assertions$;
 
 DO $crm_append_only_behavior$
 DECLARE
