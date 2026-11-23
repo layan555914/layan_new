@@ -144,6 +144,22 @@ Deno.serve(async (req: Request) => {
       return json({ path, signedUrl: data.signedUrl, token: data.token }, 200, origin);
     }
 
+    if (action === "cleanup-upload") {
+      if (!uuidPattern.test(id)) return json({ error: "رقم الطلب غير صالح." }, 400, origin);
+      const imagePaths = Array.isArray(input.image_paths) ? input.image_paths.map(String) : [];
+      const documentPaths = Array.isArray(input.document_paths) ? input.document_paths.map(String) : [];
+      if (imagePaths.some((p: string) => !allowedPath(p, id, "images"))
+          || documentPaths.some((p: string) => !allowedPath(p, id, "documents"))) {
+        return json({ error: "مسارات الملفات غير صالحة." }, 400, origin);
+      }
+      const paths = [...imagePaths, ...documentPaths];
+      if (paths.length) {
+        const { error } = await service.storage.from(BUCKET).remove(paths);
+        if (error) return json({ error: "تعذر تنظيف الملفات المؤقتة." }, 500, origin);
+      }
+      return json({ cleaned: paths.length }, 200, origin);
+    }
+
     if (action === "submit-property") {
       if (!uuidPattern.test(id) || cleanString(input.honeypot, 200) !== "" || !input.payload || typeof input.payload !== "object" || Array.isArray(input.payload) || !validPropertyPayload(input.payload)) {
         return json({ error: "راجع بيانات العقار وبيانات التواصل قبل الإرسال." }, 400, origin);
