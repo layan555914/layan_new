@@ -42,8 +42,10 @@ async function requireAdmin(req: Request, url: string, publishableKey: string) {
   const token = authorization.slice(7);
   const { data, error } = await userClient.auth.getUser(token);
   if (error || !data.user) throw new Error("جلسة الإدارة غير صالحة.");
-  const { data: isAdmin, error: roleError } = await userClient.rpc("layan_is_admin");
-  if (roleError || isAdmin !== true) throw new Error("هذا الحساب غير مخوّل لإدارة صور الإعلانات.");
+  const { data: isAdmin, error: adminError } = await userClient.rpc("layan_is_admin");
+  if (adminError || isAdmin !== true) throw new Error("هذا الحساب غير مخوّل لإدارة صور الإعلانات.");
+  const { data: role, error: roleError } = await userClient.rpc("layan_admin_whoami");
+  if (roleError || role !== "owner") throw new Error("رفع صور إعلانات العملاء أو حذفها متاح لمالك المنصة فقط إلى أن يكتمل مسار موافقة المالك.");
   return data.user;
 }
 
