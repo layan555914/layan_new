@@ -252,7 +252,7 @@ BEGIN
     description,price_on_request,total_price,down_payment,paid_amount,remaining_amount,remaining_installments,
     assignment_fee,assignment_fee_percentage,discount_amount,discount_percent,developer_name,project_name,
     document_urls,image_urls,contact_name,contact_phone,featured_requested,is_featured,promotion_status,
-    status,verification_status
+    status,verification_status,verified_at,verification_notes
   ) VALUES (
     s.payload->>'title',s.payload->>'listing_purpose',s.payload->>'land_ownership_authority',
     s.payload->>'land_permit_details',s.payload->>'land_utilities',s.payload->>'land_zoning',
@@ -272,7 +272,7 @@ BEGIN
     s.contact_name,CASE WHEN s.contact_consent THEN s.contact_phone ELSE NULL END,
     COALESCE((s.payload->>'featured_requested')::boolean,false),false,
     CASE WHEN COALESCE((s.payload->>'featured_requested')::boolean,false) THEN 'requested' ELSE 'none' END,
-    'available','pending'
+    'available','verified',now(),null
   ) RETURNING id INTO v_offer_id;
   UPDATE private.guest_property_submissions
      SET status='approved',reviewed_at=now(),reviewed_by=auth.uid(),published_offer_id=v_offer_id
