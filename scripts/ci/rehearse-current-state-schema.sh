@@ -46,8 +46,8 @@ if ! grep -Fq 'id="adminCrm"' "$ROOT_DIR/admin.html" \
   || ! grep -Fq './admin-crm.js?v=20261121-1' "$ROOT_DIR/sw.js" \
   || ! grep -Fq './admin-crm.css?v=20261121-1' "$ROOT_DIR/admin.html" \
   || ! grep -Fq './admin-crm.css?v=20261121-1' "$ROOT_DIR/sw.js" \
-  || ! grep -Fq './admin-approval.js?v=20261121-crm-fail-closed-1' "$ROOT_DIR/admin.html" \
-  || ! grep -Fq './admin-approval.js?v=20261121-crm-fail-closed-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-approval.js?v=20261123-owner-approval-allowlist-2' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-approval.js?v=20261123-owner-approval-allowlist-2' "$ROOT_DIR/sw.js" \
   || ! grep -Fq './admin-layout.js?v=20261121-crm-view-1' "$ROOT_DIR/admin.html" \
   || ! grep -Fq './admin-layout.js?v=20261121-crm-view-1' "$ROOT_DIR/sw.js"; then
   echo "The CRM admin workspace is not fully wired into the admin page and PWA shell." >&2
