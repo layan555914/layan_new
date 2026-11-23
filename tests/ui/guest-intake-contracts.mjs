@@ -28,8 +28,11 @@ assert.ok(migration.includes("GRANT EXECUTE ON FUNCTION public.layan_guest_submi
   "Only the trusted service role may submit guest requests.");
 assert.ok(edge.includes('requestUrl.searchParams.get("action") === "upload-file"') &&
   edge.includes('service.storage.from(BUCKET).upload') &&
-  edge.includes('p_kind: "upload"'),
-  "Guest files must be validated and uploaded by the rate-limited Edge Function, not directly by anonymous clients.");
+  edge.includes('p_kind: "upload"') &&
+  edge.includes("req.body?.getReader()") &&
+  edge.includes("totalBytes > maxSize") &&
+  edge.includes("reader.cancel()"),
+  "Guest files must be validated, streamed with a hard byte cap before buffering, and uploaded by the rate-limited Edge Function.");
 assert.ok(edge.includes("auth.getUser(token)") && edge.includes('role !== "owner"'),
   "Admin review must verify the caller session and restrict public listing to the owner.");
 assert.ok(edge.includes('userClient.rpc("layan_admin_publish_guest_property_submission"') && edge.includes('userClient.rpc("layan_admin_review_guest_buyer_request"'),
