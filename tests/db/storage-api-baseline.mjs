@@ -19,7 +19,7 @@ if (!apiUrl || !anonKey || !serviceRoleKey || !databaseUrl) {
 }
 
 function isLoopbackHost(hostname) {
-  return ['127.0.0.1', 'localhost', '::1'].includes(String(hostname).replace(/^\\[|\\]$/g, '').toLowerCase());
+  return ['127.0.0.1', 'localhost', '::1'].includes(String(hostname).replace(/^\[|\]$/g, '').toLowerCase());
 }
 function requireLocalUrl(value, label, protocols) {
   const parsed = new URL(value);
