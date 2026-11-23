@@ -127,10 +127,30 @@ Deno.serve(async (req: Request) => {
       if (!ext || (isImage && mime !== "image/jpeg") || (!isImage && !["application/pdf","image/jpeg","image/png"].includes(mime))) {
         return json({ error: "نوع الملف غير مسموح." }, 400, origin);
       }
-      const bytes = new Uint8Array(await req.arrayBuffer());
       const maxSize = 5 * 1024 * 1024;
-      if (bytes.length < (isImage ? 4 : 8) || bytes.length > maxSize) {
+      const reader = req.body?.getReader();
+      if (!reader) return json({ error: "ملف الرفع غير موجود." }, 400, origin);
+      const chunks: Uint8Array[] = [];
+      let totalBytes = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        totalBytes += value.byteLength;
+        if (totalBytes > maxSize) {
+          await reader.cancel();
+          return json({ error: "حجم الملف يجب ألا يتجاوز 5 ميجابايت." }, 413, origin);
+        }
+        chunks.push(value);
+      }
+      reader.releaseLock();
+      if (totalBytes < (isImage ? 4 : 8)) {
         return json({ error: "حجم الملف يجب ألا يتجاوز 5 ميجابايت." }, 413, origin);
+      }
+      const bytes = new Uint8Array(totalBytes);
+      let offset = 0;
+      for (const chunk of chunks) {
+        bytes.set(chunk, offset);
+        offset += chunk.byteLength;
       }
       const validSignature = mime === "image/jpeg"
         ? bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
