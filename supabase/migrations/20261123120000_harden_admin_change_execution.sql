@@ -50,6 +50,7 @@ BEGIN
 
   v_resource := split_part(split_part(v_path, '/rest/v1/', 2), '?', 1);
   v_query := CASE WHEN position('?' IN v_path) > 0 THEN split_part(v_path, '?', 2) ELSE '' END;
+  v_body := CASE WHEN p_payload->'body' = 'null'::jsonb THEN '{}'::jsonb ELSE COALESCE(p_payload->'body','{}'::jsonb) END;
   IF v_resource LIKE 'rpc/%' THEN
     IF v_method <> 'POST' OR v_query <> ''
        OR split_part(v_resource, '/', 2) NOT IN (
@@ -141,9 +142,9 @@ BEGIN
       WHEN 'directory_opportunity_sources' THEN ARRAY['opportunity_id','source_id','claim_key']
       ELSE NULL
     END;
-    v_body := COALESCE(p_payload->'body','{}'::jsonb);
+    IF v_method='DELETE' THEN v_body := '{}'::jsonb; END IF;
     IF jsonb_typeof(v_body) <> 'object'
-       OR EXISTS (SELECT 1 FROM jsonb_object_keys(v_body) AS k WHERE NOT (k = ANY(v_allowed_fields))) THEN
+       OR EXISTS (SELECT 1 FROM jsonb_object_keys(v_body) AS keys(field_name) WHERE NOT (field_name = ANY(v_allowed_fields))) THEN
       RAISE EXCEPTION 'حقول التعديل تتجاوز قائمة الحقول المسموح بها لهذا المورد' USING ERRCODE = '22023';
     END IF;
     IF v_method='PATCH' AND v_body ? 'owner_id' THEN
@@ -168,16 +169,16 @@ BEGIN
       RAISE EXCEPTION 'إعلان السوق الجديد لا يمكن تمييزه قبل المراجعة' USING ERRCODE = '22023';
     END IF;
     IF v_method='PATCH' AND v_resource='marketplace_listings' AND v_body ? 'status' THEN
-      IF v_body->>'status' NOT IN ('approved','rejected') THEN
+      IF COALESCE(v_body->>'status','') NOT IN ('approved','rejected') THEN
         RAISE EXCEPTION 'حالة مراجعة إعلان السوق غير صالحة' USING ERRCODE = '22023';
       END IF;
       v_body := jsonb_set(jsonb_set(v_body,'{reviewed_by}',to_jsonb(auth.uid()),true),'{reviewed_at}',to_jsonb(now()),true);
     END IF;
     IF v_method='PATCH' AND v_resource='company_property_ads' AND v_body ? 'status'
-       AND v_body->>'status' NOT IN ('active','rejected') THEN
+       AND COALESCE(v_body->>'status','') NOT IN ('active','rejected') THEN
       RAISE EXCEPTION 'حالة إعلان الشركة غير صالحة' USING ERRCODE = '22023';
     END IF;
-    IF v_method='PATCH' AND v_resource='partner_ad_slots' AND v_body->>'status' NOT IN ('active','paused') THEN
+    IF v_method='PATCH' AND v_resource='partner_ad_slots' AND COALESCE(v_body->>'status','') NOT IN ('active','paused') THEN
       RAISE EXCEPTION 'حالة المساحة الإعلانية غير صالحة' USING ERRCODE = '22023';
     END IF;
     IF v_resource='directory_change_log' AND v_method='POST' THEN
