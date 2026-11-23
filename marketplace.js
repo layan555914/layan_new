@@ -202,7 +202,7 @@ function renderListings(){
  $("marketplaceCount").textContent=rows.length+(rows.length===1?" مقدم خدمة":" مقدمي خدمات");
  const pager=$("marketplacePagination");
  if(pager){pager.hidden=rows.length<=MARKETPLACE_PER_PAGE;pager.innerHTML=pager.hidden?"":'<button type="button" data-market-page="prev" '+(marketplacePage===1?"disabled":"")+'>السابق</button><span>صفحة '+marketplacePage+' من '+pages+'</span><button type="button" data-market-page="next" '+(marketplacePage===pages?"disabled":"")+'>التالي</button>';}
- if(!rows.length){listingGrid.innerHTML='<div class="mk-empty"><h3>لا توجد خدمات معتمدة بهذه الاختيارات حاليًا</h3><p>غيّر القسم أو المدينة، أو أضف خدمتك مجانًا لتظهر هنا بعد مراجعة الإدارة.</p></div>';return;}
+ if(!rows.length){listingGrid.innerHTML='<div class="mk-empty"><h3>لا توجد خدمات بهذه الاختيارات حاليًا</h3><p>غيّر القسم أو المدينة، أو أضف خدمتك مجانًا لتظهر هنا.</p></div>';return;}
  listingGrid.innerHTML=pageRows.map(item=>{
   const image=Array.isArray(item.image_urls)?item.image_urls.find(v=>typeof v==="string"&&(v.startsWith("data:image/")||v.startsWith("https://"))):"";
   const phone=egPhone(item.contact_phone);
