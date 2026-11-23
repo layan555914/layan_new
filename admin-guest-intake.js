@@ -81,7 +81,7 @@
         await call("admin-review-buyer",{id,decision:bd});
         status(bd==="contacted"?"تم تسجيل التواصل مع الباحث.":"تم إغلاق طلب الباحث.");
       }
-      loaded=false; await load(true);
+      loaded=false; busy=false; await load(true);
     } catch(error) { status(error.message||"تعذر تنفيذ قرار المراجعة."); button.disabled=false; }
     finally { busy=false; }
   });
