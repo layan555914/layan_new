@@ -838,33 +838,43 @@
     } catch (error) { console.warn("تعذر تنظيف ملفات طلب الزائر:", error); }
   }
 
-  async function submitGuestProperty(offer, imageFiles, documentFiles, honeypot = "") {
-    const submissionId = crypto.randomUUID();
-    let imagePaths = [], documentPaths = [];
-    try {
-      imagePaths = await uploadGuestFiles(submissionId, imageFiles, "images", honeypot);
-      documentPaths = await uploadGuestFiles(submissionId, documentFiles, "documents", honeypot);
-    } catch (error) {
-      await cleanupGuestUploads(submissionId, imagePaths, documentPaths);
-      throw error;
+  const guestUploadCache = new Map();
+
+  async function submitGuestProperty(offer, imageFiles, documentFiles, honeypot = "", submissionId = crypto.randomUUID()) {
+    let cached = guestUploadCache.get(submissionId);
+    if (!cached) {
+      let imagePaths = [], documentPaths = [];
+      try {
+        imagePaths = await uploadGuestFiles(submissionId, imageFiles, "images", honeypot);
+        documentPaths = await uploadGuestFiles(submissionId, documentFiles, "documents", honeypot);
+      } catch (error) {
+        await cleanupGuestUploads(submissionId, imagePaths, documentPaths);
+        throw error;
+      }
+      cached = { imagePaths, documentPaths };
+      guestUploadCache.set(submissionId, cached);
     }
     try {
-      return await guestIntakeRequest({
+      const result = await guestIntakeRequest({
         action: "submit-property", submission_id: submissionId,
         payload: { ...offer, contact_consent: offer.contact_consent === true },
-        image_paths: imagePaths, document_paths: documentPaths, honeypot
+        image_paths: cached.imagePaths, document_paths: cached.documentPaths, honeypot
       });
+      guestUploadCache.delete(submissionId);
+      return result;
     } catch (error) {
-      // A transport failure may happen after the database committed. Keep private files in that
-      // uncertain case rather than deleting assets that a pending moderation record may reference.
-      if (Number.isFinite(error?.status)) await cleanupGuestUploads(submissionId, imagePaths, documentPaths);
+      // A transport failure may happen after commit. Keep the same ID and file paths for a safe retry.
+      if (Number.isFinite(error?.status)) {
+        await cleanupGuestUploads(submissionId, cached.imagePaths, cached.documentPaths);
+        guestUploadCache.delete(submissionId);
+      }
       throw error;
     }
   }
 
-  async function submitGuestBuyer(payload, honeypot = "") {
+  async function submitGuestBuyer(payload, honeypot = "", submissionId = crypto.randomUUID()) {
     return guestIntakeRequest({
-      action: "submit-buyer", submission_id: crypto.randomUUID(), payload, honeypot
+      action: "submit-buyer", submission_id: submissionId, payload, honeypot
     });
   }
 
