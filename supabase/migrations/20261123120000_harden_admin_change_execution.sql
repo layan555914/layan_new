@@ -42,6 +42,7 @@ BEGIN
   END IF;
   IF jsonb_typeof(p_payload) <> 'object'
      OR (p_payload->'body' IS NOT NULL AND p_payload->'body' <> 'null'::jsonb AND jsonb_typeof(p_payload->'body') <> 'object')
+     OR (v_method IN ('POST','PATCH') AND COALESCE(jsonb_typeof(p_payload->'body'),'') <> 'object')
      OR v_method NOT IN ('POST', 'PATCH', 'DELETE')
      OR v_path !~ '^/rest/v1/([a-z_]+|rpc/[a-z_]+)(\?[A-Za-z0-9_.,=()!_:*+&%~-]*)?$'
      OR char_length(p_payload::text) > 20000 THEN
@@ -167,6 +168,12 @@ BEGIN
     IF v_method='POST' AND v_resource='marketplace_listings'
        AND COALESCE((v_body->>'is_featured')::boolean,false) THEN
       RAISE EXCEPTION 'إعلان السوق الجديد لا يمكن تمييزه قبل المراجعة' USING ERRCODE = '22023';
+    END IF;
+    IF v_method='POST' AND v_resource='supplier_ads' AND v_body->>'plan_code' IS DISTINCT FROM 'custom' THEN
+      RAISE EXCEPTION 'طلبات الإعلانات الممولة يجب أن تستخدم الخطة المخصصة للمراجعة' USING ERRCODE = '22023';
+    END IF;
+    IF v_method='POST' AND v_resource='company_property_ads' AND v_body->>'plan_code' IS DISTINCT FROM 'trial_30' THEN
+      RAISE EXCEPTION 'طلب إعلان الشركة يجب أن يدخل كتجربة للمراجعة' USING ERRCODE = '22023';
     END IF;
     IF v_method='PATCH' AND v_resource='marketplace_listings' AND v_body ? 'status' THEN
       IF COALESCE(v_body->>'status','') NOT IN ('approved','rejected') THEN
