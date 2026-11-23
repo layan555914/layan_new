@@ -128,6 +128,7 @@ BEGIN
   SELECT count(*) INTO v_old_admin_storage_write_policies
   FROM pg_policies
   WHERE schemaname='storage' AND tablename='objects' AND cmd <> 'SELECT'
+    AND policyname NOT LIKE 'directory_media_storage_%'
     AND (coalesce(qual,'') || coalesce(with_check,'')) ~* '(^|[^a-z_])layan_is_admin\(\)';
 
   SELECT count(*) INTO v_old_admin_write_functions
@@ -145,6 +146,7 @@ BEGIN
   SELECT count(*) INTO v_old_admin_storage_write_policies
   FROM pg_policies
   WHERE schemaname='storage' AND tablename='objects' AND cmd <> 'SELECT'
+    AND policyname NOT LIKE 'directory_media_storage_%'
     AND (coalesce(qual,'') || coalesce(with_check,'')) ~* '(^|[^a-z_])layan_is_admin\(\)';
 
   SELECT count(*) INTO v_old_admin_write_functions
@@ -198,8 +200,8 @@ BEGIN
   END IF;
 
   IF (SELECT count(*) FROM storage.buckets WHERE id IN ('layan_real_estat','layan-property-documents')) <> 2
-     OR (SELECT count(*) FROM pg_policies WHERE schemaname='storage' AND tablename='objects') <> 10 THEN
-    RAISE EXCEPTION 'Storage baseline must contain two app buckets and ten object policies (six baseline plus four admin image policies)';
+     OR (SELECT count(*) FROM pg_policies WHERE schemaname='storage' AND tablename='objects') <> 16 THEN
+    RAISE EXCEPTION 'Storage must contain the two existing app buckets and sixteen object policies (ten baseline plus six directory-media policies)';
   END IF;
 
   IF to_regclass('private.admin_crm_leads') IS NULL
