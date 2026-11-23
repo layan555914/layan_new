@@ -829,13 +829,10 @@
     return uploaded;
   }
 
-  async function cleanupGuestUploads(submissionId, imagePaths, documentPaths) {
-    try {
-      await guestIntakeRequest({
-        action: "cleanup-upload", submission_id: submissionId,
-        image_paths: imagePaths || [], document_paths: documentPaths || []
-      });
-    } catch (error) { console.warn("تعذر تنظيف ملفات طلب الزائر:", error); }
+  async function cleanupGuestUploads() {
+    // Guest browsers cannot delete objects from the private bucket.
+    // Unsubmitted temporary files are removed only by the owner-only 7-day cleanup.
+    return undefined;
   }
 
   const guestUploadCache = new Map();
