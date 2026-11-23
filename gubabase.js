@@ -797,9 +797,9 @@
     for (const file of files || []) {
       const isImage = kind === "images";
       const allowedMime = isImage ? ["image/jpeg"] : ["application/pdf", "image/jpeg", "image/png"];
-      const maxSize = isImage ? 15 * 1024 * 1024 : 10 * 1024 * 1024;
+      const maxSize = 5 * 1024 * 1024;
       if (!allowedMime.includes(file.type) || file.size < (isImage ? 4 : 8) || file.size > maxSize) {
-        throw new Error(isImage ? "صور الزائر يجب أن تكون JPG/JPEG ولا تتجاوز 15 ميجابايت." : "المستندات المسموحة PDF أو JPG أو PNG وبحد أقصى 10 ميجابايت.");
+        throw new Error(isImage ? "صور الزائر يجب أن تكون JPG/JPEG ولا تتجاوز 5 ميجابايت للصورة." : "مستندات الزائر المسموحة PDF أو JPG أو PNG وبحد أقصى 5 ميجابايت.");
       }
       const head = new Uint8Array(await file.slice(0, 8).arrayBuffer());
       const valid = file.type === "image/jpeg"
@@ -808,26 +808,23 @@
           ? head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4E && head[3] === 0x47
           : head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46;
       if (!valid) throw new Error("محتوى أحد الملفات لا يطابق نوعه الحقيقي.");
-      const ticket = await guestIntakeRequest({
-        action: "upload-ticket", submission_id: submissionId, kind,
-        content_type: file.type, size: file.size
-      });
-      let uploadUrl = String(ticket?.signedUrl || "");
-      if (!uploadUrl) throw new Error("تعذر تجهيز رفع الملف.");
-      if (!/^https?:\/\//i.test(uploadUrl)) {
-        uploadUrl = uploadUrl.startsWith("/storage/v1/")
-          ? url.replace(/\/$/, "") + uploadUrl
-          : url.replace(/\/$/, "") + "/storage/v1" + uploadUrl;
-      }
-      if (new URL(uploadUrl).origin !== new URL(url).origin) throw new Error("عنوان رفع الملف غير موثوق.");
-      const response = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { apikey: key, "Content-Type": file.type, "x-upsert": "false" },
+      const endpoint = url.replace(/\/$/, "") + "/functions/v1/guest-intake?action=upload-file&submission_id="
+        + encodeURIComponent(submissionId) + "&kind=" + encodeURIComponent(kind);
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": file.type },
         body: file,
         redirect: "error"
       });
-      if (!response.ok) throw new Error("فشل رفع ملف مؤقت. حاول مرة أخرى.");
-      uploaded.push(ticket.path);
+      const raw = await response.text();
+      let result = null;
+      try { result = raw ? JSON.parse(raw) : null; } catch (_) {}
+      if (!response.ok || !result?.path) {
+        const error = new Error(result?.error || "فشل رفع ملف مؤقت. حاول مرة أخرى.");
+        error.status = response.status;
+        throw error;
+      }
+      uploaded.push(result.path);
     }
     return uploaded;
   }
