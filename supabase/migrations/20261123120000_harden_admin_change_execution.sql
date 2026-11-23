@@ -59,7 +59,7 @@ BEGIN
          'directory_admin_mutate_with_audit','layan_approve_free_trial_ad',
          'layan_admin_review_logo','company_claim_admin_review',
          'company_entity_profile_update_admin_review','company_project_request_admin_review',
-         'company_project_unit_request_admin_review','property_offer_project_unit_request_admin_review'
+         'company_project_unit_request_admin_review','property_offer_project_unit_request_admin_review','layan_reorder_supplier_ads'
        ) THEN
       RAISE EXCEPTION 'إجراء الإدارة المطلوب غير مسموح بمراجعته' USING ERRCODE = '22023';
     END IF;
