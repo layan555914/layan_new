@@ -24,7 +24,8 @@
     directory_change_log: "سجل الدليل العقاري", directory_entities: "جهات الدليل العقاري",
     directory_projects: "مشروعات الدليل العقاري", directory_areas: "مناطق الدليل العقاري",
     directory_opportunities: "الفرص والطرحات", directory_entity_sources: "مصادر الجهات",
-    directory_project_sources: "مصادر المشروعات", directory_opportunity_sources: "مصادر الفرص"
+    directory_project_sources: "مصادر المشروعات", directory_opportunity_sources: "مصادر الفرص",
+    platform_sponsors: "الرعاة الرسميين"
   };
   const RPCS = {
     layan_admin_review_property_offer: "مراجعة إعلان عقار", layan_activate_supplier_ad: "تفعيل إعلان ممول",
