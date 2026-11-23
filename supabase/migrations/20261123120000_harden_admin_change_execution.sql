@@ -92,7 +92,7 @@ BEGIN
       md5(COALESCE(v_target_id, jsonb_build_object('path',v_path,'body',p_payload->'body')::text));
   ELSIF v_method IN ('PATCH','DELETE') THEN
     v_target_id := (regexp_match(v_query,'(^|&)id=eq\.([^&]+)'))[2];
-    v_target := 'chg:' || v_method || ':' || left(v_resource,30) || ':' || md5(COALESCE(v_target_id,''));
+    v_target := 'chg:' || left(v_resource,35) || ':' || md5(COALESCE(v_target_id,''));
   ELSE
     v_target := 'chg:post:' || left(v_resource,30) || ':' ||
       md5(jsonb_build_object('path',v_path,'body',p_payload->'body')::text);
