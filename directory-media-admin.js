@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     const value = data?.signedURL || data?.signedUrl;
     if (!value) throw new Error("تعذر فتح الصورة للمراجعة.");
-    return /^https?:\/\//i.test(value) ? value : base + (value.startsWith("/") ? value : "/" + value);
+    return /^https?:\/\//i.test(value) ? value : base + (value.startsWith("/storage/v1/") ? value : "/storage/v1" + (value.startsWith("/") ? value : "/" + value));
   }
   async function load() {
     status.textContent = "جارٍ تحميل الصور المرسلة للمراجعة...";
