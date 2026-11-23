@@ -68,7 +68,7 @@ function directoryCard(c,type){
  const name=String(c.name_ar||c.name_en||"شركة عقارية");
  const logo=safeUrl(c.public_logo_url)||ENTITY_LOGO_ASSETS[c.id]||officialEntityLogo(c.website_url)||"";
  const label=companyTypeLabel(type);
- const description=String(c.description||"بيانات تعريفية منشورة في دليل الشركات. راجع المصادر داخل الملف لمعرفة تفاصيل الإدراج.");
+ const description=String(c.description||"تعرّف على الشركة وخدماتها وطرق التواصل معها.");
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
  const services=Array.isArray(c.public_services)?c.public_services.slice(0,3):[];
