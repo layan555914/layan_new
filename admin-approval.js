@@ -32,7 +32,8 @@
     company_entity_profile_update_admin_review: "مراجعة تعديل ملف جهة",
     company_project_request_admin_review: "مراجعة طلب إدارة مشروع",
     company_project_unit_request_admin_review: "مراجعة طلب وحدة مشروع",
-    property_offer_project_unit_request_admin_review: "مراجعة ربط عقار بوحدة مشروع"
+    property_offer_project_unit_request_admin_review: "مراجعة ربط عقار بوحدة مشروع",
+    layan_reorder_supplier_ads: "إعادة ترتيب الإعلانات الممولة"
   };
   const VERB = { POST: "إضافة", PATCH: "تعديل", DELETE: "حذف", PUT: "تعديل" };
 
@@ -147,7 +148,7 @@
         "directory_admin_mutate_with_audit", "layan_approve_free_trial_ad",
         "layan_admin_review_logo", "company_claim_admin_review",
         "company_entity_profile_update_admin_review", "company_project_request_admin_review",
-        "company_project_unit_request_admin_review", "property_offer_project_unit_request_admin_review"
+        "company_project_unit_request_admin_review", "property_offer_project_unit_request_admin_review", "layan_reorder_supplier_ads"
       ]);
       const method = String(payload?.method || "").toUpperCase();
       const target = new URL(String(payload?.path || ""), base);
