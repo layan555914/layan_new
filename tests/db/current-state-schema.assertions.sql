@@ -269,6 +269,13 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'Admin request execution reservation columns are missing';
   END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema='private' AND table_name='layan_admin_requests'
+      AND column_name='execution_started_by' AND data_type='uuid'
+  ) THEN
+    RAISE EXCEPTION 'Admin request execution actor audit column is missing';
+  END IF;
   IF to_regprocedure('public.layan_admin_claim_change(bigint)') IS NULL
      OR to_regprocedure('public.layan_admin_finish_change(bigint,uuid,boolean,text)') IS NULL
      OR to_regprocedure('public.layan_admin_finish_change(bigint,boolean,text)') IS NOT NULL THEN
