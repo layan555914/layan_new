@@ -71,12 +71,12 @@ BEGIN
       ('platform_sponsors_admin_update_all','UPDATE')
     )
     SELECT 1 FROM expected e LEFT JOIN pg_policies p
-      ON v_policy.schemaname='public' AND v_policy.policyname=e.policyname
-    WHERE v_policy.policyname IS NULL OR p.cmd IS DISTINCT FROM e.cmd
-       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(v_policy.qual,'') !~* 'layan_is_owner\(\)')
-       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(v_policy.with_check,'') !~* 'layan_is_owner\(\)')
-       OR coalesce(v_policy.qual,'') ~* 'layan_is_admin\(\)'
-       OR coalesce(v_policy.with_check,'') ~* 'layan_is_admin\(\)'
+      ON p.schemaname='public' AND p.policyname=e.policyname
+    WHERE p.policyname IS NULL OR p.cmd IS DISTINCT FROM e.cmd
+       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(p.qual,'') !~* 'layan_is_owner\(\)')
+       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(p.with_check,'') !~* 'layan_is_owner\(\)')
+       OR coalesce(p.qual,'') ~* 'layan_is_admin\(\)'
+       OR coalesce(p.with_check,'') ~* 'layan_is_admin\(\)'
   ) THEN
     RAISE EXCEPTION 'One or more of the 13 public ad/sponsor policies did not become owner-only';
   END IF;
@@ -88,12 +88,12 @@ BEGIN
       ('asyut_admin_delete_customer_offer_images','DELETE')
     )
     SELECT 1 FROM expected e LEFT JOIN pg_policies p
-      ON v_policy.schemaname='storage' AND v_policy.tablename='objects' AND v_policy.policyname=e.policyname
-    WHERE v_policy.policyname IS NULL OR p.cmd IS DISTINCT FROM e.cmd
-       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(v_policy.qual,'') !~* 'layan_is_owner\(\)')
-       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(v_policy.with_check,'') !~* 'layan_is_owner\(\)')
-       OR coalesce(v_policy.qual,'') ~* 'layan_is_admin\(\)'
-       OR coalesce(v_policy.with_check,'') ~* 'layan_is_admin\(\)'
+      ON p.schemaname='storage' AND p.tablename='objects' AND p.policyname=e.policyname
+    WHERE p.policyname IS NULL OR p.cmd IS DISTINCT FROM e.cmd
+       OR (e.cmd IN ('UPDATE','DELETE') AND coalesce(p.qual,'') !~* 'layan_is_owner\(\)')
+       OR (e.cmd IN ('INSERT','UPDATE') AND coalesce(p.with_check,'') !~* 'layan_is_owner\(\)')
+       OR coalesce(p.qual,'') ~* 'layan_is_admin\(\)'
+       OR coalesce(p.with_check,'') ~* 'layan_is_admin\(\)'
   ) THEN
     RAISE EXCEPTION 'One or more of the 3 customer-image Storage policies did not become owner-only';
   END IF;
