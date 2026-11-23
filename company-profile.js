@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
  const profileId=params.get("id");
  const entityId=params.get("entity_id");
  const ENTITY_LOGO_ASSETS=Object.freeze({
+ "810cc5ae-2e02-4418-8ee8-c681668723b6":"./assets/brand/diar-asyut-logo-temp.svg",
   "8f9371fc-09a8-4f11-afad-d72a4c2d5edf":"./assets/brand/al-benaa-arabi-star.webp"
  });
  // Official public brand assets are keyed by an exact company website hostname.
