@@ -48,6 +48,10 @@ CREATE INDEX IF NOT EXISTS guest_buyer_requests_pending
   ON private.guest_buyer_requests (created_at DESC) WHERE status='pending';
 REVOKE ALL ON private.guest_buyer_requests FROM PUBLIC, anon, authenticated, service_role;
 
+ALTER TABLE private.guest_submission_rate_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE private.guest_property_submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE private.guest_buyer_requests ENABLE ROW LEVEL SECURITY;
+
 INSERT INTO storage.buckets (id,name,public,file_size_limit,allowed_mime_types)
 VALUES ('asyut-guest-intake','asyut-guest-intake',false,15728640,
         ARRAY['image/jpeg','application/pdf','image/png']::text[])
