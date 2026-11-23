@@ -61,7 +61,7 @@ function card(c,type){
  const href="./company.html?id="+encodeURIComponent(c.id);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
  const label=companyTypeLabel(type);
- return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف شركة معتمد لدى أسيوط عقار</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف الشركة</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
 }
 function directoryCard(c,type){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
@@ -72,7 +72,7 @@ function directoryCard(c,type){
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
  const services=Array.isArray(c.public_services)?c.public_services.slice(0,3):[];
- return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">ملف شركة منشور في الدليل العقاري</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">ملف الشركة</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
 }
 function renderGroup(type,ownerRows,entityRows,gridElement,countElement,q){
  const owners=ownerRows.filter(c=>!q||normalizeName([c.company_name,c.description,c.city,c.category,...(c.services||[])].join(" ")).includes(q));
