@@ -314,7 +314,10 @@ BEGIN
      OR v_definition NOT ILIKE '%v_allowed_fields%'
      OR v_definition NOT ILIKE '%jsonb_object_keys(v_body)%'
      OR v_definition NOT ILIKE '%directory_entities%'
-     OR v_definition NOT ILIKE '%directory_opportunity_sources%' THEN
+     OR v_definition NOT ILIKE '%directory_opportunity_sources%'
+     OR v_definition NOT ILIKE '%select=id%'
+     OR v_definition NOT ILIKE '%owner_id%'
+     OR v_definition NOT ILIKE '%changed_by%' THEN
     RAISE EXCEPTION 'Admin change request RPC does not enforce its explicit resource allowlist';
   END IF;
   IF has_function_privilege('anon','public.layan_admin_claim_change(bigint)','EXECUTE')
