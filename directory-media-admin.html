@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#102746">
+<title>مراجعة صور الدليل والمشروعات | أسيوط عقار</title>
+<link rel="stylesheet" href="./assets/theme/unified-bright-clarity.css?v=20261118-brand-identity-1">
+<link rel="stylesheet" href="./assets/theme/design-system.css?v=20261118-brand-identity-1">
+<link rel="stylesheet" href="./assets/theme/directory-media.css?v=20261123-1">
+<style>
+body{background:#f7f8fa;color:#243449}.media-admin-wrap{width:min(1180px,calc(100% - 24px));margin:24px auto 60px}
+.media-admin-head,.media-admin-panel{background:#fff;border:1px solid #e4e9ef;border-radius:16px;padding:20px;margin-bottom:16px}
+.media-admin-head{background:#102746;color:#fff}.media-admin-head h1{margin:0 0 8px}.media-admin-head p{margin:0;line-height:1.8;color:#e4eaf1}
+.media-admin-login{display:grid;gap:12px;max-width:480px}.media-admin-login label{display:grid;gap:6px}.media-admin-login input{padding:11px;border:1px solid #d9e0e8;border-radius:9px;font:inherit}
+.media-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.media-admin-card{border:1px solid #e4e9ef;border-radius:14px;padding:13px;background:#fff;display:grid;gap:9px;min-width:0}
+.media-admin-card img{width:100%;aspect-ratio:4/3;object-fit:contain;background:#f4f6f8;border-radius:9px}
+.media-admin-card h3{margin:0;font-size:16px}.media-admin-card p{margin:0;color:#657386;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.media-admin-card textarea{width:100%;min-height:70px;border:1px solid #d9e0e8;border-radius:8px;padding:9px;font:inherit}
+.media-admin-actions{display:flex;gap:8px;flex-wrap:wrap}.media-admin-actions button{flex:1;min-width:110px}
+.media-admin-status{padding:12px;background:#f2f5f8;border-radius:9px;min-height:42px;line-height:1.7}
+@media(max-width:520px){.media-admin-wrap{width:calc(100% - 14px)}.media-admin-panel,.media-admin-head{padding:14px}}
+</style>
+</head>
+<body>
+<main class="media-admin-wrap">
+<header class="media-admin-head"><h1>مراجعة صور الشركات والمشروعات</h1><p>لا تظهر أي صورة للزوار إلا بعد اعتمادها. راجع الصورة ووصفها والجهة أو المشروع المرتبط بها قبل اتخاذ القرار.</p><p><a href="./directory-admin.html" style="color:#f3d7a4">العودة إلى إدارة الدليل العقاري ←</a></p></header>
+<section class="media-admin-panel" id="mediaAdminLoginPanel">
+<h2>دخول مسؤول الإدارة</h2><form class="media-admin-login" id="mediaAdminLogin">
+<label>البريد الإلكتروني<input id="mediaAdminEmail" type="email" autocomplete="username" required></label>
+<label>كلمة المرور<input id="mediaAdminPassword" type="password" autocomplete="current-password" required></label>
+<button class="btn btn-gold" type="submit">دخول والتحقق من الصلاحية</button></form>
+</section>
+<section class="media-admin-panel" id="mediaAdminPanel" hidden>
+<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h2>الصور قيد المراجعة</h2><button class="btn btn-outline" id="mediaAdminRefresh" type="button">تحديث القائمة</button></div>
+<div id="mediaAdminStatus" class="media-admin-status" role="status" aria-live="polite">جارٍ التحميل...</div>
+<div id="mediaAdminGrid" class="media-admin-grid"></div>
+</section>
+<p id="mediaAdminGlobalStatus" class="media-admin-status" role="status" aria-live="polite"></p>
+</main>
+<script src="./config.js?v=20261105-7"></script>
+<script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script>
+<script src="./directory-media-admin.js?v=20261123-1" defer></script>
+</body></html>
