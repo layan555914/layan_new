@@ -3,10 +3,12 @@
 -- loses connectivity after the side effect, the request remains locked for manual reconciliation;
 -- this intentionally favors preventing duplicate destructive writes over automatic replay.
 
-DROP INDEX IF EXISTS private.layan_admin_requests_one_pending;
+DROP INDEX IF EXISTS private.layan_admin_requests_one_active_change;
+CREATE UNIQUE INDEX IF NOT EXISTS layan_admin_requests_one_pending
+  ON private.layan_admin_requests (action, target) WHERE status='pending';
 CREATE UNIQUE INDEX layan_admin_requests_one_active_change
   ON private.layan_admin_requests (action, target)
-  WHERE status IN ('pending','executing');
+  WHERE action='change' AND status IN ('pending','executing');
 
 ALTER TABLE private.layan_admin_requests
   ADD COLUMN IF NOT EXISTS execution_token uuid,
@@ -100,7 +102,7 @@ BEGIN
   VALUES ('change', v_target, left(COALESCE(p_label, 'تعديل'), 200), auth.uid(),
           jsonb_build_object('method', v_method, 'path', v_path, 'body', p_payload->'body',
                              'prefer', 'return=minimal'))
-  ON CONFLICT (action,target) WHERE status IN ('pending','executing') DO NOTHING;
+  ON CONFLICT (action,target) WHERE action='change' AND status IN ('pending','executing') DO NOTHING;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'يوجد طلب تعديل نشط بالفعل على نفس العنصر. راجع الطلب السابق قبل تكرار العملية.' USING ERRCODE='23505';
   END IF;
