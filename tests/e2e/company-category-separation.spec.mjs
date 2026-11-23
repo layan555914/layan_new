@@ -95,8 +95,8 @@ test("company directory separates marketing firms from developers and excludes s
   await expect(page.locator('.company-topbar a[href="./company-dashboard.html"]')).toHaveCount(0);
   await expect(marketing.locator('a[href="./company.html?id=profile-marketing-1"]')).toHaveCount(1);
   await expect(developers.locator('a[href="./company.html?id=profile-developer-1"]')).toHaveCount(1);
-  await expect(marketing.locator('a[href="./company.html?entity_id=entity-marketing-1"]')).toContainText("عرض الملف واستلامه من داخله");
-  await expect(developers.locator('a[href="./company.html?entity_id=entity-developer-1"]')).toContainText("عرض الملف واستلامه من داخله");
+  await expect(marketing.locator('a[href="./company.html?entity_id=entity-marketing-1"]')).toContainText("عرض ملف الشركة");
+  await expect(developers.locator('a[href="./company.html?entity_id=entity-developer-1"]')).toContainText("عرض ملف الشركة");
 
   await page.locator("#companyCategoryFilter").selectOption("developers");
   await expect(page.locator("#marketingCompaniesSection")).toBeHidden();
