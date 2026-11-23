@@ -30,6 +30,11 @@ async function mock(page, { adminAllowed = true } = {}) {
       if (name === "layan_is_admin") return reply(route, adminAllowed);
       if (name === "layan_admin_whoami") return reply(route, globalThis.__role || "owner");
       if (name === "layan_admin_request_change") { state.changes.push(body); return reply(route, "pending"); }
+      if (name === "layan_admin_claim_change") {
+        const request = state.changes[Number(body.p_id) - 1];
+        if (!request) return reply(route, { message: "request not found" }, 404);
+        return reply(route, { id: body.p_id, execution_token: "dddddddd-dddd-4ddd-8ddd-dddddddddddd", payload: request.p_payload });
+      }
       if (name === "layan_admin_finish_change") { state.finished.push(body); return reply(route, body.p_ok ? "approved" : "failed"); }
       if (name === "layan_admin_list_requests") return reply(route, state.changes.map((c, i) => ({ id: i + 1, action: "change", target: "chg-" + i, target_label: c.p_label, requested_by_email: "helper@example.invalid", status: "pending", created_at: "2026-11-10T10:00:00Z", can_decide: (globalThis.__role || "owner") === "owner", payload: c.p_payload })));
       if (name === "layan_admin_delete_sponsor") { state.sponsors = state.sponsors.filter(s => s.id !== body.p_id); return reply(route, "done"); }
