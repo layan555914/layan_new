@@ -54,9 +54,11 @@ assert.ok(edge.includes('action === "admin-cleanup"') && edge.includes("7 * 24 *
   "The owner must be able to clean expired private uploads without touching pending moderation records.");
 assert.ok(client.includes("async function submitGuestProperty") && client.includes("async function submitGuestBuyer"),
   "The shared client must expose guest property and buyer submission helpers.");
-assert.ok(app.includes("api.submitGuestProperty(offer, files, documentFiles") &&
+assert.ok(app.includes("api.submitGuestProperty(offer, guestImages, documentFiles") &&
+  app.includes("compressGuestImage") &&
+  app.includes("guestDocumentMaxBytes = 5 * 1024 * 1024") &&
   app.includes("لا تحتاج إلى إنشاء حساب"),
-  "The property form must submit as a visitor without bypassing moderation.");
+  "Guest property images must be compressed below the 5 MiB server cap and guest documents must be limited to 5 MiB without bypassing moderation.");
 assert.ok(buyer.includes("submitGuestBuyer") && buyer.includes("buyer_preferences?on_conflict=owner_id"),
   "Visitors must use the private buyer request queue while registered users retain saved preferences.");
 assert.ok(offers.includes('name="website"') && buyer.includes('name="website"'),
@@ -66,10 +68,10 @@ assert.ok(adminHtml.includes('id="adminGuestIntake"') && admin.includes('call("a
 assert.ok(config.includes("[functions.guest-intake]") && sw.includes("./admin-guest-intake.js?v=20261123-2"),
   "The Edge Function and admin moderation PWA assets must be configured.");
 assert.ok(offers.includes("gubabase.js?v=20261123-guest-intake-2") &&
-  offers.includes("app.js?v=20261123-guest-property-2") &&
+  offers.includes("app.js?v=20261123-guest-property-3") &&
   index.includes("buyer.js?v=20261123-guest-buyer-2") &&
   sw.includes("./gubabase.js?v=20261123-guest-intake-2") &&
-  sw.includes("./app.js?v=20261123-guest-property-2") &&
+  sw.includes("./app.js?v=20261123-guest-property-3") &&
   sw.includes("./buyer.js?v=20261123-guest-buyer-2"),
   "Guest submission helpers and forms must use matching versioned PWA assets.");
 
