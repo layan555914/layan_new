@@ -234,6 +234,13 @@ try {
   assert(queued.response.ok && queued.body === "pending",
     "An added administrator could not submit a CRM change for owner approval: " + JSON.stringify(queued.body));
 
+  const duplicateQueued = await rpc("layan_admin_request_change", {
+    p_label: approvalLabel,
+    p_payload: approvalPayload,
+  }, adminToken);
+  assert(!duplicateQueued.response.ok,
+    "The same CRM write was queued twice while its first approval request was still pending.");
+
   const disallowed = await rpc("layan_admin_request_change", {
     p_label: "Blocked arbitrary RPC " + runId,
     p_payload: { method: "POST", path: "/rest/v1/rpc/layan_admin_set_admin", body: { p_email: admin.email, p_enabled: true } },
