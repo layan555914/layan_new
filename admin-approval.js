@@ -143,12 +143,12 @@
         "supplier_ads", "property_offers", "marketplace_listings", "company_property_ads",
         "partner_ad_slots", "directory_sources", "directory_change_log", "directory_entities",
         "directory_projects", "directory_areas", "directory_opportunities", "directory_entity_sources",
-        "directory_project_sources", "directory_opportunity_sources"
+        "directory_project_sources", "directory_opportunity_sources", "platform_sponsors"
       ]);
       const allowedMethods = {
         property_offers: ["POST","PATCH"], marketplace_listings: ["POST","PATCH"],
         supplier_ads: ["POST","PATCH"], company_property_ads: ["POST","PATCH"],
-        partner_ad_slots: ["PATCH"], directory_sources: ["POST","PATCH"],
+        partner_ad_slots: ["PATCH"], platform_sponsors: ["PATCH"], directory_sources: ["POST","PATCH"],
         directory_entities: ["PATCH"], directory_projects: ["PATCH"], directory_areas: ["PATCH"],
         directory_opportunities: ["PATCH"], directory_change_log: ["POST"],
         directory_entity_sources: ["POST"], directory_project_sources: ["POST"],
