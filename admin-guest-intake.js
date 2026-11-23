@@ -50,6 +50,7 @@
     const properties=root.querySelector("[data-guest-properties]"), buyers=root.querySelector("[data-guest-buyers]");
     const pc=root.querySelector("[data-guest-property-count]"), bc=root.querySelector("[data-guest-buyer-count]");
     if(pc) pc.textContent=String(propertyRows.length); if(bc) bc.textContent=String(buyerRows.length);
+    const cleanupButton=root.querySelector("[data-guest-cleanup]"); if(cleanupButton) cleanupButton.hidden=role!=="owner";
     if(properties) properties.innerHTML=propertyRows.map(propertyCard).join("")||'<p class="agi-empty">لا توجد إعلانات زوار تنتظر المراجعة.</p>';
     if(buyers) buyers.innerHTML=buyerRows.map(buyerCard).join("")||'<p class="agi-empty">لا توجد طلبات باحثين تنتظر التواصل.</p>';
   }
@@ -67,6 +68,17 @@
     finally { busy=false; }
   }
   root.addEventListener("click",async event=>{
+    const cleanupButton=event.target.closest("[data-guest-cleanup]");
+    if(cleanupButton&&!busy) {
+      if(!confirm("تنظيف الملفات الخاصة الأقدم من 7 أيام التي لا ترتبط بطلب عقار ما زال قيد المراجعة؟"))return;
+      busy=true; cleanupButton.disabled=true; status("جارٍ فحص الملفات المؤقتة...");
+      try {
+        const result=await call("admin-cleanup");
+        status("تم تنظيف "+Number(result.removed||0)+" ملف مؤقت. الطلبات التي ما زالت قيد المراجعة لم تتأثر.");
+      } catch(error) { status(error.message||"تعذر تنظيف الملفات المؤقتة."); }
+      finally { busy=false; cleanupButton.disabled=false; }
+      return;
+    }
     const button=event.target.closest("[data-guest-property-decision], [data-guest-buyer-decision]");
     if(!button||busy)return;
     const id=button.dataset.id, pd=button.dataset.guestPropertyDecision, bd=button.dataset.guestBuyerDecision;
