@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v190-guest-intake-owner-approval-20261123";
+const CACHE_NAME = "asyut-aqar-shell-v191-company-welcome-20261123";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -47,7 +47,7 @@ const APP_SHELL = [
   "./assets/theme/companies-directory-bridge.css?v=20261115-verified-company-brand-1",
   "./assets/theme/entity-brand-cards.css?v=20261115-unified-entity-brand-1",
   "./companies.js?v=20261115-company-types-1",
-  "./company-profile.js?v=20261115-verified-company-brand-1",
+  "./company-profile.js?v=20261123-welcome-after-claim-1",
   "./styles.css",
   "./assets/theme/sitewide-typography.css?v=20261116-1",
   "./assets/theme/visual-refresh.css?v=20261116-1",
