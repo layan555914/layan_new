@@ -1627,7 +1627,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    if (offer.contact_phone && !data.get("contact_consent")) {
+    if (offer.contact_phone && !data.get("contact_consent") && window.LAYAN_SUPABASE?.isAuthenticated?.()) {
       setStatus("لنشر رقم التواصل داخل الإعلان يجب الموافقة صراحةً على نشره. اترك الرقم فارغًا إن لم ترغب في نشره.");
       return;
     }
