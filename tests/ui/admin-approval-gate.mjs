@@ -11,7 +11,7 @@ const source = await readFile(new URL("../../admin-approval.js", import.meta.url
 const base = "https://supabase.test";
 
 const consoleSource = await readFile(new URL("../../admin-console.js", import.meta.url), "utf8");
-assert.ok(source.includes("layan_admin_crm_archive_lead") && source.includes("directory_admin_mutate_with_audit") && source.includes("layan_admin_review_edit") && source.includes("allowedResources"),
+assert.ok(source.includes("layan_admin_crm_archive_lead") && source.includes("directory_admin_mutate_with_audit") && source.includes("layan_admin_review_edit") && source.includes("allowedResources") && source.includes("allowedMethods") && source.includes("directory_entities"),
   "Approved writes must be restricted to explicit table and all existing owner-review RPC allowlists.");
 assert.ok(source.includes('redirect: "error"'),
   "Approved REST writes must reject redirects.");
