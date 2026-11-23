@@ -6,8 +6,8 @@ const USER_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
 
 async function mock(page, { adminAllowed = true } = {}) {
   const state = { authRequests: [], sponsors: [
-    { id: "s1", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
-    { id: "s2", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
+    { id: "11111111-1111-4111-8111-111111111111", name: "Rahma Builders", tier: "official", kicker: "الراعي الرسمي لمنصة أسيوط عقار", tagline: "مقاولات وتشطيبات فاخرة", subline: "Since 2001", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: "https://example.com/rahma", link_label: "زيارة الموقع", sort_order: 0, is_active: true },
+    { id: "22222222-2222-4222-8222-222222222222", name: "Nile Tiles", tier: "partner", tagline: "سيراميك وبورسلين", logo_url: "./assets/brand/golden-ratio-logo.svg?v=1", link_url: null, sort_order: 1, is_active: true }
   ], ads: [
     { id: "a1", owner_id: USER_ID, business_name: "layan", category: "سيراميك وبورسلين", title: "معرض سيراميك asuit", description: "أحدث موديلات السيراميك والبورسلين بأسعار المصنع.", image_url: null, target_url: null, contact_phone: "01012345678", status: "active", price: 0, created_at: "2026-11-09T10:00:00Z" }
   ], rpc: [], patches: [], posts: [], changes: [], finished: [] };
@@ -30,6 +30,11 @@ async function mock(page, { adminAllowed = true } = {}) {
       if (name === "layan_is_admin") return reply(route, adminAllowed);
       if (name === "layan_admin_whoami") return reply(route, globalThis.__role || "owner");
       if (name === "layan_admin_request_change") { state.changes.push(body); return reply(route, "pending"); }
+      if (name === "layan_admin_claim_change") {
+        const request = state.changes[Number(body.p_id) - 1];
+        if (!request) return reply(route, { message: "request not found" }, 404);
+        return reply(route, { id: body.p_id, execution_token: "dddddddd-dddd-4ddd-8ddd-dddddddddddd", payload: request.p_payload });
+      }
       if (name === "layan_admin_finish_change") { state.finished.push(body); return reply(route, body.p_ok ? "approved" : "failed"); }
       if (name === "layan_admin_list_requests") return reply(route, state.changes.map((c, i) => ({ id: i + 1, action: "change", target: "chg-" + i, target_label: c.p_label, requested_by_email: "helper@example.invalid", status: "pending", created_at: "2026-11-10T10:00:00Z", can_decide: (globalThis.__role || "owner") === "owner", payload: c.p_payload })));
       if (name === "layan_admin_delete_sponsor") { state.sponsors = state.sponsors.filter(s => s.id !== body.p_id); return reply(route, "done"); }
@@ -78,11 +83,11 @@ test("added admin change goes to the owner, owner approves and it is performed",
   ]);
   await page.locator("[data-view='sponsors']").click();
   await expect(page.locator("#adminSponsorsList")).toContainText("Rahma Builders");
-  await page.locator("[data-sponsor-id='s1'] [data-sp='toggle']").click();
+  await page.locator("[data-sponsor-id='11111111-1111-4111-8111-111111111111'] [data-sp='toggle']").click();
   await expect.poll(() => state.changes.length).toBe(1);
   expect(state.patches.length).toBe(0); // nothing written directly
   expect(state.changes[0].p_payload).toMatchObject({ method: "PATCH", body: { is_active: false } });
-  expect(state.changes[0].p_payload.path).toContain("/rest/v1/platform_sponsors?id=eq.s1");
+  expect(state.changes[0].p_payload.path).toContain("/rest/v1/platform_sponsors?id=eq.11111111-1111-4111-8111-111111111111");
   expect(state.changes[0].p_label).toContain("الرعاة الرسميين");
   await expect(page.locator("#asyutApprovalToast")).toContainText("للموافقة");
 
@@ -97,10 +102,12 @@ test("added admin change goes to the owner, owner approves and it is performed",
   await page2.locator("[data-view='requests']").first().click();
   const row = page2.locator("[data-request-action='change']").first();
   await expect(row).toContainText("الرعاة الرسميين");
+  await row.locator("details.adm-change summary").click();
+  await expect(row.locator("details.adm-change")).toHaveJSProperty("open", true);
   await row.locator("[data-request-decide='1']").click();
   await expect.poll(() => state.owner.finished.length).toBe(1);
   expect(state.owner.finished[0]).toMatchObject({ p_id: 1, p_ok: true });
-  expect(state.owner.patches.find(p => p.id === "s1")).toMatchObject({ is_active: false });
+  expect(state.owner.patches.find(p => p.id === "11111111-1111-4111-8111-111111111111")).toMatchObject({ is_active: false });
   await page2Context.close();
 });
 

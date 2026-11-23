@@ -18,9 +18,14 @@
   // RPCs that only read, or already have their own owner-approval flow, or are owner-only on the server.
   const PASS_RPC = /^(layan_is_admin|layan_admin_whoami|layan_admin_list_[a-z_]+|layan_admin_activity(_summary)?|layan_admin_pending_[a-z_]+|layan_track_event|layan_admin_request_change|layan_admin_finish_change|layan_admin_decide_request|company_claim_admin_list|company_entity_profile_update_admin_list|layan_admin_delete_[a-z_]+|layan_admin_set_user_suspended|layan_admin_set_admin|layan_list_[a-z_]+|layan_get_[a-z_]+|directory_admin_list[a-z_]*)$/;
   const TABLES = {
-    platform_sponsors: "الرعاة الرسميين", supplier_ads: "الإعلانات الممولة", property_offers: "إعلانات العقارات",
-    marketplace_listings: "خدمات السوق", company_profiles: "ملفات الشركات", company_property_ads: "إعلانات الشركات", company_entity_profile_update_requests: "تعديلات ملفات الجهات",
-    partner_ad_slots: "مساحات الإعلانات", directory_sources: "مصادر الدليل العقاري", directory_change_log: "سجل الدليل العقاري"
+    supplier_ads: "الإعلانات الممولة", property_offers: "إعلانات العقارات",
+    marketplace_listings: "خدمات السوق", company_property_ads: "إعلانات الشركات",
+    partner_ad_slots: "مساحات الإعلانات", directory_sources: "مصادر الدليل العقاري",
+    directory_change_log: "سجل الدليل العقاري", directory_entities: "جهات الدليل العقاري",
+    directory_projects: "مشروعات الدليل العقاري", directory_areas: "مناطق الدليل العقاري",
+    directory_opportunities: "الفرص والطرحات", directory_entity_sources: "مصادر الجهات",
+    directory_project_sources: "مصادر المشروعات", directory_opportunity_sources: "مصادر الفرص",
+    platform_sponsors: "الرعاة الرسميين"
   };
   const RPCS = {
     layan_admin_review_property_offer: "مراجعة إعلان عقار", layan_activate_supplier_ad: "تفعيل إعلان ممول",
@@ -29,7 +34,11 @@
     directory_admin_mutate_with_audit: "تعديل في الدليل العقاري", layan_approve_free_trial_ad: "اعتماد إعلان تجريبي",
     layan_admin_review_logo: "مراجعة شعار معلن",
     company_claim_admin_review: "مراجعة طلب استلام ملف جهة",
-    company_entity_profile_update_admin_review: "مراجعة تعديل ملف جهة"
+    company_entity_profile_update_admin_review: "مراجعة تعديل ملف جهة",
+    company_project_request_admin_review: "مراجعة طلب إدارة مشروع",
+    company_project_unit_request_admin_review: "مراجعة طلب وحدة مشروع",
+    property_offer_project_unit_request_admin_review: "مراجعة ربط عقار بوحدة مشروع",
+    layan_reorder_supplier_ads: "إعادة ترتيب الإعلانات الممولة"
   };
   const VERB = { POST: "إضافة", PATCH: "تعديل", DELETE: "حذف", PUT: "تعديل" };
 
@@ -54,8 +63,11 @@
     if (!roles.has(auth)) {
       roles.set(auth, nativeFetch(base + "/rest/v1/rpc/layan_admin_whoami", {
         method: "POST", headers: { apikey: key, Authorization: auth, "Content-Type": "application/json" }, body: "{}"
-      }).then(r => r.ok ? r.json() : "owner") // not deployed yet: behave exactly as before
-        .catch(() => "owner"));
+      }).then(async r => {
+        if (!r.ok) return "unknown";
+        const role = await r.json().catch(() => null);
+        return role === "owner" || role === "admin" ? role : "none";
+      }).catch(() => "unknown"));
     }
     return roles.get(auth);
   }
@@ -94,6 +106,12 @@
     if (rpcName && PASS_RPC.test(rpcName)) return nativeFetch(input, init);
     const auth = headerOf(init.headers, "Authorization");
     const role = await roleFor(auth);
+    if (role === "unknown") {
+      return new Response(JSON.stringify({
+        code: "ROLE_CHECK_FAILED",
+        message: "تعذر التحقق من صلاحيات الحساب؛ لم يتم تنفيذ التعديل. حاول مرة أخرى."
+      }), { status: 503, headers: { "Content-Type": "application/json" } });
+    }
     if (role !== "admin") return nativeFetch(input, init);
 
     let body = null;
@@ -121,12 +139,54 @@
     async perform(payload, authHeader) {
       const auth = authHeader || lastAuth;
       if (!auth) throw new Error("سجّل الدخول مرة أخرى ثم أعد المحاولة.");
+      const allowedResources = new Set([
+        "supplier_ads", "property_offers", "marketplace_listings", "company_property_ads",
+        "partner_ad_slots", "directory_sources", "directory_change_log", "directory_entities",
+        "directory_projects", "directory_areas", "directory_opportunities", "directory_entity_sources",
+        "directory_project_sources", "directory_opportunity_sources", "platform_sponsors"
+      ]);
+      const allowedMethods = {
+        property_offers: ["POST","PATCH"], marketplace_listings: ["POST","PATCH"],
+        supplier_ads: ["POST","PATCH"], company_property_ads: ["POST","PATCH"],
+        partner_ad_slots: ["PATCH"], platform_sponsors: ["PATCH"], directory_sources: ["POST","PATCH"],
+        directory_entities: ["PATCH"], directory_projects: ["PATCH"], directory_areas: ["PATCH"],
+        directory_opportunities: ["PATCH"], directory_change_log: ["POST"],
+        directory_entity_sources: ["POST"], directory_project_sources: ["POST"],
+        directory_opportunity_sources: ["POST"]
+      };
+      const allowedRpcs = new Set([
+        "layan_admin_crm_save_lead", "layan_admin_crm_log_activity",
+        "layan_admin_crm_restore_lead", "layan_admin_crm_archive_lead",
+        "layan_admin_review_property_offer", "layan_activate_supplier_ad",
+        "layan_reject_supplier_ad", "layan_admin_set_offer_trust_badge",
+        "layan_review_company_profile", "layan_admin_review_edit",
+        "directory_admin_mutate_with_audit", "layan_approve_free_trial_ad",
+        "layan_admin_review_logo", "company_claim_admin_review",
+        "company_entity_profile_update_admin_review", "company_project_request_admin_review",
+        "company_project_unit_request_admin_review", "property_offer_project_unit_request_admin_review", "layan_reorder_supplier_ads"
+      ]);
+      const method = String(payload?.method || "").toUpperCase();
+      const target = new URL(String(payload?.path || ""), base);
+      const resourceMatch = target.pathname.match(/^\/rest\/v1\/([a-z_]+)$/);
+      const rpcMatch = target.pathname.match(/^\/rest\/v1\/rpc\/([a-z_]+)$/);
+      const isTableWrite = resourceMatch && allowedResources.has(resourceMatch[1])
+        && allowedMethods[resourceMatch[1]]?.includes(method)
+        && (method === "POST" || (method === "PATCH"
+          && /(^|&)id=eq\.[0-9a-fA-F-]+(&|$)/.test(target.search.slice(1))));
+      const isCrmRpc = rpcMatch && allowedRpcs.has(rpcMatch[1]) && method === "POST" && !target.search;
+      if (!["POST", "PATCH", "DELETE"].includes(method)
+          || target.origin !== new URL(base).origin
+          || (!isTableWrite && !isCrmRpc)
+          || (payload.body != null && (typeof payload.body !== "object" || Array.isArray(payload.body)))) {
+        throw new Error("العملية المطلوبة لا تطابق قائمة التعديلات المسموح بها؛ تم إيقاف التنفيذ.");
+      }
       const headers = { apikey: key, Authorization: auth, "Content-Type": "application/json" };
-      headers.Prefer = payload.prefer || "return=minimal";
-      const res = await nativeFetch(base + payload.path, {
-        method: payload.method,
+      headers.Prefer = "return=minimal";
+      const res = await nativeFetch(target.href, {
+        method,
         headers,
-        body: payload.body == null ? undefined : (typeof payload.body === "string" ? payload.body : JSON.stringify(payload.body))
+        redirect: "error",
+        body: payload.body == null ? undefined : JSON.stringify(payload.body)
       });
       const text = await res.text();
       if (!res.ok) {

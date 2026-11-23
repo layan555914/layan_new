@@ -5,19 +5,63 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CONFIG_FILE="$ROOT_DIR/supabase/config.toml"
 STORAGE_BASELINE_FILE="$ROOT_DIR/supabase/bootstrap/storage-baseline.sql"
 ASSERTIONS_FILE="$ROOT_DIR/tests/db/current-state-schema.assertions.sql"
+CRM_API_TEST="$ROOT_DIR/tests/db/admin-crm-api.mjs"
+APPROVAL_GATE_TEST="$ROOT_DIR/tests/ui/admin-approval-gate.mjs"
+CRM_UI_TEST="$ROOT_DIR/tests/ui/admin-crm-regressions.mjs"
 STORAGE_API_TEST="$ROOT_DIR/tests/db/storage-api-baseline.mjs"
 TEST_DIR="$(mktemp -d "${TMPDIR:-/tmp}/asyut-aqar-current-state.XXXXXX")"
-STACK_STARTED=0
-
 cleanup() {
-  if [[ "$STACK_STARTED" == "1" ]]; then
+  # Stop even after a partially failed `supabase start`; stopping an absent stack is harmless.
+  if [[ -f "$TEST_DIR/supabase/config.toml" ]]; then
     (cd "$TEST_DIR" && supabase stop --no-backup) >/dev/null 2>&1 || true
   fi
   rm -rf "$TEST_DIR"
 }
 trap cleanup EXIT
 
-for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$STORAGE_API_TEST"; do
+node --check "$ROOT_DIR/admin-crm.js"
+node --check "$ROOT_DIR/admin-approval.js"
+node --check "$ROOT_DIR/admin-guest-intake.js"
+node --check "$ROOT_DIR/tests/ui/guest-intake-contracts.mjs"
+
+if ! grep -Fq 'id="adminGuestIntake"' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-guest-intake.js?v=20261123-2' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-guest-intake.js?v=20261123-2' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-guest-intake.css?v=20261123-2' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-guest-intake.css?v=20261123-2' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq '[functions.guest-intake]' "$CONFIG_FILE"; then
+  echo "The guest-intake admin workspace, PWA assets, or Edge Function config is incomplete." >&2
+  exit 1
+fi
+node --check "$CRM_API_TEST"
+node --check "$APPROVAL_GATE_TEST"
+node --check "$CRM_UI_TEST"
+node --check "$STORAGE_API_TEST"
+node "$ROOT_DIR/tests/ui/guest-intake-contracts.mjs"
+node "$APPROVAL_GATE_TEST"
+node "$CRM_UI_TEST"
+
+if ! grep -Fq 'id="adminCrm"' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-crm.js?v=20261121-1' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-crm.js?v=20261121-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-crm.css?v=20261121-1' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-crm.css?v=20261121-1' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-approval.js?v=20261123-owner-approval-allowlist-3' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-approval.js?v=20261123-owner-approval-allowlist-3' "$ROOT_DIR/sw.js" \
+  || ! grep -Fq './admin-layout.js?v=20261121-crm-view-1' "$ROOT_DIR/admin.html" \
+  || ! grep -Fq './admin-layout.js?v=20261121-crm-view-1' "$ROOT_DIR/sw.js"; then
+  echo "The CRM admin workspace is not fully wired into the admin page and PWA shell." >&2
+  exit 1
+fi
+
+# Phase 2 service-company categories must stay out of the phase 1 admin UI.
+if grep -Eq 'option value="(supplier_factory|finishing_furniture|service_provider)"' "$ROOT_DIR/admin.html" \
+  || grep -Eq 'supplier_factory:|finishing_furniture:|service_provider:' "$ROOT_DIR/admin-crm.js"; then
+  echo "Phase 2 service-company categories are exposed in the phase 1 CRM UI." >&2
+  exit 1
+fi
+
+for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" "$CRM_API_TEST" "$APPROVAL_GATE_TEST" "$CRM_UI_TEST" "$STORAGE_API_TEST"; do
   if [[ ! -s "$required_file" ]]; then
     echo "Required current-state rehearsal file is missing or empty: $required_file" >&2
     exit 1
@@ -25,7 +69,7 @@ for required_file in "$CONFIG_FILE" "$STORAGE_BASELINE_FILE" "$ASSERTIONS_FILE" 
 done
 
 # Never inherit credentials capable of linking this rehearsal to hosted Supabase.
-unset SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD
+unset SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_DB_URL SUPABASE_PROJECT_ID
 mkdir -p "$TEST_DIR"
 cd "$TEST_DIR"
 
@@ -63,11 +107,11 @@ mkdir -p "$TEST_DIR/supabase/migrations"
 # Copy the reviewed Nov 3 schema baseline, its stable marketplace seed, the
 # current main-branch incremental migrations, and the company-claim feature
 # migrations. No production data or no-op historical ledger markers are copied.
+cp "$ROOT_DIR"/supabase/bootstrap/ci-migrations/*.sql "$TEST_DIR/supabase/migrations/"
 cp "$ROOT_DIR"/supabase/migrations/*.sql "$TEST_DIR/supabase/migrations/"
 
 echo "Starting a disposable local Supabase stack; no hosted project is linked."
 supabase start -x "studio,edge-runtime,logflare,vector,postgres-meta,imgproxy"
-STACK_STARTED=1
 supabase db reset --local --no-seed
 supabase migration list --local
 
@@ -119,8 +163,9 @@ fi
 
 export API_URL ANON_KEY SERVICE_ROLE_KEY
 export DATABASE_URL="$DB_URL"
+node "$CRM_API_TEST"
 export MAILPIT_URL="http://127.0.0.1:54324"
 node "$STORAGE_API_TEST"
 unset MAILPIT_URL DATABASE_URL SERVICE_ROLE_KEY ANON_KEY
 
-echo "PASS: clean current-state schema build from baseline + post-baseline migrations, claim RLS/lock assertions, private admin isolation, and local Storage/Auth API checks."
+echo "PASS: current-main clean local schema, CRM isolation/RLS/grants and append-only timeline, fail-closed approval, plus local Auth and Storage API boundaries."

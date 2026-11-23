@@ -18,11 +18,26 @@ if (!apiUrl || !anonKey || !serviceRoleKey || !databaseUrl) {
   throw new Error('API_URL, ANON_KEY, SERVICE_ROLE_KEY and DATABASE_URL are required from local Supabase CLI status.');
 }
 
-const parsedUrl = new URL(apiUrl);
-const parsedDatabaseUrl = new URL(databaseUrl);
-if (!['127.0.0.1', 'localhost', '::1'].includes(parsedUrl.hostname)
-    || !['127.0.0.1', 'localhost', '::1'].includes(parsedDatabaseUrl.hostname)) {
-  throw new Error('Refusing to run Auth, database or Storage tests against a non-local Supabase host.');
+function isLoopbackHost(hostname) {
+  return ['127.0.0.1', 'localhost', '::1'].includes(String(hostname).replace(/^\[|\]$/g, '').toLowerCase());
+}
+function requireLocalUrl(value, label, protocols) {
+  const parsed = new URL(value);
+  if (!protocols.includes(parsed.protocol) || !isLoopbackHost(parsed.hostname)) {
+    throw new Error(`Refusing to use non-local or unsupported ${label}: expected ${protocols.join('/')} on loopback.`);
+  }
+  return parsed;
+}
+const parsedUrl = requireLocalUrl(apiUrl, 'API_URL', ['http:']);
+const parsedDatabaseUrl = requireLocalUrl(databaseUrl, 'DATABASE_URL', ['postgres:', 'postgresql:']);
+const parsedMailpitUrl = requireLocalUrl(mailpitUrl, 'MAILPIT_URL', ['http:']);
+
+async function localFetch(target, options = {}, expectedOrigin = parsedUrl.origin) {
+  const parsed = target instanceof URL ? target : new URL(target);
+  if (parsed.origin !== expectedOrigin || parsed.protocol !== 'http:' || !isLoopbackHost(parsed.hostname)) {
+    throw new Error('Refusing to fetch outside the explicitly configured local test service.');
+  }
+  return fetch(parsed, { ...options, redirect: options.redirect === 'manual' ? 'manual' : 'error' });
 }
 
 const bucketPhotos = 'layan_real_estat';
@@ -54,7 +69,7 @@ function headers(apiKey, accessToken, extra = {}) {
 }
 
 async function request(path, options = {}) {
-  const response = await fetch(new URL(path, apiUrl), options);
+  const response = await localFetch(new URL(path, apiUrl), options, parsedUrl.origin);
   const bodyText = await response.text();
   let body;
   try {
@@ -167,12 +182,12 @@ async function recoverPasswordThroughMailpit(email, oldPassword) {
 
   let message;
   for (let attempt = 0; attempt < 20 && !message; attempt += 1) {
-    const listResponse = await fetch(mailpitUrl + '/api/v1/messages?start=0&limit=50');
+    const listResponse = await localFetch(new URL('/api/v1/messages?start=0&limit=50', mailpitUrl), {}, parsedMailpitUrl.origin);
     assert(listResponse.ok, `Mailpit is not reachable at ${mailpitUrl} (HTTP ${listResponse.status}).`);
     const list = await listResponse.json();
     const candidate = (list.messages || []).find(item => JSON.stringify(item.To || []).toLowerCase().includes(email.toLowerCase()));
     if (candidate?.ID) {
-      const detailResponse = await fetch(mailpitUrl + '/api/v1/message/' + encodeURIComponent(candidate.ID));
+      const detailResponse = await localFetch(new URL('/api/v1/message/' + encodeURIComponent(candidate.ID), mailpitUrl), {}, parsedMailpitUrl.origin);
       assert(detailResponse.ok, 'Mailpit did not return the recovery message details.');
       message = await detailResponse.json();
     } else {
@@ -195,7 +210,10 @@ async function recoverPasswordThroughMailpit(email, oldPassword) {
   });
   assert(recoveryUrl, 'Recovery email did not contain a valid Supabase recovery verification link.');
 
-  const verification = await fetch(recoveryUrl, { redirect: 'manual' });
+  const recoveryTarget = new URL(recoveryUrl);
+  assert(recoveryTarget.origin === parsedUrl.origin && isLoopbackHost(recoveryTarget.hostname) && recoveryTarget.protocol === 'http:',
+    'Recovery email URL must resolve only to the configured local Supabase Auth service.');
+  const verification = await localFetch(recoveryTarget, { redirect: 'manual' }, parsedUrl.origin);
   assert([301, 302, 303, 307, 308].includes(verification.status),
     `Recovery verification did not redirect as expected (HTTP ${verification.status}).`);
   const location = verification.headers.get('location');
@@ -207,7 +225,7 @@ async function recoverPasswordThroughMailpit(email, oldPassword) {
   assert(recoveryAccessToken, 'Recovery link did not establish an access token.');
 
   const newPassword = oldPassword + '-Recovered!';
-  const updateResponse = await fetch(new URL('/auth/v1/user', apiUrl), {
+  const updateResponse = await localFetch(new URL('/auth/v1/user', apiUrl), {
     method: 'PUT',
     headers: headers(anonKey, recoveryAccessToken, { 'content-type': 'application/json' }),
     body: JSON.stringify({ password: newPassword }),
@@ -430,7 +448,7 @@ async function testPropertyOfferLifecycle(photoUrl) {
     && publicApprovedRead.body[0].image_urls?.[0] === photoUrl,
     'Approved property offer was not publicly visible with its image URL.');
 
-  const publicImage = await fetch(photoUrl, { signal: AbortSignal.timeout(10000) });
+  const publicImage = await localFetch(photoUrl, { signal: AbortSignal.timeout(10000) }, parsedUrl.origin);
   assert(publicImage.ok, `Approved offer image was not publicly readable (HTTP ${publicImage.status}).`);
 
   const reject = await restRequest('/rest/v1/rpc/layan_admin_review_property_offer', {

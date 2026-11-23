@@ -1,6 +1,6 @@
 // ASYUT AQAR admin — direct ad creation and editing on behalf of existing customer accounts.
-// All writes still pass through Supabase RLS. The database migration grants these paths
-// only to layan_is_admin(), and blocks owner_id reassignment after a row is created.
+// Database writes remain protected by Supabase RLS and owner_id cannot be reassigned.
+// Image uploads/deletes use the admin-media Edge Function with a verified admin session.
 (() => {
   "use strict";
   let A = null;
@@ -129,17 +129,15 @@
     if (jpg.type !== "image/jpeg") throw new Error("تعذر تحويل الصورة إلى JPG.");
     if (jpg.size > 5 * 1024 * 1024) throw new Error("حجم الصورة بعد الضغط أكبر من 5 ميجابايت.");
     const base = String(cfg.SUPABASE_URL || "").replace(/\/$/, "");
-    const filename = "admin-" + (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())) + ".jpg";
-    const path = "offers/" + ownerId + "/" + filename;
-    const url = base + "/storage/v1/object/layan_real_estat/" + path;
+    const url = base + "/functions/v1/admin-media?action=upload";
+    const headers = { apikey:cfg.SUPABASE_PUBLISHABLE_KEY, "Content-Type":"image/jpeg", "x-owner-id":String(ownerId || "") };
+    const options = { method:"POST", headers, body:jpg };
     const response = typeof auth.authedFetch === "function"
-      ? await auth.authedFetch(url, { method:"POST", headers:{ "Content-Type":"image/jpeg", "x-upsert":"false" }, body:jpg })
-      : await fetch(url, { method:"POST", headers:{ apikey:cfg.SUPABASE_PUBLISHABLE_KEY, Authorization:"Bearer " + session.access_token, "Content-Type":"image/jpeg", "x-upsert":"false" }, body:jpg });
-    if (!response.ok) {
-      const raw = await response.text();
-      throw new Error("تعذر رفع الصورة (" + response.status + "): " + raw.slice(0,160));
-    }
-    return base + "/storage/v1/object/public/layan_real_estat/" + path;
+      ? await auth.authedFetch(url, options)
+      : await fetch(url, { ...options, headers:{ ...headers, Authorization:"Bearer " + session.access_token } });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.public_url) throw new Error(data.error || "تعذر رفع صورة الإعلان.");
+    return data.public_url;
   }
 
   async function deleteStoredImage(value) {
@@ -153,21 +151,16 @@
     const marker = "/storage/v1/object/public/layan_real_estat/";
     const index = source.pathname.indexOf(marker);
     if (index < 0) return;
-    const path = source.pathname.slice(index + marker.length).split("/").map(decodeURIComponent);
-    if (path[0] !== "offers" || path.length < 3) return;
-    const target = base + "/storage/v1/object/layan_real_estat";
-    const options = {
-      method:"DELETE",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ prefixes:[path.join("/")] })
-    };
+    const path = source.pathname.slice(index + marker.length).split("/").map(decodeURIComponent).join("/");
+    if (!/^offers\/[0-9a-f-]{36}\/[a-zA-Z0-9._-]{1,160}\.(jpg|jpeg|png|webp)$/i.test(path)) return;
+    const target = base + "/functions/v1/admin-media?action=delete";
+    const headers = { apikey:cfg.SUPABASE_PUBLISHABLE_KEY, "Content-Type":"application/json" };
+    const options = { method:"POST", headers, body:JSON.stringify({ path }) };
     const response = typeof auth.authedFetch === "function"
       ? await auth.authedFetch(target, options)
-      : await fetch(target, {
-          ...options,
-          headers:{ ...options.headers, apikey:cfg.SUPABASE_PUBLISHABLE_KEY, Authorization:"Bearer " + session.access_token }
-        });
-    if (!response.ok && response.status !== 404) throw new Error("تعذر حذف ملف صورة قديم من التخزين.");
+      : await fetch(target, { ...options, headers:{ ...headers, Authorization:"Bearer " + session.access_token } });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok && response.status !== 404) throw new Error(data.error || "تعذر حذف ملف صورة قديم من التخزين.");
   }
 
   function readForm(form, kind, creating) {

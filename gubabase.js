@@ -774,6 +774,107 @@
     return row.id;
   }
 
+  async function guestIntakeRequest(payload) {
+    const response = await fetch(url + "/functions/v1/guest-intake", {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      redirect: "error"
+    });
+    const raw = await response.text();
+    let data = null;
+    try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
+    if (!response.ok) {
+      const error = new Error(data?.error || "تعذر إرسال الطلب إلى خدمة استقبال الزوار.");
+      error.status = response.status;
+      throw error;
+    }
+    return data;
+  }
+
+  async function uploadGuestFiles(submissionId, files, kind, honeypot = "") {
+    const uploaded = [];
+    for (const file of files || []) {
+      const isImage = kind === "images";
+      const allowedMime = isImage ? ["image/jpeg"] : ["application/pdf", "image/jpeg", "image/png"];
+      const maxSize = 5 * 1024 * 1024;
+      if (!allowedMime.includes(file.type) || file.size < (isImage ? 4 : 8) || file.size > maxSize) {
+        throw new Error(isImage ? "صور الزائر يجب أن تكون JPG/JPEG ولا تتجاوز 5 ميجابايت للصورة." : "مستندات الزائر المسموحة PDF أو JPG أو PNG وبحد أقصى 5 ميجابايت.");
+      }
+      const head = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+      const valid = file.type === "image/jpeg"
+        ? head[0] === 0xFF && head[1] === 0xD8 && head[2] === 0xFF
+        : file.type === "image/png"
+          ? head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4E && head[3] === 0x47
+          : head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46;
+      if (!valid) throw new Error("محتوى أحد الملفات لا يطابق نوعه الحقيقي.");
+      const endpoint = url.replace(/\/$/, "") + "/functions/v1/guest-intake?action=upload-file&submission_id="
+        + encodeURIComponent(submissionId) + "&kind=" + encodeURIComponent(kind) + "&honeypot=" + encodeURIComponent(honeypot);
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": file.type },
+        body: file,
+        redirect: "error"
+      });
+      const raw = await response.text();
+      let result = null;
+      try { result = raw ? JSON.parse(raw) : null; } catch (_) {}
+      if (!response.ok || !result?.path) {
+        const error = new Error(result?.error || "فشل رفع ملف مؤقت. حاول مرة أخرى.");
+        error.status = response.status;
+        throw error;
+      }
+      uploaded.push(result.path);
+    }
+    return uploaded;
+  }
+
+  async function cleanupGuestUploads() {
+    // Guest browsers cannot delete objects from the private bucket.
+    // Unsubmitted temporary files are removed only by the owner-only 7-day cleanup.
+    return undefined;
+  }
+
+  const guestUploadCache = new Map();
+
+  async function submitGuestProperty(offer, imageFiles, documentFiles, honeypot = "", submissionId = crypto.randomUUID()) {
+    let cached = guestUploadCache.get(submissionId);
+    if (!cached) {
+      let imagePaths = [], documentPaths = [];
+      try {
+        imagePaths = await uploadGuestFiles(submissionId, imageFiles, "images", honeypot);
+        documentPaths = await uploadGuestFiles(submissionId, documentFiles, "documents", honeypot);
+      } catch (error) {
+        await cleanupGuestUploads(submissionId, imagePaths, documentPaths);
+        throw error;
+      }
+      cached = { imagePaths, documentPaths };
+      guestUploadCache.set(submissionId, cached);
+    }
+    try {
+      const result = await guestIntakeRequest({
+        action: "submit-property", submission_id: submissionId,
+        payload: { ...offer, contact_consent: offer.contact_consent === true },
+        image_paths: cached.imagePaths, document_paths: cached.documentPaths, honeypot
+      });
+      guestUploadCache.delete(submissionId);
+      return result;
+    } catch (error) {
+      // A transport failure may happen after commit. Keep the same ID and file paths for a safe retry.
+      if (Number.isFinite(error?.status)) {
+        await cleanupGuestUploads(submissionId, cached.imagePaths, cached.documentPaths);
+        guestUploadCache.delete(submissionId);
+      }
+      throw error;
+    }
+  }
+
+  async function submitGuestBuyer(payload, honeypot = "", submissionId = crypto.randomUUID()) {
+    return guestIntakeRequest({
+      action: "submit-buyer", submission_id: submissionId, payload, honeypot
+    });
+  }
+
   async function createOffer(offer) {
     if (!isAuthenticated()) throw new Error("سجّل الدخول أو أنشئ حسابًا أولًا لإرسال عرضك.");
     const payload = {
@@ -912,6 +1013,6 @@
   }
 
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, markNewAccountProfilePending, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, getPriceGuideOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
+  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, markNewAccountProfilePending, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, getPriceGuideOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, submitGuestProperty, submitGuestBuyer, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();

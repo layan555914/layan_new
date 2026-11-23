@@ -134,3 +134,14 @@ PostgreSQL 16 smoke tests and the current GitHub Actions workflow passed on the 
 ## Important distinction
 
 The remaining 65 missing historical sources are a repository traceability/reproducibility problem. They do not by themselves prove that the current production schema is broken, and they do not prevent an independently reviewed static front-end release once all required forward migrations are already applied. They do prevent safe reconstruction of the entire database migration history from this repository and block any use of `db push`, migration repair, or baseline operations until the source gap is resolved.
+
+## Pre-release hardening additions — November 23, 2026
+
+The following forward migrations are included in the current pre-release review set (some already exist on the repository's main branch). Their presence in Git does **not** mean they have been applied to production; they must not be treated as part of the production migration ledger:
+
+- `20261121120000_admin_crm_private_atomic.sql` — private CRM tables and owner-only CRM operations.
+- `20261122191600_enforce_owner_approval_on_admin_ad_writes.sql` — owner-only gates for the enumerated ad, sponsor, and Storage write policies and review RPCs.
+- `20261123120000_harden_admin_change_execution.sql` — atomic claim/finish tokens, executing state, duplicate-active-request prevention, exact resource/method/RPC/field allowlists, and request-path validation.
+- `20261123130000_secure_guest_intake.sql` — private guest property and buyer request queues, service-role-only intake RPCs, rate-limit storage, and owner/admin moderation RPCs.
+
+These migrations are being prepared for disposable local clean-install rehearsal only. Do not run `supabase db push`, migration repair, or any production SQL operation for them without a separately reviewed rollout plan, verified backup, and explicit owner approval.

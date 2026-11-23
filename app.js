@@ -1554,6 +1554,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   [calcContract, calcPaid, calcFees].forEach((input) => input?.addEventListener("input", updateCalculator));
   updateCalculator();
 
+  let pendingGuestSubmissionId = null;
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
@@ -1608,6 +1609,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       project_name: value("project_name"),
       company_business_name: selectedAccountType === "company" ? value("company_business_name") : "",
       contact_phone: value("contact_phone"),
+      contact_consent: data.get("contact_consent") === "on",
       featured_requested: value("promotion_plan") === "featured_15" || value("promotion_plan") === "featured_30",
       promotion_status: (value("promotion_plan") === "featured_15" || value("promotion_plan") === "featured_30") ? "requested" : "none",
       is_featured: false,
@@ -1626,7 +1628,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    if (offer.contact_phone && !data.get("contact_consent")) {
+    if (offer.contact_phone && !data.get("contact_consent") && window.LAYAN_SUPABASE?.isAuthenticated?.()) {
       setStatus("لنشر رقم التواصل داخل الإعلان يجب الموافقة صراحةً على نشره. اترك الرقم فارغًا إن لم ترغب في نشره.");
       return;
     }
@@ -1705,33 +1707,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     let uploadedImageUrls = [];
     let uploadedDocumentPaths = [];
     let offerWasCreated = false;
+    let guestSubmission = false;
     let apiForCleanup = null;
     try {
       const api = window.LAYAN_SUPABASE;
       apiForCleanup = api;
       if (!api?.createOffer) throw new Error("اتصال Supabase غير جاهز.");
-      if (!api.isAuthenticated()) throw new Error("سجّل الدخول أو أنشئ حسابًا أولًا لإرسال عرضك.");
+      if (!api.isAuthenticated()) {
+        if (selectedAccountType === "company") throw new Error("إعلانات الشركات تتطلب تسجيل الدخول بالبريد الإلكتروني وكود التحقق. يمكنك إرسال إعلان فردي كزائر.");
+        if (!api.submitGuestProperty) throw new Error("خدمة استقبال إعلانات الزوار غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
+        if (!offer.contact_name || !offer.contact_phone) throw new Error("لإرسال إعلان دون حساب، اكتب اسم صاحب العرض ورقم تواصل صحيحًا.");
+        setStatus("جارٍ رفع الصور والمستندات إلى مساحة خاصة...");
+        if (!pendingGuestSubmissionId) pendingGuestSubmissionId = crypto.randomUUID();
+        await api.submitGuestProperty(offer, files, documentFiles, value("website"), pendingGuestSubmissionId);
+        pendingGuestSubmissionId = null;
+        guestSubmission = true;
+      } else {
+        if (files.length) {
+          if (!api.uploadImages) throw new Error("رفع الصور غير مفعّل.");
+          setStatus("جارٍ رفع الصور...");
+          uploadedImageUrls = await api.uploadImages(files);
+          offer.image_urls = uploadedImageUrls;
+        }
 
-      if (files.length) {
-        if (!api.uploadImages) throw new Error("رفع الصور غير مفعّل.");
-        setStatus("جارٍ رفع الصور...");
-        uploadedImageUrls = await api.uploadImages(files);
-        offer.image_urls = uploadedImageUrls;
-      }
+        setStatus(selectedAccountType === "company" ? "جارٍ ربط العقار بإعلان الشركة..." : "جارٍ حفظ العرض...");
+        if (documentFiles.length) {
+          if (!api.uploadPropertyDocuments) throw new Error("رفع مستندات العقار غير جاهز. حدّث الصفحة وحاول مرة أخرى.");
+          setStatus("جارٍ رفع المستندات إلى مساحة خاصة...");
+          uploadedDocumentPaths = await api.uploadPropertyDocuments(documentFiles);
+          offer.document_urls = uploadedDocumentPaths;
+        }
 
-      setStatus(selectedAccountType === "company" ? "جارٍ ربط العقار بإعلان الشركة..." : "جارٍ حفظ العرض...");
-      if (documentFiles.length) {
-        if (!api.uploadPropertyDocuments) throw new Error("رفع مستندات العقار غير جاهز. حدّث الصفحة وحاول مرة أخرى.");
-        setStatus("جارٍ رفع المستندات إلى مساحة خاصة...");
-        uploadedDocumentPaths = await api.uploadPropertyDocuments(documentFiles);
-        offer.document_urls = uploadedDocumentPaths;
+        if (selectedAccountType === "company") {
+          if (!api.getOrCreateCompanyAd) throw new Error("ميزة إعلانات الشركات غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
+          offer.company_ad_id = await api.getOrCreateCompanyAd(offer.company_business_name);
+        }
+        await api.createOffer(offer);
       }
-
-      if (selectedAccountType === "company") {
-        if (!api.getOrCreateCompanyAd) throw new Error("ميزة إعلانات الشركات غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
-        offer.company_ad_id = await api.getOrCreateCompanyAd(offer.company_business_name);
-      }
-      await api.createOffer(offer);
       offerWasCreated = true;
 
       form.reset();
@@ -1739,11 +1751,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       updateLandFields();
       clearPhotoPreview();
       closeDialog();
-      setStatus(offer.featured_requested
-        ? "تم إرسال العرض وطلب الإعلان المميز للمراجعة. ستتواصل معك إدارة أسيوط عقار عبر واتساب لتوضيح تفاصيل الخدمة؛ لا تحوّل أي مبلغ قبل تأكيد التفاصيل رسميًا من الإدارة."
-        : selectedAccountType === "company"
-          ? "تم إرسال العقار للمراجعة وربطه بإعلان الشركة. يمكنك إضافة عقارين آخرين كحد أقصى إلى إعلان الشركة نفسه باستخدام اسم الشركة ذاته. قاعدة البيانات تمنع إضافة عقار رابع إلى الإعلان الواحد."
-          : "تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
+      setStatus(guestSubmission
+        ? "استلمنا إعلانك كزائر بنجاح. لا تحتاج إلى إنشاء حساب؛ الإعلان والصور والمستندات ستظل خاصة ولن تظهر للزوار إلا بعد مراجعة الإدارة والموافقة عليها."
+        : offer.featured_requested
+          ? "تم إرسال العرض وطلب الإعلان المميز للمراجعة. ستتواصل معك إدارة أسيوط عقار عبر واتساب لتوضيح تفاصيل الخدمة؛ لا تحوّل أي مبلغ قبل تأكيد التفاصيل رسميًا من الإدارة."
+          : selectedAccountType === "company"
+            ? "تم إرسال العقار للمراجعة وربطه بإعلان الشركة. يمكنك إضافة عقارين آخرين كحد أقصى إلى إعلان الشركة نفسه باستخدام اسم الشركة ذاته. قاعدة البيانات تمنع إضافة عقار رابع إلى الإعلان الواحد."
+            : "تم إرسال العرض للمراجعة، وسيظهر بعد الموافقة.");
     } catch (error) {
       console.error("فشل حفظ العرض:", error);
       if (!offerWasCreated && uploadedDocumentPaths.length && apiForCleanup?.deleteUploadedPropertyDocuments) {
