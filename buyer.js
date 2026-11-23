@@ -11,6 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="buyer-match-layout">
         <form id="buyerPreferenceForm" class="buyer-preference-form">
           <p class="buyer-login-note" id="buyerLoginNote">سجّل الدخول لحفظ طلبك ومتابعة العروض المناسبة لك.</p>
+          <div id="buyerGuestContactFields" class="buyer-guest-contact">
+            <label>اسمك للتواصل
+              <input name="contact_name" type="text" maxlength="120" autocomplete="name" placeholder="اكتب اسمك" required>
+            </label>
+            <label>رقم الموبايل
+              <input name="contact_phone" type="tel" inputmode="tel" maxlength="20" autocomplete="tel" pattern="[0-9+\\s()-]{7,20}" placeholder="مثال: 01012345678" required>
+            </label>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" hidden>
+            <small>بيانات التواصل تُرسل لإدارة أسيوط عقار لمتابعة طلبك، ولا تُنشر على الموقع.</small>
+          </div>
           <label>إيه نوع العقار اللي بتدور عليه؟
             <select name="property_type" required><option value="أي نوع">أي نوع</option><option value="شقة">شقة</option><option value="منزل">منزل / بيت</option><option value="فيلا">فيلا</option><option value="محل">محل تجاري</option><option value="مكتب إداري">مكتب إداري</option><option value="عيادة طبية">عيادة طبية</option><option value="مخزن">مخزن</option><option value="معرض">معرض</option><option value="أرض">أي أرض</option><option value="أرض مطروحة للبناء">أرض مطروحة للبناء</option><option value="أرض تنازل">أرض تنازل</option></select>
           </label>
@@ -80,6 +90,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const authService = () => window.LAYAN_SUPABASE || null;
   const getSession = () => authService()?.getSession?.() || null;
   const auth = () => { const s=getSession(); return s?.access_token && s?.user?.id ? s : null; };
+  const guestContactFields = $("buyerGuestContactFields");
+  function updateGuestContactFields() {
+    const isGuest = !auth();
+    if (guestContactFields) {
+      guestContactFields.hidden = !isGuest;
+      guestContactFields.querySelectorAll("input[name='contact_name'], input[name='contact_phone']").forEach(el => { el.required = isGuest; });
+    }
+    if (loginNote) loginNote.textContent = isGuest
+      ? "تقدر ترسل طلب البحث كزائر دون إنشاء حساب. سجّل الدخول فقط لو عايز تحفظ اختياراتك وتفعّل التنبيهات."
+      : "طلبك واختيارات التنبيه محفوظة داخل حسابك.";
+  }
   async function requireSession() {
     const service=authService();
     if(!service?.requireAuthenticated) throw new Error("خدمة تسجيل الدخول غير جاهزة. حدّث الصفحة وحاول مرة أخرى.");
@@ -173,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadSaved() {
     const current=auth();
     loginNote.hidden=Boolean(current);
+    updateGuestContactFields();
     if (!current) return;
     try {
       const s=await requireSession();
@@ -185,7 +207,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   form.addEventListener("submit",async e=>{
     e.preventDefault();
-    if (!auth()) { status.textContent="سجّل الدخول أولًا لحفظ طلبك ومتابعة العروض المناسبة."; document.getElementById("loginBtn")?.click(); return; }
+    if (!auth()) {
+      const contactName=String(form.elements.namedItem("contact_name")?.value||"").trim();
+      const contactPhone=String(form.elements.namedItem("contact_phone")?.value||"").trim();
+      const honeypot=String(form.elements.namedItem("website")?.value||"");
+      if(contactName.length<2 || !/^[0-9+() -]{7,20}$/.test(contactPhone)) {
+        status.textContent="اكتب اسمك ورقم موبايل صحيحًا حتى تتمكن الإدارة من متابعة طلبك.";
+        return;
+      }
+      const guestPayload={...values(),contact_name:contactName,contact_phone:contactPhone};
+      status.textContent="جارٍ إرسال طلبك إلى إدارة أسيوط عقار...";
+      try {
+        const result=await authService()?.submitGuestBuyer?.(guestPayload,honeypot);
+        if(!result?.id) throw new Error("تعذر تأكيد استلام طلبك.");
+        status.textContent="استلمنا طلبك بنجاح. هيتواصل معاك فريق أسيوط عقار على رقم الموبايل لمتابعة احتياجك. لا تحتاج إلى إنشاء حساب.";
+        form.elements.namedItem("contact_name").value="";
+        form.elements.namedItem("contact_phone").value="";
+      } catch(error) { status.textContent="تعذر إرسال طلبك: "+(error.message||"حاول مرة أخرى."); }
+      return;
+    }
     saved=values();
     baselineReady=false;
     knownMatches=new Set();
@@ -197,6 +237,8 @@ document.addEventListener("DOMContentLoaded", () => {
       status.textContent="تم حفظ اختيارات التنبيه. ستصلك الإعلانات العامة أو العروض المطابقة حسب الخيارات التي فعلتها.";
     } catch(e) { status.textContent="تعذر حفظ الطلب: "+e.message; }
   });
+  window.addEventListener("layan-auth-callback", updateGuestContactFields);
+  updateGuestContactFields();
   const pushSubscribeButton=$("buyerPushSubscribe");
   const pushUnsubscribeButton=$("buyerPushUnsubscribe");
   function decodeVapidKey(value) {
