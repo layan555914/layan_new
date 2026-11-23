@@ -392,7 +392,16 @@ try {
         const remaining = runLocalSql("SELECT count(*) FROM auth.users WHERE id = " + safeUuid(id) + ";");
         if (remaining !== "0") throw new Error("Local Auth user still exists after SQL cleanup.");
       } catch (cleanupError) {
-        throw new Error("CRM local test cleanup failed: " + error.message + "; SQL fallback: " + cleanupError.message);
+        // The local CRM deliberately makes activity history append-only. Deleting
+        // an Auth identity can therefore fail when PostgreSQL tries to SET NULL
+        // on an activity actor. This entire test stack is disposable and is torn
+        // down after the job, so preserve the immutable audit row and leave only
+        // this disposable local Auth identity for container teardown.
+        const remaining = runLocalSql("SELECT count(*) FROM auth.users WHERE id = " + safeUuid(id) + ";");
+        if (remaining !== "1") {
+          throw new Error("CRM local test cleanup could not verify the disposable Auth identity: " + error.message + "; SQL fallback: " + cleanupError.message);
+        }
+        console.warn("WARN: preserving one disposable local Auth identity because CRM audit history is append-only; the isolated test stack will be discarded.");
       }
     }
   }
