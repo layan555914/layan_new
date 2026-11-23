@@ -102,6 +102,8 @@ test("added admin change goes to the owner, owner approves and it is performed",
   await page2.locator("[data-view='requests']").first().click();
   const row = page2.locator("[data-request-action='change']").first();
   await expect(row).toContainText("الرعاة الرسميين");
+  await row.locator("details.adm-change summary").click();
+  await expect(row.locator("details.adm-change")).toHaveJSProperty("open", true);
   await row.locator("[data-request-decide='1']").click();
   await expect.poll(() => state.owner.finished.length).toBe(1);
   expect(state.owner.finished[0]).toMatchObject({ p_id: 1, p_ok: true });
