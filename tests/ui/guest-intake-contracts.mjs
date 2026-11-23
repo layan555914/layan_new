@@ -3,13 +3,14 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = path => readFile(new URL("../../" + path, import.meta.url), "utf8");
-const [migration, edge, client, app, buyer, offers, admin, adminHtml, config, sw] = await Promise.all([
+const [migration, edge, client, app, buyer, offers, index, admin, adminHtml, config, sw] = await Promise.all([
   read("supabase/migrations/20261123130000_secure_guest_intake.sql"),
   read("supabase/functions/guest-intake/index.ts"),
   read("gubabase.js"),
   read("app.js"),
   read("buyer.js"),
   read("offers.html"),
+  read("index.html"),
   read("admin-guest-intake.js"),
   read("admin.html"),
   read("supabase/config.toml"),
@@ -48,5 +49,13 @@ assert.ok(adminHtml.includes('id="adminGuestIntake"') && admin.includes('call("a
   "The admin dashboard must expose a working guest moderation workspace.");
 assert.ok(config.includes("[functions.guest-intake]") && sw.includes("./admin-guest-intake.js?v=20261123-1"),
   "The Edge Function and admin moderation PWA assets must be configured.");
+assert.ok(offers.includes("gubabase.js?v=20261123-guest-intake-1") &&
+  offers.includes("app.js?v=20261123-guest-property-1") &&
+  index.includes("buyer.js?v=20261123-guest-buyer-1") &&
+  sw.includes("./gubabase.js?v=20261123-guest-intake-1") &&
+  sw.includes("./app.js?v=20261123-guest-property-1") &&
+  sw.includes("./buyer.js?v=20261123-guest-buyer-1"),
+  "Guest submission helpers and forms must use matching versioned PWA assets.");
+
 
 console.log("PASS: guest property/buyer intake, private storage, rate limiting, owner moderation, OTP-preserving client routing and admin PWA contracts.");
