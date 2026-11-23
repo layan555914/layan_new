@@ -774,6 +774,103 @@
     return row.id;
   }
 
+  async function guestIntakeRequest(payload) {
+    const response = await fetch(url + "/functions/v1/guest-intake", {
+      method: "POST",
+      headers: { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      redirect: "error"
+    });
+    const raw = await response.text();
+    let data = null;
+    try { data = raw ? JSON.parse(raw) : null; } catch (_) {}
+    if (!response.ok) {
+      const error = new Error(data?.error || "تعذر إرسال الطلب إلى خدمة استقبال الزوار.");
+      error.status = response.status;
+      throw error;
+    }
+    return data;
+  }
+
+  async function uploadGuestFiles(submissionId, files, kind) {
+    const uploaded = [];
+    for (const file of files || []) {
+      const isImage = kind === "images";
+      const allowedMime = isImage ? ["image/jpeg"] : ["application/pdf", "image/jpeg", "image/png"];
+      const maxSize = isImage ? 15 * 1024 * 1024 : 10 * 1024 * 1024;
+      if (!allowedMime.includes(file.type) || file.size < (isImage ? 4 : 8) || file.size > maxSize) {
+        throw new Error(isImage ? "صور الزائر يجب أن تكون JPG/JPEG ولا تتجاوز 15 ميجابايت." : "المستندات المسموحة PDF أو JPG أو PNG وبحد أقصى 10 ميجابايت.");
+      }
+      const head = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+      const valid = file.type === "image/jpeg"
+        ? head[0] === 0xFF && head[1] === 0xD8 && head[2] === 0xFF
+        : file.type === "image/png"
+          ? head[0] === 0x89 && head[1] === 0x50 && head[2] === 0x4E && head[3] === 0x47
+          : head[0] === 0x25 && head[1] === 0x50 && head[2] === 0x44 && head[3] === 0x46;
+      if (!valid) throw new Error("محتوى أحد الملفات لا يطابق نوعه الحقيقي.");
+      const ticket = await guestIntakeRequest({
+        action: "upload-ticket", submission_id: submissionId, kind,
+        content_type: file.type, size: file.size
+      });
+      let uploadUrl = String(ticket?.signedUrl || "");
+      if (!uploadUrl) throw new Error("تعذر تجهيز رفع الملف.");
+      if (!/^https?:\/\//i.test(uploadUrl)) {
+        uploadUrl = uploadUrl.startsWith("/storage/v1/")
+          ? url.replace(/\/$/, "") + uploadUrl
+          : url.replace(/\/$/, "") + "/storage/v1" + uploadUrl;
+      }
+      if (new URL(uploadUrl).origin !== new URL(url).origin) throw new Error("عنوان رفع الملف غير موثوق.");
+      const response = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { apikey: key, "Content-Type": file.type, "x-upsert": "false" },
+        body: file,
+        redirect: "error"
+      });
+      if (!response.ok) throw new Error("فشل رفع ملف مؤقت. حاول مرة أخرى.");
+      uploaded.push(ticket.path);
+    }
+    return uploaded;
+  }
+
+  async function cleanupGuestUploads(submissionId, imagePaths, documentPaths) {
+    try {
+      await guestIntakeRequest({
+        action: "cleanup-upload", submission_id: submissionId,
+        image_paths: imagePaths || [], document_paths: documentPaths || []
+      });
+    } catch (error) { console.warn("تعذر تنظيف ملفات طلب الزائر:", error); }
+  }
+
+  async function submitGuestProperty(offer, imageFiles, documentFiles, honeypot = "") {
+    const submissionId = crypto.randomUUID();
+    let imagePaths = [], documentPaths = [];
+    try {
+      imagePaths = await uploadGuestFiles(submissionId, imageFiles, "images");
+      documentPaths = await uploadGuestFiles(submissionId, documentFiles, "documents");
+    } catch (error) {
+      await cleanupGuestUploads(submissionId, imagePaths, documentPaths);
+      throw error;
+    }
+    try {
+      return await guestIntakeRequest({
+        action: "submit-property", submission_id: submissionId,
+        payload: { ...offer, contact_consent: offer.contact_consent === true },
+        image_paths: imagePaths, document_paths: documentPaths, honeypot
+      });
+    } catch (error) {
+      // A transport failure may happen after the database committed. Keep private files in that
+      // uncertain case rather than deleting assets that a pending moderation record may reference.
+      if (Number.isFinite(error?.status)) await cleanupGuestUploads(submissionId, imagePaths, documentPaths);
+      throw error;
+    }
+  }
+
+  async function submitGuestBuyer(payload, honeypot = "") {
+    return guestIntakeRequest({
+      action: "submit-buyer", submission_id: crypto.randomUUID(), payload, honeypot
+    });
+  }
+
   async function createOffer(offer) {
     if (!isAuthenticated()) throw new Error("سجّل الدخول أو أنشئ حسابًا أولًا لإرسال عرضك.");
     const payload = {
@@ -912,6 +1009,6 @@
   }
 
   function getSession() { return session; }
-  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, markNewAccountProfilePending, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, getPriceGuideOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
+  window.LAYAN_SUPABASE = { signUp, signIn, requestEmailOtp, verifyEmailOtp, updateUserMetadata, markNewAccountProfilePending, syncEmailNotificationSubscription, signOut, getUser, getSession, isAuthenticated, authedFetch, requireAuthenticated, getMyOffers, getOffers, getPriceGuideOffers, uploadImages, deleteUploadedImages, uploadPropertyDocuments, deleteUploadedPropertyDocuments, submitGuestProperty, submitGuestBuyer, createOffer, getOrCreateCompanyAd, resendConfirmation, resetPasswordForEmail, getFavoriteOfferIds, addFavoriteOffer, removeFavoriteOffer, syncFavoriteOffers, getBuyerAlerts, addBuyerAlerts, markBuyerAlertsRead };
   console.log("LAYAN: اتصال Supabase جاهز.");
 })();
