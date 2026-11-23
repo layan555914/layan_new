@@ -210,7 +210,10 @@ async function recoverPasswordThroughMailpit(email, oldPassword) {
   });
   assert(recoveryUrl, 'Recovery email did not contain a valid Supabase recovery verification link.');
 
-  const recoveryTarget = new URL(recoveryUrl);\n  assert(recoveryTarget.origin === parsedUrl.origin && isLoopbackHost(recoveryTarget.hostname) && recoveryTarget.protocol === 'http:',\n    'Recovery email URL must resolve only to the configured local Supabase Auth service.');\n  const verification = await localFetch(recoveryTarget, { redirect: 'manual' }, parsedUrl.origin);
+  const recoveryTarget = new URL(recoveryUrl);
+  assert(recoveryTarget.origin === parsedUrl.origin && isLoopbackHost(recoveryTarget.hostname) && recoveryTarget.protocol === 'http:',
+    'Recovery email URL must resolve only to the configured local Supabase Auth service.');
+  const verification = await localFetch(recoveryTarget, { redirect: 'manual' }, parsedUrl.origin);
   assert([301, 302, 303, 307, 308].includes(verification.status),
     `Recovery verification did not redirect as expected (HTTP ${verification.status}).`);
   const location = verification.headers.get('location');
