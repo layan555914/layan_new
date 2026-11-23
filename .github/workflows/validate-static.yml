@@ -82,7 +82,7 @@ jobs:
 
       - name: Type-check Supabase Edge Functions
         run: |
-          deno check --no-lock             supabase/functions/asyut-admin/index.ts             supabase/functions/asyut-push/index.ts             supabase/functions/email-notifications/index.ts
+          deno check --no-lock supabase/functions/asyut-admin/index.ts supabase/functions/asyut-push/index.ts supabase/functions/email-notifications/index.ts supabase/functions/guest-intake/index.ts
 
       - name: Validate unified email OTP and notification contracts
         run: node scripts/ci/validate-email-auth-notifications.mjs
