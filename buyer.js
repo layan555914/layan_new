@@ -150,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cards.innerHTML=rows.map(o=>`<article class="buyer-match-card"><span class="buyer-match-type">${esc(o.property_type||"عقار")}</span><h4>${esc(o.title||"عرض عقاري")}</h4><p>📍 ${esc([o.city||o.governorate,o.area].filter(Boolean).join(" · ")||"أسيوط")}</p><div class="buyer-match-price"><span>السعر الإجمالي</span><strong>${o.price_on_request ? "السعر عند التواصل" : money(o.total_price)}</strong></div><div class="buyer-match-price"><span>المدفوع + رسوم التنازل</span><strong>${money(Number(o.paid_amount||0)+Number(o.assignment_fee||0))}</strong></div>${Number(o.monthly_installment||0)>0?`<div class="buyer-match-price"><span>القسط الشهري المسجل</span><strong>${money(o.monthly_installment)}</strong></div>`:""}<a class="btn btn-gold" href="./?offer=${encodeURIComponent(o.id)}" data-buyer-title="${esc(o.title||"عرض عقاري")}">شوف العرض في القائمة</a></article>`).join("");
   }
   let saved = null;
+  let guestBuyerSubmissionId = null;
   let knownMatches = new Set();
   let baselineReady = false;
   let checkInProgress = false;
@@ -226,8 +227,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const guestPayload={...values(),contact_name:contactName,contact_phone:contactPhone};
       status.textContent="جارٍ إرسال طلبك إلى إدارة أسيوط عقار...";
       try {
-        const result=await authService()?.submitGuestBuyer?.(guestPayload,honeypot);
+        if(!guestBuyerSubmissionId) guestBuyerSubmissionId=crypto.randomUUID();
+        const result=await authService()?.submitGuestBuyer?.(guestPayload,honeypot,guestBuyerSubmissionId);
         if(!result?.id) throw new Error("تعذر تأكيد استلام طلبك.");
+        guestBuyerSubmissionId=null;
         status.textContent="استلمنا طلبك بنجاح. هيتواصل معاك فريق أسيوط عقار على رقم الموبايل لمتابعة احتياجك. لا تحتاج إلى إنشاء حساب.";
         form.elements.namedItem("contact_name").value="";
         form.elements.namedItem("contact_phone").value="";
