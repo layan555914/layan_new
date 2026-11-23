@@ -170,7 +170,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === "admin-list") {
-      const { userClient } = await adminContext(req, supabaseUrl, publicKey);
+      const { userClient, role } = await adminContext(req, supabaseUrl, publicKey);
       const [properties, buyers] = await Promise.all([
         userClient.rpc("layan_admin_list_guest_property_submissions", { p_limit: 100 }),
         userClient.rpc("layan_admin_list_guest_buyer_requests", { p_limit: 100 }),
@@ -191,7 +191,7 @@ Deno.serve(async (req: Request) => {
         ]);
         return { ...row, image_urls: images.filter(Boolean), document_urls: documents.filter(Boolean) };
       }));
-      return json({ properties: propertyRows, buyers: buyers.data || [] }, 200, origin);
+      return json({ role, properties: propertyRows, buyers: buyers.data || [] }, 200, origin);
     }
 
     if (action === "admin-review-property") {
