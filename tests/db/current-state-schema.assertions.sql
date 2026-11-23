@@ -16,8 +16,8 @@ DECLARE
   v_has_lock boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 55 THEN
-    RAISE EXCEPTION 'Expected 55 clean-install migrations after adding the owner-approval execution hardening migration; found %', v_count;
+  IF v_count <> 56 THEN
+    RAISE EXCEPTION 'Expected 56 clean-install migrations after adding secure guest intake; found %', v_count;
   END IF;
 
   IF to_regclass('public.directory_entities') IS NULL
@@ -300,6 +300,46 @@ BEGIN
   END IF;
 END;
 $admin_change_execution_assertions$;
+
+
+DO $guest_intake_assertions$
+DECLARE
+  v_bucket_public boolean;
+BEGIN
+  IF to_regclass('private.guest_property_submissions') IS NULL
+     OR to_regclass('private.guest_buyer_requests') IS NULL
+     OR to_regclass('private.guest_submission_rate_events') IS NULL THEN
+    RAISE EXCEPTION 'Private guest intake tables are missing';
+  END IF;
+  IF NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.guest_property_submissions'::regclass)
+     OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.guest_buyer_requests'::regclass)
+     OR NOT (SELECT relrowsecurity FROM pg_class WHERE oid='private.guest_submission_rate_events'::regclass) THEN
+    RAISE EXCEPTION 'All private guest intake tables must have RLS enabled';
+  END IF;
+  IF has_table_privilege('anon','private.guest_property_submissions','SELECT')
+     OR has_table_privilege('authenticated','private.guest_property_submissions','SELECT')
+     OR has_table_privilege('service_role','private.guest_property_submissions','SELECT')
+     OR has_table_privilege('anon','private.guest_buyer_requests','INSERT')
+     OR has_table_privilege('authenticated','private.guest_buyer_requests','INSERT') THEN
+    RAISE EXCEPTION 'Guest intake rows must be inaccessible through direct API table grants';
+  END IF;
+  SELECT public INTO v_bucket_public FROM storage.buckets WHERE id='asyut-guest-intake';
+  IF v_bucket_public IS DISTINCT FROM false THEN
+    RAISE EXCEPTION 'Guest upload bucket must remain private';
+  END IF;
+  IF has_function_privilege('anon','public.layan_guest_submit_property(uuid,jsonb,text[],text[],text)','EXECUTE')
+     OR has_function_privilege('authenticated','public.layan_guest_submit_property(uuid,jsonb,text[],text[],text)','EXECUTE')
+     OR has_function_privilege('anon','public.layan_guest_submit_buyer(uuid,jsonb,text)','EXECUTE')
+     OR has_function_privilege('authenticated','public.layan_guest_submit_buyer(uuid,jsonb,text)','EXECUTE') THEN
+    RAISE EXCEPTION 'Guest submission RPCs must be callable only by the trusted intake service';
+  END IF;
+  IF to_regprocedure('public.layan_admin_publish_guest_property_submission(uuid,text[])') IS NULL
+     OR to_regprocedure('public.layan_admin_list_guest_property_submissions(integer)') IS NULL
+     OR to_regprocedure('public.layan_admin_list_guest_buyer_requests(integer)') IS NULL THEN
+    RAISE EXCEPTION 'Guest moderation RPCs are incomplete';
+  END IF;
+END;
+$guest_intake_assertions$;
 
 DO $crm_append_only_behavior$
 DECLARE
