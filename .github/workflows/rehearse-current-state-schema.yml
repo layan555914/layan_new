@@ -25,6 +25,11 @@ on:
       - "tests/db/admin-crm-api.mjs"
       - "tests/ui/admin-approval-gate.mjs"
       - "tests/ui/admin-crm-regressions.mjs"
+      - "tests/ui/guest-intake-contracts.mjs"
+      - "app.js"
+      - "buyer.js"
+      - "gubabase.js"
+      - "offers.html"
       - "tests/db/current-state-schema.assertions.sql"
       - ".github/workflows/rehearse-current-state-schema.yml"
   workflow_dispatch:
