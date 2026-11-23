@@ -244,6 +244,51 @@ END;
 $current_state_assertions$;
 
 
+
+DO $crm_append_only_behavior$
+DECLARE
+  v_lead uuid;
+  v_activity uuid;
+  v_count integer;
+BEGIN
+  INSERT INTO private.admin_crm_leads (category, name)
+  VALUES ('other', 'CI append-only fixture') RETURNING id INTO v_lead;
+  INSERT INTO private.admin_crm_activities (lead_id, activity_type, notes)
+  VALUES (v_lead, 'note', 'CI immutable timeline fixture') RETURNING id INTO v_activity;
+
+  BEGIN
+    UPDATE private.admin_crm_activities SET notes='tampered' WHERE id=v_activity;
+    RAISE EXCEPTION 'CRM activity UPDATE unexpectedly succeeded';
+  EXCEPTION WHEN SQLSTATE '42501' THEN
+    NULL;
+  END;
+
+  BEGIN
+    DELETE FROM private.admin_crm_activities WHERE id=v_activity;
+    RAISE EXCEPTION 'CRM activity DELETE unexpectedly succeeded';
+  EXCEPTION WHEN SQLSTATE '42501' THEN
+    NULL;
+  END;
+
+  BEGIN
+    DELETE FROM private.admin_crm_leads WHERE id=v_lead;
+    RAISE EXCEPTION 'CRM lead deletion unexpectedly cascaded through immutable activity history';
+  EXCEPTION WHEN SQLSTATE '42501' THEN
+    NULL;
+  END;
+
+  SELECT count(*) INTO v_count FROM private.admin_crm_activities
+  WHERE id=v_activity AND lead_id=v_lead AND notes='CI immutable timeline fixture';
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'CRM append-only fixture was modified or deleted';
+  END IF;
+  SELECT count(*) INTO v_count FROM private.admin_crm_leads WHERE id=v_lead;
+  IF v_count <> 1 THEN
+    RAISE EXCEPTION 'CRM lead was deleted despite immutable activity history';
+  END IF;
+END;
+$crm_append_only_behavior$;
+
 DO $owner_policy_assertions$
 DECLARE
   v_bad text;
