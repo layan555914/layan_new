@@ -1,0 +1,37 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+
+const migration = fs.readFileSync("supabase/migrations/20261123170000_secure_directory_media.sql", "utf8");
+const media = fs.readFileSync("directory-media.js", "utf8");
+const admin = fs.readFileSync("directory-media-admin.js", "utf8");
+const company = fs.readFileSync("company-profile.js", "utf8");
+const project = fs.readFileSync("project.js", "utf8");
+const companyHtml = fs.readFileSync("company.html", "utf8");
+const projectHtml = fs.readFileSync("project.html", "utf8");
+const adminHtml = fs.readFileSync("directory-media-admin.html", "utf8");
+
+assert.match(migration, /VALUES\s*\(\s*'asyut-directory-media',\s*'asyut-directory-media',\s*false/s,
+  "directory media bucket must remain private");
+assert.match(migration, /CREATE POLICY directory_media_verified_manager_insert[\s\S]*company_entity_manager_access[\s\S]*IN \('owner','manager'\)/,
+  "only verified owners and managers may upload metadata");
+assert.match(migration, /CREATE POLICY directory_media_public_approved_read[\s\S]*status = 'approved'[\s\S]*public_visible = true[\s\S]*verification_status = 'published'/,
+  "public metadata reads must require approval and published records");
+assert.match(migration, /CREATE POLICY directory_media_storage_review_read[\s\S]*m\.status = 'approved'/,
+  "public storage reads must require approved metadata");
+assert.match(media, /10 \* 1024 \* 1024/, "uploader must enforce the 10 MB image limit");
+assert.match(media, /directory_media_assets/, "uploader must create metadata records");
+assert.match(media, /storage\/v1\/object\/sign/, "public gallery must use signed URLs for private storage");
+assert.match(media, /status:"eq\.approved"/, "public gallery must request approved media only");
+assert.match(media, /relation_type=in\.\(developer,land_owner\)/, "project uploads must be restricted to developer/land-owner relationships");
+assert.match(admin, /rpc\/layan_is_admin/, "moderation page must verify admin authorization");
+assert.match(admin, /status:nextStatus/, "moderation must record approval or rejection");
+assert.match(admin, /reviewed_by:session\.user\.id/, "moderation must record the reviewing administrator");
+assert.match(company, /AsyutDirectoryMedia\.mountManager/, "company profile must expose the verified manager uploader");
+assert.doesNotMatch(company, /public_gallery_urls:gallery/, "managers must not bypass moderation with direct public image URLs");
+assert.match(company, /AsyutDirectoryMedia\.renderGallery/, "company profile must show approved media");
+assert.match(project, /AsyutDirectoryMedia\.renderGallery/, "project profile must show approved media");
+assert.match(companyHtml, /directory-media\.js/, "company page must load directory media client");
+assert.match(projectHtml, /directory-media\.js/, "project page must load directory media client");
+assert.match(adminHtml, /directory-media-admin\.js/, "admin review page must load moderation client");
+
+console.log("Directory media upload, review, private storage, and public gallery contracts passed.");
