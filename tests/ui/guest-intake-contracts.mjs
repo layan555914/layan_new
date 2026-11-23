@@ -33,6 +33,8 @@ assert.ok(edge.includes("auth.getUser(token)") && edge.includes('role !== "owner
   "Admin review must verify the caller session and restrict public listing to the owner.");
 assert.ok(edge.includes("createSignedUrl(path, 300)") && edge.includes("temporary_file_cleanup_pending"),
   "Admin file previews must be signed and temporary-file cleanup failures must be reported.");
+assert.ok(edge.includes('action === "admin-cleanup"') && edge.includes("7 * 24 * 60 * 60 * 1000") && admin.includes('call("admin-cleanup")'),
+  "The owner must be able to clean expired private uploads without touching pending moderation records.");
 assert.ok(client.includes("async function submitGuestProperty") && client.includes("async function submitGuestBuyer"),
   "The shared client must expose guest property and buyer submission helpers.");
 assert.ok(app.includes("api.submitGuestProperty(offer, files, documentFiles") &&
