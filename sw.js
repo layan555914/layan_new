@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v189-guest-intake-owner-approval-20261123";
+const CACHE_NAME = "asyut-aqar-shell-v190-guest-intake-owner-approval-20261123";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -13,7 +13,7 @@ const APP_SHELL = [
   "./admin-guest-intake.css?v=20261123-2",
   "./admin.js?v=20261114-service-claims-2",
   "./admin-layout.js?v=20261121-crm-view-1",
-  "./admin-approval.js?v=20261123-owner-approval-allowlist-2",
+  "./admin-approval.js?v=20261123-owner-approval-allowlist-3",
   "./admin-entry.js",
   "./companies.html",
   "./assets/theme/company-type-sections.css?v=20261115-1",
