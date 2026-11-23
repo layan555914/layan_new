@@ -234,7 +234,7 @@ Deno.serve(async (req: Request) => {
           const prefix = "pending/" + folder.name + "/" + kind;
           const { data: files, error } = await service.storage.from(BUCKET).list(prefix, { limit: 100 });
           if (error) continue;
-          const expired = (files || []).filter(file =>
+          const expired = (files || []).filter(file => {
             const timestamp = Date.parse(file.created_at || file.updated_at || "");
             return Number.isFinite(timestamp) && timestamp < cutoff;
           }).map(file => prefix + "/" + file.name);
