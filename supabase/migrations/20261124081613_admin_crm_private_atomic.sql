@@ -1,0 +1,2 @@
+-- No-op migration retained to match the remote migration ledger.
+-- The CRM schema is applied in 20261124081632_admin_crm_private_atomic_schema.sql.
