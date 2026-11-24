@@ -128,7 +128,7 @@ function updateDirectoryMap(){
   :(chosen?(chosen.name_ar+", Assiut, Egypt"):"Assiut, Egypt");
  frame.src="https://maps.google.com/maps?q="+encodeURIComponent(query)+"&output=embed";
  frame.title=trustedPoint
-  ?("خريطة مركز "+chosen.name_ar+" وفق مصدر موثق")
+  ?("خريطة منطقة "+chosen.name_ar)
   :(chosen?("بحث خريطة استرشادي لمنطقة "+chosen.name_ar):"خريطة بحث عامة لمدينة أسيوط");
  link.href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(query);
  link.textContent=trustedPoint
