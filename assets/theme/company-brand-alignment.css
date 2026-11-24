@@ -1,0 +1,41 @@
+/* ASYUT AQAR public company and directory brand alignment */
+:root{--aq-navy:#102746;--aq-gold:#C8963E;--aq-red:#A93636}
+body .topbar{background:var(--aq-navy);color:#fff}
+.company-directory-card--directory{border-color:#d8e0e9}
+.company-directory-card--directory .company-card-cover--directory{background:radial-gradient(circle at 15% 15%,rgba(200,150,62,.2),transparent 36%),linear-gradient(125deg,#102746,#1d3c60);color:#fff}
+.company-card-cover--directory>span{border-color:var(--aq-gold);background:#fff;color:var(--aq-navy)}
+.company-card-cover--directory small{color:#e4bd78}
+.company-card-open,.company-source-list a,.mk-profile-open,.company-claim-login-link,.company-claim-contact-link{color:var(--aq-navy)}
+.company-directory-card>a:focus-visible{outline-color:var(--aq-gold)}
+.company-directory-entity-monogram{border-color:var(--aq-gold);background:linear-gradient(135deg,#fff,#edf2f7);color:var(--aq-navy);box-shadow:0 8px 26px rgba(16,39,70,.12)}
+.company-claim-panel{border-color:#e4d2ad;background:linear-gradient(125deg,#fff,#fbf6eb)}
+.company-claim-panel .eyebrow{color:#8b672c}
+.company-claim-panel h2,.company-manager-panel h2{color:var(--aq-navy)}
+.company-claim-panel--prominent{border-color:var(--aq-gold);background:linear-gradient(120deg,#fff 0%,#fbf5e8 100%);box-shadow:0 8px 24px rgba(16,39,70,.08)}
+.company-claim-panel--prominent:before{background:var(--aq-gold)}
+.company-claim-dialog{border-color:#d8e0e9;background:#fff;color:var(--aq-navy);box-shadow:0 20px 70px rgba(16,39,70,.22)}
+.company-claim-dialog-head>button{border-color:#d8e0e9;color:var(--aq-navy)}
+.company-claim-form label{color:var(--aq-navy)}
+.company-claim-form input,.company-claim-form select,.company-claim-form textarea{border-color:#d8e0e9;color:var(--aq-navy)}
+.company-claim-form input:focus,.company-claim-form select:focus,.company-claim-form textarea:focus{outline-color:var(--aq-gold)}
+.company-profile-highlights span,.company-coverage-list span{border-color:#e4d2ad;background:#fffaf0;color:var(--aq-navy)}
+.company-detail-item{border-color:#d8e0e9}
+.company-detail-item strong{color:var(--aq-navy)}
+.company-detail-item span,.company-detail-item a{color:#24364b}
+.company-service-list li{border-color:#d8e0e9}
+.company-manager-panel{border-color:#d8e0e9}
+.company-manager-panel p{color:#52657b}
+.company-manager-form label{color:var(--aq-navy)}
+.company-manager-form input,.company-manager-form select,.company-manager-form textarea{border-color:#d8e0e9;color:var(--aq-navy)}
+.company-service-offer-card{border-color:#d8e0e9}
+.company-service-offer-card small,.company-service-offer-card>a{color:var(--aq-navy)}
+.company-service-offer-card strong{color:var(--aq-navy)}
+.company-source-label,.company-source-label--directory{border-color:#e4d2ad;background:#fffaf0;color:var(--aq-navy)}
+.company-source-note{border-right-color:var(--aq-gold);background:#fffaf0}
+.company-source-list li{border-color:#d8e0e9}
+.company-detail-empty{border-color:#d8e0e9;background:#f7f9fc;color:#52657b}
+.company-claim-status{border-color:#d8e0e9;background:#f7f9fc;color:var(--aq-navy)}
+
+.company-profile-page h1,.company-profile-page h2,.company-profile-page h3,.company-directory-page h1,.company-directory-page h2,.company-directory-page h3{color:var(--aq-navy)}
+.company-profile-page .eyebrow,.company-directory-page .eyebrow{color:#8b672c}
+.company-profile-page a:not(.btn),.company-directory-page a:not(.btn){text-decoration-color:var(--aq-gold)}
