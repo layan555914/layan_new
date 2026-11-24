@@ -183,3 +183,15 @@ body .topbar{background:var(--aq-navy);color:#fff}
  border-right-color:#C8963E;
  background:#fffaf0;
 }
+
+.company-profile-page .company-service-offer-card h3,
+.company-profile-page .company-service-offer-card strong{color:#102746}
+.company-profile-page .company-manager-panel h2,
+.company-profile-page .company-manager-panel label{color:#102746}
+.company-profile-page .company-manager-panel p{color:#52657b}
+.company-profile-page .company-manager-form input,
+.company-profile-page .company-manager-form select,
+.company-profile-page .company-manager-form textarea{
+ border-color:#d8e0e9;
+ color:#102746;
+}
