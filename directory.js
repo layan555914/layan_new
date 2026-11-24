@@ -136,7 +136,7 @@ function updateDirectoryMap(){
   :(chosen?("فتح بحث "+chosen.name_ar+" في خرائط Google ↗"):"فتح بحث نطاق أسيوط في خرائط Google ↗");
  if(trustedPoint){
   const source=state.data.sources.find(item=>String(item.id)===String(chosen.location_source_id));
-  note.textContent="مركز منطقة موثق وفق مصدر "+(source?.confidence_level==="official"?"رسمي":"عالي الثقة")+" («"+(source?.title||"مصدر عام")+"»)، بدقة "+precisionLabel(chosen.location_precision)+" وتحقق بتاريخ "+chosen.location_verified_at+".";
+  note.textContent="موقع المنطقة المختارة على الخريطة."
  }else{
   note.textContent=chosen
    ?("يعرض Google Maps نتائج بحث باسم «"+chosen.name_ar+"» داخل نطاق أسيوط. عرض نتائج الخريطة للمنطقة المختارة.")
