@@ -11,3 +11,24 @@
 .marketplace-category-fields input,.marketplace-category-fields select{width:100%;padding:11px;border:1px solid #DCD4CE;border-radius:9px;font:inherit}
 
 .marketplace-detail-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.marketplace-detail-chip{font-size:12px;color:#6A5343;background:#FAF6F1;border-radius:20px;padding:5px 9px}
+
+
+/* ASYUT AQAR brand alignment: navy, gold and restrained red accents. */
+.marketplace-page-hero{background:linear-gradient(125deg,#102746,#18385F 68%,#102746);border-bottom-color:#C8963E}
+.marketplace-page-hero .eyebrow{color:#E7C77F}
+.marketplace-page-hero h1,.marketplace-page-hero p{color:#fff}
+.marketplace-category-directory h2,.marketplace-category-fields h3,.marketplace-category-fields p{color:#102746}
+.marketplace-category-tile{border-color:#E2E7EE;color:#24364B}
+.marketplace-category-tile strong{color:#102746}
+.marketplace-category-tile span{color:#66758A}
+.marketplace-category-tile:hover,.marketplace-category-tile:focus-visible{border-color:#C8963E;background:#FBF8F0}
+.marketplace-category-fields{border-color:#C8963E}
+.marketplace-category-fields input,.marketplace-category-fields select{border-color:#D6DEE8;color:#24364B}
+.marketplace-page-note{background:#F8F4E9;border-right-color:#C8963E;color:#34445A}
+.marketplace-form-dialog{border-color:#C8963E}
+.marketplace-form-note{background:#F8F4E9;color:#34445A}
+.marketplace-form-head button{background:#A93636}
+.marketplace-listing-card{border-color:#E2E7EE}
+.marketplace-listing-body h3{color:#102746}
+.marketplace-listing-body small{color:#A93636}
+@media(prefers-reduced-motion:no-preference){.marketplace-category-tile{transition:border-color .18s ease,background .18s ease,box-shadow .18s ease}}
