@@ -116,14 +116,14 @@ test("only public points backed by an official source create map links", async (
     "src","https://maps.google.com/maps?q="+query+"&output=embed"
   );
   await expect(page.locator("#directoryMapNote")).toContainText("موقع المنطقة المختارة على الخريطة");
-  await expect(page.locator("#directoryMapNote")).toContainText("موقع المنطقة المختارة على الخريطة");
+  await expect(page.locator("#directoryMapNote")).not.toContainText("المصدر الرسمي التجريبي");
 
   await page.locator("[data-view='entities']").click();
   const verifiedCard=page.locator("#directoryResults .directory-card").filter({hasText:"شركة اختبار التطوير"});
   await expect(verifiedCard.locator(".directory-verified-location a")).toHaveAttribute(
     "href","https://www.google.com/maps/search/?api=1&query="+encodeURIComponent("27.205,31.154")
   );
-  await expect(verifiedCard.locator(".directory-verified-location")).toContainText("المصدر الرسمي التجريبي");
+  await expect(verifiedCard.locator(".directory-verified-location")).toContainText("عرض الموقع على الخريطة");
 
   const unverifiedCard=page.locator("#directoryResults .directory-card").filter({hasText:"هيئة اختبار عامة"});
   await expect(unverifiedCard.locator(".directory-verified-location")).toHaveCount(0);
