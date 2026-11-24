@@ -20,6 +20,12 @@ assert.match(migration, /CREATE POLICY directory_media_storage_review_read[\s\S]
   "public storage reads must require approved metadata");
 assert.match(media, /10 \* 1024 \* 1024/, "uploader must enforce the 10 MB image limit");
 assert.match(media, /directory_media_assets/, "uploader must create metadata records");
+assert.ok(
+  media.indexOf('request("/rest/v1/directory_media_assets"') < media.indexOf('fetch(base + "/storage/v1/object/" + bucket'),
+  "pending metadata must be created before storage upload so failed metadata cannot orphan an object"
+);
+assert.match(media, /directory_media_assets\?storage_path=eq\./,
+  "failed storage uploads must remove their pending metadata row");
 assert.match(media, /storage\/v1\/object\/sign/, "public gallery must use signed URLs for private storage");
 assert.match(media, /status:"eq\.approved"/, "public gallery must request approved media only");
 assert.match(media, /relation_type=in\.\(developer,land_owner\)/, "project uploads must be restricted to developer/land-owner relationships");
