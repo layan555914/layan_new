@@ -612,7 +612,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const requestId=Array.isArray(result)?result[0]?.id:null;
     form.reset();
     if(claimLoginLink)claimLoginLink.hidden=true;
-    showClaimStatus("تم تسجيل طلبك بنجاح"+(requestId?" — رقم الطلب: "+requestId:"")+"، وسيتواصل معك فريق أسيوط عقار لاستكمال الخطوات.",false);
+    showClaimStatus("تم تسجيل طلبك بنجاح"+(requestId?" — رقم الطلب: "+requestId:"")+"، وطلبك قيد المراجعة. سيتواصل معك فريق أسيوط عقار لاستكمال الخطوات.",false);
     await refreshMyClaimStatus();
    }catch(error){
     const message=String(error?.message||"");
