@@ -285,7 +285,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const row=Array.isArray(rows)?rows[0]:null;
     if(!row)return;
     if(row.status==="pending"){
-     showClaimStatus("استلمنا طلبك، وسيتواصل معك فريق أسيوط عقار."+(row.admin_notes?" ملاحظة الإدارة: "+row.admin_notes:""),false);
+     showClaimStatus("استلمنا طلبك، وطلبك قيد المراجعة. سيتواصل معك فريق أسيوط عقار."+(row.admin_notes?" ملاحظة الإدارة: "+row.admin_notes:""),false);
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=false;
     }else if(row.status==="approved"){
