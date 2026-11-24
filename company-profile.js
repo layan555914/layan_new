@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const place=[item.city,item.area].filter(Boolean).join("، ")||"أسيوط";
     return '<article class="company-service-offer-card"><div><small>'+esc(item.category||"خدمة")+'</small><h3>'+esc(item.title||"عرض خدمة")+'</h3><p>'+esc(String(item.description||"").slice(0,180))+'</p><span>'+esc(place)+'</span><strong>'+esc(price)+'</strong></div><a href="./marketplace.html#marketplace-listing-'+encodeURIComponent(item.id)+'">تفاصيل العرض ←</a></article>';
    }).join("");
-   return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2>'+(offers.length?'<div class="company-service-offers-grid">'+cards+'</div>':'<p>لا توجد عروض منشورة مرتبطة بهذا الملف حاليًا. ستظهر هنا العروض بعد اعتمادها وربطها بملف مقدم الخدمة.</p>')+'</section>';
+   return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2>'+(offers.length?'<div class="company-service-offers-grid">'+cards+'</div>':'<p>لا توجد عروض مرتبطة بهذا الملف حاليًا.</p>')+'</section>';
   }catch(error){
    console.warn("Published service provider offers unavailable:",error);
    return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2><p>تعذر تحميل العروض حاليًا. يمكنك تصفح <a href="./marketplace.html">سوق الخدمات</a>.</p></section>';
@@ -285,7 +285,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const row=Array.isArray(rows)?rows[0]:null;
     if(!row)return;
     if(row.status==="pending"){
-     showClaimStatus("طلبك قيد المراجعة لدى إدارة أسيوط عقار."+(row.admin_notes?" ملاحظة الإدارة: "+row.admin_notes:""),false);
+     showClaimStatus("استلمنا طلبك، وسيتواصل معك فريق أسيوط عقار."+(row.admin_notes?" ملاحظة الإدارة: "+row.admin_notes:""),false);
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=false;
     }else if(row.status==="approved"){
@@ -612,7 +612,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const requestId=Array.isArray(result)?result[0]?.id:null;
     form.reset();
     if(claimLoginLink)claimLoginLink.hidden=true;
-    showClaimStatus("تم تسجيل طلبك بنجاح"+(requestId?" — رقم الطلب: "+requestId:"")+"، وستراجع الإدارة وسيلة إثبات الصفة قبل اعتمادك. بعد الاعتماد ستتمكن من إدارة البيانات التشغيلية مباشرة.",false);
+    showClaimStatus("تم تسجيل طلبك بنجاح"+(requestId?" — رقم الطلب: "+requestId:"")+"، وسيتواصل معك فريق أسيوط عقار لاستكمال الخطوات.",false);
     await refreshMyClaimStatus();
    }catch(error){
     const message=String(error?.message||"");
