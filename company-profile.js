@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    const byProject=new Map(rows.map(row=>[String(row.project_id),row.relation_type]));
    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2>'+
     (visible.length
-     ?'<div class="company-linked-project-list">'+visible.map(project=>'<article class="company-linked-project"><div><strong>'+esc(project.name_ar||"مشروع عقاري")+'</strong><small>'+esc(roleLabels[byProject.get(String(project.id))]||"علاقة موثقة")+'</small></div><a href="./project.html?id='+encodeURIComponent(project.id)+'">فتح ملف المشروع ←</a></article>').join("")+'</div>'
+     ?'<div class="company-linked-project-list">'+visible.map(project=>'<article class="company-linked-project"><div><strong>'+esc(project.name_ar||"مشروع عقاري")+'</strong><small>'+esc((roleLabels[byProject.get(String(project.id))]||""))+'</small></div><a href="./project.html?id='+encodeURIComponent(project.id)+'">فتح ملف المشروع ←</a></article>').join("")+'</div>'
      :'<p>لا توجد مشروعات مرتبطة بهذا الملف حتى الآن.</p>')+
     '</section>';
   }catch(error){
