@@ -175,6 +175,24 @@
           const ext = fileExtension(file.type);
           const path = entityId + "/" + current.user.id + "/" + crypto.randomUUID() + "." + ext;
           const bytes = await file.arrayBuffer();
+          const payload = {
+            directory_entity_id:entityId,
+            project_id:kind.value === "project_gallery" ? projectSelect.value : null,
+            owner_user_id:current.user.id,
+            media_kind:kind.value,
+            bucket_id:bucket,
+            storage_path:path,
+            caption:String(form.elements.caption.value || "").trim()
+          };
+
+          // Create the pending metadata first. Storage deletion policies require this
+          // row, so uploading first could leave an undeletable orphan if metadata fails.
+          await request("/rest/v1/directory_media_assets", {
+            method:"POST",
+            headers:{ "Content-Type":"application/json", "Prefer":"return=minimal" },
+            body:JSON.stringify(payload)
+          }, current.access_token);
+
           const storageResponse = await fetch(base + "/storage/v1/object/" + bucket + "/" + storagePath(path), {
             method:"POST",
             headers:{
@@ -188,29 +206,14 @@
           });
           if (!storageResponse.ok) {
             const detail = await storageResponse.json().catch(() => ({}));
-            throw new Error(detail.message || "تعذر رفع الصورة إلى التخزين الآمن.");
-          }
-          const payload = {
-            directory_entity_id:entityId,
-            project_id:kind.value === "project_gallery" ? projectSelect.value : null,
-            owner_user_id:current.user.id,
-            media_kind:kind.value,
-            bucket_id:bucket,
-            storage_path:path,
-            caption:String(form.elements.caption.value || "").trim()
-          };
-          try {
-            await request("/rest/v1/directory_media_assets", {
-              method:"POST",
-              headers:{ "Content-Type":"application/json", "Prefer":"return=minimal" },
-              body:JSON.stringify(payload)
-            }, current.access_token);
-          } catch (error) {
-            await fetch(base + "/storage/v1/object/" + bucket + "/" + storagePath(path), {
+            // Remove the pending metadata while it still authorizes owner cleanup.
+            await request("/rest/v1/directory_media_assets?storage_path=eq." + encodeURIComponent(path), {
               method:"DELETE",
-              headers:{ apikey:key, Authorization:"Bearer " + current.access_token }
-            }).catch(() => {});
-            throw error;
+              headers:{ "Prefer":"return=minimal" }
+            }, current.access_token).catch(cleanupError => {
+              console.error("Could not remove pending media metadata after upload failure:", cleanupError);
+            });
+            throw new Error(detail.message || "تعذر رفع الصورة إلى التخزين الآمن.");
           }
           uploaded++;
         }
