@@ -2,7 +2,7 @@
 
 > **Deployment safety hold — do not run `supabase db push`, `migration repair`, or apply a baseline against production until this audit is resolved and explicitly reviewed.**
 
-Audit date: 2026-11-15 (updated after forward migrations)
+Historical audit snapshot: 2026-11-15 (the historical tables and findings below describe that audit date, not the current production ledger)
 Repository: `layan555914/layan_new`
 Branch audited: `feature/service-provider-claim-review-final-20261114`
 Production project: `ebyhwqkmhxbgocngpqfe`
@@ -135,13 +135,39 @@ PostgreSQL 16 smoke tests and the current GitHub Actions workflow passed on the 
 
 The remaining 65 missing historical sources are a repository traceability/reproducibility problem. They do not by themselves prove that the current production schema is broken, and they do not prevent an independently reviewed static front-end release once all required forward migrations are already applied. They do prevent safe reconstruction of the entire database migration history from this repository and block any use of `db push`, migration repair, or baseline operations until the source gap is resolved.
 
-## Pre-release hardening additions — November 23, 2026
+## Production reconciliation update — November 24, 2026
 
-The following forward migrations are included in the current pre-release review set (some already exist on the repository's main branch). Their presence in Git does **not** mean they have been applied to production; they must not be treated as part of the production migration ledger:
+This section supersedes the November 23 pre-release status below. It records a read-only comparison against the live production migration ledger on November 24, 2026. The historical November 15 audit above is retained for traceability; its counts (91 production versions and 65 missing source files) are not the current ledger totals.
 
-- `20261121120000_admin_crm_private_atomic.sql` — private CRM tables and owner-only CRM operations.
-- `20261122191600_enforce_owner_approval_on_admin_ad_writes.sql` — owner-only gates for the enumerated ad, sponsor, and Storage write policies and review RPCs.
-- `20261123120000_harden_admin_change_execution.sql` — atomic claim/finish tokens, executing state, duplicate-active-request prevention, exact resource/method/RPC/field allowlists, and request-path validation.
-- `20261123130000_secure_guest_intake.sql` — private guest property and buyer request queues, service-role-only intake RPCs, rate-limit storage, and owner/admin moderation RPCs.
+### Live production migration ledger
 
-These migrations are being prepared for disposable local clean-install rehearsal only. Do not run `supabase db push`, migration repair, or any production SQL operation for them without a separately reviewed rollout plan, verified backup, and explicit owner approval.
+- Production project: `ebyhwqkmhxbgocngpqfe`.
+- The live Supabase migration ledger contains **112 recorded migrations**.
+- Latest recorded versions:
+  - `20261124081613` — `admin_crm_private_atomic`
+  - `20261124081632` — `admin_crm_private_atomic_schema`
+  - `20261124081637` — `harden_admin_change_execution`
+- These are observed production ledger entries, not a recommendation to run or repair migrations.
+
+### CRM production status
+
+A read-only inspection of production confirmed:
+
+- `private.admin_crm_leads` and `private.admin_crm_activities` exist.
+- RLS is enabled on both tables.
+- The `admin_crm_activities_append_only` trigger exists.
+- Direct grants to `anon` and `authenticated` on the private CRM tables are absent; the intended access path is through the reviewed RPC boundary.
+- The CRM tables currently contain zero lead rows and zero activity rows. This is an empty feature dataset, not evidence that the tables or migrations are missing.
+
+### PR 184 reconciliation
+
+PR 184 (`feature/crm-on-current-main-20261121`) is a draft and remains unmerged as of this review. Its branch contains older versions of files that have since advanced on `main`; the core CRM implementation files checked were already identical to `main`. The PR's migration filenames/timestamps are not the production ledger entries listed above.
+
+**Do not merge PR 184 as-is.** It is not a safe way to deploy CRM: production already records the CRM migrations, and merging the stale branch risks reintroducing older versions of adjacent admin and service-worker files. Keep the PR open pending owner decision; this document update does not close or merge it.
+
+### Safety and scope
+
+- This reconciliation was read-only against Supabase. No SQL, migration, schema, data, RLS, grant, or production setting was changed.
+- No `supabase db push`, migration repair, baseline, or guessed historical SQL was run.
+- This update changes documentation only. It does not authorize production database changes, merging PR 184, or deploying application code.
+- The older November 15 missing-source inventory remains a historical record. A fresh complete source-to-ledger reconciliation is still required before any migration-history repair or `db push` operation. Never infer that a recorded migration name proves its exact original SQL source is present or identical.
