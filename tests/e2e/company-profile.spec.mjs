@@ -103,7 +103,7 @@ test("directory entity profile clearly labels missing logo and all mobile action
   await page.goto("/company.html?entity_id=" + DIRECTORY_ENTITY_ID);
 
   await expect(page.locator("#companyProfileRoot h1")).toHaveText(publicDirectoryEntity.name_ar);
-  await expect(page.locator(".company-logo-fallback")).toContainText("لا يتوفر شعار موثّق");
+  await expect(page.locator(".company-logo-fallback")).toContainText("شعار الشركة");
   await expect(page.locator(".company-profile-logo img")).toHaveCount(0);
   await expect(page.locator(".company-contact-actions")).not.toContainText("الخط الساخن الرسمي");
   await expect(page.locator(".company-contact-actions a")).toHaveCount(4);
@@ -161,7 +161,7 @@ test("official company website supplies its verified logo and clearly labeled ge
   await expect(page.locator(".company-contact-details")).toContainText("+20 15898");
   await expect(page.locator(".company-contact-details")).toContainText("مكتب مبيعات أسيوط");
   await expect(page.locator(".company-contact-details")).toContainText("info@primedev-eg.com");
-  await expect(page.locator(".company-map-panel")).toContainText("بحث استرشادي");
+  await expect(page.locator(".company-map-panel")).toContainText("استكشف موقع النشاط على الخريطة");
   await expect(page.locator(".company-claim-panel--prominent")).toContainText("استلم ملفك مجانًا");
 });
 

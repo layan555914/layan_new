@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    const rows=Array.isArray(relations)?relations:[];
    const projectIds=[...new Set(rows.map(row=>row.project_id).filter(Boolean))];
    if(!projectIds.length){
-    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2><p>لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن.</p></section>';
+    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2><p>لا توجد مشروعات مرتبطة بالشركة حاليًا.</p></section>';
    }
    const projectFilter="("+projectIds.join(",")+")";
    const projects=await api("directory_projects?select=id,name_ar,project_type,project_status&public_visible=eq.true&verification_status=eq.published&id=in."+encodeURIComponent(projectFilter)+"&order=name_ar.asc");
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
    return '<section class="company-profile-section company-linked-projects"><h2>مشروعات مرتبطة بالشركة</h2>'+
     (visible.length
      ?'<div class="company-linked-project-list">'+visible.map(project=>'<article class="company-linked-project"><div><strong>'+esc(project.name_ar||"مشروع عقاري")+'</strong><small>'+esc(roleLabels[byProject.get(String(project.id))]||"علاقة موثقة")+'</small></div><a href="./project.html?id='+encodeURIComponent(project.id)+'">فتح ملف المشروع ←</a></article>').join("")+'</div>'
-     :'<p>لا توجد مشروعات منشورة مرتبطة بهذا الملف حتى الآن. الطلبات التي ما زالت قيد المراجعة لا تظهر للعامة.</p>')+
+     :'<p>لا توجد مشروعات مرتبطة بهذا الملف حتى الآن.</p>')+
     '</section>';
   }catch(error){
    console.warn("Published company projects unavailable:",error);
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const place=[item.city,item.area].filter(Boolean).join("، ")||"أسيوط";
     return '<article class="company-service-offer-card"><div><small>'+esc(item.category||"خدمة")+'</small><h3>'+esc(item.title||"عرض خدمة")+'</h3><p>'+esc(String(item.description||"").slice(0,180))+'</p><span>'+esc(place)+'</span><strong>'+esc(price)+'</strong></div><a href="./marketplace.html#marketplace-listing-'+encodeURIComponent(item.id)+'">تفاصيل العرض ←</a></article>';
    }).join("");
-   return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2>'+(offers.length?'<div class="company-service-offers-grid">'+cards+'</div>':'<p>لا توجد عروض منشورة مرتبطة بهذا الملف حاليًا. ستظهر هنا العروض بعد اعتمادها وربطها بملف مقدم الخدمة.</p>')+'</section>';
+   return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2>'+(offers.length?'<div class="company-service-offers-grid">'+cards+'</div>':'<p>لا توجد عروض مرتبطة بهذا الملف حاليًا.</p>')+'</section>';
   }catch(error){
    console.warn("Published service provider offers unavailable:",error);
    return '<section class="company-profile-section company-service-offers"><h2>عروض وإعلانات مقدم الخدمة</h2><p>تعذر تحميل العروض حاليًا. يمكنك تصفح <a href="./marketplace.html">سوق الخدمات</a>.</p></section>';
@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const mapQuery=hasVerifiedMapPoint?String(latitude+","+longitude):(address?address+", محافظة أسيوط، مصر":"");
   const mapUrl=mapQuery?"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(mapQuery):"";
   const mapEmbedUrl=mapQuery?"https://maps.google.com/maps?q="+encodeURIComponent(mapQuery)+"&output=embed":"";
-  const mapNote=hasVerifiedMapPoint?"دبوس الموقع مبني على إحداثيات منشورة في الدليل بعد مراجعة مصدرها.":"هذا بحث استرشادي عن العنوان، وليس دبوسًا جغرافيًا معتمدًا للجهة.";
+  const mapNote="استكشف موقع النشاط على الخريطة.";
   const mapSubject=isServiceProvider?"مقدم الخدمة":isRealEstateCompany?"الشركة":"الجهة";
   const mapMarkup=mapQuery
    ? '<section class="company-map-panel" aria-labelledby="companyProviderMapTitle"><div><span class="eyebrow">الموقع الجغرافي</span><h2 id="companyProviderMapTitle">موقع '+mapSubject+' على الخريطة</h2><p>'+esc(mapNote)+'</p></div><div class="company-map-frame"><iframe title="خريطة موقع '+mapSubject+'" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="'+esc(mapEmbedUrl)+'"></iframe></div><a href="'+esc(mapUrl)+'" target="_blank" rel="noopener noreferrer">فتح الموقع على خرائط Google ↗</a></section>'
@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   canonical.searchParams.set("entity_id",entity.id);
   const canonicalEl=document.querySelector('link[rel="canonical"]');
   if(canonicalEl)canonicalEl.href=canonical.href;
-  const description=entity.description||"بيانات تعريفية منشورة في الدليل العقاري بمحافظة أسيوط.";
+  const description=entity.description||"تعرّف على الشركة وخدماتها وطرق التواصل معها.";
   setMeta("description",description);
   setProperty("og:title",name+" | أسيوط عقار");
   setProperty("og:description",description);
@@ -235,9 +235,9 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const coverageMarkup=coverage.length
    ?'<section class="company-profile-section company-coverage-section"><h2>نطاق تقديم الخدمات</h2><div class="company-coverage-list">'+coverage.map(area=>'<span>'+esc(area)+'</span>').join('')+'</div></section>'
    :"";
-  const claimPanelMarkup=entity.representative_verified_at?'<section class="company-claim-panel company-claim-panel--prominent company-profile-welcome"><div><h2>'+(isServiceProvider?'أهلاً بك لدى ':isRealEstateCompany?'أهلاً بك في شركة ':'أهلاً بك في ')+esc(name)+'</h2><p>يسعدنا وجودك. تعرّف على خدماتنا وأعمالنا ومشروعاتنا وطرق التواصل معنا.</p></div></section>':'<section class="company-claim-panel company-claim-panel--prominent"><div><span class="eyebrow">'+profileRepresentative+'؟</span><h2>ملف شركتك أو نشاطك؟ استلمه وأدِره مجانًا</h2><p>قدّم طلب الاستلام باسمك وبصفتك داخل الشركة. تراجع إدارة أسيوط عقار الهوية والتفويض أولًا، ولا تُمنح صلاحية التعديل لمجرد إرسال الطلب.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">استلم ملفك مجانًا</button></section>';
+  const claimPanelMarkup=entity.representative_verified_at?'<section class="company-claim-panel company-claim-panel--prominent company-profile-welcome"><div><h2>'+(isServiceProvider?'أهلاً بك لدى ':isRealEstateCompany?'أهلاً بك في شركة ':'أهلاً بك في ')+esc(name)+'</h2><p>يسعدنا وجودك. تعرّف على خدماتنا وأعمالنا ومشروعاتنا وطرق التواصل معنا.</p></div></section>':'<section class="company-claim-panel company-claim-panel--prominent"><div><span class="eyebrow">'+profileRepresentative+'؟</span><h2>ملف شركتك أو نشاطك؟ استلمه وأدِره مجانًا</h2><p>استلم ملف شركتك وأضف خدماتك ومشروعاتك وبيانات التواصل ليعرفك عملاء أسيوط.</p></div><button class="btn btn-gold" type="button" id="companyClaimOpen">استلم ملفك مجانًا</button></section>';
   root.innerHTML=
-   '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>لا يتوفر شعار موثّق</small></span>')+'</div><div><span class="eyebrow">ملف تعريفي منشور في دليل أسيوط عقار</span>'+(entity.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الجهة وصفته · لا يعني ذلك شهادة ترخيص للنشاط</span>':'')+'<h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div>'+serviceHighlightsMarkup+'<div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
+   '<section class="company-profile-hero company-directory-entity-hero"><div class="company-profile-logo company-directory-entity-monogram">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(name.trim().slice(0,1))+'</strong><small>شعار الشركة</small></span>')+'</div><div><span class="eyebrow">ملف تعريفي منشور في دليل أسيوط عقار</span>'+'<h1>'+esc(name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(type)+'</span><span>محافظة أسيوط</span></div>'+serviceHighlightsMarkup+'<div class="company-contact-actions">'+contact.join("")+'</div></div></section>'+
    claimPanelMarkup+
    projectSectionMarkup+
    serviceOffersMarkup+
@@ -246,9 +246,9 @@ document.addEventListener("DOMContentLoaded",async()=>{
    coverageMarkup+
    mapMarkup+
    (gallery.length?'<section class="company-profile-section"><h2>معرض أعمال الشركة ومقدم الخدمة</h2><div class="company-gallery">'+gallery.map((u,i)=>'<img src="'+esc(u)+'" alt="صورة من أعمال '+esc(name)+' رقم '+(i+1)+'" loading="lazy">').join('')+'</div></section>':'')+
-   '<section class="company-profile-section"><h2>مصادر المعلومات</h2>'+sourceLinks(sources)+'</section>'+
-   '<section class="company-profile-section company-source-note"><h2>تنويه من أسيوط عقار</h2><p>هذا ملف تعريفي مجاني، ولا يعني الإدراج وجود شراكة أو تزكية أو ضمان أو شهادة ترخيص من المنصة. راجع التفاصيل والعناوين وبيانات الاتصال مباشرة مع الجهة قبل التعاقد.</p></section>'+
-   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف '+profileSubject+'</span><h2 id="companyClaimTitle">بيانات '+profileRepresentative+'</h2></div><button type="button" id="companyClaimClose" class="company-claim-close" aria-label="إغلاق نافذة طلب استلام الملف"><span aria-hidden="true">×</span><span>إغلاق</span></button></div><p class="company-claim-dialog-note">إرسال الطلب يتطلب تسجيل الدخول إلى حسابك على أسيوط عقار. بعد الإرسال تراجع الإدارة هويتك وصفَتك وتفويض الجهة قبل اعتماد الاستلام.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم '+profileRepresentative+' *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>المالك</option><option>شريك</option><option>مدير النشاط</option><option>مدير الفرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><label>رابط موقع أو صفحة رسمية للجهة (اختياري)<input name="evidence_url" type="url" maxlength="500" placeholder="https://..."></label><label>وصف مختصر لما يثبت صفتك أو علاقتك بالجهة (اختياري)<textarea name="evidence_description" rows="2" maxlength="500" placeholder="مثال: اسمي مدرج كمدير في صفحة الشركة الرسمية."></textarea></label><p class="company-claim-dialog-note">لا ترفع بطاقة هوية أو مستندات حساسة في النموذج. يمكن للإدارة طلب إثبات مناسب عبر قناة آمنة عند الحاجة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
+
+
+   '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف '+profileSubject+'</span><h2 id="companyClaimTitle">بيانات '+profileRepresentative+'</h2></div><button type="button" id="companyClaimClose" class="company-claim-close" aria-label="إغلاق نافذة طلب استلام الملف"><span aria-hidden="true">×</span><span>إغلاق</span></button></div><p class="company-claim-dialog-note">سجّل الدخول لإرسال طلب استلام ملف الشركة.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم '+profileRepresentative+' *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>المالك</option><option>شريك</option><option>مدير النشاط</option><option>مدير الفرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><label>رابط موقع أو صفحة رسمية للجهة (اختياري)<input name="evidence_url" type="url" maxlength="500" placeholder="https://..."></label><label>وصف مختصر لما يثبت صفتك أو علاقتك بالجهة (اختياري)<textarea name="evidence_description" rows="2" maxlength="500" placeholder="مثال: اسمي مدرج كمدير في صفحة الشركة الرسمية."></textarea></label><p class="company-claim-dialog-note">لا ترفع بطاقة هوية أو مستندات حساسة في النموذج. يمكن للإدارة طلب إثبات مناسب عبر قناة آمنة عند الحاجة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
   attachLogoFallback(root,name);
   const claimDialog=document.getElementById("companyClaimDialog");
   document.getElementById("companyClaimOpen")?.addEventListener("click",()=>{claimDialog?.showModal();refreshMyClaimStatus();});
@@ -285,7 +285,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const row=Array.isArray(rows)?rows[0]:null;
     if(!row)return;
     if(row.status==="pending"){
-     showClaimStatus("طلبك قيد المراجعة لدى إدارة أسيوط عقار."+(row.admin_notes?" ملاحظة الإدارة: "+row.admin_notes:""),false);
+     showClaimStatus("استلمنا طلبك، وطلبك قيد المراجعة. سيتواصل معك فريق أسيوط عقار."+(row.admin_notes?" ملاحظة الإدارة: "+row.admin_notes:""),false);
      if(claimForm)claimForm.hidden=true;
      if(claimContactLink)claimContactLink.hidden=false;
     }else if(row.status==="approved"){
@@ -612,7 +612,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const requestId=Array.isArray(result)?result[0]?.id:null;
     form.reset();
     if(claimLoginLink)claimLoginLink.hidden=true;
-    showClaimStatus("تم تسجيل طلبك بنجاح"+(requestId?" — رقم الطلب: "+requestId:"")+"، وستراجع الإدارة وسيلة إثبات الصفة قبل اعتمادك. بعد الاعتماد ستتمكن من إدارة البيانات التشغيلية مباشرة.",false);
+    showClaimStatus("تم تسجيل طلبك بنجاح"+(requestId?" — رقم الطلب: "+requestId:"")+"، وطلبك قيد المراجعة. سيتواصل معك فريق أسيوط عقار لاستكمال الخطوات.",false);
     await refreshMyClaimStatus();
    }catch(error){
     const message=String(error?.message||"");
@@ -817,7 +817,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(wa)approvedContactDetails.push('<div class="company-detail-item"><strong>واتساب</strong><a href="https://wa.me/'+esc(wa)+'" target="_blank" rel="noopener noreferrer">مراسلة الشركة</a></div>');
   if(safeUrl(c.website))approvedContactDetails.push('<div class="company-detail-item"><strong>الموقع الإلكتروني</strong><a href="'+esc(safeUrl(c.website))+'" target="_blank" rel="noopener noreferrer">زيارة الموقع ↗</a></div>');
   root.innerHTML=
-   '<section class="company-profile-hero"><div class="company-profile-logo">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(String(c.company_name||"ش").slice(0,1))+'</strong><small>لا يتوفر شعار موثّق</small></span>')+'</div><div><span class="eyebrow">ملف شركة مقدم من الشركة ومعتمد من الإدارة</span>'+(c.representative_verified_at?'<span class="company-card-meta">تم التحقق من هوية ممثل الشركة وصفته · لا يمثل ذلك شهادة ترخيص</span>':'')+'<h1>'+esc(c.company_name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><div class="company-contact-actions">'+actions.join("")+'</div></div></section>'+
+   '<section class="company-profile-hero"><div class="company-profile-logo">'+(logo?'<img src="'+esc(logo)+'" alt="شعار '+esc(c.company_name)+'" loading="eager">':'<span class="company-logo-fallback"><strong>'+esc(String(c.company_name||"ش").slice(0,1))+'</strong><small>شعار الشركة</small></span>')+'</div><div><span class="eyebrow">ملف شركة مقدم من الشركة ومعتمد من الإدارة</span>'+'<h1>'+esc(c.company_name)+'</h1><p>'+esc(description)+'</p><div class="company-card-meta"><span>'+esc(c.category)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><div class="company-contact-actions">'+actions.join("")+'</div></div></section>'+
    (services.length?'<section class="company-profile-section"><h2>الخدمات والتخصصات</h2><ul class="company-service-list">'+services.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></section>':"")+
    (approvedContactDetails.length?'<section class="company-profile-section company-contact-details"><h2>بيانات التواصل ومقر الشركة</h2><div class="company-detail-grid">'+approvedContactDetails.join("")+'</div></section>':"")+
    (projects.length?'<section class="company-profile-section"><h2>المشروعات والأعمال السابقة</h2><div class="company-project-list">'+projects.map(p=>'<article class="company-project"><h3>'+esc(p.title||"عمل سابق")+'</h3><p>'+esc(p.description||"")+'</p></article>').join('')+'</div></section>':"")+

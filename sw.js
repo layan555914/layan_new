@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v192-company-welcome-20261123";
+const CACHE_NAME = "asyut-aqar-shell-v194-clean-public-copy-20261124";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -26,7 +26,7 @@ const APP_SHELL = [
   "./directory-admin.html",
   "./directory-admin.js?v=20261114-service-profiles-1",
   "./directory.css",
-  "./directory.js?v=20261122-directory-reference-separation-1",
+  "./directory.js?v=20261124-clean-public-copy-1",
   "./project.html",
   "./project.css?v=project-profile-v1-20261115",
   "./project.js?v=project-profile-v1-20261115",
@@ -36,7 +36,7 @@ const APP_SHELL = [
   "./favorites.js",
   "./marketplace.css",
   "./marketplace-page.css",
-  "./marketplace.js?v=20261115-services-only-1",
+  "./marketplace.js?v=20261124-clean-public-copy-1",
   "./my-listings.html",
   "./my-listings.css",
   "./my-listings.js",
@@ -46,8 +46,8 @@ const APP_SHELL = [
   "./companies.css",
   "./assets/theme/companies-directory-bridge.css?v=20261115-verified-company-brand-1",
   "./assets/theme/entity-brand-cards.css?v=20261115-unified-entity-brand-1",
-  "./companies.js?v=20261115-company-types-1",
-  "./company-profile.js?v=20261123-welcome-after-claim-2",
+  "./companies.js?v=20261124-clean-public-copy-1",
+  "./company-profile.js?v=20261124-clean-public-copy-1",
   "./styles.css",
   "./assets/theme/sitewide-typography.css?v=20261116-1",
   "./assets/theme/visual-refresh.css?v=20261116-1",

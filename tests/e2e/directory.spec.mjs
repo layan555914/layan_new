@@ -43,7 +43,7 @@ async function mockDirectoryApi(page) {
 test("directory shows reference entities only and excludes companies and service providers", async ({page})=>{
   await mockDirectoryApi(page);
   await page.goto("/directory.html");
-  await expect(page.locator(".directory-tabs button[data-view='entities']")).toHaveText("الجهات المرجعية");
+  await expect(page.locator(".directory-tabs button[data-view='entities']")).toHaveText("الجهات");
   await expect(page.locator("#directoryResults .directory-card")).toHaveCount(2);
   const options=await page.locator("#directoryTypeFilter option").allTextContents();
   expect(options.join(" ")).toContain("مطور عقاري");
@@ -101,8 +101,8 @@ test("directory map searches the selected published area without inventing a loc
     "href",
     "https://www.google.com/maps/search/?api=1&query="+query
   );
-  await expect(page.locator("#directoryMapNote")).toContainText("بحث استرشادي");
-  await expect(page.locator("#directoryMapNote")).toContainText("ليس دبوسًا جغرافيًا معتمدًا");
+  await expect(page.locator("#directoryMapNote")).toContainText("يعرض Google Maps نتائج بحث");
+  await expect(page.locator("#directoryMapNote")).toContainText("داخل نطاق أسيوط");
   await page.locator("#directoryMapArea").selectOption("");
   await expect(page.locator("#directoryMapOpen")).toContainText("نطاق أسيوط");
 });
@@ -115,15 +115,15 @@ test("only public points backed by an official source create map links", async (
   await expect(page.locator("#directoryMapFrame")).toHaveAttribute(
     "src","https://maps.google.com/maps?q="+query+"&output=embed"
   );
-  await expect(page.locator("#directoryMapNote")).toContainText("مركز منطقة تقريبي");
-  await expect(page.locator("#directoryMapNote")).toContainText("المصدر الرسمي التجريبي");
+  await expect(page.locator("#directoryMapNote")).toContainText("موقع المنطقة المختارة على الخريطة");
+  await expect(page.locator("#directoryMapNote")).not.toContainText("المصدر الرسمي التجريبي");
 
   await page.locator("[data-view='entities']").click();
   const verifiedCard=page.locator("#directoryResults .directory-card").filter({hasText:"شركة اختبار التطوير"});
   await expect(verifiedCard.locator(".directory-verified-location a")).toHaveAttribute(
     "href","https://www.google.com/maps/search/?api=1&query="+encodeURIComponent("27.205,31.154")
   );
-  await expect(verifiedCard.locator(".directory-verified-location")).toContainText("المصدر الرسمي التجريبي");
+  await expect(verifiedCard.locator(".directory-verified-location")).toContainText("عرض الموقع على الخريطة");
 
   const unverifiedCard=page.locator("#directoryResults .directory-card").filter({hasText:"هيئة اختبار عامة"});
   await expect(unverifiedCard.locator(".directory-verified-location")).toHaveCount(0);
@@ -240,7 +240,7 @@ test("company directory general map and outbound Google Maps link remain visible
   await page.setViewportSize({width:375,height:812});
   await page.goto("/companies.html");
   await expect(page.locator(".company-map-panel h2")).toHaveText("خريطة نطاق أسيوط");
-  await expect(page.locator(".company-map-frame iframe")).toHaveAttribute("title","خريطة عامة لمدينة أسيوط");
+  await expect(page.locator(".company-map-frame iframe")).toHaveAttribute("title","خريطة أسيوط");
   await expect(page.locator(".company-map-panel a")).toHaveAttribute(
     "href",
     "https://www.google.com/maps/search/?api=1&query=Assiut%2C%20Egypt"

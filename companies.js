@@ -61,18 +61,18 @@ function card(c,type){
  const href="./company.html?id="+encodeURIComponent(c.id);
  const services=Array.isArray(c.services)?c.services.slice(0,3):[];
  const label=companyTypeLabel(type);
- return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف شركة معتمد لدى أسيوط عقار</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--owner"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(c.company_name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--owner">ملف الشركة</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>'+esc(c.city||"أسيوط")+'</span></div><h3>'+esc(c.company_name)+'</h3></div></div><p>'+esc(c.description||"")+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
 }
 function directoryCard(c,type){
  const href="./company.html?entity_id="+encodeURIComponent(c.id);
  const name=String(c.name_ar||c.name_en||"شركة عقارية");
  const logo=safeUrl(c.public_logo_url)||ENTITY_LOGO_ASSETS[c.id]||officialEntityLogo(c.website_url)||"";
  const label=companyTypeLabel(type);
- const description=String(c.description||"بيانات تعريفية منشورة في دليل الشركات. راجع المصادر داخل الملف لمعرفة تفاصيل الإدراج.");
+ const description=String(c.description||"تعرّف على الشركة وخدماتها وطرق التواصل معها.");
  const contact=c.public_phone?'<span>'+esc(c.public_phone)+'</span>':"";
  const address=c.public_address?'<span>'+esc(c.public_address)+'</span>':"";
  const services=Array.isArray(c.public_services)?c.public_services.slice(0,3):[];
- return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">ملف شركة منشور في الدليل العقاري</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
+ return '<article class="company-directory-card company-directory-card--directory"><a href="'+href+'"><div class="company-directory-card-body"><div class="aq-entity-card-head">'+entityBrandMarkup(name,logo)+'<div class="aq-entity-card-head__content"><span class="company-source-label company-source-label--directory">ملف الشركة</span><div class="company-card-meta"><span>'+esc(label)+'</span><span>محافظة أسيوط</span></div><h3>'+esc(name)+'</h3></div></div><p>'+esc(description)+'</p><div class="company-card-meta">'+services.map(esc).join(" · ")+(services.length?' · ':'')+contact+address+'</div><span class="company-card-open">عرض ملف الشركة ←</span></div></a></article>';
 }
 function renderGroup(type,ownerRows,entityRows,gridElement,countElement,q){
  const owners=ownerRows.filter(c=>!q||normalizeName([c.company_name,c.description,c.city,c.category,...(c.services||[])].join(" ")).includes(q));
@@ -81,7 +81,7 @@ function renderGroup(type,ownerRows,entityRows,gridElement,countElement,q){
   ...owners.map(c=>({name:c.company_name,html:card(c,type)})),
   ...entities.map(c=>({name:c.name_ar||c.name_en,html:directoryCard(c,type)}))
  ].sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"ar"));
- gridElement.innerHTML=items.length?items.map(x=>x.html).join(""):'<p class="company-directory-state">لا توجد ملفات منشورة في هذا القسم تطابق البحث حاليًا.</p>';
+ gridElement.innerHTML=items.length?items.map(x=>x.html).join(""):'<p class="company-directory-state">لا توجد شركات تطابق البحث حاليًا.</p>';
  countElement.textContent=items.length+" ملف";
  return items.length;
 }
@@ -142,7 +142,7 @@ async function loadMyProfile(){
   else if(c.status==="rejected"){status.textContent="تم رفض طلب شركتك: "+(c.admin_notes||"لم تُسجَّل ملاحظات")+". يمكنك تعديل البيانات وإعادة إرسال الطلب للمراجعة.";}
   else if(c.status==="paused"){status.textContent="ملف شركتك موقوف مؤقتًا من إدارة أسيوط عقار. تواصل مع الإدارة لمعرفة السبب.";}
   else if(c.status==="active"){status.textContent=c.verified_at?"ملف شركتك منشور وممثلها تم التحقق منه. يمكنك تحديث البيانات التشغيلية مباشرة، أما الاسم ووسائل التواصل الأساسية فتحتاج موافقة الإدارة.":"ملف شركتك منشور. يلزم استكمال تحقق الممثل لدى الإدارة قبل تفعيل التحديث المباشر.";}
-  $("companyRegisterOpen").textContent=needsChanges?"استكمال البيانات":"تحديث ملف شركتك";$("companyRegisterOpenBottom").textContent=needsChanges?"استكمال بيانات الشركة":"تحديث بيانات الشركة";const submitButton=form.querySelector('button[type="submit"]');if(submitButton)submitButton.textContent=needsChanges?"إرسال البيانات المستكملة للمراجعة":"إرسال للمراجعة";
+  $("companyRegisterOpen").textContent=needsChanges?"استكمال البيانات":"تحديث ملف شركتك";$("companyRegisterOpenBottom").textContent=needsChanges?"استكمال بيانات الشركة":"تحديث بيانات الشركة";const submitButton=form.querySelector('button[type="submit"]');if(submitButton)submitButton.textContent=needsChanges?"إرسال البيانات المستكملة":"إرسال الطلب";
   return true;
  }catch(e){status.textContent="تعذر التأكد من وجود ملف شركة سابق. لن نسمح بإنشاء طلب جديد قبل حل المشكلة. "+(e.message||"");console.warn("Company profile lookup:",e);return false}
 }
@@ -202,8 +202,8 @@ try{
    })
   });
   existingProfileId=saved.id;existingStatus=saved.status;existingProfileSnapshot=saved;existingVerifiedAt=saved.verified_at||null;supportsDraft=Object.prototype.hasOwnProperty.call(saved,"pending_update");profileLookupComplete=true;
-  submissionSaved=true;btn.disabled=true;btn.textContent="تم الإرسال للمراجعة";
-  status.textContent=(wasExistingProfile?"تم استلام تحديث ملف شركتك بنجاح.":"تم إرسال طلب شركتك بنجاح.")+" بيانات الممثل وأدلة الصفة أصبحت لدى الإدارة للتحقق قبل النشر.";
+  submissionSaved=true;btn.disabled=true;btn.textContent="تم إرسال الطلب";
+  status.textContent=(wasExistingProfile?"تم استلام تحديث ملف شركتك بنجاح.":"تم إرسال طلب شركتك بنجاح.")+" سيتواصل معك فريق أسيوط عقار لاستكمال التفاصيل.";
  }
 }catch(err){status.textContent=err.message||"تعذر إرسال التحديث."}finally{if(!submissionSaved)btn.disabled=false}
 });
