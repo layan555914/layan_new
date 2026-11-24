@@ -32,3 +32,12 @@
 .marketplace-listing-body h3{color:#102746}
 .marketplace-listing-body small{color:#A93636}
 @media(prefers-reduced-motion:no-preference){.marketplace-category-tile{transition:border-color .18s ease,background .18s ease,box-shadow .18s ease}}
+
+/* Standalone marketplace hero and category palette overrides. */
+.page-marketplace .page-hero{background:linear-gradient(135deg,#102746,#18385F);border-bottom:4px solid #C8963E;color:#fff}
+.page-marketplace .page-hero .eyebrow{color:#E7C77F}
+.page-marketplace .page-hero h1,.page-marketplace .page-hero p{color:#fff}
+.page-marketplace .category-tile{border-color:#E2E7EE;color:#24364B}
+.page-marketplace .category-tile strong{color:#102746}
+.page-marketplace .category-tile span{color:#66758A}
+.page-marketplace .category-tile:hover,.page-marketplace .category-tile:focus{border-color:#C8963E;background:#FBF8F0}
