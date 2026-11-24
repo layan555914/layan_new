@@ -155,3 +155,31 @@ body .topbar{background:var(--aq-navy);color:#fff}
  background:#fffaf0;
  color:#102746;
 }
+
+.companies-page .company-card-meta{color:#8b672c}
+.companies-page .company-map-panel{
+ border-color:#d8e0e9;
+ background:#fff;
+}
+.companies-page .company-map-panel h2{color:#102746}
+.companies-page .company-map-panel>a{color:#102746}
+.company-profile-page .company-profile-logo{
+ border:1px solid #e4d2ad;
+ color:#102746;
+}
+.company-profile-page .company-claim-panel,
+.company-profile-page .company-claim-panel--prominent{
+ border-color:#e4d2ad;
+ background:linear-gradient(120deg,#fff 0%,#fbf5e8 100%);
+}
+.company-profile-page .company-claim-panel .eyebrow{color:#8b672c}
+.company-profile-page .company-claim-panel h2{color:#102746}
+.company-profile-page .company-claim-status{
+ border-color:#d8e0e9;
+ background:#f7f9fc;
+ color:#102746;
+}
+.company-profile-page .company-source-note{
+ border-right-color:#C8963E;
+ background:#fffaf0;
+}
