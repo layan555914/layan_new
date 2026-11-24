@@ -35,3 +35,7 @@ body .topbar{background:var(--aq-navy);color:#fff}
 .company-source-list li{border-color:#d8e0e9}
 .company-detail-empty{border-color:#d8e0e9;background:#f7f9fc;color:#52657b}
 .company-claim-status{border-color:#d8e0e9;background:#f7f9fc;color:var(--aq-navy)}
+
+.company-profile-page h1,.company-profile-page h2,.company-profile-page h3,.company-directory-page h1,.company-directory-page h2,.company-directory-page h3{color:var(--aq-navy)}
+.company-profile-page .eyebrow,.company-directory-page .eyebrow{color:#8b672c}
+.company-profile-page a:not(.btn),.company-directory-page a:not(.btn){text-decoration-color:var(--aq-gold)}
