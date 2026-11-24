@@ -142,7 +142,7 @@ async function loadMyProfile(){
   else if(c.status==="rejected"){status.textContent="تم رفض طلب شركتك: "+(c.admin_notes||"لم تُسجَّل ملاحظات")+". يمكنك تعديل البيانات وإعادة إرسال الطلب للمراجعة.";}
   else if(c.status==="paused"){status.textContent="ملف شركتك موقوف مؤقتًا من إدارة أسيوط عقار. تواصل مع الإدارة لمعرفة السبب.";}
   else if(c.status==="active"){status.textContent=c.verified_at?"ملف شركتك منشور وممثلها تم التحقق منه. يمكنك تحديث البيانات التشغيلية مباشرة، أما الاسم ووسائل التواصل الأساسية فتحتاج موافقة الإدارة.":"ملف شركتك منشور. يلزم استكمال تحقق الممثل لدى الإدارة قبل تفعيل التحديث المباشر.";}
-  $("companyRegisterOpen").textContent=needsChanges?"استكمال البيانات":"تحديث ملف شركتك";$("companyRegisterOpenBottom").textContent=needsChanges?"استكمال بيانات الشركة":"تحديث بيانات الشركة";const submitButton=form.querySelector('button[type="submit"]');if(submitButton)submitButton.textContent=needsChanges?"إرسال البيانات المستكملة للمراجعة":"إرسال للمراجعة";
+  $("companyRegisterOpen").textContent=needsChanges?"استكمال البيانات":"تحديث ملف شركتك";$("companyRegisterOpenBottom").textContent=needsChanges?"استكمال بيانات الشركة":"تحديث بيانات الشركة";const submitButton=form.querySelector('button[type="submit"]');if(submitButton)submitButton.textContent=needsChanges?"إرسال البيانات المستكملة":"إرسال الطلب";
   return true;
  }catch(e){status.textContent="تعذر التأكد من وجود ملف شركة سابق. لن نسمح بإنشاء طلب جديد قبل حل المشكلة. "+(e.message||"");console.warn("Company profile lookup:",e);return false}
 }
@@ -202,8 +202,8 @@ try{
    })
   });
   existingProfileId=saved.id;existingStatus=saved.status;existingProfileSnapshot=saved;existingVerifiedAt=saved.verified_at||null;supportsDraft=Object.prototype.hasOwnProperty.call(saved,"pending_update");profileLookupComplete=true;
-  submissionSaved=true;btn.disabled=true;btn.textContent="تم الإرسال للمراجعة";
-  status.textContent=(wasExistingProfile?"تم استلام تحديث ملف شركتك بنجاح.":"تم إرسال طلب شركتك بنجاح.")+" بيانات الممثل وأدلة الصفة أصبحت لدى الإدارة للتحقق قبل النشر.";
+  submissionSaved=true;btn.disabled=true;btn.textContent="تم إرسال الطلب";
+  status.textContent=(wasExistingProfile?"تم استلام تحديث ملف شركتك بنجاح.":"تم إرسال طلب شركتك بنجاح.")+" سيتواصل معك فريق أسيوط عقار لاستكمال التفاصيل.";
  }
 }catch(err){status.textContent=err.message||"تعذر إرسال التحديث."}finally{if(!submissionSaved)btn.disabled=false}
 });
