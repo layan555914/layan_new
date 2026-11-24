@@ -224,7 +224,7 @@ function card(title,desc,tag,detail,url,refs,record,recordType){
  const heading=entityBrand
   ?'<div class="aq-entity-card-head directory-card-head">'+entityBrand+'<div class="aq-entity-card-head__content"><div class="directory-card-meta">'+tagMarkup+'</div><h3>'+esc(title)+'</h3></div></div>'
   :'<div class="directory-card-meta">'+tagMarkup+'</div><h3>'+esc(title)+'</h3>';
- return '<article class="directory-card"'+(recordKey?' id="directory-record-'+esc(encodeURIComponent(recordKey))+'" data-share-url="'+esc(shareUrl)+'"':"")+'>'+heading+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+companyProfileLink+projectProfileLink+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(recordObj?verifiedLocationHtml(recordObj):"")+(refs?'<div class="directory-linked-sources"><strong>مراجع السجل:</strong> '+refs+'</div>':"")+'</article>';
+ return '<article class="directory-card"'+(recordKey?' id="directory-record-'+esc(encodeURIComponent(recordKey))+'" data-share-url="'+esc(shareUrl)+'"':"")+'>'+heading+(desc?'<p>'+esc(desc)+'</p>':"")+(detail?'<small>'+esc(detail)+'</small>':"")+companyProfileLink+projectProfileLink+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">زيارة الموقع الرسمي ↗</a>':"")+(recordObj?verifiedLocationHtml(recordObj):"")+'</article>';
 }
 function setFilterAvailability(){
  $("#directoryTypeFilter").disabled=state.view!=="entities";
