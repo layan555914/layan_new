@@ -82,11 +82,10 @@ body .topbar{background:var(--aq-navy);color:#fff}
  background:linear-gradient(135deg,#102746,#1d3c60);
  color:#e4bd78;
 }
-.companies-page .company-directory-card h3,
-.company-profile-page .company-profile-hero h1{color:#102746}
+.companies-page .company-directory-card h3{color:#102746}
 .companies-page .company-directory-card p,
 .companies-page .company-directory-state,
-.company-profile-page .company-profile-hero p,
+.company-profile-page .company-profile-hero p{color:#e8eef5}
 .company-profile-page .company-service-offer-card p,
 .company-profile-page .company-service-offer-card span{color:#52657b}
 .companies-page .company-directory-state{
