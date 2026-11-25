@@ -104,12 +104,25 @@ test("verified owner can publish operational edits immediately and queue identit
 
   await page.route("**/auth/v1/user", async route => reply(route, USER));
   await page.route("**/storage/v1/object/asyut-directory-media/**", async route => reply(route, {}));
+  await page.route("**/storage/v1/object/sign/asyut-directory-media/**", async route => reply(route, { signedURL: "https://signed.example.invalid/approved.png" }));
   await page.route("**/rest/v1/**", async route => {
     const request = route.request();
     const url = new URL(request.url());
     const path = url.pathname;
     const table = path.split("/").pop();
 
+    if (table === "directory_media_assets" && request.method() === "GET" && url.searchParams.get("status") === "eq.approved") {
+      return reply(route, [{
+        id: "a2222222-2222-4222-8222-222222222201",
+        directory_entity_id: ENTITY_ID,
+        project_id: null,
+        media_kind: "service_gallery",
+        storage_path: ENTITY_ID + "/" + USER_ID + "/approved.png",
+        caption: "صورة معتمدة",
+        sort_order: 0,
+        created_at: "2026-11-14T10:00:00Z"
+      }]);
+    }
     if (table === "directory_media_assets" && request.method() === "POST") {
       state.mediaAssets.push(request.postDataJSON());
       return reply(route, [], 201);
@@ -174,6 +187,9 @@ test("verified owner can publish operational edits immediately and queue identit
   });
   await mediaForm.locator("button[type='submit']").click();
   await expect(page.locator(".directory-media-status")).toContainText("تم إرسال 1 صورة للمراجعة");
+  await expect(page.locator(".company-gallery")).toHaveCount(1);
+  await expect(page.locator(".company-gallery img")).toHaveCount(2);
+  await expect(page.locator(".company-profile-section:has(.company-gallery)")).toHaveCount(1);
   expect(state.mediaAssets).toHaveLength(1);
   expect(state.mediaAssets[0]).toMatchObject({
     directory_entity_id: ENTITY_ID,
