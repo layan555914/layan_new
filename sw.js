@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v194-clean-public-copy-20261124";
+const CACHE_NAME = "asyut-aqar-shell-v195-directory-media-20261125";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -25,11 +25,15 @@ const APP_SHELL = [
   "./know-more.html",
   "./directory-admin.html",
   "./directory-admin.js?v=20261114-service-profiles-1",
+  "./directory-media-admin.html",
+  "./directory-media-admin.js?v=20261123-1",
+  "./directory-media.js?v=20261125-media-gallery-2",
+  "./assets/theme/directory-media.css?v=20261125-media-1",
   "./directory.css",
   "./directory.js?v=20261124-clean-public-copy-1",
   "./project.html",
   "./project.css?v=project-profile-v1-20261115",
-  "./project.js?v=project-profile-v1-20261115",
+  "./project.js?v=20261125-media-gallery-2",
   "./directory-public.json",
   "./marketplace.html",
   "./favorites.html",
@@ -47,7 +51,7 @@ const APP_SHELL = [
   "./assets/theme/companies-directory-bridge.css?v=20261115-verified-company-brand-1",
   "./assets/theme/entity-brand-cards.css?v=20261115-unified-entity-brand-1",
   "./companies.js?v=20261124-clean-public-copy-1",
-  "./company-profile.js?v=20261124-clean-public-copy-1",
+  "./company-profile.js?v=20261124-clean-public-copy-2",
   "./styles.css",
   "./assets/theme/sitewide-typography.css?v=20261116-1",
   "./assets/theme/visual-refresh.css?v=20261116-1",
