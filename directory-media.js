@@ -40,6 +40,35 @@
   function storagePath(path) {
     return String(path).split("/").map(encodeURIComponent).join("/");
   }
+  async function cleanupPendingUpload(path, token, reason) {
+    let objectRemoved = false;
+    try {
+      const response = await fetch(base + "/storage/v1/object/" + bucket + "/" + storagePath(path), {
+        method:"DELETE",
+        headers:{ apikey:key, Authorization:"Bearer " + token }
+      });
+      if (response.ok || response.status === 404) {
+        objectRemoved = true;
+      } else {
+        const detail = await response.json().catch(() => ({}));
+        throw new Error(detail.message || "Storage cleanup failed (HTTP " + response.status + ").");
+      }
+    } catch (error) {
+      console.error("Could not remove failed directory media object:", error);
+    }
+    if (!objectRemoved) {
+      console.error("Keeping pending media metadata so the object remains traceable for administrator cleanup:", reason);
+      return;
+    }
+    try {
+      await request("/rest/v1/directory_media_assets?storage_path=eq." + encodeURIComponent(path), {
+        method:"DELETE",
+        headers:{ "Prefer":"return=minimal" }
+      }, token);
+    } catch (error) {
+      console.error("Could not remove pending media metadata after " + reason + ":", error);
+    }
+  }
   async function signedUrl(path, token) {
     const result = await request("/storage/v1/object/sign/" + bucket + "/" + storagePath(path), {
       method: "POST",
@@ -231,23 +260,13 @@
               body:bytes
             });
           } catch (storageError) {
-            await request("/rest/v1/directory_media_assets?storage_path=eq." + encodeURIComponent(path), {
-              method:"DELETE",
-              headers:{ "Prefer":"return=minimal" }
-            }, current.access_token).catch(cleanupError => {
-              console.error("Could not remove pending media metadata after storage network failure:", cleanupError);
-            });
+            await cleanupPendingUpload(path, current.access_token, "storage network failure");
             throw storageError;
           }
           if (!storageResponse.ok) {
             const detail = await storageResponse.json().catch(() => ({}));
-            // Remove the pending metadata while it still authorizes owner cleanup.
-            await request("/rest/v1/directory_media_assets?storage_path=eq." + encodeURIComponent(path), {
-              method:"DELETE",
-              headers:{ "Prefer":"return=minimal" }
-            }, current.access_token).catch(cleanupError => {
-              console.error("Could not remove pending media metadata after upload failure:", cleanupError);
-            });
+            // Remove the storage object first while the pending row still authorizes owner cleanup.
+            await cleanupPendingUpload(path, current.access_token, "storage upload failure");
             throw new Error(detail.message || "تعذر رفع الصورة إلى التخزين الآمن.");
           }
           uploaded++;
