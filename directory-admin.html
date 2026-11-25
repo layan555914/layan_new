@@ -56,6 +56,7 @@ body{background:#FAF7F3;color:#372B23}
   <link rel="stylesheet" href="/assets/theme/unified-bright-clarity.css?v=20261118-brand-identity-1">
   <link rel="stylesheet" href="/assets/theme/design-system.css?v=20261118-brand-identity-1" data-asyut-design-foundation="global">
   <link rel="stylesheet" href="/assets/theme/platform-unified-theme.css?v=20261118-1" data-asyut-unified-theme="global">
+<link rel="stylesheet" href="./assets/theme/directory-media.css?v=20261125-media-1">
 </head>
 <body>
 <main class="dir-admin-wrap">
@@ -63,7 +64,7 @@ body{background:#FAF7F3;color:#372B23}
 <h1>مركز إدارة قاعدة بيانات السوق العقاري</h1>
 <p>إدارة الجهات والشركات والمشروعات والمناطق والطروحات والمصادر في محافظة أسيوط. البيانات الداخلية لا تظهر للزوار إلا بعد اعتماد مسؤول ومصدر عام مرتبط.</p>
 <div class="dir-admin-top">
-<div><a class="btn btn-outline" href="./admin.html">لوحة الإدارة الرئيسية</a> <a class="btn btn-outline" href="./directory.html">معاينة الدليل العام</a> <a class="btn btn-outline" href="./company-project-requests-admin.html">طلبات مشروعات الشركات</a> <a class="btn btn-outline" href="./project-units-admin.html">طلبات الوحدات وربط الإعلانات</a> <a class="btn btn-outline" href="./directory-media-admin.html">مراجعة صور الشركات والمشروعات</a></div>
+<div><a class="btn btn-outline" href="./admin.html">لوحة الإدارة الرئيسية</a> <a class="btn btn-outline" href="./directory.html">معاينة الدليل العام</a> <a class="btn btn-outline" href="./company-project-requests-admin.html">طلبات مشروعات الشركات</a> <a class="btn btn-outline" href="./project-units-admin.html">طلبات الوحدات وربط الإعلانات</a> <a class="btn btn-outline" href="#dirAdminMediaPanel">مراجعة صور الشركات والمشروعات</a></div>
 <button class="btn btn-outline" id="dirAdminLogout" type="button" hidden>تسجيل الخروج</button>
 </div>
 </header>
@@ -118,12 +119,23 @@ body{background:#FAF7F3;color:#372B23}
 <p id="dirAdminListStatus" aria-live="polite">جارٍ تحميل قاعدة البيانات...</p>
 <div id="dirAdminRecords" class="dir-admin-grid"></div>
 </div>
+<section class="dir-admin-panel media-admin-embedded" id="dirAdminMediaPanel" aria-labelledby="dirAdminMediaTitle">
+  <div class="media-admin-embedded-head">
+    <div><h2 id="dirAdminMediaTitle">مراجعة صور الشركات والمشروعات</h2><p>تظهر هنا الصور المرسلة من المالك أو مدير الملف. الصور لا تظهر للعامة إلا بعد اعتمادها.</p></div>
+    <button class="btn btn-outline" id="mediaAdminRefresh" type="button">تحديث القائمة</button>
+  </div>
+  <p id="mediaAdminGlobalStatus" class="dir-admin-status" role="status" aria-live="polite">تظهر القائمة بعد التحقق من صلاحية مسؤول الدليل.</p>
+  <p id="mediaAdminStatus" class="media-admin-status" role="status" aria-live="polite">جارٍ التحميل...</p>
+  <div id="mediaAdminGrid" class="media-admin-grid"></div>
+  <button class="btn btn-outline" id="mediaAdminLoadMore" type="button" hidden>تحميل المزيد</button>
+</section>
 </section>
 <p id="dirAdminStatus" class="dir-admin-status" role="status" aria-live="polite"></p>
 </main>
 <script src="./config.js?v=20261105-7"></script><script src="./admin-approval.js?v=20261114-service-profiles-1"></script>
 <script src="./gubabase.js?v=20261117-persistent-auth-session-1"></script>
 <script src="./directory-admin.js?v=20261114-service-profiles-1" defer></script>
+<script src="./directory-media-admin.js?v=20261125-review-pagination-2" defer></script>
 <footer class="site-credit-footer"><div class="site-credit" dir="ltr" lang="en">Copyright © 2026 AQAR ASYUT All Rights Reserved <span aria-hidden="true">|</span> Developed by A-G : <a href="mailto:Cair0@hotmail.com">Cair0@hotmail.com</a></div></footer>
 </body>
 </html>
