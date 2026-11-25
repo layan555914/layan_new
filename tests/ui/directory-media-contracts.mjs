@@ -46,7 +46,8 @@ assert.match(admin, /reviewed_by:session\.user\.id/, "moderation must record the
 assert.match(company, /AsyutDirectoryMedia\.mountManager/, "company profile must expose the verified manager uploader");
 assert.doesNotMatch(company, /public_gallery_urls:gallery/, "managers must not bypass moderation with direct public image URLs");
 assert.match(company, /AsyutDirectoryMedia\.renderGallery/, "company profile must show approved media");
-assert.ok(company.includes("رفع الصور متاح للمالك الأساسي أو مدير الملف المفوض"), "editor role copy must match actual upload permissions");
+assert.ok(company.includes("رفع الصور متاح للمالك الأساسي أو مدير الملف المفوض"), "owner instructions must match upload permissions");
+assert.ok(company.includes("رفع الصور غير متاح لصلاحية المحرر"), "editors must be told directly that they cannot upload media");
 assert.match(project, /AsyutDirectoryMedia\.renderGallery/, "project profile must show approved media");
 assert.match(companyHtml, /directory-media\.js/, "company page must load directory media client");
 assert.match(projectHtml, /directory-media\.js/, "project page must load directory media client");
