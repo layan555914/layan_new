@@ -26,7 +26,7 @@ const APP_SHELL = [
   "./directory-admin.html",
   "./directory-admin.js?v=20261114-service-profiles-1",
   "./directory-media-admin.html",
-  "./directory-media-admin.js?v=20261123-1",
+  "./directory-media-admin.js?v=20261125-review-pagination-1",
   "./directory-media.js?v=20261125-media-gallery-2",
   "./assets/theme/directory-media.css?v=20261125-media-1",
   "./directory.css",
