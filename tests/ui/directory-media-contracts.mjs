@@ -21,8 +21,9 @@ assert.match(migration, /CREATE POLICY directory_media_storage_review_read[\s\S]
   "public storage reads must require approved metadata");
 assert.match(media, /10 \* 1024 \* 1024/, "uploader must enforce the 10 MB image limit");
 assert.match(media, /directory_media_assets/, "uploader must create metadata records");
+const uploadBlock = media.slice(media.indexOf("for (const file of files) {"));
 assert.ok(
-  media.indexOf('request("/rest/v1/directory_media_assets"') < media.indexOf('fetch(base + "/storage/v1/object/" + bucket'),
+  uploadBlock.indexOf('request("/rest/v1/directory_media_assets"') < uploadBlock.indexOf('fetch(base + "/storage/v1/object/" + bucket'),
   "pending metadata must be created before storage upload so failed metadata cannot orphan an object"
 );
 assert.match(media, /directory_media_assets\?storage_path=eq\./,
@@ -32,7 +33,9 @@ assert.match(media, /status:"eq\.approved"/, "public gallery must request approv
 assert.ok(!media.includes('<option value=\\"entity_cover\\">'), "upload form must not offer a cover until cover rendering exists");
 assert.ok(media.includes('root.querySelector(".company-gallery")'), "approved company media must reuse the existing gallery");
 assert.ok(media.includes("existingGallery.appendChild(image)"), "approved company media must merge into the existing gallery");
-assert.ok(media.includes("Could not remove pending media metadata after storage network failure"), "network upload failures must clean pending metadata");
+assert.ok(media.includes("async function cleanupPendingUpload"), "failed uploads must share one cleanup path");
+assert.ok(media.includes('method:"DELETE"'), "failed uploads must attempt to remove the storage object");
+assert.ok(media.includes("Keeping pending media metadata so the object remains traceable"), "metadata must remain when storage cleanup cannot be confirmed");
 assert.match(media, /relation_type=in\.\(developer,land_owner\)/, "project uploads must be restricted to developer/land-owner relationships");
 assert.match(admin, /rpc\/layan_is_admin/, "moderation page must verify admin authorization");
 assert.match(admin, /status:nextStatus/, "moderation must record approval or rejection");
