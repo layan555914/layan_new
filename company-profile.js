@@ -250,6 +250,9 @@ document.addEventListener("DOMContentLoaded",async()=>{
 
    '<dialog class="company-claim-dialog" id="companyClaimDialog" aria-labelledby="companyClaimTitle"><div class="company-claim-dialog-head"><div><span class="eyebrow">طلب استلام ملف '+profileSubject+'</span><h2 id="companyClaimTitle">بيانات '+profileRepresentative+'</h2></div><button type="button" id="companyClaimClose" class="company-claim-close" aria-label="إغلاق نافذة طلب استلام الملف"><span aria-hidden="true">×</span><span>إغلاق</span></button></div><p class="company-claim-dialog-note">سجّل الدخول لإرسال طلب استلام ملف الشركة.</p><p class="company-claim-status" id="companyClaimStatus" role="status" aria-live="polite" hidden></p><a class="company-claim-login-link" id="companyClaimLoginLink" href="./index.html" hidden>اذهب للصفحة الرئيسية لتسجيل الدخول</a><a class="company-claim-login-link" id="companyClaimContactLink" href="https://wa.me/201007044265" target="_blank" rel="noopener noreferrer" hidden>تواصل مع إدارة أسيوط عقار لمتابعة الطلب</a><form id="companyClaimForm" class="company-claim-form"><label>اسم '+profileRepresentative+' *<input name="representative_name" required minlength="3" maxlength="120" autocomplete="name"></label><label>الصفة داخل الجهة *<select name="representative_role" required><option value="">اختر الصفة</option><option>المالك</option><option>شريك</option><option>مدير النشاط</option><option>مدير الفرع</option><option>مسؤول تسويق أو مبيعات</option><option>موظف مفوض</option><option>وكيل / ممثل قانوني</option><option>صفة أخرى</option></select></label><label>رقم الهاتف / واتساب *<input name="representative_phone" type="tel" required minlength="7" maxlength="30" autocomplete="tel"></label><label>البريد الإلكتروني (اختياري)<input name="representative_email" type="email" maxlength="160" autocomplete="email"></label><label>معلومات إضافية (اختياري)<textarea name="representative_notes" rows="3" maxlength="600" placeholder="مثال: أنا مدير فرع أسيوط ومستعد لإرسال التفويض"></textarea></label><label>رابط موقع أو صفحة رسمية للجهة (اختياري)<input name="evidence_url" type="url" maxlength="500" placeholder="https://..."></label><label>وصف مختصر لما يثبت صفتك أو علاقتك بالجهة (اختياري)<textarea name="evidence_description" rows="2" maxlength="500" placeholder="مثال: اسمي مدرج كمدير في صفحة الشركة الرسمية."></textarea></label><p class="company-claim-dialog-note">لا ترفع بطاقة هوية أو مستندات حساسة في النموذج. يمكن للإدارة طلب إثبات مناسب عبر قناة آمنة عند الحاجة.</p><button class="btn btn-gold" type="submit">إرسال طلب الاستلام</button></form></dialog>';
   attachLogoFallback(root,name);
+  if(window.AsyutDirectoryMedia){
+   window.AsyutDirectoryMedia.renderGallery({entityId:entity.id,root}).catch(error=>console.warn("Public company media gallery unavailable:",error));
+  }
   const claimDialog=document.getElementById("companyClaimDialog");
   document.getElementById("companyClaimOpen")?.addEventListener("click",()=>{claimDialog?.showModal();refreshMyClaimStatus();});
   document.getElementById("companyClaimClose")?.addEventListener("click",()=>claimDialog?.close());
@@ -329,14 +332,13 @@ document.addEventListener("DOMContentLoaded",async()=>{
     const categories=
       '<option value="contracting_construction">مقاولات وإنشاءات</option><option value="real_estate_marketing">تسويق عقاري</option><option value="real_estate_brokerage">وساطة ومكتب عقاري</option><option value="building_materials">مواد بناء وتشطيب</option><option value="finishing_decoration">تشطيب وديكور</option><option value="furniture_furnishings">أثاث وفرش وتجهيز وحدات</option><option value="engineering_design">مكاتب هندسية وتصميم معماري</option><option value="maintenance_property_management">صيانة وإدارة عقارات</option><option value="real_estate_consultancy">استشارات عقارية</option><option value="real_estate_development">تطوير ومشروعات عقارية</option><option value="real_estate_sales">مبيعات عقارية</option><option value="other_real_estate_services">خدمات عقارية مساندة</option>';
     target.innerHTML=
-     '<div><span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة ملف '+managedSubject+'</h2><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر ملف مفوض")+'. التعديلات التشغيلية المسموح بها تظهر مباشرة وتسجل في سجل المراجعة. بيانات الهوية والتواصل الأساسي تحتاج اعتماد الإدارة.</p></div>'+
+     '<div><span class="eyebrow">إدارة الملف بعد التحقق</span><h2>إدارة ملف '+managedSubject+'</h2><p>صلاحيتك: '+(isOwner?"المالك الأساسي المعتمد":accessRole==="manager"?"مدير ملف مفوض":"محرر ملف مفوض")+'. '+(isOwner||accessRole==="manager"?"يمكنك رفع الصور من القسم أدناه، ولا تظهر الصور إلا بعد مراجعة الإدارة.":"رفع الصور غير متاح لصلاحية المحرر؛ يقتصر على المالك الأساسي أو مدير الملف المفوض.")+' التعديلات التشغيلية المسموح بها تظهر مباشرة وتسجل في سجل المراجعة. بيانات الهوية والتواصل الأساسي تحتاج اعتماد الإدارة.</p></div>'+
      '<p class="company-manager-status" id="companyManagerStatus" role="status" aria-live="polite"></p>'+
      '<h3>تحديثات تشغيلية تظهر مباشرة</h3><form class="company-manager-form" id="companyManagerDirectForm">'+
       '<label class="wide">وصف النشاط والخدمات<textarea name="description" rows="3" maxlength="2000">'+esc(entity.description||"")+'</textarea></label>'+
       '<label>مواعيد العمل<input name="public_business_hours" maxlength="240" value="'+esc(entity.public_business_hours||"")+'"></label>'+
       '<label class="wide">الخدمات والتخصصات (كل خدمة في سطر)<textarea name="public_services" rows="3">'+esc(list(entity.public_services))+'</textarea></label>'+
       '<label class="wide">مناطق التغطية (كل منطقة في سطر)<textarea name="public_coverage_areas" rows="2">'+esc(list(entity.public_coverage_areas))+'</textarea></label>'+
-      '<label class="wide">روابط صور الأعمال (رابط آمن في كل سطر)<textarea name="public_gallery_urls" rows="3">'+esc(list(entity.public_gallery_urls))+'</textarea></label>'+
       '<button class="btn btn-gold" type="submit">حفظ التحديثات مباشرة</button></form>'+
      (isOwner?
       '<h3>تغييرات تتطلب موافقة الإدارة</h3><p>اسم الجهة، مجال النشاط، الهاتف، واتساب، البريد، الموقع، العنوان والشعار لا تتغير للزوار إلا بعد مراجعة الإدارة.</p>'+
@@ -353,12 +355,17 @@ document.addEventListener("DOMContentLoaded",async()=>{
        '<button class="btn btn-outline-dark" type="submit">إرسال التغيير لموافقة الإدارة</button></form>'
       :'<p class="company-manager-status">إدارة الاسم ووسائل الاتصال الأساسية تظل للمالك الأساسي للملف.</p>')+
      (isOwner?
-      '<section class="company-manager-team"><h3>فريق إدارة الملف</h3><p>أضف موظفًا لديه حساب مؤكد على أسيوط عقار. المدير المفوض يستطيع تحديث البيانات التشغيلية، والمحرر يستطيع تحديث الخدمات والوصف ومناطق التغطية والصور التشغيلية فقط.</p>'+
+      '<section class="company-manager-team"><h3>فريق إدارة الملف</h3><p>أضف موظفًا لديه حساب مؤكد على أسيوط عقار. المحرر يستطيع تحديث الوصف والخدمات ومواعيد العمل ومناطق التغطية فقط. رفع الصور متاح للمالك الأساسي أو مدير الملف المفوض، وتخضع الصور لمراجعة الإدارة قبل ظهورها.</p>'+
       '<form class="company-manager-form" id="companyManagerInviteForm"><label>بريد الموظف الإلكتروني<input name="email" type="email" required maxlength="254"></label><label>الصلاحية<select name="role"><option value="editor">محرر بيانات تشغيلية</option><option value="manager">مدير ملف مفوض</option></select></label><button class="btn btn-outline-dark" type="submit">إضافة إلى فريق الملف</button></form>'+
       '<div id="companyManagerMembers" class="company-manager-status">جارٍ تحميل أعضاء الفريق...</div></section>'
       :"");
     const profileHero=root.querySelector(".company-profile-hero");
     if(profileHero)profileHero.insertAdjacentElement("afterend",target);else root.appendChild(target);
+    if(window.AsyutDirectoryMedia && (isOwner||accessRole==="manager")){
+     try{
+      await window.AsyutDirectoryMedia.mountManager({entityId:entity.id,root:target,isServiceProvider});
+     }catch(error){console.warn("Directory media interface unavailable:",error);}
+    }
 
     if(isRealEstateCompany){
      const canManageProjects=isOwner||accessRole==="manager";
@@ -420,20 +427,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
      const data=new FormData(directForm);
      const value=name=>String(data.get(name)||"").trim();
      const lines=name=>value(name).split(/\n+/).map(item=>item.trim()).filter(Boolean);
-     let gallery;
-     try{
-      gallery=lines("public_gallery_urls").map(item=>{
-       const url=safeUrl(item);
-       if(!url)throw new Error("روابط صور الأعمال يجب أن تبدأ بـ http:// أو https://.");
-       return url;
-      });
-     }catch(error){directStatus.textContent=error.message;return;}
      const payload={
       description:value("description")||null,
       public_business_hours:value("public_business_hours")||null,
       public_services:lines("public_services"),
-      public_coverage_areas:lines("public_coverage_areas"),
-      public_gallery_urls:gallery
+      public_coverage_areas:lines("public_coverage_areas")
      };
      const button=directForm.querySelector('button[type="submit"]');
      button.disabled=true;

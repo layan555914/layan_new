@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loginPanel.hidden = ok;
     panel.hidden = !ok;
     logout.hidden = !ok;
+    window.dispatchEvent(new CustomEvent(ok ? "asyut-directory-admin-ready" : "asyut-directory-admin-locked"));
   };
   const dateText = value => value ? new Date(value).toLocaleString("ar-EG-u-nu-latn") : "—";
   const sessionUserId = () => session?.user?.id || auth?.getUser?.()?.id || null;

@@ -100,15 +100,33 @@ test("marketplace displays approved service provider profiles separately from su
 
 test("verified owner can publish operational edits immediately and queue identity changes for review", async ({ page }) => {
   await seedAuthenticatedSession(page);
-  const state = { directUpdates: [], submitted: [], directEntityPatches: 0 };
+  const state = { directUpdates: [], submitted: [], directEntityPatches: 0, mediaAssets: [] };
 
   await page.route("**/auth/v1/user", async route => reply(route, USER));
+  await page.route("**/storage/v1/object/asyut-directory-media/**", async route => reply(route, {}));
+  await page.route("**/storage/v1/object/sign/asyut-directory-media/**", async route => reply(route, { signedURL: "https://signed.example.invalid/approved.png" }));
   await page.route("**/rest/v1/**", async route => {
     const request = route.request();
     const url = new URL(request.url());
     const path = url.pathname;
     const table = path.split("/").pop();
 
+    if (table === "directory_media_assets" && request.method() === "GET" && url.searchParams.get("status") === "eq.approved") {
+      return reply(route, [{
+        id: "a2222222-2222-4222-8222-222222222201",
+        directory_entity_id: ENTITY_ID,
+        project_id: null,
+        media_kind: "service_gallery",
+        storage_path: ENTITY_ID + "/" + USER_ID + "/approved.png",
+        caption: "صورة معتمدة",
+        sort_order: 0,
+        created_at: "2026-11-14T10:00:00Z"
+      }]);
+    }
+    if (table === "directory_media_assets" && request.method() === "POST") {
+      state.mediaAssets.push(request.postDataJSON());
+      return reply(route, [], 201);
+    }
     if (table === "directory_entities" && request.method() === "PATCH") {
       state.directEntityPatches += 1;
       return reply(route, [ENTITY]);
@@ -143,7 +161,6 @@ test("verified owner can publish operational edits immediately and queue identit
   await directForm.locator("[name='public_business_hours']").fill("من 9 صباحًا إلى 8 مساءً");
   await directForm.locator("[name='public_services']").fill("تشطيب داخلي\nديكور");
   await directForm.locator("[name='public_coverage_areas']").fill("مدينة أسيوط\nأسيوط الجديدة");
-  await directForm.locator("[name='public_gallery_urls']").fill("https://assets.example.invalid/new-work.jpg");
   await directForm.locator("button[type='submit']").click();
 
   await expect(page.locator("#companyManagerStatus")).toContainText("تم حفظ التحديثات مباشرة");
@@ -154,12 +171,34 @@ test("verified owner can publish operational edits immediately and queue identit
       description: "وصف محدث لخدمات التشطيب.",
       public_business_hours: "من 9 صباحًا إلى 8 مساءً",
       public_services: ["تشطيب داخلي", "ديكور"],
-      public_coverage_areas: ["مدينة أسيوط", "أسيوط الجديدة"],
-      public_gallery_urls: ["https://assets.example.invalid/new-work.jpg"]
+      public_coverage_areas: ["مدينة أسيوط", "أسيوط الجديدة"]
     }
   });
   expect(state.directUpdates[0].p_payload).not.toHaveProperty("name_ar");
   expect(state.directEntityPatches).toBe(0);
+
+  const mediaForm = page.locator(".directory-media-upload-form");
+  await expect(mediaForm).toBeVisible({ timeout: 15000 });
+  await mediaForm.locator("[name='media_kind']").selectOption("service_gallery");
+  await mediaForm.locator("[name='files']").setInputFiles({
+    name: "service-work.png",
+    mimeType: "image/png",
+    buffer: Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])
+  });
+  await mediaForm.locator("button[type='submit']").click();
+  await expect(page.locator(".directory-media-status")).toContainText("تم إرسال 1 صورة للمراجعة");
+  await expect(page.locator(".company-gallery")).toHaveCount(1);
+  await expect(page.locator(".company-gallery img")).toHaveCount(2);
+  await expect(page.locator(".company-profile-section:has(.company-gallery)")).toHaveCount(1);
+  expect(state.mediaAssets).toHaveLength(1);
+  expect(state.mediaAssets[0]).toMatchObject({
+    directory_entity_id: ENTITY_ID,
+    owner_user_id: USER_ID,
+    media_kind: "service_gallery",
+    bucket_id: "asyut-directory-media",
+    caption: ""
+  });
+  expect(state.mediaAssets[0].storage_path).toMatch(new RegExp("^" + ENTITY_ID + "/" + USER_ID + "/[0-9a-f-]+\\.png$"));
 
   const reviewForm = page.locator("#companyManagerReviewForm");
   await expect(reviewForm).toBeVisible();
@@ -206,7 +245,9 @@ test("a delegated editor can manage operational fields but cannot access owner-o
   const directForm = page.locator("#companyManagerDirectForm");
   await expect(directForm).toBeVisible({ timeout: 15000 });
   await expect(page.locator("#companyManagerReviewForm")).toHaveCount(0);
+  await expect(page.locator(".company-manager-panel")).toContainText("رفع الصور غير متاح لصلاحية المحرر");
   await expect(page.locator("#companyManagerInviteForm")).toHaveCount(0);
+  await expect(page.locator(".directory-media-upload-form")).toHaveCount(0);
   await directForm.locator("[name='description']").fill("تحديث بواسطة محرر مفوض.");
   await directForm.locator("button[type='submit']").click();
   await expect(page.locator("#companyManagerStatus")).toContainText("تم حفظ التحديثات مباشرة");
