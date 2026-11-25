@@ -8,7 +8,8 @@ const company = fs.readFileSync("company-profile.js", "utf8");
 const project = fs.readFileSync("project.js", "utf8");
 const companyHtml = fs.readFileSync("company.html", "utf8");
 const projectHtml = fs.readFileSync("project.html", "utf8");
-const adminHtml = fs.readFileSync("directory-media-admin.html", "utf8");
+const adminHtml = fs.readFileSync("directory-admin.html", "utf8");
+const directoryAdmin = fs.readFileSync("directory-admin.js", "utf8");
 const workflow = fs.readFileSync(".github/workflows/validate-static.yml", "utf8");
 
 assert.match(migration, /VALUES\s*\(\s*'asyut-directory-media',\s*'asyut-directory-media',\s*false/s,
@@ -51,8 +52,13 @@ assert.ok(company.includes("رفع الصور غير متاح لصلاحية ا�
 assert.match(project, /AsyutDirectoryMedia\.renderGallery/, "project profile must show approved media");
 assert.match(companyHtml, /directory-media\.js/, "company page must load directory media client");
 assert.match(projectHtml, /directory-media\.js/, "project page must load directory media client");
-assert.match(adminHtml, /directory-media-admin\.js/, "admin review page must load moderation client");
-assert.ok(adminHtml.includes("mediaAdminLoadMore"), "admin screen must expose pagination");
+assert.match(adminHtml, /id="dirAdminMediaPanel"/, "media review must live inside the existing directory admin panel");
+assert.match(adminHtml, /directory-media-admin\\.js/, "existing directory admin page must load the media review module");
+assert.ok(adminHtml.includes("mediaAdminLoadMore"), "embedded admin screen must expose pagination");
+assert.doesNotMatch(adminHtml, /mediaAdminLoginPanel|mediaAdminLogin/, "media review must not add a second login form");
+assert.ok(directoryAdmin.includes("asyut-directory-admin-ready"), "media review must wait for existing admin authorization");
+assert.ok(admin.includes("asyut-directory-admin-ready"), "media review controller must reuse existing admin session");
+assert.doesNotMatch(admin, /signIn\\(/, "media review controller must not create a second sign-in flow");
 assert.ok(workflow.includes("tests/ui/directory-media-contracts.mjs"), "static workflow must run media contracts");
 
 console.log("Directory media upload, review, private storage, and public gallery contracts passed.");
