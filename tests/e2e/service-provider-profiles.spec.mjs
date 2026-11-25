@@ -245,6 +245,7 @@ test("a delegated editor can manage operational fields but cannot access owner-o
   const directForm = page.locator("#companyManagerDirectForm");
   await expect(directForm).toBeVisible({ timeout: 15000 });
   await expect(page.locator("#companyManagerReviewForm")).toHaveCount(0);
+  await expect(page.locator(".company-manager-panel")).toContainText("رفع الصور غير متاح لصلاحية المحرر");
   await expect(page.locator("#companyManagerInviteForm")).toHaveCount(0);
   await expect(page.locator(".directory-media-upload-form")).toHaveCount(0);
   await directForm.locator("[name='description']").fill("تحديث بواسطة محرر مفوض.");
