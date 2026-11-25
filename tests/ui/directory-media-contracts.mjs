@@ -53,12 +53,12 @@ assert.match(project, /AsyutDirectoryMedia\.renderGallery/, "project profile mus
 assert.match(companyHtml, /directory-media\.js/, "company page must load directory media client");
 assert.match(projectHtml, /directory-media\.js/, "project page must load directory media client");
 assert.match(adminHtml, /id="dirAdminMediaPanel"/, "media review must live inside the existing directory admin panel");
-assert.match(adminHtml, /directory-media-admin\\.js/, "existing directory admin page must load the media review module");
+assert.ok(adminHtml.includes('src="./directory-media-admin.js?v=20261125-review-pagination-2"'), "existing directory admin page must load the media review module");
 assert.ok(adminHtml.includes("mediaAdminLoadMore"), "embedded admin screen must expose pagination");
 assert.doesNotMatch(adminHtml, /mediaAdminLoginPanel|mediaAdminLogin/, "media review must not add a second login form");
 assert.ok(directoryAdmin.includes("asyut-directory-admin-ready"), "media review must wait for existing admin authorization");
 assert.ok(admin.includes("asyut-directory-admin-ready"), "media review controller must reuse existing admin session");
-assert.doesNotMatch(admin, /signIn\\(/, "media review controller must not create a second sign-in flow");
+assert.ok(!admin.includes("auth.signIn"), "media review controller must not create a second sign-in flow");
 assert.ok(workflow.includes("tests/ui/directory-media-contracts.mjs"), "static workflow must run media contracts");
 
 console.log("Directory media upload, review, private storage, and public gallery contracts passed.");
