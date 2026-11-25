@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v195-directory-media-20261125";
+const CACHE_NAME = "asyut-aqar-shell-v196-directory-media-embedded-20261125";
 const APP_SHELL = [
   "./",
   "./index.html",
