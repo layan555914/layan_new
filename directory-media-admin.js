@@ -5,8 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const key = cfg.SUPABASE_PUBLISHABLE_KEY || "";
   const auth = window.LAYAN_SUPABASE;
   const bucket = "asyut-directory-media";
-  const loginPanel = document.getElementById("mediaAdminLoginPanel");
-  const panel = document.getElementById("mediaAdminPanel");
+  const panel = document.getElementById("dirAdminMediaPanel");
   const grid = document.getElementById("mediaAdminGrid");
   const status = document.getElementById("mediaAdminStatus");
   const globalStatus = document.getElementById("mediaAdminGlobalStatus");
@@ -16,14 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let loading = false;
   let currentSession = auth?.getSession?.() || null;
   let rows = [];
+  if (!panel || !grid || !status || !globalStatus || !loadMoreButton) return;
 
   const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[ch]));
-  function showLoggedIn(value) {
-    loginPanel.hidden = value;
-    panel.hidden = !value;
-  }
   async function fresh() {
     if (!auth?.requireAuthenticated) throw new Error("خدمة تسجيل الدخول غير جاهزة.");
     currentSession = await auth.requireAuthenticated();
@@ -139,22 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     });
   }
-  document.getElementById("mediaAdminLogin").addEventListener("submit", async event => {
-    event.preventDefault();
-    const button = event.target.querySelector("button[type=submit]");
-    button.disabled = true;
-    globalStatus.textContent = "جارٍ التحقق من حساب الإدارة...";
-    try {
-      await auth.signIn(document.getElementById("mediaAdminEmail").value.trim(), document.getElementById("mediaAdminPassword").value);
-      await requireAdmin();
-      showLoggedIn(true);
-      await load();
-      globalStatus.textContent = "تم التحقق من صلاحية الإدارة.";
-    } catch (error) {
-      showLoggedIn(false);
-      globalStatus.textContent = error.message || "تعذر تسجيل الدخول.";
-    } finally { button.disabled = false; }
-  });
+
   document.getElementById("mediaAdminRefresh").addEventListener("click", async () => {
     try { await load(); } catch (error) { status.textContent = error.message || "تعذر تحديث القائمة."; }
   });
@@ -182,11 +163,18 @@ document.addEventListener("DOMContentLoaded", () => {
       button.disabled = false;
     }
   });
-  showLoggedIn(false);
-  if (currentSession?.access_token) {
-    (async () => {
-      try { await requireAdmin(); showLoggedIn(true); await load(); }
-      catch (_) { showLoggedIn(false); }
-    })();
-  }
+  window.addEventListener("asyut-directory-admin-ready", async () => {
+    try {
+      await load();
+      globalStatus.textContent = "تم التحقق من صلاحية الإدارة من لوحة إدارة الدليل.";
+    } catch (error) {
+      status.textContent = error.message || "تعذر تحميل قائمة مراجعة الصور.";
+    }
+  });
+  window.addEventListener("asyut-directory-admin-locked", () => {
+    rows = [];
+    pendingOffset = 0;
+    grid.innerHTML = "";
+    status.textContent = "تظهر القائمة بعد التحقق من صلاحية مسؤول الدليل.";
+  });
 });
