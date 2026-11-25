@@ -331,3 +331,13 @@ test("directory admin page has no horizontal overflow on a phone viewport", asyn
   }));
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 });
+
+test("public directory uses the populated offline snapshot when Supabase is unavailable", async ({page})=>{
+  await page.route(SUPABASE + "/rest/v1/**", route => route.abort());
+  await page.goto("/directory.html");
+  await expect(page.locator("#directoryResults .directory-card")).toHaveCount(19);
+  await page.locator("[data-view='projects']").click();
+  await expect(page.locator("#directoryResults .directory-card")).toHaveCount(18);
+  await page.locator("[data-view='areas']").click();
+  await expect(page.locator("#directoryResults .directory-card")).toHaveCount(13);
+});

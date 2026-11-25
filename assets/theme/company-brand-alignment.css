@@ -39,3 +39,160 @@ body .topbar{background:var(--aq-navy);color:#fff}
 .company-profile-page h1,.company-profile-page h2,.company-profile-page h3,.company-directory-page h1,.company-directory-page h2,.company-directory-page h3{color:var(--aq-navy)}
 .company-profile-page .eyebrow,.company-directory-page .eyebrow{color:#8b672c}
 .company-profile-page a:not(.btn),.company-directory-page a:not(.btn){text-decoration-color:var(--aq-gold)}
+/* Complete ASYUT AQAR palette coverage for company directory and profiles */
+.companies-page .companies-hero,
+.company-profile-page .company-profile-hero{
+ background:linear-gradient(125deg,#102746 0%,#1d3c60 100%);
+ color:#fff;
+}
+.companies-page .companies-hero .eyebrow,
+.company-profile-page .company-profile-hero .eyebrow{color:#e4bd78}
+.companies-page .company-search-tools input,
+.companies-page .company-search-tools select,
+.company-profile-page .company-manager-form input,
+.company-profile-page .company-manager-form select,
+.company-profile-page .company-manager-form textarea{
+ border-color:#d8e0e9;
+ color:#102746;
+}
+.companies-page .company-search-tools input:focus,
+.companies-page .company-search-tools select:focus,
+.company-profile-page .company-manager-form input:focus,
+.company-profile-page .company-manager-form select:focus,
+.company-profile-page .company-manager-form textarea:focus{
+ outline:2px solid #C8963E;
+ outline-offset:1px;
+}
+.companies-page .company-directory-heading h2,
+.companies-page .company-join h2,
+.companies-page .company-directory-group-heading h3,
+.company-profile-page .company-profile-section h2,
+.company-profile-page .company-project h3,
+.company-profile-page .company-manager-panel h2{color:#102746}
+.companies-page .company-directory-heading p,
+.companies-page .company-join p,
+.companies-page .company-directory-group-heading p,
+.companies-page .company-map-panel p{color:#52657b}
+.companies-page .company-directory-heading>span,
+.companies-page .company-directory-group-heading>span{color:#8b672c}
+.companies-page .company-directory-card,
+.company-profile-page .company-project,
+.company-profile-page .company-service-offer-card{border-color:#d8e0e9}
+.companies-page .company-card-cover{
+ background:linear-gradient(135deg,#102746,#1d3c60);
+ color:#e4bd78;
+}
+.companies-page .company-directory-card h3{color:#102746}
+.companies-page .company-directory-card p,
+.companies-page .company-directory-state,
+.company-profile-page .company-profile-hero p{color:#e8eef5}
+.company-profile-page .company-service-offer-card p,
+.company-profile-page .company-service-offer-card span{color:#52657b}
+.companies-page .company-directory-state{
+ background:#f7f9fc;
+ border-color:#d8e0e9;
+ color:#52657b;
+}
+.companies-page .company-join{
+ border-color:#e4d2ad;
+ background:linear-gradient(120deg,#fff 0%,#fbf5e8 100%);
+}
+.companies-page .company-dialog{
+ border-color:#C8963E;
+ color:#102746;
+}
+.companies-page .company-dialog-head h2{color:#102746}
+.companies-page .company-dialog-head button{
+ background:#102746;
+ color:#fff;
+ border:1px solid #C8963E;
+}
+.companies-page .company-review-note{
+ background:#fffaf0;
+ border-right-color:#C8963E;
+ color:#24364b;
+}
+.companies-page .company-form input,
+.companies-page .company-form textarea,
+.companies-page .company-form select{
+ border-color:#d8e0e9;
+ color:#102746;
+}
+.companies-page .company-form input:focus,
+.companies-page .company-form textarea:focus,
+.companies-page .company-form select:focus{
+ outline:2px solid #C8963E;
+ outline-offset:1px;
+}
+.company-profile-page .company-service-list li{
+ background:#fffaf0;
+ color:#102746;
+ border:1px solid #e4d2ad;
+}
+.company-profile-page .company-contact-primary{
+ background:#C8963E;
+ color:#102746;
+}
+.company-profile-page .company-contact-secondary{
+ border-color:#d8e0e9;
+ color:#102746;
+}
+.company-profile-page .company-map-panel{
+ border-color:#d8e0e9;
+}
+.company-profile-page .company-map-panel h2{color:#102746}
+.company-profile-page .company-service-offer-card small,
+.company-profile-page .company-service-offer-card>a{color:#102746}
+.company-profile-page .company-manager-panel{
+ border-color:#d8e0e9;
+}
+.company-profile-page .company-manager-panel p{color:#52657b}
+.company-profile-page .company-manager-form label{color:#102746}
+.company-profile-page .company-source-label,
+.company-profile-page .company-source-label--directory,
+.companies-page .company-source-label,
+.companies-page .company-source-label--directory{
+ border-color:#e4d2ad;
+ background:#fffaf0;
+ color:#102746;
+}
+
+.companies-page .company-card-meta{color:#8b672c}
+.companies-page .company-map-panel{
+ border-color:#d8e0e9;
+ background:#fff;
+}
+.companies-page .company-map-panel h2{color:#102746}
+.companies-page .company-map-panel>a{color:#102746}
+.company-profile-page .company-profile-logo{
+ border:1px solid #e4d2ad;
+ color:#102746;
+}
+.company-profile-page .company-claim-panel,
+.company-profile-page .company-claim-panel--prominent{
+ border-color:#e4d2ad;
+ background:linear-gradient(120deg,#fff 0%,#fbf5e8 100%);
+}
+.company-profile-page .company-claim-panel .eyebrow{color:#8b672c}
+.company-profile-page .company-claim-panel h2{color:#102746}
+.company-profile-page .company-claim-status{
+ border-color:#d8e0e9;
+ background:#f7f9fc;
+ color:#102746;
+}
+.company-profile-page .company-source-note{
+ border-right-color:#C8963E;
+ background:#fffaf0;
+}
+
+.company-profile-page .company-service-offer-card h3,
+.company-profile-page .company-service-offer-card strong{color:#102746}
+.company-profile-page .company-manager-panel h2,
+.company-profile-page .company-manager-panel label{color:#102746}
+.company-profile-page .company-manager-panel p{color:#52657b}
+.company-profile-page .company-manager-form input,
+.company-profile-page .company-manager-form select,
+.company-profile-page .company-manager-form textarea{
+ border-color:#d8e0e9;
+ color:#102746;
+}

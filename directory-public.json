@@ -1,475 +1,2869 @@
 {
   "meta": {
     "title": "دليل أسيوط العقاري",
-    "version": 12,
-    "lastUpdated": "2026-11-02",
+    "version": 13,
+    "lastUpdated": "2026-11-24",
     "disclaimer": "دليل معلوماتي مستقل. إدراج جهة أو مصدر لا يعني شراكة أو تزكية أو اعتمادًا قانونيًا. لا تُعرض الجهات أو المشروعات قبل مراجعة الإدارة واعتمادها."
   },
   "researchCounts": {
-    "entities": 70,
-    "projects": 37,
-    "areas": 26,
-    "governmentOpportunities": 29,
-    "sources": 81,
-    "investmentPartnerships": 2,
-    "opportunities": 31
+    "entities": 19,
+    "projects": 18,
+    "areas": 13,
+    "sources": 147,
+    "governmentOpportunities": 4,
+    "investmentPartnerships": 0,
+    "opportunities": 4
   },
   "areas": [
     {
-      "id": "AREA-001",
-      "name_ar": "مدينة/مركز أسيوط",
-      "name_en": "Asyut City / Markaz",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-002",
-      "name_ar": "أبو تيج",
-      "name_en": "Abu Tig",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-003",
-      "name_ar": "الغنايم",
-      "name_en": "Al-Ghanayem",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-004",
-      "name_ar": "صدفا",
-      "name_en": "Sidfa",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-005",
-      "name_ar": "منفلوط",
-      "name_en": "Manfalut",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-006",
-      "name_ar": "القوصية",
-      "name_en": "Al-Qusiya",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-007",
-      "name_ar": "ديروط",
-      "name_en": "Dayrout",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-008",
+      "id": "850339b3-261d-4bb6-8a1b-cc59eab376c3",
+      "slug": "area-008",
       "name_ar": "أبنوب",
       "name_en": "Abnub",
-      "area_type": "center"
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-009",
-      "name_ar": "الفتح",
-      "name_en": "Al-Fath",
-      "area_type": "center"
+      "id": "8971576f-b13e-4e38-b050-36133ff48fd0",
+      "slug": "area-002",
+      "name_ar": "أبو تيج",
+      "name_en": "Abu Tig",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-010",
-      "name_ar": "ساحل سليم",
-      "name_en": "Sahel Selim",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-011",
-      "name_ar": "البداري",
-      "name_en": "Al-Badari",
-      "area_type": "center"
-    },
-    {
-      "id": "AREA-012",
+      "id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "slug": "area-012",
       "name_ar": "أسيوط الجديدة",
       "name_en": "New Assiut",
-      "area_type": "new_city"
+      "latitude": null,
+      "area_type": "new_city",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-013",
+      "id": "ddcc3824-931c-499d-8ca7-6313f677b042",
+      "slug": "area-011",
+      "name_ar": "البداري",
+      "name_en": "Al-Badari",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "85119e49-b597-417e-a0dd-5688162f3797",
+      "slug": "area-003",
+      "name_ar": "الغنايم",
+      "name_en": "Al-Ghanayem",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "09be306d-2318-49c4-a759-28639379e7e3",
+      "slug": "area-009",
+      "name_ar": "الفتح",
+      "name_en": "Al-Fath",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "96a15213-cf04-47ac-81a8-c720e331c1a8",
+      "slug": "area-006",
+      "name_ar": "القوصية",
+      "name_en": "Al-Qusiya",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "4515646c-332b-43ac-9240-0bcbc48bec96",
+      "slug": "area-007",
+      "name_ar": "ديروط",
+      "name_en": "Dayrout",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "dbaac54d-d467-4aff-a63d-d68526ec0f5e",
+      "slug": "area-010",
+      "name_ar": "ساحل سليم",
+      "name_en": "Sahel Selim",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "c4d20309-9e9d-4824-9f70-4b239b513a7a",
+      "slug": "area-004",
+      "name_ar": "صدفا",
+      "name_en": "Sidfa",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "1928f326-eaee-48ea-b2fd-c499d8d8f960",
+      "slug": "area-001",
+      "name_ar": "مدينة/مركز أسيوط",
+      "name_en": "Asyut City / Markaz",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "5912deab-41b0-40a2-b04c-bf3e1db8e94b",
+      "slug": "area-005",
+      "name_ar": "منفلوط",
+      "name_en": "Manfalut",
+      "latitude": null,
+      "area_type": "center",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "ca9e12d4-ef79-401a-8cc6-8e67f2ac6310",
+      "slug": "area-013",
       "name_ar": "ناصر الجديدة / غرب أسيوط",
       "name_en": "Nasser New City / West Assiut",
-      "area_type": "new_city"
+      "latitude": null,
+      "area_type": "new_city",
+      "is_active": true,
+      "longitude": null,
+      "parent_id": null,
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     }
   ],
   "sources": [
     {
-      "id": "SRC-001",
-      "title": "أسيوط الجديدة – هيئة المجتمعات العمرانية الجديدة",
-      "publisher": "هيئة المجتمعات العمرانية الجديدة",
-      "source_type": "جهة حكومية رسمية",
-      "source_url": "https://lands.nuca.gov.eg/ar/ViewCity.aspx?ID=11"
+      "id": "38282fb8-1364-4d65-a9ec-45a28c76cdbb",
+      "title": "صفحة فيسبوك ديار أسيوط — رابط مشاركة مقدم للإدراج",
+      "is_public": true,
+      "publisher": "Facebook",
+      "source_url": "https://www.facebook.com/share/1A75prPcRX/",
+      "accessed_at": "2026-11-23T15:16:15.36354+00:00",
+      "source_type": "social_profile",
+      "confidence_level": "unverified"
     },
     {
-      "id": "SRC-002",
-      "title": "طرح فرص استثمارية بمدينة أسيوط الجديدة",
-      "publisher": "الهيئة العامة للاستعلامات / وزارة الإسكان",
-      "source_type": "جهة حكومية رسمية",
-      "source_url": "https://sis.gov.eg/ar/المركز-الإعلامي/الأخبار/طرح-أراض-استثمارية-جديدة-بمواقع-متميزة-بمدينة-أسيوط-الجديدة/"
+      "id": "c435bc9f-5b1a-4efa-9f1d-548a3a9a2a74",
+      "title": "بيوت ديزاينز — تفاصيل فرع أسيوط",
+      "is_public": true,
+      "publisher": "دليل 140 / Yellow Pages Egypt",
+      "source_url": "https://dalil140.com/category/ar/construction/assyout",
+      "accessed_at": "2026-11-21T11:47:08.59606+00:00",
+      "source_type": "دليل تجاري — اكتشاف ومراجعة",
+      "confidence_level": "business_directory"
     },
     {
-      "id": "SRC-003",
-      "title": "طرح محال وصيدليات ووحدات إدارية وورش",
-      "publisher": "وزارة الإسكان",
-      "source_type": "جهة حكومية رسمية",
-      "source_url": "https://mhuc.gov.eg/طرح_محال_وصيدليات_ووحدات_إدارية_ومهنية_وقطع_أراضٍ_بنشاط_ورش_للبيع_بمدينتي_أسيوط_الجديدة_والعبور_الجديدة/بيانات_صحفية"
-    },
-    {
-      "id": "SRC-004",
-      "title": "لؤلؤة أسيوط الجديدة",
-      "publisher": "الهيئة العامة لتعاونيات البناء والإسكان",
-      "source_type": "جهة حكومية رسمية",
-      "source_url": "https://chc-egypt.com/أسيوط-الجديدة/"
-    },
-    {
-      "id": "SRC-005",
-      "title": "سابقة أعمال فينيسيا للتنمية العمرانية",
-      "publisher": "فينيسيا للتنمية والتخطيط العمراني",
-      "source_type": "الموقع الرسمي للشركة",
-      "source_url": "https://venecia-dev.com/portfolio"
-    },
-    {
-      "id": "SRC-006",
-      "title": "فينيسيا للتنمية والتخطيط العمراني",
-      "publisher": "Venecia Developments",
-      "source_type": "الموقع الرسمي للشركة",
-      "source_url": "https://venecia-dev.com/"
-    },
-    {
-      "id": "SRC-007",
-      "title": "هوم تاون جروب",
-      "publisher": "Home Town Group",
-      "source_type": "الموقع الرسمي للشركة",
-      "source_url": "https://htg-eg.com/ar/"
-    },
-    {
-      "id": "SRC-008",
-      "title": "خبر مشروع West Gardens بغرب أسيوط",
-      "publisher": "جريدة البورصة",
-      "source_type": "صحافة اقتصادية",
-      "source_url": "https://www.alborsaanews.com/2026/02/17/1950271"
-    },
-    {
-      "id": "SRC-009",
-      "title": "خبر القرار الوزاري لمشروع West Gardens",
-      "publisher": "بوابة الأهرام بيزنس",
-      "source_type": "صحافة اقتصادية",
-      "source_url": "https://business.ahram.org.eg/News/67501.aspx"
-    },
-    {
-      "id": "SRC-010",
-      "title": "مشروعات Arab Developers Holding",
-      "publisher": "Arab Developers Holding",
-      "source_type": "الموقع الرسمي للشركة",
-      "source_url": "https://ad-holding.com/project/"
-    },
-    {
-      "id": "SRC-011",
-      "title": "عن طايل جروب – Hayah City",
-      "publisher": "Tayel Group / Hayah City",
-      "source_type": "الموقع الرسمي للشركة",
-      "source_url": "https://www.hayahcity.com/ar/about-us.php"
-    },
-    {
-      "id": "SRC-012",
-      "title": "Global House Developments – صفحة الشركة",
-      "publisher": "Global House Developments",
-      "source_type": "LinkedIn للشركة",
-      "source_url": "https://eg.linkedin.com/company/global-house-developments"
-    },
-    {
-      "id": "SRC-013",
-      "title": "معلومات صحفية عن مشروع Asayla",
-      "publisher": "الجريدة العقارية",
-      "source_type": "صحافة عقارية متخصصة",
-      "source_url": "https://www.aleqaria.com.eg/post/details/285509/133-فيلا-بين-الـ-تاون-هاوس-وتوين-هاوس-وفيلات-مستقلة-بمشروع-asayla--بأسيوط"
-    },
-    {
-      "id": "SRC-014",
-      "title": "مباني إدريس واستعداد تسليم وحدات من أصايله",
-      "publisher": "الجريدة العقارية",
-      "source_type": "صحافة عقارية متخصصة",
-      "source_url": "https://www.aleqaria.com.eg/post/details/273060/شركة-مباني-إدريس-77753"
-    },
-    {
-      "id": "SRC-015",
-      "title": "Asayla Compound – Key Point",
-      "publisher": "Key Point Real Estate",
-      "source_type": "منصة تسويق/وساطة عقارية",
-      "source_url": "https://keypoint-realestate.com/project/asayla-compound/"
-    },
-    {
-      "id": "SRC-016",
-      "title": "تغطية عن المطورين في الصعيد",
-      "publisher": "جريدة البورصة",
-      "source_type": "صحافة اقتصادية",
-      "source_url": "https://www.alborsaanews.com/2026/09/15/1992465"
-    },
-    {
-      "id": "SRC-017",
-      "title": "شركات عقارية في أسيوط – دليل D&B",
-      "publisher": "Dun & Bradstreet",
-      "source_type": "دليل أعمال لاكتشاف الأسماء",
-      "source_url": "https://www.dnb.com/business-directory/company-information.real_estate.eg.asyut.html"
-    },
-    {
-      "id": "SRC-018",
-      "title": "مكاتب وساطة عقارية في أسيوط – D&B",
-      "publisher": "Dun & Bradstreet",
-      "source_type": "دليل أعمال لاكتشاف الأسماء",
-      "source_url": "https://www.dnb.com/business-directory/company-information.offices_of_real_estate_agents_and_brokers.eg.asyut.html"
-    },
-    {
-      "id": "SRC-019",
-      "title": "دليل الأنشطة العقارية في أسيوط – Buy.com.eg",
-      "publisher": "Buy.com.eg",
-      "source_type": "دليل أعمال لاكتشاف الأسماء",
-      "source_url": "https://buy.com.eg/ar/directory?category=real-estate&city=asyut-city&governorate=asyut"
-    },
-    {
-      "id": "SRC-020",
-      "title": "تقسيم محافظة أسيوط ومراكزها ومدنها",
-      "publisher": "الهيئة العامة للاستعلامات",
-      "source_type": "مرجع حكومي",
-      "source_url": "https://mediadr.sis.gov.eg/bitstream/handle/123456789/3433/AFED_ASSIUT18052022.pdf?sequence=1&isAllowed=y"
-    },
-    {
-      "id": "SRC-021",
-      "title": "الوقائع المصرية – قرار وزاري رقم 823 لسنة 2025",
-      "publisher": "الوقائع المصرية / وزارة الإسكان",
-      "source_type": "جريدة رسمية حكومية",
-      "source_url": "https://mediadr.sis.gov.eg/bitstream/handle/123456789/118601/WQ11_20260114_8880.pdf?isAllowed=y&sequence=2"
-    },
-    {
-      "id": "SRC-022",
-      "title": "دليل المطورين – عقارات مصر",
-      "publisher": "عقارات مصر",
-      "source_type": "منصة عقارية مرجعية",
-      "source_url": "https://realestate.eg/ar/developers"
-    },
-    {
-      "id": "SRC-023",
-      "title": "دليل المطورين – URE",
-      "publisher": "URE",
-      "source_type": "منصة عقارية مرجعية",
-      "source_url": "https://ureeg.com/en/developers/"
-    },
-    {
-      "id": "SRC-024",
-      "title": "دليل المطورين – Ahlan Homes",
-      "publisher": "Ahlan Homes",
-      "source_type": "منصة عقارية مرجعية",
-      "source_url": "https://www.ahlanhomes.com/developers"
-    },
-    {
-      "id": "SRC-025",
-      "title": "تقرير قطاع العقارات – AmCham Egypt",
-      "publisher": "AmCham Egypt",
-      "source_type": "مرجع قطاعي",
-      "source_url": "https://www.amcham.org.eg/bsac/RealEstate_IndustryInsight_Dec2025.pdf"
-    },
-    {
-      "id": "SRC-026",
-      "title": "دليل خرائط – بحث شركات عقارية في أسيوط",
-      "publisher": "Google Maps",
-      "source_type": "بحث خرائط لاكتشاف الأسماء والمواقع",
-      "source_url": "https://www.google.com/maps/search/?api=1&query=real+estate+companies+Assiut+Egypt"
-    },
-    {
-      "id": "SRC-028",
-      "title": "أسيوط الجديدة – بوابة الأراضي الرسمية",
-      "publisher": "هيئة المجتمعات العمرانية الجديدة",
-      "source_type": "مصدر حكومي رسمي",
-      "source_url": "https://lands.nuca.gov.eg/ar/ViewCity.aspx?ID=11"
-    },
-    {
-      "id": "SRC-029",
-      "title": "حياه إيليت – صفحة تسويق عقاري",
-      "publisher": "فانسيا للتسويق العقاري",
-      "source_type": "منصة تسويق عقاري",
-      "source_url": "https://venecia.estate/hayah-elite/"
-    },
-    {
-      "id": "SRC-030",
-      "title": "الموقع الرسمي – RDF Developments",
-      "publisher": "RDF Developments",
-      "source_type": "الموقع الرسمي للشركة",
-      "source_url": "https://rdfdevelopments.com/"
-    },
-    {
-      "id": "SRC-031",
-      "title": "تغطية إطلاق مشروع Paradise Compound",
-      "publisher": "موقع اليوم",
-      "source_type": "صحافة عقارية",
-      "source_url": "https://el-yomnews.com/لأول-مرة-في-أسيوط-الجديدة-rdf-development-تطلق-مشروعها-الأول-تحت-اسم-para/"
-    },
-    {
-      "id": "SRC-032",
-      "title": "تغطية التقدم لقطعة أرض 20 فدانًا في أسيوط الجديدة",
-      "publisher": "جريدة المال",
-      "source_type": "صحافة اقتصادية",
-      "source_url": "https://almalnews.com/2119694/شركتان-تتقدمان-لحجز-قطعة-أرض-بمساحة-20/"
-    },
-    {
-      "id": "SRC-033",
-      "title": "نتائج قرعة أراضي شراكة المطورين – شركة البدري للاستثمار",
-      "publisher": "مصراوي",
-      "source_type": "صحافة اقتصادية",
-      "source_url": "https://www.masrawy.com/news/news_egypt/details/2026/7/25/3022854/الإسكان-تعلن-نتائج-قرعة-أراضي-شراكة-المطورين-ضمن-سكن-لكل-المصريين"
-    },
-    {
-      "id": "SRC-034",
-      "title": "دليل شركات العقارات والاستثمار والتسويق العقاري في أسيوط",
+      "id": "fdaa40f6-0b88-46e7-ae48-6beb661cbb40",
+      "title": "دار البناء للتعمير والإنشاء — بيانات أسيوط",
+      "is_public": true,
       "publisher": "دليل 140",
-      "source_type": "دليل أعمال تجاري – للاكتشاف فقط",
-      "source_url": "https://dalil140.com/category/ar/real-estate/assyout"
+      "source_url": "https://dalil140.com/category/ar/construction/assyout",
+      "accessed_at": "2026-11-21T11:47:08.59606+00:00",
+      "source_type": "دليل تجاري — اكتشاف ومراجعة",
+      "confidence_level": "business_directory"
     },
     {
-      "id": "SRC-035",
-      "title": "متابعة تنفيذ مشروع ديارنا في أسيوط الجديدة وناصر الجديدة – 10 سبتمبر 2026",
-      "publisher": "الهيئة العامة للاستعلامات / وزارة الإسكان",
-      "source_type": "مصدر حكومي رسمي",
-      "source_url": "https://sis.gov.eg/ar/المركز-الإعلامي/الأخبار/وزيرة-الإسكان-تتابع-موقف-تنفيذ-عدد-من-المشروعات-السكنية-والخدمية-بمدن-الصعيد-الجديدة/"
+      "id": "89a0ce6a-0704-4c2e-a9c5-e72ca7af8407",
+      "title": "بناية وأمان — إدراج تجاري بأسيوط",
+      "is_public": true,
+      "publisher": "Yellow Pages Egypt",
+      "source_url": "https://yellowpages.com.eg/ar/profile/بناية-وامان/671449",
+      "accessed_at": "2026-11-21T11:46:44.021575+00:00",
+      "source_type": "دليل تجاري — اكتشاف فقط",
+      "confidence_level": "business_directory"
     },
     {
-      "id": "SRC-036",
-      "title": "شركات التسويق العقاري في أسيوط – دليل عقارات مصر",
-      "publisher": "عقارات مصر",
-      "source_type": "دليل أعمال عقاري – للاكتشاف فقط",
-      "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut/category/marketing"
+      "id": "90167a89-c1de-4bd0-a65b-800e3498ac0c",
+      "title": "وادي النيل للمقاولات — إدراج أسيوط",
+      "is_public": true,
+      "publisher": "المعهد العالي للهندسة والتكنولوجيا",
+      "source_url": "https://engmet.edu.eg/qanew/CompanySerach.aspx",
+      "accessed_at": "2026-11-21T11:46:44.021575+00:00",
+      "source_type": "دليل مؤسسي تعليمي — بيانات منشآت",
+      "confidence_level": "secondary_lead"
     },
     {
-      "id": "SRC-037",
-      "title": "دليل شركات العقارات في أسيوط – القائمة العامة",
-      "publisher": "عقارات مصر",
-      "source_type": "دليل أعمال عقاري – لاكتشاف الأسماء فقط",
-      "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut"
+      "id": "42948924-e99f-4ef5-9564-0a0fc9066f6e",
+      "title": "سيدكو للاستثمار العقاري والمقاولات — قيد وعنوان الشركة",
+      "is_public": true,
+      "publisher": "جهاز تنمية التجارة الداخلية",
+      "source_url": "https://www.itda.gov.eg/CRM/857/CRA84.pdf",
+      "accessed_at": "2026-11-21T11:46:44.021575+00:00",
+      "source_type": "سجل/جريدة أسماء تجارية حكومية",
+      "confidence_level": "government_record"
     },
     {
-      "id": "SRC-038",
-      "title": "الوقائع المصرية – قرار وزارة الإسكان رقم 1005 لسنة 2025 بشأن قطعة 15–17 بأسيوط الجديدة",
-      "publisher": "الوقائع المصرية – سجل تشريعي/قانوني",
-      "source_type": "مرجع قانوني للوقائع المصرية",
-      "source_url": "https://www.mksegypt.org/public/index.php/ar/nashras/42"
+      "id": "c96b2a3e-2029-4114-ac1b-1afd27527eee",
+      "title": "بيوت ديزاينز — بيانات فرع أسيوط",
+      "is_public": true,
+      "publisher": "دليل 140 ويَلوبيدجز",
+      "source_url": "https://dalil140.com/category/ar/construction/assyout",
+      "accessed_at": "2026-11-21T11:46:44.021575+00:00",
+      "source_type": "دليل تجاري — اكتشاف ومراجعة",
+      "confidence_level": "business_directory"
     },
     {
-      "id": "SRC-039",
-      "title": "اعتماد تخطيط وتقسيم أرض مشروع البارون للاستثمار العقاري بمدينة أسيوط الجديدة – 15 أبريل 2026",
-      "publisher": "المصدر – تغطية قرار وزارة الإسكان والوقائع المصرية",
-      "source_type": "صحافة اقتصادية",
-      "source_url": "https://www.almasdar.com/169169"
+      "id": "72ae4ce9-fa9d-41c8-bbc9-7c81ccd48bac",
+      "title": "جنيدي للإنشاءات — الموقع الرسمي ومشروعات أسيوط",
+      "is_public": true,
+      "publisher": "جنيدي للإنشاءات",
+      "source_url": "https://genedyeg.com/ar/",
+      "accessed_at": "2026-11-21T11:46:20.033889+00:00",
+      "source_type": "موقع رسمي — المشروعات ونبذة الشركة",
+      "confidence_level": "official_primary"
     },
     {
-      "id": "SRC-042",
-      "title": "مشروع West Gardens في الهضبة بأسيوط – إعلان Home Town Group",
-      "publisher": "Home Town Group",
+      "id": "ca488fe9-9d64-4db9-8139-d2d73d45d5e8",
+      "title": "ASCO — مشروعات أسيوط وبيانات التواصل",
+      "is_public": true,
+      "publisher": "ASCO Contracting",
+      "source_url": "https://ascocontracting.com/projects",
+      "accessed_at": "2026-11-21T11:46:20.033889+00:00",
+      "source_type": "موقع الشركة الرسمي — المشروعات والتواصل",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "2159c66e-cfa7-4f41-836b-a6a79096df49",
+      "title": "البدري للاستثمار العقاري والمقاولات — بيانات المقر الرسمي بأسيوط",
+      "is_public": true,
+      "publisher": "ELBADRY For Real Estate Investment & Contracting",
+      "source_url": "https://elbadry.com.eg/en/",
+      "accessed_at": "2026-11-21T11:46:20.033889+00:00",
+      "source_type": "الموقع الرسمي — بيانات المقر والتصنيف",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "edaf8856-0c8c-44b7-b2f0-caa7d0cb3cf4",
+      "title": "النصر العامة للمقاولات – حسن علام ضمن شركات القابضة للتشييد",
+      "is_public": true,
+      "publisher": "الشركة القابضة للتشييد والتعمير",
+      "source_url": "https://hccd-construction.com/SubComp_a.aspx?id=01",
+      "accessed_at": "2026-11-21T11:45:17.896519+00:00",
+      "source_type": "موقع رسمي للشركة القابضة",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "3f234ae7-7f8e-42fd-9c66-8855391cebed",
+      "title": "إشارة إلى فرع/نشاط شركة النصر العامة للمقاولات في أسيوط",
+      "is_public": true,
+      "publisher": "دليل أعمال ومعلومات مناقصات",
+      "source_url": "https://gludo.org/business-directory/96-nasr-general-contracting-co",
+      "accessed_at": "2026-11-21T11:45:17.896519+00:00",
+      "source_type": "مصدر ثانوي — يحتاج تأكيد الشركة",
+      "confidence_level": "secondary_lead"
+    },
+    {
+      "id": "2f904285-92fb-4648-a8be-ab6034abf733",
+      "title": "شركة جنوب مصر للإنشاءات — بيانات التواصل والمشروعات",
+      "is_public": true,
+      "publisher": "شركة جنوب مصر للإنشاءات",
+      "source_url": "https://www.se-constructions.com/contact_us/",
+      "accessed_at": "2026-11-21T11:45:02.303379+00:00",
+      "source_type": "موقع رسمي — التواصل وعن الشركة",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "307c7b28-fa04-4dc5-b9eb-941eb0ad7066",
+      "title": "الرحاب للمقاولات العمومية — الموقع الرسمي",
+      "is_public": true,
+      "publisher": "شركة الرحاب للمقاولات العمومية",
+      "source_url": "https://el-rehab-eg.com/",
+      "accessed_at": "2026-11-21T11:45:02.303379+00:00",
+      "source_type": "موقع رسمي — نبذة ومشروعات",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "39568d6c-a00c-4d14-a21a-74ac0cbe07d1",
+      "title": "الاتحاد الماسي للمقاولات والتوريدات — بيانات التواصل الرسمية",
+      "is_public": true,
+      "publisher": "Diamond Union Contracting and Supplies",
+      "source_url": "https://diamondunion26.com/en/contact-us",
+      "accessed_at": "2026-11-21T11:43:00.130146+00:00",
+      "source_type": "موقع رسمي — صفحة التواصل",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "9a16bb86-b7d9-4abf-a442-5a87e9f1579f",
+      "title": "مركز الاستشارات والتصميمات الهندسية — الصفحة المهنية الرسمية",
+      "is_public": true,
+      "publisher": "مركز الاستشارات والتصميمات الهندسية",
+      "source_url": "https://eg.linkedin.com/company/group-of-engineering-designs-and-consultations",
+      "accessed_at": "2026-11-21T11:42:49.742548+00:00",
+      "source_type": "صفحة الشركة على LinkedIn",
+      "confidence_level": "official_social"
+    },
+    {
+      "id": "bbe974b0-e142-4c57-9567-a4054ff4a9a2",
+      "title": "TOP MOUNTAIN — الموقع الرسمي وبيانات مكتب أسيوط",
+      "is_public": true,
+      "publisher": "TOP MOUNTAIN",
+      "source_url": "https://www.topmountain.org/contact-us/",
+      "accessed_at": "2026-11-21T11:42:42.472127+00:00",
+      "source_type": "موقع رسمي — بيانات التواصل",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "14c7aa05-28d6-4f29-b878-ffd2c521ad69",
+      "title": "الشرق الأوسط للاستشارات الهندسية — الموقع الرسمي",
+      "is_public": true,
+      "publisher": "Middle East Engineering Consultants",
+      "source_url": "https://mecegy.com/ar/",
+      "accessed_at": "2026-11-21T11:42:42.472127+00:00",
+      "source_type": "موقع رسمي",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "ca5da08f-161c-4116-b179-7dccb6290ee2",
+      "title": "ANCM — الموقع الرسمي وبيانات التواصل",
+      "is_public": true,
+      "publisher": "Assuit National for Construction and Maintenance",
+      "source_url": "https://www.ancm-eg.com/",
+      "accessed_at": "2026-11-21T11:42:42.472127+00:00",
+      "source_type": "موقع رسمي",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "aac9daed-7806-4768-80f6-8f471aeb9e33",
+      "title": "الشريف للاستشارات الهندسية — بيانات الفرع الرسمية",
+      "is_public": true,
+      "publisher": "الشريف للاستشارات الهندسية",
+      "source_url": "https://elsherifcc.com/ar/contact-us/",
+      "accessed_at": "2026-11-21T11:42:24.825975+00:00",
+      "source_type": "موقع رسمي — صفحة التواصل",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "9c4ac514-f360-454b-8add-e5951551d285",
+      "title": "ECG — بيانات فرع أسيوط الرسمية",
+      "is_public": true,
+      "publisher": "Dorsch Global / Engineering Consultants Group",
+      "source_url": "https://www.dorsch.com/companies-dorsch-global/engineering-consultants-group",
+      "accessed_at": "2026-11-21T11:42:24.825975+00:00",
+      "source_type": "الموقع الرسمي للمجموعة",
+      "confidence_level": "official_primary"
+    },
+    {
+      "id": "469c1bc6-4a9e-4e78-ab99-1d75fb47a0e2",
+      "title": "الموقع الرسمي – M2A Group",
+      "is_public": true,
+      "publisher": "M2A Group",
+      "source_url": "https://m2agroupeg.com/",
+      "accessed_at": "2026-11-21T11:40:42.856689+00:00",
+      "source_type": "official_company_website",
+      "confidence_level": "مرتفع – موقع الشركة الرسمي يعرض قطاعاتها وأنشطتها"
+    },
+    {
+      "id": "decc5ac7-3d38-4179-8605-5c2466f7c8f4",
+      "title": "صفحة التواصل الرسمية – M2A Group",
+      "is_public": true,
+      "publisher": "M2A Group",
+      "source_url": "https://m2agroupeg.com/contact/",
+      "accessed_at": "2026-11-21T11:40:42.856689+00:00",
+      "source_type": "official_company_website",
+      "confidence_level": "مرتفع – بيانات الاتصال والعنوان منشورة على موقع الشركة"
+    },
+    {
+      "id": "45816d27-c286-42a9-af28-d3fd35fa3db5",
+      "title": "الموقع الرسمي – مكتب مبيعات نيوم أسيوط",
+      "is_public": true,
+      "publisher": "المطورون العرب القابضة",
+      "source_url": "https://ad-holding.com/ar/arab-developers-holding-assiut/",
+      "accessed_at": "2026-11-21T11:40:42.856689+00:00",
+      "source_type": "official_company_website",
+      "confidence_level": "مرتفع – الموقع الرسمي للمطور"
+    },
+    {
+      "id": "3d3457dd-4ec9-424f-9616-02a738cb7618",
+      "title": "صفحة الشركة – RE/MAX Barah",
+      "is_public": true,
+      "publisher": "RE/MAX Barah",
+      "source_url": "https://eg.linkedin.com/company/remaxbarah",
+      "accessed_at": "2026-11-21T11:39:09.891029+00:00",
+      "source_type": "company_linkedin",
+      "confidence_level": "متوسط – صفحة الشركة على LinkedIn وتربط بمكتب RE/MAX الرسمي"
+    },
+    {
+      "id": "03ae5c1b-a05b-4eee-8cdd-de191c8ec1e3",
+      "title": "صفحة المكتب – RE/MAX Barah",
+      "is_public": true,
+      "publisher": "RE/MAX Egypt",
+      "source_url": "https://www.remax.com.eg/en/offices/egypt/asyut-city/remax-barah/91289",
+      "accessed_at": "2026-11-21T11:39:09.891029+00:00",
+      "source_type": "official_company_website",
+      "confidence_level": "متوسط – رابط المكتب الرسمي مذكور بصفحة الشركة، تعذر فتح الصفحة أثناء المراجعة"
+    },
+    {
+      "id": "4e461f99-51f0-42ae-addc-c7435be5d074",
+      "title": "الموقع الرسمي – The Brokers",
+      "is_public": true,
+      "publisher": "The Brokers",
+      "source_url": "https://thebrokers.pro/about-us/",
+      "accessed_at": "2026-11-21T11:39:09.891029+00:00",
+      "source_type": "official_company_website",
+      "confidence_level": "مرتفع – بيانات اتصال ونشاط وعنوان منشورة على موقع الشركة"
+    },
+    {
+      "id": "fc58483f-3675-452f-a007-90c4f7e99b30",
+      "title": "الموقع الرسمي العربي – مكتب مبيعات أسيوط",
+      "is_public": true,
+      "publisher": "Prime Developments",
+      "source_url": "https://primedev-eg.com/Arabic/DefaultAr",
+      "accessed_at": "2026-11-21T11:37:57.960695+00:00",
+      "source_type": "official_company_website",
+      "confidence_level": "مرتفع نسبيًا – بيانات فرع أسيوط منشورة على موقع الشركة"
+    },
+    {
+      "id": "7638e949-45ef-4ac9-9c31-a646145fd77f",
+      "title": "الموقع الرسمي – بيانات مكتب GROW في أسيوط",
+      "is_public": true,
+      "publisher": "GROW Real Estate",
+      "source_url": "https://growrealestate.net/contact-us/",
+      "accessed_at": "2026-11-21T11:37:52.444147+00:00",
+      "source_type": "official_company_website",
+      "confidence_level": "مرتفع نسبيًا – بيانات تواصل منشورة مباشرة على موقع الشركة"
+    },
+    {
+      "id": "5634d54c-6b27-447b-942e-c7912fc70e57",
+      "title": "Golden Ratio — صفحة النشاط العامة",
+      "is_public": true,
+      "publisher": "FindGlocal",
+      "source_url": "https://www.findglocal.com/EG/Asyut/108546710980138/Golden-Ratio",
+      "accessed_at": "2026-11-21T10:54:52.955616+00:00",
+      "source_type": "دليل أعمال عام — مصدر اكتشاف يحتاج تأكيد ممثل النشاط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "deb7e175-7eb2-4c9e-8991-1352c60acf0a",
+      "title": "حياة سيتي – صفحة المشروع الرسمية",
+      "is_public": true,
+      "publisher": "حياة سيتي / طايل جروب",
+      "source_url": "https://www.hayahcity.com/ar/hayah-city.php",
+      "accessed_at": "2026-11-21T07:46:00.646818+00:00",
+      "source_type": "الموقع الرسمي للمطور",
+      "confidence_level": "متوسط – إفصاح ذاتي من المطور"
+    },
+    {
+      "id": "f0e0a823-6e3a-4b67-89ff-593c9def6bb1",
+      "title": "حياة سيتي – الموقع الرسمي للمشروع والتواصل",
+      "is_public": true,
+      "publisher": "حياة سيتي / طايل جروب",
+      "source_url": "https://www.hayahcity.com/ar/tawasal.php",
+      "accessed_at": "2026-11-21T07:45:57.544297+00:00",
       "source_type": "الموقع الرسمي للشركة",
-      "source_url": "https://htg-eg.com/ar/latest-residential-project-in-el-hadaba-assiut-west-gardens-2/"
+      "confidence_level": "مرتفع – مصدر رسمي مباشر لبيانات التواصل"
     },
     {
-      "id": "SRC-043",
-      "title": "قرار 1070 لسنة 2025 – تخطيط قطعة هوم تاون بالحي الأول في ناصر الجديدة",
+      "id": "173ad1ae-2e06-4c3d-ba4f-acf97dc40243",
+      "title": "مباني إدريس – بيانات فرع أسيوط الرسمية",
+      "is_public": true,
+      "publisher": "مباني إدريس",
+      "source_url": "https://mabanyedris.com/contact-us/",
+      "accessed_at": "2026-11-21T07:39:59.829575+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "high"
+    },
+    {
+      "id": "18ca3331-7e34-4deb-aa63-a9adda6e9acd",
+      "title": "مجمع أصايله الطبي – صفحة المشروع الرسمية",
+      "is_public": true,
+      "publisher": "مباني إدريس",
+      "source_url": "https://mabanyedris.com/ar/project/مجمع-أصايله-الطبي/",
+      "accessed_at": "2026-11-21T07:39:46.443674+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "high"
+    },
+    {
+      "id": "21a14d7a-cafc-4bdf-9416-ef26f1a93d86",
+      "title": "الموقع الرسمي – شركة الربوة للاستثمار العقاري وكمبوند الربوة",
+      "is_public": true,
+      "publisher": "شركة الربوة للاستثمار العقاري",
+      "source_url": "https://www.alrabwaa.com/",
+      "accessed_at": "2026-11-21T07:35:25.392871+00:00",
+      "source_type": "official_website",
+      "confidence_level": "high"
+    },
+    {
+      "id": "e0dacabb-3758-4cc3-8a74-159c7680946e",
+      "title": "ملف شركة Upper Capital على LinkedIn",
+      "is_public": true,
+      "publisher": "Upper Capital – LinkedIn",
+      "source_url": "https://www.linkedin.com/company/uppercapital",
+      "accessed_at": "2026-11-21T07:35:25.392871+00:00",
+      "source_type": "company_profile",
+      "confidence_level": "medium"
+    },
+    {
+      "id": "a7249860-b6e7-46e8-8927-3944235cc1e4",
+      "title": "بيانات عنوان وهاتف Upper Capital – دليل أعمال",
+      "is_public": true,
+      "publisher": "BizMidEast",
+      "source_url": "https://www.bizmideast.com/EG/upper-capital-0109-520-0002",
+      "accessed_at": "2026-11-21T07:35:25.392871+00:00",
+      "source_type": "business_directory",
+      "confidence_level": "medium"
+    },
+    {
+      "id": "75298f15-ff1c-46b2-9b78-e9808fc21283",
+      "title": "ملف الشركة المصرية للتطوير العقاري – أسيوط",
+      "is_public": true,
+      "publisher": "دليل الشركة ومصادرها السابقة",
+      "source_url": "https://www.elmasria.co/",
+      "accessed_at": "2026-11-21T07:35:25.392871+00:00",
+      "source_type": "company_profile",
+      "confidence_level": "medium"
+    },
+    {
+      "id": "9968a4ff-824f-4dce-b30e-57736b47baab",
+      "title": "قرار وزير الإسكان رقم 193 لسنة 2021 – شركة تيرا أسيوط للاستيراد والتصدير",
+      "is_public": true,
+      "publisher": "الوقائع المصرية – عبر قاعدة التشريعات المصرية",
+      "source_url": "https://egyptianlaws.com/?p=180930",
+      "accessed_at": "2026-11-21T07:34:06.89828+00:00",
+      "source_type": "legal_database",
+      "confidence_level": "high"
+    },
+    {
+      "id": "2f5ad22c-d8d4-4710-ba4d-87544e01b8cb",
+      "title": "قرار وزارة الإسكان رقم 289 لسنة 2020 – قطعة الأرض 26 لشركة تيرا أسيوط",
+      "is_public": true,
+      "publisher": "تغطية منشورة لقرار الوقائع المصرية",
+      "source_url": "https://www.vetogate.com/Section-4104/الجريدة-الرسمية-والوقائع-المصرية/الإسكان-تعتمد-تخطيط-إقامة-نشاط-عمراني-متكامل-بمدينة-أسيوط-الجديدة-3999742",
+      "accessed_at": "2026-11-21T07:34:06.89828+00:00",
+      "source_type": "newspaper",
+      "confidence_level": "medium"
+    },
+    {
+      "id": "2119c04b-b98f-43d3-b17c-23a23044c160",
+      "title": "الملف الحكومي التعريفي للشركة السعودية المصرية للتعمير",
+      "is_public": true,
+      "publisher": "وزارة المالية المصرية",
+      "source_url": "https://assets.mof.gov.eg/files/a1d2d940-a5ac-11eb-8000-c54526828a0f.pdf",
+      "accessed_at": "2026-11-21T07:33:55.133714+00:00",
+      "source_type": "جهة حكومية رسمية",
+      "confidence_level": "high"
+    },
+    {
+      "id": "f6c0a1e9-de5b-42e9-a6c1-b49f241a9d29",
+      "title": "قرار وزير الإسكان رقم 271 لسنة 2016 – مشروع الشركة السعودية المصرية للتعمير بأسيوط الجديدة",
+      "is_public": true,
+      "publisher": "الوقائع المصرية – عبر قاعدة التشريعات المصرية",
+      "source_url": "https://egyptianlaws.com/?p=177181",
+      "accessed_at": "2026-11-21T07:33:55.133714+00:00",
+      "source_type": "legal_database",
+      "confidence_level": "high"
+    },
+    {
+      "id": "587aaa87-6a5c-4768-9d4f-17772829e979",
+      "title": "قرار وزير الإسكان رقم 271 لسنة 2016 – مشروع الشركة السعودية المصرية للتعمير بأسيوط الجديدة",
+      "is_public": true,
+      "publisher": "الوقائع المصرية – عبر قاعدة التشريعات المصرية",
+      "source_url": "https://egyptianlaws.com/?p=177181",
+      "accessed_at": "2026-11-21T07:33:48.092895+00:00",
+      "source_type": "legal_database",
+      "confidence_level": "high"
+    },
+    {
+      "id": "cc118493-fef7-4e79-8ab6-f9586ff5c515",
+      "title": "الملف الحكومي التعريفي للشركة السعودية المصرية للتعمير",
+      "is_public": true,
+      "publisher": "وزارة المالية المصرية",
+      "source_url": "https://assets.mof.gov.eg/files/a1d2d940-a5ac-11eb-8000-c54526828a0f.pdf",
+      "accessed_at": "2026-11-21T07:33:48.092895+00:00",
+      "source_type": "جهة حكومية رسمية",
+      "confidence_level": "high"
+    },
+    {
+      "id": "28954dda-3f9f-4596-879f-930fde67a02d",
+      "title": "نيوم أسيوط – الصفحة الرسمية للمشروع",
+      "is_public": true,
+      "publisher": "المطورون العرب القابضة",
+      "source_url": "https://ad-holding.com/ar/project/nyoum-assiut/",
+      "accessed_at": "2026-11-21T07:28:54.633549+00:00",
+      "source_type": "موقع المطور الرسمي",
+      "confidence_level": "مرتفع – مصدر أولي صادر عن المطور؛ بيانات الحالة والتوافر تحتاج تحديثًا مباشرًا"
+    },
+    {
+      "id": "fc4cb685-10d9-44d5-8ff0-2f264f92461b",
+      "title": "المطورون العرب القابضة – بيانات التواصل ومكتب أسيوط",
+      "is_public": true,
+      "publisher": "المطورون العرب القابضة",
+      "source_url": "https://ad-holding.com/contact-us-arab-developers-holding-%D8%A7%D9%84%D9%85%D8%B7%D9%88%D8%B1%D9%88%D9%86-%D8%A7%D9%84%D8%B9%D8%B1%D8%A8-%D8%A7%D9%84%D9%82%D8%A7%D8%A8%D8%B6%D8%A9/",
+      "accessed_at": "2026-11-21T07:28:54.633549+00:00",
+      "source_type": "موقع المطور الرسمي",
+      "confidence_level": "مرتفع – مصدر أولي صادر عن الشركة"
+    },
+    {
+      "id": "9e0da2f1-935c-4b62-9b9d-fc2ae85c7781",
+      "title": "نيوم أسيوط – الصفحة الرسمية للمشروع",
+      "is_public": true,
+      "publisher": "المطورون العرب القابضة",
+      "source_url": "https://ad-holding.com/ar/project/nyoum-assiut/",
+      "accessed_at": "2026-11-21T07:28:49.372689+00:00",
+      "source_type": "موقع المطور الرسمي",
+      "confidence_level": "مرتفع – مصدر أولي صادر عن المطور؛ بيانات الحالة والتوافر تحتاج تحديثًا مباشرًا"
+    },
+    {
+      "id": "be1bfb8f-1b16-43dc-a206-965717c6baec",
+      "title": "المطورون العرب القابضة – بيانات التواصل ومكتب أسيوط",
+      "is_public": true,
+      "publisher": "المطورون العرب القابضة",
+      "source_url": "https://ad-holding.com/contact-us-arab-developers-holding-%D8%A7%D9%84%D9%85%D8%B7%D9%88%D8%B1%D9%88%D9%86-%D8%A7%D9%84%D8%B9%D8%B1%D8%A8-%D8%A7%D9%84%D9%82%D8%A7%D8%A8%D8%B6%D8%A9/",
+      "accessed_at": "2026-11-21T07:28:49.372689+00:00",
+      "source_type": "موقع المطور الرسمي",
+      "confidence_level": "مرتفع – مصدر أولي صادر عن الشركة"
+    },
+    {
+      "id": "d8fb9d84-e322-4e5c-bb15-8e46340a6ce4",
+      "title": "القناة التعريفية للشركة المصرية للتطوير العقاري",
+      "is_public": true,
+      "publisher": "قناة الشركة على YouTube",
+      "source_url": "https://www.youtube.com/channel/UCqrBpoSNwOCBjij7fRQcqyQ",
+      "accessed_at": "2026-11-16T13:07:33.914451+00:00",
+      "source_type": "صفحة تعريفية ذاتية غير مستقلة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "de0b413f-d8c3-4412-b712-72de10a99016",
+      "title": "إعلان مشروعات Cloud Clinics وMOBI Zone وSpeedy وشراكة الإدارة والتشغيل",
+      "is_public": true,
+      "publisher": "هنا مصر",
+      "source_url": "https://honamisr.news/33853/%D8%B4%D8%B1%D8%A7%D9%83%D8%A9-%D8%A8%D9%8A%D9%86-mrb-%D9%88%D8%A7%D9%84%D9%85%D8%B5%D8%B1%D9%8A%D8%A9-%D9%84%D9%84%D8%AA%D8%B7%D9%88%D9%8A%D8%B1-%D9%84%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9-%D9%88%D8%AA/",
+      "accessed_at": "2026-11-16T13:07:33.914451+00:00",
+      "source_type": "صحافة اقتصادية",
+      "confidence_level": "متوسط إلى مرتفع – إفصاح المطور عن الإطلاق والموقع المعلن"
+    },
+    {
+      "id": "42969aaa-8b16-4018-91f9-dd55b64d9eb7",
+      "title": "قيد المصرية للاستثمار العقاري في نشرة الأسماء التجارية",
+      "is_public": true,
+      "publisher": "جهاز تنمية التجارة الداخلية – مصر",
+      "source_url": "https://www.itda.gov.eg/CRM/855/CRA84.pdf",
+      "accessed_at": "2026-11-16T13:07:33.914451+00:00",
+      "source_type": "سجل حكومي للأسماء التجارية",
+      "confidence_level": "مرتفع – مصدر حكومي"
+    },
+    {
+      "id": "074a758a-4382-4ae7-a914-697be408f06f",
+      "title": "الصفحة التعريفية للصفا للتسويق العقاري",
+      "is_public": true,
+      "publisher": "Yellow Pages Egypt",
+      "source_url": "https://yellowpages.com.eg/ar/profile/%D8%A7%D9%84%D8%B5%D9%81%D8%A7-%D9%84%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82-%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%89/569018",
+      "accessed_at": "2026-11-16T04:58:43.007902+00:00",
+      "source_type": "دليل أعمال تجاري — ملف نشاط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "3c2efc21-9d6f-4d3d-9973-ae29f616d51a",
+      "title": "الصفحة التعريفية للمستقبل للتسويق العقاري",
+      "is_public": true,
+      "publisher": "Yellow Pages Egypt",
+      "source_url": "https://yellowpages.com.eg/ar/profile/%D8%A7%D9%84%D9%85%D8%B3%D8%AA%D9%82%D8%A8%D9%84-%D9%84%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82-%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%89/270566",
+      "accessed_at": "2026-11-16T04:58:43.007902+00:00",
+      "source_type": "دليل أعمال تجاري — ملف نشاط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "5c616fc8-86bc-4369-acd2-a36f198b6722",
+      "title": "الصفحة التعريفية لبيت البركة للتسويق والاستثمار العقاري",
+      "is_public": true,
+      "publisher": "Yellow Pages Egypt",
+      "source_url": "https://yellowpages.com.eg/ar/profile/%D8%A8%D9%8A%D8%AA-%D8%A7%D9%84%D8%A8%D8%B1%D9%83%D8%A9-%D9%84%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82-%D9%88%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1-%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%89/440210",
+      "accessed_at": "2026-11-16T04:58:43.007902+00:00",
+      "source_type": "دليل أعمال تجاري — ملف نشاط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "7df9438f-8263-4d5f-a74d-fa77c85e34b2",
+      "title": "بيانات جرين واي للتسويق والخدمات العقارية — أسيوط",
+      "is_public": true,
+      "publisher": "BizMidEast",
+      "source_url": "https://www.bizmideast.com/EG/%D8%AC%D8%B1%D9%8A%D9%86-%D9%88%D8%A7%D9%8A-%D9%84%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82-%D9%88%D8%A7%D9%84%D8%AE%D8%AF%D9%85%D8%A7%D8%AA-%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9-0102-060-6960",
+      "accessed_at": "2026-11-16T04:58:43.007902+00:00",
+      "source_type": "دليل أعمال محلي — ملف نشاط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "b6f749a3-c1f5-430d-9014-d70897d63fc3",
+      "title": "شركة الوساطة العقارية بأسيوط — بيانات النشاط",
+      "is_public": true,
+      "publisher": "BizMidEast",
+      "source_url": "https://www.bizmideast.com/EG/%D8%B4%D8%B1%D9%83%D8%A9-%D8%A7%D9%84%D9%88%D8%B3%D8%A7%D8%B7%D8%A9-%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9-%D8%A8%D8%A3%D8%B3%D9%8A%D9%88%D8%B7-0106-240-8240",
+      "accessed_at": "2026-11-16T04:58:43.007902+00:00",
+      "source_type": "دليل أعمال محلي — ملف نشاط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "c06af396-23dc-42d7-aaf3-64f54ed67d38",
+      "title": "الكرنك جروب للإنشاء والتسويق العقاري — صفحة النشاط",
+      "is_public": true,
+      "publisher": "Buy.com.eg",
+      "source_url": "https://buy.com.eg/ar/directory/%D8%A7%D9%84%D9%83%D8%B1%D9%86%D9%83-%D8%AC%D8%B1%D9%88%D8%A8-%D9%84%D9%84%D8%A7%D9%86%D8%B4%D8%A7%D8%A1-%D9%88%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82-%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A-09w4l7",
+      "accessed_at": "2026-11-16T04:58:43.007902+00:00",
+      "source_type": "دليل أعمال تجاري — ملف نشاط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "10bc79dc-e622-4982-9a2b-80644fde5253",
+      "title": "بحث خرائط الأعمال عن مكتب التساهيل العقارية — أسيوط",
+      "is_public": true,
+      "publisher": "Google Maps",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=%D9%85%D9%83%D8%AA%D8%A8+%D8%A7%D9%84%D8%AA%D8%B3%D8%A7%D9%87%D9%8A%D9%84+%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A%D8%A9+%D8%A3%D8%B3%D9%8A%D9%88%D8%B7",
+      "accessed_at": "2026-11-16T04:58:43.007902+00:00",
+      "source_type": "خرائط أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "02acf593-fd87-4d3c-a78c-026614290a7a",
+      "title": "عقار للاستثمار والإنشاء والتسويق العقاري — صفحة النشاط",
+      "is_public": true,
+      "publisher": "Buy.com.eg",
+      "source_url": "https://buy.com.eg/ar/directory/%D8%B9%D9%82%D8%A7%D8%B1-%D9%84%D9%84%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7%D8%B1-%D9%88%D8%A7%D9%84%D8%A5%D9%86%D8%B4%D8%A7%D8%A1-%D9%88%D8%A7%D9%84%D8%AA%D8%B3%D9%88%D9%8A%D9%82-%D8%A7%D9%84%D8%B9%D9%82%D8%A7%D8%B1%D9%8A-%D9%88%D8%A5%D8%AF%D8%A7%D8%B1%D8%A9-%D8%A7%D9%84%D9%85%D8%B4%D8%B1%D9%88%D8%B9%D8%A7%D8%AA-hrrn8e",
+      "accessed_at": "2026-11-16T04:58:43.007902+00:00",
+      "source_type": "دليل أعمال تجاري — ملف نشاط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "b85df57c-7120-4944-8e40-a47cf1b05067",
+      "title": "Kahareb — قائمة متاجر الإضاءة بأسيوط",
+      "is_public": true,
+      "publisher": "MegaBizDir",
+      "source_url": "https://www.megabizdir.com/EG/Asyut/67430-42/genre/196820813663200/Lighting%2Bfixtures",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل محلات محلي",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "4246212e-da25-4880-b6e5-5e9cf0ee1295",
+      "title": "الموقع الرسمي لمعارض الدكتور — الفروع",
+      "is_public": true,
+      "publisher": "معارض الدكتور",
+      "source_url": "https://aldoctorgroup.com/",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "الموقع الرسمي للشركة — مصدر اكتشاف",
+      "confidence_level": "primary_company"
+    },
+    {
+      "id": "519843a3-39bc-4a6d-a0ca-df672a63aaf1",
+      "title": "دليل أعمال — قباني للأثاث أسيوط",
+      "is_public": true,
+      "publisher": "BizMidEast",
+      "source_url": "https://www.bizmideast.com/EG/kabbani-furniture-asyut-%D9%82%D8%A8%D8%A7%D9%86%D9%89-%D9%84%D9%84%D8%A3%D8%AB%D8%A7%D8%AB-0100-784-8884",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "edd440d4-6ed6-42a3-a2bd-3f72a03b8d32",
+      "title": "دليل أعمال — مكتب الديار الهندسي",
+      "is_public": true,
+      "publisher": "BizMidEast",
+      "source_url": "https://www.bizmideast.com/EG/%D9%85%D9%83%D8%AA%D8%A8-%D8%A7%D9%84%D8%AF%D9%8A%D8%A7%D8%B1-%D8%A7%D9%84%D9%87%D9%86%D8%AF%D8%B3%D9%8A-0106-448-0023",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "42aab9e6-2c02-4e08-8b19-316a7f8fdcaf",
+      "title": "دليل يلوبيدجز — George Essam Designs",
+      "is_public": true,
+      "publisher": "Yellow Pages Egypt",
+      "source_url": "https://yellowpages.com.eg/ar/profile/%D8%AC%D9%88%D8%B1%D8%AC-%D8%B9%D8%B5%D8%A7%D9%85-%D8%AF%D9%8A%D8%B2%D8%A7%D9%8A%D9%86%D8%B2/704714",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "9c8a030f-19e5-41af-8e15-f8148a6ff5c2",
+      "title": "Centre of Engineering Designs and Consultations — LinkedIn",
+      "is_public": true,
+      "publisher": "Centre of Engineering Designs and Consultations",
+      "source_url": "https://www.linkedin.com/company/group-of-engineering-designs-and-consultations/",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "LinkedIn — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "30e549f2-b858-4c6f-944e-d71611f4f4c0",
+      "title": "BONIAN misr Architects — LinkedIn",
+      "is_public": true,
+      "publisher": "BONIAN misr Architects",
+      "source_url": "https://www.linkedin.com/company/bonian-misr-architects/",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "LinkedIn — مصدر اكتشاف",
+      "confidence_level": "primary_company"
+    },
+    {
+      "id": "d7464efb-eec5-4682-a5c8-78e6e9e2f1b3",
+      "title": "DIZN STUDIO — LinkedIn",
+      "is_public": true,
+      "publisher": "DIZN STUDIO",
+      "source_url": "https://www.linkedin.com/company/dizn-studio/",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "LinkedIn — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "791e2c15-ced1-4bd4-b3b1-566b8012c79f",
+      "title": "TSA Lighting — بيانات النشاط والفرع",
+      "is_public": true,
+      "publisher": "Cybo",
+      "source_url": "https://www.cybo.com/EG-biz/tsa-lighting",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "5d9f8093-b57e-42b1-9f5c-3639929bf6af",
+      "title": "Chapeau Lighting — بيانات الفرع",
+      "is_public": true,
+      "publisher": "BizMidEast",
+      "source_url": "https://www.bizmideast.com/EG/chapeau-lighting-0122-114-0900",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "04297bee-f152-4151-80e9-4056b0e57833",
+      "title": "سيراميكا كليوباترا — قائمة الفروع في أسيوط",
+      "is_public": true,
+      "publisher": "دليل 140",
+      "source_url": "https://dalil140.com/branches/ar/71234-ceramica-cleopatra-group",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل فروع أعمال — مصدر تحقق",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "c673730c-8ee1-4e4c-9f9e-0233bf5ddfff",
+      "title": "Ideal Standard — محدد صالات العرض الرسمي",
+      "is_public": true,
+      "publisher": "Ideal Standard Egypt",
+      "source_url": "https://idealstandard-egypt.com/showrooms/",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "primary_company"
+    },
+    {
+      "id": "83caf2e8-16ec-4123-9cd7-470bf503565b",
+      "title": "مظلوم للسيراميك — بيانات فرع أسيوط المنشورة 2026",
+      "is_public": true,
+      "publisher": "المكان",
+      "source_url": "https://www.al-makan.com/sanitary-ceramics/مظلوم-اسيوط/",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل محلي متخصص — مصدر تحقق",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "827121c8-80d6-4ebf-bba1-a6e1a01c8e4a",
+      "title": "Gila Electric — فرع أسيوط، الموقع الرسمي",
+      "is_public": true,
+      "publisher": "Gila Electric",
+      "source_url": "https://gilaelectric.com/contact-us/",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "primary_company"
+    },
+    {
+      "id": "85a9948c-394a-47f6-86f6-f2f2daa78dad",
+      "title": "جلال عامر للإضاءة الحديثة — الهاتف والعنوان",
+      "is_public": true,
+      "publisher": "BizMidEast",
+      "source_url": "https://www.bizmideast.com/EG/جلال-عامر-للإضاءة-الحديثه-أسيوط-0101-515-1785",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل أعمال",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "8c76553c-3225-4f62-abe6-05d537d67d6c",
+      "title": "Design Group Engineering — دليل 140online",
+      "is_public": true,
+      "publisher": "140online",
+      "source_url": "https://140online.com/company.aspx?CompanyId=C129969&Lang=En&Name=Design+Group+Engineering",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "43f90874-8413-4262-8ad7-31df199f888b",
+      "title": "Volt Assuit — قائمة متاجر الإضاءة بأسيوط",
+      "is_public": true,
+      "publisher": "MegaBizDir",
+      "source_url": "https://www.megabizdir.com/EG/Asyut/67430-42/genre/196820813663200/Lighting%2Bfixtures",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "دليل محلات محلي",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "4a63ffee-a876-46bc-b00f-2d77713a835e",
+      "title": "Forbed Assiut — فرع أسيوط",
+      "is_public": true,
+      "publisher": "Furniture1000",
+      "source_url": "https://www.furniture1000.com/EG/Asyut/857265880972344/Forbed-assiut-فوربد-اسيوط",
+      "accessed_at": "2026-11-15T09:16:37.011574+00:00",
+      "source_type": "صفحة نشاط محلية",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "48cf4915-d805-4f06-977c-747af82c4b10",
+      "title": "أمان البيوت للأبواب المصفحة والألوميتال — موقع النشاط",
+      "is_public": true,
+      "publisher": "Google Maps",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=شركة+امان+البيوت+للأبواب+المصفحه+والألوميتال+أسيوط",
+      "accessed_at": "2026-11-15T06:21:14.581371+00:00",
+      "source_type": "ملف متجر أبواب وألوميتال",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "35bb03e2-8094-4071-b8cd-b43e3f45a1cc",
+      "title": "Shezell Fabrics — متجر أقمشة ومفروشات",
+      "is_public": true,
+      "publisher": "MegaBizDir",
+      "source_url": "https://www.megabizdir.com/EG/Asyut/67430-42/genre/986118931495301/Fabric%2BStores",
+      "accessed_at": "2026-11-15T05:55:05.389013+00:00",
+      "source_type": "دليل محلات أقمشة محلي",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "bce1879a-1f0e-4a97-b439-687a626a3a5b",
+      "title": "هشام عنتر للستائر — بيانات النشاط في أسيوط",
+      "is_public": true,
+      "publisher": "POI Data",
+      "source_url": "https://poidata.io/report/curtain-store/egypt/assiut-governorate",
+      "accessed_at": "2026-11-15T05:55:05.389013+00:00",
+      "source_type": "قاعدة بيانات متاجر متخصصة",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "a227639c-6e37-41eb-809e-c16fae21e808",
+      "title": "Decorando — قائمة أنشطة الديكور بأسيوط",
+      "is_public": true,
+      "publisher": "MegaBizDir",
+      "source_url": "https://www.megabizdir.com/EG/Asyut/67430-30/genre/192647794097278/Home%2Bdecor",
+      "accessed_at": "2026-11-14T23:35:41.964981+00:00",
+      "source_type": "دليل أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "9ebb877a-8c7b-4431-8744-f0870a904d89",
+      "title": "معرض مكة للسيراميك والأدوات الصحية — أسيوط",
+      "is_public": true,
+      "publisher": "دي زون",
+      "source_url": "https://dezone.net/place/معرض-مكه-للسيراميك-و-الاداوت-الصحيه/",
+      "accessed_at": "2026-11-14T23:35:04.00037+00:00",
+      "source_type": "دليل محلي — مصدر تحقق",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "6ee95ab2-0224-43ec-80ff-5e559eaa4910",
+      "title": "Makka — صفحة اعثر علينا الرسمية",
+      "is_public": true,
+      "publisher": "Ceramica Granito",
+      "source_url": "https://www.ceramicagranito.com/find-us?vendor=25",
+      "accessed_at": "2026-11-14T23:33:58.673312+00:00",
+      "source_type": "الموقع الرسمي — مصدر اكتشاف",
+      "confidence_level": "primary_company"
+    },
+    {
+      "id": "01a3b23e-46af-408d-b952-d66d445a585c",
+      "title": "Iereny For Wood Industries — بيانات النشاط",
+      "is_public": true,
+      "publisher": "Google Maps",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=Iereny+For+Wood+Industries+Assiut",
+      "accessed_at": "2026-11-14T23:33:58.673312+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "94e94d55-1510-47fc-9d55-542b104167cf",
+      "title": "Shezell Textiles — بيانات الفرع",
+      "is_public": true,
+      "publisher": "Google Maps",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=Shezell+Textiles+Assiut",
+      "accessed_at": "2026-11-14T23:33:58.673312+00:00",
+      "source_type": "دليل أعمال — مصدر اكتشاف",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "86bd9487-e26d-4580-8d9d-25df9a78bfa7",
+      "title": "هشام عنتر للستائر — بيانات النشاط",
+      "is_public": true,
+      "publisher": "Google Maps",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=هشام+عنتر+للستائر+أسيوط",
+      "accessed_at": "2026-11-14T23:33:58.673312+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "f2f5432f-1267-46c9-a2ba-bfed8be06537",
+      "title": "Engineering Consultants Group — مكتب أسيوط",
+      "is_public": true,
+      "publisher": "Google Maps / دليل أعمال",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=Engineering+Consultants+Group+Assiut",
+      "accessed_at": "2026-11-14T23:33:37.596979+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "f22f68ad-d154-4a9b-8164-d17de93b53a3",
+      "title": "الشريف للاستشارات الهندسية — موقع الفرع",
+      "is_public": true,
+      "publisher": "Google Maps / دليل أعمال",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=الشريف+للاستشارات+الهندسية+أسيوط",
+      "accessed_at": "2026-11-14T23:33:37.596979+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "1c45e695-34f8-41a0-abe1-601bd3229491",
+      "title": "مكتب الشرق الأوسط للاستشارات الهندسية — أسيوط",
+      "is_public": true,
+      "publisher": "Google Maps / دليل أعمال",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=مكتب+الشرق+الأوسط+للاستشارات+الهندسية+أسيوط",
+      "accessed_at": "2026-11-14T23:33:37.596979+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "39e5bec9-c587-44b8-a4b7-b833d57c1571",
+      "title": "Byoot Designs — أسيوط",
+      "is_public": true,
+      "publisher": "Google Maps / دليل أعمال",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=Byoot+Designs+Assiut",
+      "accessed_at": "2026-11-14T23:33:37.596979+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "e05e8c03-22cc-404a-be38-bc199bc56fa2",
+      "title": "Elkashef Design Group — أسيوط",
+      "is_public": true,
+      "publisher": "Google Maps / دليل أعمال",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=Elkashef+Design+Group+Assiut",
+      "accessed_at": "2026-11-14T23:33:37.596979+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "54549fe0-294f-4a42-a648-a3dc665131b6",
+      "title": "MH Designs — أسيوط",
+      "is_public": true,
+      "publisher": "Google Maps / دليل أعمال",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=MH+Designs+Asyut",
+      "accessed_at": "2026-11-14T23:33:37.596979+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "8b0334cd-d593-47fb-b757-f03d8ffd27f3",
+      "title": "نتيجة خرائط أعمال — Smart Furniture أسيوط",
+      "is_public": true,
+      "publisher": "خرائط Google / دليل أعمال",
+      "source_url": "https://www.google.com/maps/search/?api=1&query=Smart+Furniture+Assiut",
+      "accessed_at": "2026-11-14T23:32:32.101552+00:00",
+      "source_type": "مصدر اكتشاف فقط",
+      "confidence_level": "business_directory"
+    },
+    {
+      "id": "20254164-8053-4645-b017-384432458b80",
+      "title": "طايل جروب تعتزم ضخ 3 مليارات جنيه استثمارات خلال العام الجاري",
+      "is_public": true,
+      "publisher": "جريدة حابي",
+      "source_url": "https://hapijournal.com/2026/03/30/%D8%B7%D8%A7%D9%8A%D9%84-%D8%AC%D8%B1%D9%88%D8%A8-%D8%AA%D8%B9%D8%AA%D8%B2%D9%85-%D8%B6%D8%AE-3-%D9%85%D9%84%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA-%D8%AC%D9%86%D9%8A%D9%87-%D8%A7%D8%B3%D8%AA%D8%AB%D9%85%D8%A7/",
+      "accessed_at": "2026-11-13T14:45:20.425391+00:00",
+      "source_type": "صحافة اقتصادية",
+      "confidence_level": "مرتفع لتوثيق تصريحات رئيس المجموعة كما نقلتها الصحيفة؛ لا يعد مستندًا حكوميًا أو إثباتًا للتراخيص"
+    },
+    {
+      "id": "cea24dbe-a61b-4ddf-977e-970d336878de",
+      "title": "جريدة الأسماء التجارية – قيد BWH وتعديل عنوانها إلى أسيوط",
+      "is_public": true,
+      "publisher": "جهاز تنمية التجارة الداخلية",
+      "source_url": "https://www.itda.gov.eg/CRM/889/CRA53.pdf",
+      "accessed_at": "2026-11-13T14:45:06.080724+00:00",
+      "source_type": "سجل حكومي للأسماء التجارية",
+      "confidence_level": "مرتفع لبيانات القيد والعنوان المسجل بتاريخ التعديل؛ لا يثبت وحده استمرار الترخيص أو النشاط"
+    },
+    {
+      "id": "fab1577b-cbb0-454f-8a87-3846411d917f",
+      "title": "قرار 883 لسنة 2025 – مشروع ديرا هاوس بالمنطقة الإقليمية",
+      "is_public": true,
       "publisher": "المصدر",
+      "source_url": "https://www.almasdar.com/168664",
+      "accessed_at": "2026-11-13T14:45:06.080724+00:00",
       "source_type": "صحافة اقتصادية تنقل الوقائع المصرية",
-      "source_url": "https://www.almasdar.com/167326"
+      "confidence_level": "مرتفع لنص القرار ومساحة القطعة كما نشرها المصدر"
     },
     {
-      "id": "SRC-044",
+      "id": "dd14d71a-6d90-44ce-a3ff-cf8380f70ef6",
+      "title": "قرار 529 لسنة 2025 – المشروع التجاري للمتحدة للإعمار",
+      "is_public": true,
+      "publisher": "المصدر",
+      "source_url": "https://www.almasdar.com/161705",
+      "accessed_at": "2026-11-13T14:45:06.080724+00:00",
+      "source_type": "صحافة اقتصادية تنقل الوقائع المصرية",
+      "confidence_level": "مرتفع لنص القرار المنقول واسم الشركة والنشاط والمساحة"
+    },
+    {
+      "id": "9159de65-dd37-4b74-962a-99ccf9e1f5c8",
+      "title": "تغطية قرار 1063 لسنة 2025 – مشروع بي دبليو إتش بمدينة أسيوط الجديدة",
+      "is_public": true,
+      "publisher": "المصدر – فهرس تغطيات الوقائع المصرية",
+      "source_url": "https://www.almasdar.com/keyword/5789",
+      "accessed_at": "2026-11-13T14:45:06.080724+00:00",
+      "source_type": "فهرس صحفي لقرار منشور بالوقائع المصرية",
+      "confidence_level": "متوسط: الفهرس يورد اسم الشركة ورقم القرار وقطعة الأرض؛ يلزم الرجوع للعدد الأصلي لتفاصيل التنفيذ"
+    },
+    {
+      "id": "248cc76d-be66-44fa-a32c-e55530acf7af",
+      "title": "الموقع الرسمي – شركة البدري للاستثمار العقاري والمقاولات",
+      "is_public": true,
+      "publisher": "شركة البدري للاستثمار العقاري والمقاولات",
+      "source_url": "https://elbadry.com.eg/",
+      "accessed_at": "2026-11-13T14:34:34.503831+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "0982115a-9c89-4a71-9afc-789b0737e960",
+      "title": "مواقع الشركة داخل مصر – بيانات فرع أسيوط",
+      "is_public": true,
+      "publisher": "المقاولون العرب",
+      "source_url": "https://www.arabcont.com/EgyptOffices.aspx",
+      "accessed_at": "2026-11-13T14:34:34.503831+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "high"
+    },
+    {
+      "id": "b87fd3bb-b150-404a-bee3-498f8cc84827",
+      "title": "أصايله – صفحة المشروع الرسمية",
+      "is_public": true,
+      "publisher": "مباني إدريس",
+      "source_url": "https://mabanyedris.com/ar/project/asayla/",
+      "accessed_at": "2026-11-13T14:34:34.503831+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "high"
+    },
+    {
+      "id": "ac4483ef-2b93-4d6a-97ef-c5b1256b6724",
+      "title": "Zahw Assiut – صفحة المشروع الرسمية",
+      "is_public": true,
+      "publisher": "Madinet Masr",
+      "source_url": "https://madinetmasr.com/en/projects/zahw",
+      "accessed_at": "2026-11-13T14:34:34.503831+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "high"
+    },
+    {
+      "id": "1d9e3643-354e-4a0d-a726-0e95ba4ebab6",
+      "title": "الموقع الرسمي – Prime Developments وبيانات مكتب مبيعات أسيوط",
+      "is_public": true,
+      "publisher": "Prime Developments",
+      "source_url": "https://primedev-eg.com/",
+      "accessed_at": "2026-11-13T14:34:34.503831+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "57b76c0f-70b0-4a12-a8ac-f17750f90b7d",
+      "title": "بيانات ملف شركة البناء العربي استار والفيديو التعريفي المقدم من الشركة",
+      "is_public": true,
+      "publisher": "صفحة الشركة على فيسبوك – رابط قدمته الشركة",
+      "source_url": "https://www.facebook.com/share/1CimVDX8Di/",
+      "accessed_at": "2026-11-12T21:07:11.245079+00:00",
+      "source_type": "بيانات مقدمة من الشركة",
+      "confidence_level": "medium"
+    },
+    {
+      "id": "3ca1ac01-6e07-43b1-849e-988264ae6e84",
+      "title": "Madinet Masr Launches Zahw in West Assiut",
+      "is_public": true,
+      "publisher": "Madinet Masr",
+      "source_url": "https://madinetmasr.com/en/news/madinet-masr-launches-zahw",
+      "accessed_at": "2026-11-02T21:32:40.036202+00:00",
+      "source_type": "company_announcement",
+      "confidence_level": "high"
+    },
+    {
+      "id": "a53d06a2-ea3a-49c1-b958-576576275c8a",
+      "title": "مشروع West Gardens في الهضبة بأسيوط – إعلان Home Town Group",
+      "is_public": true,
+      "publisher": "Home Town Group",
+      "source_url": "https://htg-eg.com/ar/latest-residential-project-in-el-hadaba-assiut-west-gardens-2/",
+      "accessed_at": "2026-11-02T20:58:56.266586+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط إلى مرتفع – إفصاح المطور عن الإطلاق والموقع المعلن"
+    },
+    {
+      "id": "a998d123-81e7-4a3b-8ad1-c5a3303ee5cf",
+      "title": "قرار 1070 لسنة 2025 – تخطيط قطعة هوم تاون بالحي الأول في ناصر الجديدة",
+      "is_public": true,
+      "publisher": "المصدر",
+      "source_url": "https://www.almasdar.com/167326",
+      "accessed_at": "2026-11-02T20:58:56.266586+00:00",
+      "source_type": "صحافة اقتصادية تنقل الوقائع المصرية",
+      "confidence_level": "مرتفع لنص القرار المنقول؛ يلزم الرجوع لصورة العدد والخريطة عند الاعتماد النهائي"
+    },
+    {
+      "id": "90760cc1-39c5-4321-85f8-e0bed18577ab",
       "title": "الأسئلة الرسمية لمشروع ديارنا – مدن أسيوط الجديدة وناصر الجديدة",
+      "is_public": true,
       "publisher": "بنك التعمير والإسكان",
+      "source_url": "https://www.hdb-egy.com/HousingProjectsFAQs/",
+      "accessed_at": "2026-11-02T20:58:56.266586+00:00",
       "source_type": "صفحة أسئلة وأجوبة رسمية",
-      "source_url": "https://www.hdb-egy.com/HousingProjectsFAQs/"
+      "confidence_level": "مرتفع لإثبات إدراج المدينتين ضمن مشروع ديارنا؛ لا يثبت توافر وحدة بعينها حالياً"
     },
     {
-      "id": "SRC-045",
+      "id": "be2ea8d4-3a85-4ab4-8d50-e342d6ced94b",
       "title": "تنفيذ خمس عمارات و130 وحدة ضمن ديارنا بأسيوط الجديدة",
+      "is_public": true,
       "publisher": "المصري اليوم",
+      "source_url": "https://www.almasryalyoum.com/news/details/4210166",
+      "accessed_at": "2026-11-02T20:58:56.266586+00:00",
       "source_type": "صحافة محلية تنقل تصريح رئيس جهاز المدينة",
-      "source_url": "https://www.almasryalyoum.com/news/details/4210166"
+      "confidence_level": "متوسط إلى مرتفع – نقل تصريح من رئيس جهاز المدينة"
+    },
+    {
+      "id": "176ef1da-c027-4a47-b878-e8aaf90ded54",
+      "title": "الوقائع المصرية – قرار وزارة الإسكان رقم 1005 لسنة 2025 بشأن قطعة 15–17 بأسيوط الجديدة",
+      "is_public": true,
+      "publisher": "الوقائع المصرية – سجل تشريعي/قانوني",
+      "source_url": "https://www.mksegypt.org/public/index.php/ar/nashras/42",
+      "accessed_at": "2026-11-02T20:46:51.674217+00:00",
+      "source_type": "مرجع قانوني للوقائع المصرية",
+      "confidence_level": "مرتفع لتوثيق رقم القرار والأرض والشركة وفق سجل تشريعي يعرض بيانات الوقائع المصرية؛ يلزم مطابقة صورة العدد الأصلي قبل الاعتماد النهائي"
+    },
+    {
+      "id": "9d705f6f-4aaa-4749-9aa2-c4936d33bfcf",
+      "title": "اعتماد تخطيط وتقسيم أرض مشروع البارون للاستثمار العقاري بمدينة أسيوط الجديدة – 15 أبريل 2026",
+      "is_public": true,
+      "publisher": "المصدر – تغطية قرار وزارة الإسكان والوقائع المصرية",
+      "source_url": "https://www.almasdar.com/169169",
+      "accessed_at": "2026-11-02T20:46:51.674217+00:00",
+      "source_type": "صحافة اقتصادية",
+      "confidence_level": "مرتفع لنقل نص القرار والشرط المنشور؛ المصدر صحفي وليس أصل القرار"
+    },
+    {
+      "id": "588da71d-4ff2-49f2-af07-040efa10f0e0",
+      "title": "صفحة شركة كيان المستقبل – أسيوط الجديدة والرحاب",
+      "is_public": true,
+      "publisher": "شركة كيان المستقبل – صفحة تعريفية ذاتية",
+      "source_url": "https://sites.google.com/view/kayanthefuture/",
+      "accessed_at": "2026-11-02T20:46:51.674217+00:00",
+      "source_type": "صفحة تعريفية ذاتية غير مستقلة",
+      "confidence_level": "منخفض – إفصاح ذاتي غير متحقق قانونيًا أو ميدانيًا"
+    },
+    {
+      "id": "a823f150-c66c-4b1f-851e-6d9e9fefed11",
+      "title": "دليل شركات العقارات في أسيوط – القائمة العامة",
+      "is_public": true,
+      "publisher": "عقارات مصر",
+      "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut",
+      "accessed_at": "2026-11-02T19:23:13.805877+00:00",
+      "source_type": "دليل أعمال عقاري – لاكتشاف الأسماء فقط",
+      "confidence_level": "منخفض – دليل تجاري"
+    },
+    {
+      "id": "c034ea00-5075-435f-a1aa-b59b5dd321c2",
+      "title": "دليل شركات العقارات والاستثمار والتسويق العقاري في أسيوط",
+      "is_public": true,
+      "publisher": "دليل 140",
+      "source_url": "https://dalil140.com/category/ar/real-estate/assyout",
+      "accessed_at": "2026-11-02T19:08:52.273749+00:00",
+      "source_type": "دليل أعمال تجاري",
+      "confidence_level": "منخفض إلى متوسط – للاكتشاف فقط"
+    },
+    {
+      "id": "16af49e4-a1dc-4cfe-8760-5f53aa67fbfa",
+      "title": "متابعة تنفيذ مشروعات سكنية وخدمية في أسيوط الجديدة وناصر الجديدة – 10 سبتمبر 2026",
+      "is_public": true,
+      "publisher": "الهيئة العامة للاستعلامات نقلًا عن وزارة الإسكان",
+      "source_url": "https://sis.gov.eg/ar/المركز-الإعلامي/الأخبار/وزيرة-الإسكان-تتابع-موقف-تنفيذ-عدد-من-المشروعات-السكنية-والخدمية-بمدن-الصعيد-الجديدة/",
+      "accessed_at": "2026-11-02T19:08:52.273749+00:00",
+      "source_type": "مصدر حكومي رسمي",
+      "confidence_level": "مرتفع – مصدر حكومي"
+    },
+    {
+      "id": "5441dbd4-ccdf-4ba3-8ce5-d8a55d4058f1",
+      "title": "شركات التسويق العقاري في أسيوط – دليل عقارات مصر",
+      "is_public": true,
+      "publisher": "عقارات مصر",
+      "source_url": "https://www.aqarategypt.com/ar/directory/egypt/assiut/category/marketing",
+      "accessed_at": "2026-11-02T19:08:52.273749+00:00",
+      "source_type": "دليل أعمال عقاري",
+      "confidence_level": "منخفض – للاكتشاف فقط"
+    },
+    {
+      "id": "0c19b21d-aa35-49b1-bb1c-b0400f7e7d37",
+      "title": "هيئة المجتمعات العمرانية الجديدة – أسيوط الجديدة",
+      "is_public": true,
+      "publisher": "هيئة المجتمعات العمرانية الجديدة",
+      "source_url": "https://lands.nuca.gov.eg/ar/ViewCity.aspx?ID=11",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "جهة حكومية رسمية",
+      "confidence_level": "عالي"
+    },
+    {
+      "id": "78f51bc0-c3a2-4f8f-9f31-e181bda779d0",
+      "title": "طرح فرص استثمارية بمدينة أسيوط الجديدة – 2 فبراير 2026",
+      "is_public": true,
+      "publisher": "الهيئة العامة للاستعلامات / وزارة الإسكان",
+      "source_url": "https://sis.gov.eg/ar/المركز-الإعلامي/الأخبار/طرح-أراض-استثمارية-جديدة-بمواقع-متميزة-بمدينة-أسيوط-الجديدة/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "جهة حكومية رسمية",
+      "confidence_level": "عالي"
+    },
+    {
+      "id": "a5e9c3ab-6b45-4c59-9d74-3b97b704fecd",
+      "title": "لؤلؤة أسيوط الجديدة – الهيئة العامة لتعاونيات البناء والإسكان",
+      "is_public": true,
+      "publisher": "الهيئة العامة لتعاونيات البناء والإسكان",
+      "source_url": "https://chc-egypt.com/أسيوط-الجديدة/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "جهة حكومية رسمية",
+      "confidence_level": "عالي"
+    },
+    {
+      "id": "40e23a67-39df-48a0-b2ba-149cca97f26b",
+      "title": "سابقة أعمال فينيسيا للتنمية العمرانية",
+      "is_public": true,
+      "publisher": "فينيسيا للتنمية والتخطيط العمراني",
+      "source_url": "https://venecia-dev.com/portfolio",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "e8176280-a040-4bbd-b9b8-5890a45fa7de",
+      "title": "الموقع الرسمي – Venecia Developments",
+      "is_public": true,
+      "publisher": "Venecia Developments",
+      "source_url": "https://venecia-dev.com/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "7f2a04be-6968-49a5-856d-3494108d749b",
+      "title": "الموقع الرسمي – Home Town Group",
+      "is_public": true,
+      "publisher": "Home Town Group",
+      "source_url": "https://htg-eg.com/ar/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "7f1aff28-5c5b-466c-8c72-d5c607a33ec5",
+      "title": "هوم تاون تضع حجر الأساس لمشروع West Gardens بغرب أسيوط – 17 فبراير 2026",
+      "is_public": true,
+      "publisher": "جريدة البورصة",
+      "source_url": "https://www.alborsaanews.com/2026/02/17/1950271",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "صحافة اقتصادية",
+      "confidence_level": "متوسط إلى عالي"
+    },
+    {
+      "id": "1a49a6aa-c1ba-4443-82eb-84b0efd491d6",
+      "title": "هوم تاون تحصل على القرار الوزاري لمشروع West Gardens – 13 مايو 2026",
+      "is_public": true,
+      "publisher": "بوابة الأهرام بيزنس",
+      "source_url": "https://business.ahram.org.eg/News/67501.aspx",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "صحافة اقتصادية",
+      "confidence_level": "متوسط إلى عالي"
+    },
+    {
+      "id": "9af99b3d-bb18-443b-981b-1a6c761d4435",
+      "title": "مشروعات Arab Developers Holding",
+      "is_public": true,
+      "publisher": "Arab Developers Holding",
+      "source_url": "https://ad-holding.com/project/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "88e5e64c-a2ed-4d26-984c-2558404d1eff",
+      "title": "عن طايل جروب – Hayah City",
+      "is_public": true,
+      "publisher": "Tayel Group / Hayah City",
+      "source_url": "https://www.hayahcity.com/ar/about-us.php",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "title": "Global House Developments – صفحة الشركة",
+      "is_public": true,
+      "publisher": "Global House Developments",
+      "source_url": "https://eg.linkedin.com/company/global-house-developments",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "LinkedIn للشركة",
+      "confidence_level": "متوسط – إفصاح ذاتي"
+    },
+    {
+      "id": "c4e573d7-f4a6-4a18-a8d1-e6bb335b157b",
+      "title": "133 فيلا بمشروع Asayla – 3 أغسطس 2025",
+      "is_public": true,
+      "publisher": "الجريدة العقارية / العقارية",
+      "source_url": "https://www.aleqaria.com.eg/post/details/285509/133-فيلا-بين-الـ-تاون-هاوس-وتوين-هاوس-وفيلات-مستقلة-بمشروع-asayla--بأسيوط",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "صحافة عقارية متخصصة",
+      "confidence_level": "متوسط"
+    },
+    {
+      "id": "ad3a203f-f4e0-46d7-96d0-745fee871717",
+      "title": "مباني إدريس واستعداد تسليم وحدات من أصايله – 19 مايو 2025",
+      "is_public": true,
+      "publisher": "الجريدة العقارية / العقارية",
+      "source_url": "https://www.aleqaria.com.eg/post/details/273060/شركة-مباني-إدريس-77753",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "صحافة عقارية متخصصة",
+      "confidence_level": "متوسط"
+    },
+    {
+      "id": "d5cea5ca-2a8e-4e76-8a84-b5fd7c4cfa25",
+      "title": "Asayla Compound – Key Point",
+      "is_public": true,
+      "publisher": "Key Point Real Estate",
+      "source_url": "https://keypoint-realestate.com/project/asayla-compound/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "منصة تسويق/وساطة عقارية",
+      "confidence_level": "متوسط إلى منخفض"
+    },
+    {
+      "id": "f3dcb277-cb59-499b-b6ea-72b3dbd14470",
+      "title": "ضعف المنافسة يجذب المطورين العقاريين نحو الصعيد – 15 سبتمبر 2026",
+      "is_public": true,
+      "publisher": "جريدة البورصة",
+      "source_url": "https://www.alborsaanews.com/2026/09/15/1992465",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "صحافة اقتصادية",
+      "confidence_level": "متوسط"
+    },
+    {
+      "id": "0c65da1f-532b-4f9e-8071-785a8d315d5d",
+      "title": "شركات عقارية في أسيوط – دليل D&B",
+      "is_public": true,
+      "publisher": "Dun & Bradstreet",
+      "source_url": "https://www.dnb.com/business-directory/company-information.real_estate.eg.asyut.html",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "دليل شركات تجاري",
+      "confidence_level": "متوسط – دليل اكتشاف"
+    },
+    {
+      "id": "d03662dd-ada7-495d-bf68-07f6c438a9b8",
+      "title": "مكاتب وساطة عقارية في أسيوط – D&B",
+      "is_public": true,
+      "publisher": "Dun & Bradstreet",
+      "source_url": "https://www.dnb.com/business-directory/company-information.offices_of_real_estate_agents_and_brokers.eg.asyut.html",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "دليل شركات تجاري",
+      "confidence_level": "متوسط – دليل اكتشاف"
+    },
+    {
+      "id": "5c36b7da-faf7-4fec-9760-e0a8635aaf27",
+      "title": "دليل الأنشطة العقارية في أسيوط – Buy.com.eg",
+      "is_public": true,
+      "publisher": "Buy.com.eg",
+      "source_url": "https://buy.com.eg/ar/directory?category=real-estate&city=asyut-city&governorate=asyut",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "دليل شركات تجاري",
+      "confidence_level": "منخفض إلى متوسط – دليل اكتشاف"
+    },
+    {
+      "id": "1c294bbb-882c-4b17-87e1-7d3dbb7892ee",
+      "title": "تقسيم محافظة أسيوط ومراكزها ومدنها – SIS PDF",
+      "is_public": true,
+      "publisher": "الهيئة العامة للاستعلامات",
+      "source_url": "https://mediadr.sis.gov.eg/bitstream/handle/123456789/3433/AFED_ASSIUT18052022.pdf?sequence=1&isAllowed=y",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "مرجع حكومي",
+      "confidence_level": "عالي للتقسيم المنشور وقت التقرير"
+    },
+    {
+      "id": "1ace6208-a8e8-4c9a-9495-447821a77d07",
+      "title": "الوقائع المصرية – قرار وزاري رقم 823 لسنة 2025",
+      "is_public": true,
+      "publisher": "الوقائع المصرية / وزارة الإسكان",
+      "source_url": "https://mediadr.sis.gov.eg/bitstream/handle/123456789/118601/WQ11_20260114_8880.pdf?isAllowed=y&sequence=2",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "جريدة رسمية حكومية",
+      "confidence_level": "عالي"
+    },
+    {
+      "id": "5b0e8dff-2e12-49d7-b25c-e941bcd6f55b",
+      "title": "دليل المطورين – عقارات مصر",
+      "is_public": true,
+      "publisher": "عقارات مصر",
+      "source_url": "https://realestate.eg/ar/developers",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "منصة عقارية وطنية",
+      "confidence_level": "مرجع مقارن/اكتشاف"
+    },
+    {
+      "id": "53470d3d-da7c-48bd-9abb-bd310b812b30",
+      "title": "دليل المطورين – URE",
+      "is_public": true,
+      "publisher": "URE",
+      "source_url": "https://ureeg.com/en/developers/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "منصة عقارية وطنية",
+      "confidence_level": "مرجع مقارن/اكتشاف"
+    },
+    {
+      "id": "e2988b5e-07c6-498e-aa2e-73db53f158b5",
+      "title": "دليل المطورين – Ahlan Homes",
+      "is_public": true,
+      "publisher": "Ahlan Homes",
+      "source_url": "https://www.ahlanhomes.com/developers",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "منصة عقارية وطنية",
+      "confidence_level": "مرجع مقارن/اكتشاف"
+    },
+    {
+      "id": "b756aeae-73fa-4956-b203-c4250960c9b8",
+      "title": "تقرير قطاع العقارات – AmCham Egypt (ديسمبر 2025)",
+      "is_public": true,
+      "publisher": "AmCham Egypt",
+      "source_url": "https://www.amcham.org.eg/bsac/RealEstate_IndustryInsight_Dec2025.pdf",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "تقرير قطاعي",
+      "confidence_level": "مرجع قطاعي"
+    },
+    {
+      "id": "a0a3e365-d1b7-4702-be89-8cdf046c99c2",
+      "title": "أسيوط الجديدة – هيئة المجتمعات العمرانية (بوابة الأراضي)",
+      "is_public": true,
+      "publisher": "هيئة المجتمعات العمرانية الجديدة",
+      "source_url": "https://lands.nuca.gov.eg/ar/ViewCity.aspx?ID=11",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "مصدر حكومي",
+      "confidence_level": "عالي"
+    },
+    {
+      "id": "110fba80-21d9-4d9e-88e4-54db135a215e",
+      "title": "حياه إيليت – صفحة تسويق عقاري",
+      "is_public": true,
+      "publisher": "فانسيا للتسويق العقاري",
+      "source_url": "https://venecia.estate/hayah-elite/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "منصة تسويق عقاري",
+      "confidence_level": "منخفض"
+    },
+    {
+      "id": "76971158-92bb-4678-a34e-0acce1581c23",
+      "title": "الموقع الرسمي – RDF Developments",
+      "is_public": true,
+      "publisher": "RDF Developments",
+      "source_url": "https://rdfdevelopments.com/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "الموقع الرسمي للشركة",
+      "confidence_level": "متوسط إلى مرتفع"
+    },
+    {
+      "id": "27c28c86-3a89-47a1-a8b0-3ab3bcd39684",
+      "title": "إطلاق مشروع Paradise Compound بمدينة أسيوط الجديدة – 17 مايو 2026",
+      "is_public": true,
+      "publisher": "موقع اليوم",
+      "source_url": "https://el-yomnews.com/لأول-مرة-في-أسيوط-الجديدة-rdf-development-تطلق-مشروعها-الأول-تحت-اسم-para/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "صحافة عقارية",
+      "confidence_level": "متوسط"
+    },
+    {
+      "id": "ca9a9f6c-dcde-4d81-ba83-512fae72c0d2",
+      "title": "شركتان تتقدمان لحجز قطعة أرض 20 فدانًا في أسيوط الجديدة – 16 يونيو 2026",
+      "is_public": true,
+      "publisher": "جريدة المال",
+      "source_url": "https://almalnews.com/2119694/شركتان-تتقدمان-لحجز-قطعة-أرض-بمساحة-20/",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "صحافة اقتصادية",
+      "confidence_level": "متوسط"
+    },
+    {
+      "id": "4c61bd44-caf1-4fc5-8ebd-59e59250b370",
+      "title": "نتائج قرعة أراضي شراكة المطورين – فوز شركة البدري للاستثمار في أسيوط الجديدة – 25 يوليو 2026",
+      "is_public": true,
+      "publisher": "مصراوي",
+      "source_url": "https://www.masrawy.com/news/news_egypt/details/2026/7/25/3022854/الإسكان-تعلن-نتائج-قرعة-أراضي-شراكة-المطورين-ضمن-سكن-لكل-المصريين",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "صحافة اقتصادية",
+      "confidence_level": "متوسط إلى مرتفع"
+    },
+    {
+      "id": "d81a73c2-be22-4724-9e56-20cd58a38afa",
+      "title": "طرح محال وصيدليات ووحدات إدارية – 17 أكتوبر 2026",
+      "is_public": true,
+      "publisher": "وزارة الإسكان والمرافق والمجتمعات العمرانية",
+      "source_url": "https://mhuc.gov.eg/طرح_محال_وصيدليات_ووحدات_إدارية_ومهنية_وقطع_أراضٍ_بنشاط_ورش_للبيع_بمدينتي_أسيوط_الجديدة_والعبور_الجديدة/بيانات_صحفية",
+      "accessed_at": "2026-11-02T17:56:17.333583+00:00",
+      "source_type": "جهة حكومية رسمية",
+      "confidence_level": "مرتفع – وزارة الإسكان / مصدر حكومي"
     }
   ],
-  "entities": [],
-  "projects": [],
-  "draftAreas": [
+  "entities": [
     {
-      "id": "AREA-014",
-      "name_ar": "حي شرق أسيوط",
-      "name_en": "East District",
-      "area_type": "district"
+      "id": "c232159a-66fd-432d-9468-1c7ffabb3fb9",
+      "name_ar": "RDF Development",
+      "latitude": null,
+      "longitude": null,
+      "description": "شركة تطوير عقاري تعرض على موقعها الرسمي مشروع Paradise بمدينة أسيوط الجديدة، وتوجد تغطية صحفية عن إطلاق المشروع في مايو 2026. الإدراج مرجعي ولا يمثل شهادة ترخيص أو تزكية أو ضمانًا للتنفيذ أو الإتاحة.",
+      "entity_type": "developer",
+      "website_url": "https://rdfdevelopments.com/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-015",
-      "name_ar": "حي غرب أسيوط",
-      "name_en": "West District",
-      "area_type": "district"
+      "id": "5b6269c1-b164-4b9e-8602-f9e461638114",
+      "name_ar": "أبر كابيتال للتطوير العقاري",
+      "latitude": null,
+      "longitude": null,
+      "description": "شركة عقارية مقرها أسيوط وتعرّف نفسها بأنها تعمل في مجال التطوير العقاري وخدمات المعمار بصعيد مصر. بيانات العنوان والهاتف مأخوذة من ملف الشركة ودليل أعمال عام، ويلزم تأكيدها مباشرة من الشركة. لم يتم ربط مشروع محدد لعدم توافر توثيق كافٍ لمشروع بعينه.",
+      "entity_type": "developer",
+      "website_url": "http://www.uppercapital.com.eg/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": null,
+      "public_logo_url": null,
+      "service_category": null,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-016",
-      "name_ar": "الوليدية",
-      "name_en": "Al-Walideya",
-      "area_type": "neighborhood"
+      "id": "9ddc09aa-f358-4ba6-8666-34e42be127a1",
+      "name_ar": "أحمد فوزي محمود وشركاه – البارون للاستثمار العقاري والمقاولات",
+      "latitude": null,
+      "longitude": null,
+      "description": "الاسم القانوني/التجاري كما ورد في قرار وزارة الإسكان رقم 1005 لسنة 2025 بشأن تخصيص قطعة الأرض 15–17 بالمنطقة الإقليمية في أسيوط الجديدة لإقامة مشروع عمراني متكامل. إدراج الجهة هنا مرجعي ولا يثبت وحده الوضع القانوني الحالي أو الترخيص أو السماح ببيع وحدات المشروع.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "b5bf77c1-821a-4c0f-91d6-3585f96345b3",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-017",
-      "name_ar": "شارع الجمهورية / وسط المدينة",
-      "name_en": "El-Gomhoreya / Downtown",
-      "area_type": "zone"
+      "id": "35a6fc96-e83a-4166-b51a-2eb28da446fa",
+      "name_ar": "الشركة السعودية المصرية للتعمير",
+      "latitude": null,
+      "longitude": null,
+      "description": "شركة تطوير واستثمار عقاري مصرية سعودية. يثبت الملف الحكومي الرسمي نشاطها في الاستثمار العقاري والسياحي وإطار تأسيسها، كما يثبت قرار وزارة الإسكان رقم 271 لسنة 2016 اعتماد تخطيط مشروع سكني عمراني متكامل على قطعتي الأرض 2 و4 بمنطقة الجمعيات بالتوسعات الجنوبية الشرقية بمدينة أسيوط الجديدة. لا تتضمن هذه الصفحة تأكيدًا بتوافر وحدات أو أسعار أو حالة تنفيذ حالية؛ يلزم الرجوع للشركة للتحقق من ذلك.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": null,
+      "public_logo_url": null,
+      "service_category": null,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-018",
-      "name_ar": "الهضبة",
-      "name_en": "El-Hadaba",
-      "area_type": "zone"
+      "id": "0a708dcf-66ff-4626-8f81-85ce2fedf8a2",
+      "name_ar": "المصرية للتطوير العقاري – أسيوط",
+      "latitude": null,
+      "longitude": null,
+      "description": "جهة تعمل في الاستثمار والتطوير العقاري بمحافظة أسيوط. يرد اسمها القانوني «المصرية للاستثمار العقاري» في نشرة الأسماء التجارية الحكومية لعام 2022، بينما تستخدم في تسويق مشروعاتها اسم «المصرية للتطوير العقاري». ومن المشروعات التي أُعلن عنها ضمن حملة «قلب أسيوط يساعى 3» عام 2024: Cloud Clinics (طبي)، وMOBI Zone (تجاري متخصص في إكسسوارات الهواتف)، وSpeedy (تجاري متخصص في إكسسوارات السيارات). لا تثبت الإعلانات وحدها اكتمال التنفيذ أو التشغيل أو توافر الوحدات حاليًا؛ يُرجى التحقق مباشرة من الشركة قبل الحجز أو الشراء. إدراج هذا السجل في الدليل معلوماتي فقط، ولا يعني توثيق الشركة أو مشروعاتها أو وجود شراكة أو رعاية رسمية مع أسيوط عقار.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "1928f326-eaee-48ea-b2fd-c499d8d8f960",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-019",
-      "name_ar": "المنطقة الإقليمية",
-      "name_en": "Regional Services Area",
-      "area_type": "zone"
+      "id": "37c12e5b-eb95-48fc-b43d-7d1ba7a52bed",
+      "name_ar": "جلوبال هاوس للتطوير العقاري",
+      "latitude": null,
+      "longitude": null,
+      "description": "بحسب صفحة Global House Developments على LinkedIn، تصف الشركة نفسها بأنها شركة تطوير عقاري مقرها مدينة أسيوط، وتذكر ضمن محفظتها مشروعات Konoz Residence وKonoz Land وKonoz Medical Hub في أسيوط الجديدة، وKonoz Heights في الهضبة/ناصر الجديدة. هذه التفاصيل إفصاح ذاتي منشور على صفحة الشركة ولم يتم التحقق المستقل من كل مشروع أو حالته أو الوحدات المتاحة.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "1928f326-eaee-48ea-b2fd-c499d8d8f960",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-020",
-      "name_ar": "حي رجال الأعمال",
-      "name_en": "Business District",
-      "area_type": "zone"
+      "id": "3ae6b855-0183-4497-9a93-665791465bf8",
+      "name_ar": "شركة الربوة للاستثمار العقاري",
+      "latitude": null,
+      "longitude": null,
+      "description": "شركة متخصصة في الأعمال العقارية، ومن أبرز مشروعاتها كمبوند الربوة بمدينة أسيوط الجديدة. يعرض الموقع الرسمي للمشروع وحدات سكنية تشمل شققًا وفيلات ومرافق خدمية وترفيهية. لا يؤكد هذا الإدراج توافر وحدات أو أسعارًا أو حالة تنفيذ حالية؛ يرجى التواصل مع الشركة للتحقق قبل أي تعامل.",
+      "entity_type": "developer",
+      "website_url": "https://www.alrabwaa.com/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": null,
+      "public_logo_url": null,
+      "service_category": null,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-021",
-      "name_ar": "مركز خدمات الحي الثاني",
-      "name_en": "Second District Services Center",
-      "area_type": "zone"
+      "id": "986be7e5-4faa-4cd7-a5ad-f8a200724394",
+      "name_ar": "شركة بي دبليو إتش للاستثمار العقاري ش.ذ.م.م",
+      "latitude": null,
+      "longitude": null,
+      "description": "الشركة المخصصة لها قطعة الأرض رقم 6 بمنطقة الحزام الأخضر بجوار مدخل أسيوط الجديدة لإقامة مشروع عمراني متكامل، وفق القرار 1063 لسنة 2025. توجد بيانات قيد تجاري في جهاز تنمية التجارة الداخلية، لكن ذلك لا يغني عن التحقق من التراخيص والموقف التنفيذي.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-022",
-      "name_ar": "مركز المدينة الرئيسي",
-      "name_en": "Main City Center",
-      "area_type": "zone"
+      "id": "28b41753-a771-4ccf-b72c-85d33fe06263",
+      "name_ar": "شركة تيرا أسيوط للاستيراد والتصدير",
+      "latitude": null,
+      "longitude": null,
+      "description": "شركة مخصصة لها قطعة الأرض رقم 26 بالمنطقة الإقليمية بمدينة أسيوط الجديدة لإقامة نشاط عمراني متكامل، وفق القرار الوزاري رقم 289 لسنة 2020 وتعديل التخطيط بالقرار رقم 193 لسنة 2021. لا تتوافر لدينا بيانات اتصال رسمية مؤكدة أو معلومات حديثة عن حالة التنفيذ أو التوافر؛ لذلك لا نعرض أسعارًا أو وحدات متاحة. هذا الكيان مختلف عن تيراكّو مصر المسجلة في الدليل.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": null,
+      "public_logo_url": null,
+      "service_category": null,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-023",
-      "name_ar": "مركز الخدمات الرئيسي",
-      "name_en": "Main Services Center",
-      "area_type": "zone"
+      "id": "5de40cec-7c11-4a71-bf55-7022896614d5",
+      "name_ar": "شركة خلف طه حسن وشريكه – المتحدة للإعمار وتصنيع مواد البناء",
+      "latitude": null,
+      "longitude": null,
+      "description": "الشركة المخصصة لها قطعة الأرض رقم 1 يمين مدخل أسيوط الجديدة بالمنطقة الإقليمية لإقامة مشروع تجاري، واسمها التجاري المتحدة للإعمار وتصنيع مواد البناء، وفق القرار الوزاري 529 لسنة 2025. لا يثبت القرار وحده موافقة الحجز أو البيع أو الإعلان.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "b5bf77c1-821a-4c0f-91d6-3585f96345b3",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-024",
-      "name_ar": "المنطقة الصناعية الثانية",
-      "name_en": "Second Industrial Zone",
-      "area_type": "industrial_zone"
+      "id": "33a76d8f-5fad-4e26-b2e6-b233f7fdd5e9",
+      "name_ar": "شركة ديرا هاوس للاستثمار العقاري والمقاولات (ش.م.م)",
+      "latitude": null,
+      "longitude": null,
+      "description": "جهة مخصصة لها قطعة الأرض رقم 30 بالمنطقة الإقليمية في أسيوط الجديدة لإقامة مشروع عمراني متكامل، وفق القرار الوزاري 883 لسنة 2025. لا يثبت قرار التخطيط وحده سريان التراخيص أو بدء التنفيذ أو الموافقة على التسويق.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "b5bf77c1-821a-4c0f-91d6-3585f96345b3",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-025",
-      "name_ar": "التوسعات الشمالية الغربية",
-      "name_en": "North-Western Extensions",
-      "area_type": "zone"
+      "id": "9a04337c-2b6d-4403-90c8-10cf9c7ebc94",
+      "name_ar": "شركة مدينة مصر للإسكان والتعمير – مدينة مصر",
+      "latitude": null,
+      "longitude": null,
+      "description": "تذكر مدينة مصر على موقعها الرسمي أن مشروع Zahw هو أول مشروعاتها في محافظة أسيوط، وتعرض صفحة المشروع موقعه في غرب أسيوط ومكوناته السكنية والتجارية. هذه معلومات المشروع كما تعلنها الشركة، ولا تمثل تحققًا مستقلاً من التراخيص أو حالة التنفيذ أو توافر وحدة بعينها حاليًا.",
+      "entity_type": "developer",
+      "website_url": "https://madinetmasr.com/en/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": null,
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
     },
     {
-      "id": "AREA-026",
-      "name_ar": "التوسعات الجنوبية الشرقية",
-      "name_en": "South-Eastern Extensions",
-      "area_type": "zone"
+      "id": "be32e9e6-5d57-48d7-af81-42462c1647f4",
+      "name_ar": "عامر جروب / بورتو جروب",
+      "latitude": null,
+      "longitude": null,
+      "description": "تقرير صحفي منشور في 15 سبتمبر 2026 يذكر مشروع بورتو أسيوط ضمن أبرز مشروعات شركة عامر جروب بمدينة ناصر الجديدة غرب أسيوط. هذا إدراج معلوماتي للشركة والمشروع، ولا يثبت إتاحة الحجز أو البيع حاليًا أو اعتماد أي عرض عقاري بعينه.",
+      "entity_type": "developer",
+      "website_url": null,
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "ca9e12d4-ef79-401a-8cc6-8e67f2ac6310",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "b4a920c4-878b-41b6-946e-bf3dede8f87f",
+      "name_ar": "عرب ديفيلوبرز القابضة",
+      "latitude": null,
+      "longitude": null,
+      "description": "شركة تطوير عقاري مصرية. يدرج موقعها الرسمي مشروع نيوم أسيوط ضمن محفظتها، كما يعلن عن مكتب للشركة في أسيوط ببرج بانوراما – شارع الجمهورية، ومركز اتصال 16663. بيانات التواصل والمشروع من الموقع الرسمي للشركة؛ يُستكمل التحقق من ممثل الشركة قبل طلب استلام الملف أو منحه صلاحيات.",
+      "entity_type": "developer",
+      "website_url": "https://ad-holding.com/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "8376d0e8-2f0a-4101-85b3-597329082e6c",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "fb8b1c41-93f3-4484-8695-9fa44b5a2a95",
+      "name_ar": "فينيسيا للتنمية والتخطيط العمراني",
+      "latitude": null,
+      "longitude": null,
+      "description": "شركة تطوير وتخطيط عمراني لها موقع رسمي يعرض مشروعات فينيسيا وفيينا ومشروعًا سكنيًا إداريًا تجاريًا في المنطقة الإقليمية بمدينة أسيوط الجديدة. البيانات الواردة في بطاقة المشروع وفق إفصاح الشركة على موقعها الرسمي، ولا تمثل اعتمادًا مستقلًا للتراخيص أو الوحدات المتاحة.",
+      "entity_type": "developer",
+      "website_url": "https://venecia-dev.com/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "2700ddd4-93aa-4247-b36c-9c078148518e",
+      "name_ar": "مباني إدريس للتطوير العقاري",
+      "latitude": null,
+      "longitude": null,
+      "description": "يعرض الموقع الرسمي لشركة مباني إدريس مشروع أصايله ضمن مشروعاتها، ويحدد موقعه في أسيوط الجديدة ويصفه كمشروع سكني يضم فيلات مستقلة وتاون هاوس وتوين هاوس. بيانات المشروع المعروضة مصدرها الشركة، ولا تمثل تحققًا مستقلاً من التراخيص أو حالة التنفيذ أو توافر الوحدات حاليًا.",
+      "entity_type": "developer",
+      "website_url": "https://mabanyedris.com/ar/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "2d4d4044-4540-4c2d-8ee4-0d73b77ae5b4",
+      "name_ar": "مجموعة طايل / فوفوزيلا للتطوير العقاري",
+      "latitude": null,
+      "longitude": null,
+      "description": "الموقع الرسمي لحياة سيتي يعرّف مجموعة طايل ويذكر تكاملها مع شركتي الرحاب للمقاولات وفوفوزيلا للتطوير العقاري ومشروعاتها في أسيوط الجديدة. كما نقلت جريدة حابي في 30 مارس 2026 تصريحات رئيس المجموعة عن بدء إنشاءات المرحلة الأولى من امتداد حياة سيتي. التفاصيل الواردة عن المجموعة ومشروعاتها تعريفية، ولا تمثل اعتمادًا أو ضمانًا من أسيوط عقار.",
+      "entity_type": "developer",
+      "website_url": "https://www.hayahcity.com/ar/about-us.php",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "f853fb29-c535-4abf-b5c2-8b58e7bc1d7a",
+      "name_ar": "هوم تاون للتطوير العقاري",
+      "latitude": null,
+      "longitude": null,
+      "description": "شركة تطوير عقاري لها موقع رسمي، وأعلنت إطلاق مشروع West Gardens في منطقة الهضبة بأسيوط في فبراير 2026، كما نشرت تغطيات صحفية خبر القرار الوزاري للمشروع في مايو 2026. إدراج الشركة مرجعي ولا يُعد شهادة ترخيص أو تزكية أو ضمانًا للمشروعات.",
+      "entity_type": "developer",
+      "website_url": "https://htg-eg.com/ar/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "ca9e12d4-ef79-401a-8cc6-8e67f2ac6310",
+      "public_logo_url": null,
+      "service_category": "real_estate_development",
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "86e848ca-6175-4898-bdd8-8daddcee58d1",
+      "name_ar": "هيئة المجتمعات العمرانية الجديدة",
+      "latitude": null,
+      "longitude": null,
+      "description": "جهة حكومية مسؤولة عن المجتمعات العمرانية الجديدة، وتوفر بوابة رسمية لبيانات وأراضي مدينة أسيوط الجديدة. هذا إدراج مرجعي للمصدر الحكومي ولا يمثل جهة تسويق أو مكتب بيع.",
+      "entity_type": "public_authority",
+      "website_url": "https://lands.nuca.gov.eg/",
+      "public_visible": true,
+      "location_public": false,
+      "primary_area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "public_logo_url": null,
+      "service_category": null,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    }
+  ],
+  "projects": [
+    {
+      "id": "b1f08419-9e58-410b-b7e6-0cf747b7fea3",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "أصايله",
+      "latitude": null,
+      "longitude": null,
+      "description": "مباني إدريس. تغطية صحفية تذكر أكثر من 30 فدانًا و133 فيلا بأنواع مختلفة؛ توجد تغطية عن تسليم مرحلي في 2025.",
+      "project_type": "residential",
+      "location_text": "مدينة أسيوط الجديدة – الموقع التفصيلي وفق صفحة المطور الرسمية",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "0c552de1-4499-45ff-b6b6-5dfc84a6f7dd",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "بارادايس كومباوند – RDF",
+      "latitude": null,
+      "longitude": null,
+      "description": "أعلنت RDF Development إطلاق مشروع Paradise Compound في مدينة أسيوط الجديدة في 17 مايو 2026، ويعرض الموقع الرسمي المشروع وعنوانه بجوار مسجد طريق الصعيد البحر الأحمر. حالة التنفيذ الحالية والوحدات المتاحة تحتاج تحققًا منفصلًا.",
+      "project_type": "residential",
+      "location_text": "مدينة أسيوط الجديدة – بجوار مسجد طريق الصعيد البحر الأحمر، وفق موقع الشركة الرسمي.",
+      "project_status": "announced",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "58a48cc0-5511-47aa-a957-17fbca7ff8da",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "ديارنا – أسيوط الجديدة",
+      "latitude": null,
+      "longitude": null,
+      "description": "ذكرت الهيئة العامة للاستعلامات في 10 سبتمبر 2026 متابعة أعمال تنفيذ وحدات مشروع ديارنا بمدينة أسيوط الجديدة. هذا يثبت متابعة التنفيذ في تاريخ الخبر، ولا يثبت التسليم أو توافر الحجز حاليًا.",
+      "project_type": "residential",
+      "location_text": "أسيوط الجديدة – الموقع التفصيلي والمرحلة يحتاجان مطابقة",
+      "project_status": "under_construction",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "1a14ad5f-b7db-4ba3-a26e-e3fe5462e12b",
+      "area_id": "ca9e12d4-ef79-401a-8cc6-8e67f2ac6310",
+      "name_ar": "ديارنا – ناصر الجديدة / غرب أسيوط",
+      "latitude": null,
+      "longitude": null,
+      "description": "ذكرت الهيئة العامة للاستعلامات في 10 سبتمبر 2026 متابعة الموقف التنفيذي لوحدات مشروع ديارنا بالحي الرابع في ناصر الجديدة. يلزم التحقق من المرحلة والتفاصيل قبل النشر.",
+      "project_type": "residential",
+      "location_text": "ناصر الجديدة – الحي الرابع",
+      "project_status": "under_construction",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "246cef29-4068-4cee-b0be-8091602404ba",
+      "area_id": null,
+      "name_ar": "كمبوند الربوة – أسيوط الجديدة",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع سكني تابع لشركة الربوة للاستثمار العقاري في مدينة أسيوط الجديدة. يذكر الموقع الرسمي وجود شقق وفيلات، ويعرض مرافق تشمل مساحات خضراء وحمامات سباحة وملاعب وناديًا اجتماعيًا ومولًا تجاريًا ومسجدًا. لا نؤكد نسب التنفيذ أو التسليم أو توافر وحدات أو أسعارًا حالية؛ يجب مراجعة الشركة مباشرة.",
+      "project_type": "residential",
+      "location_text": "مدينة أسيوط الجديدة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "e334f7b1-ef83-4bc9-ae5c-350dea84b4a6",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "كونوز بلازا مول",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع تجاري ضمن محفظة Global House في أسيوط الجديدة بحسب صفحة الشركة. لم تتوفر في المصدر الرسمي المستخدم تفاصيل كافية عن الموقع الدقيق أو المساحات أو الوحدات أو الحالة التنفيذية؛ تُستكمل بعد التواصل مع الشركة.",
+      "project_type": "commercial",
+      "location_text": "أسيوط الجديدة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "e2dafd4d-2ea6-441d-8b86-26554a2aebb8",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "كونوز ريزيدنس",
+      "latitude": null,
+      "longitude": null,
+      "description": "أول مشروعات Global House بحسب ما تعلنه الشركة. مشروع سكني في أسيوط الجديدة، وتصف الشركة رؤيته بأنه مجتمع يجمع السكن والخدمات الطبية والتجارية. وتشير منشورات الشركة إلى استمرار تسليمات المرحلة الأولى. هذه معلومات من إفصاح الشركة؛ يلزم التواصل معها لتأكيد الموقف الحالي والتفاصيل المتاحة، ولا تتضمن هذه الصفحة أسعارًا أو مساحات غير موثقة.",
+      "project_type": "residential",
+      "location_text": "أسيوط الجديدة",
+      "project_status": "announced",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "4da11ade-8491-410c-9138-0e44f55f8d7a",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "كونوز سيتي",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع تصفه Global House بأنه مدينة متكاملة تحت الإنشاء في المنطقة الذهبية بقلب أسيوط الجديدة. الوصف والحالة وفق منشورات الشركة، وتحتاج تفاصيل المكونات والموقع الدقيق والمراحل والمساحات إلى تأكيد مباشر.",
+      "project_type": "mixed_use",
+      "location_text": "أسيوط الجديدة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "a7f75dfc-fb7f-4b7c-ae3d-4ca538981ff7",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "كونوز لاند",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع ضمن محفظة Global House في أسيوط الجديدة، وتذكر الشركة أنها بدأت تطويره. لم يتوفر في المصدر الرسمي المستخدم ما يكفي لتأكيد الموقع التفصيلي أو المساحات أو المكونات أو نسبة التنفيذ؛ تُستكمل هذه البيانات بعد التواصل مع الشركة.",
+      "project_type": "land",
+      "location_text": "أسيوط الجديدة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "2344c138-7767-49ab-ac04-4d7761e6f3ba",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "كونوز ميديكال هب",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع طبي في أسيوط الجديدة ضمن محفظة Global House. أعلنت الشركة عن استضافة فعالية بشأن امتلاك مستشفى بنون الزراعيين مبنى كاملًا داخل المجمع الطبي. هذا نقل لما أعلنته الشركة ولا يثبت بمفرده بدء تشغيل المستشفى أو اكتمال المشروع؛ يلزم تأكيد التفاصيل والحالة التشغيلية مباشرة.",
+      "project_type": "medical",
+      "location_text": "أسيوط الجديدة",
+      "project_status": "announced",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "edeaf558-da7f-40e9-989e-dbfd5573f9e3",
+      "area_id": "ca9e12d4-ef79-401a-8cc6-8e67f2ac6310",
+      "name_ar": "كونوز هايتس",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع ضمن محفظة Global House في مدينة ناصر الجديدة (الهضبة) بحسب صفحة الشركة. التفاصيل الخاصة بالموقع الدقيق والمكونات والمساحات والحالة التنفيذية تحتاج إلى تأكيد مباشر من الشركة.",
+      "project_type": "residential",
+      "location_text": "مدينة ناصر الجديدة / الهضبة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "a4794a7b-2bc2-4454-a46a-0e3c78f7ccc1",
+      "area_id": null,
+      "name_ar": "مجمع أصايله الطبي – أسيوط الجديدة",
+      "latitude": null,
+      "longitude": null,
+      "description": "مجمع طبي يضم عيادات، وفق صفحة المشروع الرسمية للمطور. لا تُعرض حالة التشغيل أو توافر الوحدات دون تأكيد مباشر.",
+      "project_type": "medical",
+      "location_text": "طريق المنيا – مدينة أسيوط الجديدة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "2e9a8e53-c94e-4521-8d84-388eac31b91e",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "مدينة حياة",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع متعدد الاستخدامات في المنطقة الإقليمية بمدينة أسيوط الجديدة. يذكر الموقع الرسمي لطايل جروب/حياة سيتي أن المشروع يضم مناطق سكنية وتجارية وترفيهية وطبية، ويعرض حياة ريزيدنس وحياة إيليت وفوفوزيلا هب ووك. حالة التنفيذ الحالية وتوافر الوحدات والأسعار تحتاج تأكيدًا مباشرًا من المطور.",
+      "project_type": "mixed_use",
+      "location_text": "المنطقة الإقليمية، القطعة 20، مدينة أسيوط الجديدة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "98faef3d-e874-4c4e-a99a-0a4b49c32758",
+      "area_id": null,
+      "name_ar": "مشروع الشركة السعودية المصرية للتعمير – قطعتي 2 و4",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع سكني عمراني متكامل اعتمدت وزارة الإسكان تخطيطه بقرار وزاري رقم 271 لسنة 2016 على قطعتي الأرض رقمي 2 و4 بإجمالي 11.33 فدان بمنطقة الجمعيات بالتوسعات الجنوبية الشرقية بمدينة أسيوط الجديدة. إدراج القرار لا يعني تأكيد حالة التنفيذ أو التسليم أو توافر وحدات للبيع حاليًا؛ تُراجع هذه التفاصيل مع المطور مباشرة.",
+      "project_type": "residential",
+      "location_text": "منطقة الجمعيات – التوسعات الجنوبية الشرقية، مدينة أسيوط الجديدة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "bf223d26-cc4a-40e4-8ab0-e6f76e517ebe",
+      "area_id": null,
+      "name_ar": "مشروع تيرا أسيوط – قطعة 26",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع نشاط عمراني متكامل على قطعة الأرض رقم 26 بالمنطقة الإقليمية بمدينة أسيوط الجديدة، بمساحة 29.45 فدان وفق القرار الوزاري رقم 193 لسنة 2021 المعدل لتخطيط المشروع المعتمد أصلاً بالقرار 289 لسنة 2020. حالة التنفيذ والتسليم وتوافر الوحدات غير مؤكدة من المصادر المتاحة؛ لا يُفهم من اعتماد التخطيط وجود وحدات مطروحة للبيع حاليًا.",
+      "project_type": "residential",
+      "location_text": "المنطقة الإقليمية – مدينة أسيوط الجديدة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "100a4461-5b14-4aac-8ea5-6635c72c2fc8",
+      "area_id": "f2ab2f29-8ebe-4ccc-86ba-6b87864e225f",
+      "name_ar": "مشروع فينيسيا السكني الإداري التجاري – المنطقة الإقليمية",
+      "latitude": null,
+      "longitude": null,
+      "description": "بحسب صفحة المشروعات الرسمية لفينيسيا، المشروع سكني وإداري وتجاري مختلط في المنطقة الإقليمية بمدينة أسيوط الجديدة، بمساحة معلنة 70,230 م² تقريبًا (نحو 16.7 فدان)، وتصفه الشركة بأنه قيد التطوير والتنفيذ. هذه بيانات إفصاح الشركة وليست تحققًا مستقلًا من نسبة التنفيذ أو التراخيص أو الإتاحة.",
+      "project_type": "mixed_use",
+      "location_text": "منطقة خدمات المنطقة الإقليمية – أسيوط الجديدة؛ يذكر الموقع الرسمي قطع الأراضي 4-34 و3-34 و9-34 و8-34 و6-34 و5-34.",
+      "project_status": "under_construction",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "67e10dd5-126c-4dbf-9fac-f86531782078",
+      "area_id": "8376d0e8-2f0a-4101-85b3-597329082e6c",
+      "name_ar": "نيوم أسيوط",
+      "latitude": null,
+      "longitude": null,
+      "description": "مشروع نيوم أسيوط من تطوير عرب ديفيلوبرز القابضة، ويعرض الموقع الرسمي للشركة المشروع في مدينة ناصر الجديدة. تصف الشركة المشروع بأنه مجتمع سكني متكامل يضم شققًا وفيلات ومرافق وخدمات تجارية وطبية وترفيهية. لا تُعرض هنا أسعار أو وحدات متاحة أو نسب تنفيذ؛ يجب الرجوع للشركة لتأكيد الحالة الحالية والتوافر وتفاصيل كل مرحلة.",
+      "project_type": "mixed_use",
+      "location_text": "مدينة ناصر الجديدة (غرب أسيوط) – وفق الموقع الرسمي للمطور؛ يلزم تأكيد الموقع التفصيلي على الخريطة",
+      "project_status": "unknown",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    },
+    {
+      "id": "4ed07efa-672a-431a-9408-1580447a2d3b",
+      "area_id": "ca9e12d4-ef79-401a-8cc6-8e67f2ac6310",
+      "name_ar": "ويست جاردنز",
+      "latitude": null,
+      "longitude": null,
+      "description": "أعلنت Home Town Group إطلاق مشروع West Gardens وإقامة حفل وضع حجر الأساس في فبراير 2026 بمنطقة الهضبة في أسيوط. ونشرت تغطية صحفية في مايو 2026 خبر حصول المشروع على القرار الوزاري. لا يثبت ذلك وحده حالة التنفيذ الحالية أو توافر وحدات للبيع.",
+      "project_type": "mixed_use",
+      "location_text": "منطقة الهضبة – مدينة ناصر الجديدة / غرب أسيوط، وفق بيان الإطلاق؛ تحديد الموقع التفصيلي يحتاج مطابقة مستقلة.",
+      "project_status": "announced",
+      "public_visible": true,
+      "location_public": false,
+      "location_precision": null,
+      "location_source_id": null,
+      "verification_status": "published",
+      "location_verified_at": null
+    }
+  ],
+  "entitySources": [
+    {
+      "claim_key": "general",
+      "entity_id": "86e848ca-6175-4898-bdd8-8daddcee58d1",
+      "source_id": "0c19b21d-aa35-49b1-bb1c-b0400f7e7d37"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "fb8b1c41-93f3-4484-8695-9fa44b5a2a95",
+      "source_id": "40e23a67-39df-48a0-b2ba-149cca97f26b"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "fb8b1c41-93f3-4484-8695-9fa44b5a2a95",
+      "source_id": "e8176280-a040-4bbd-b9b8-5890a45fa7de"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "f853fb29-c535-4abf-b5c2-8b58e7bc1d7a",
+      "source_id": "7f2a04be-6968-49a5-856d-3494108d749b"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "f853fb29-c535-4abf-b5c2-8b58e7bc1d7a",
+      "source_id": "7f1aff28-5c5b-466c-8c72-d5c607a33ec5"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "f853fb29-c535-4abf-b5c2-8b58e7bc1d7a",
+      "source_id": "1a49a6aa-c1ba-4443-82eb-84b0efd491d6"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "b4a920c4-878b-41b6-946e-bf3dede8f87f",
+      "source_id": "9af99b3d-bb18-443b-981b-1a6c761d4435"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "2d4d4044-4540-4c2d-8ee4-0d73b77ae5b4",
+      "source_id": "88e5e64c-a2ed-4d26-984c-2558404d1eff"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "37c12e5b-eb95-48fc-b43d-7d1ba7a52bed",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "2700ddd4-93aa-4247-b36c-9c078148518e",
+      "source_id": "c4e573d7-f4a6-4a18-a8d1-e6bb335b157b"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "2700ddd4-93aa-4247-b36c-9c078148518e",
+      "source_id": "ad3a203f-f4e0-46d7-96d0-745fee871717"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "2700ddd4-93aa-4247-b36c-9c078148518e",
+      "source_id": "d5cea5ca-2a8e-4e76-8a84-b5fd7c4cfa25"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "be32e9e6-5d57-48d7-af81-42462c1647f4",
+      "source_id": "f3dcb277-cb59-499b-b6ea-72b3dbd14470"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "0a708dcf-66ff-4626-8f81-85ce2fedf8a2",
+      "source_id": "5c36b7da-faf7-4fec-9760-e0a8635aaf27"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "86e848ca-6175-4898-bdd8-8daddcee58d1",
+      "source_id": "1c294bbb-882c-4b17-87e1-7d3dbb7892ee"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "86e848ca-6175-4898-bdd8-8daddcee58d1",
+      "source_id": "a0a3e365-d1b7-4702-be89-8cdf046c99c2"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "c232159a-66fd-432d-9468-1c7ffabb3fb9",
+      "source_id": "76971158-92bb-4678-a34e-0acce1581c23"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "c232159a-66fd-432d-9468-1c7ffabb3fb9",
+      "source_id": "27c28c86-3a89-47a1-a8b0-3ab3bcd39684"
+    },
+    {
+      "claim_key": "directory_listing",
+      "entity_id": "0a708dcf-66ff-4626-8f81-85ce2fedf8a2",
+      "source_id": "c034ea00-5075-435f-a1aa-b59b5dd321c2"
+    },
+    {
+      "claim_key": "official_execution_update",
+      "entity_id": "86e848ca-6175-4898-bdd8-8daddcee58d1",
+      "source_id": "16af49e4-a1dc-4cfe-8760-5f53aa67fbfa"
+    },
+    {
+      "claim_key": "identity_and_allocation",
+      "entity_id": "9ddc09aa-f358-4ba6-8666-34e42be127a1",
+      "source_id": "176ef1da-c027-4a47-b878-e8aaf90ded54"
+    },
+    {
+      "claim_key": "decision_text_and_sales_restriction",
+      "entity_id": "9ddc09aa-f358-4ba6-8666-34e42be127a1",
+      "source_id": "9d705f6f-4aaa-4749-9aa2-c4936d33bfcf"
+    },
+    {
+      "claim_key": "official_west_gardens_project_page",
+      "entity_id": "f853fb29-c535-4abf-b5c2-8b58e7bc1d7a",
+      "source_id": "a53d06a2-ea3a-49c1-b958-576576275c8a"
+    },
+    {
+      "claim_key": "ministerial_decision_1070_2025",
+      "entity_id": "f853fb29-c535-4abf-b5c2-8b58e7bc1d7a",
+      "source_id": "a998d123-81e7-4a3b-8ad1-c5a3303ee5cf"
+    },
+    {
+      "claim_key": "commercial_registration_and_address",
+      "entity_id": "986be7e5-4faa-4cd7-a5ad-f8a200724394",
+      "source_id": "cea24dbe-a61b-4ddf-977e-970d336878de"
+    },
+    {
+      "claim_key": "allocation_and_legal_name",
+      "entity_id": "33a76d8f-5fad-4e26-b2e6-b233f7fdd5e9",
+      "source_id": "fab1577b-cbb0-454f-8a87-3846411d917f"
+    },
+    {
+      "claim_key": "allocation_and_trade_name",
+      "entity_id": "5de40cec-7c11-4a71-bf55-7022896614d5",
+      "source_id": "dd14d71a-6d90-44ce-a3ff-cf8380f70ef6"
+    },
+    {
+      "claim_key": "zahw_project_launch_2023",
+      "entity_id": "9a04337c-2b6d-4403-90c8-10cf9c7ebc94",
+      "source_id": "3ca1ac01-6e07-43b1-849e-988264ae6e84"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "2700ddd4-93aa-4247-b36c-9c078148518e",
+      "source_id": "b87fd3bb-b150-404a-bee3-498f8cc84827"
+    },
+    {
+      "claim_key": "general",
+      "entity_id": "9a04337c-2b6d-4403-90c8-10cf9c7ebc94",
+      "source_id": "ac4483ef-2b93-4d6a-97ef-c5b1256b6724"
+    },
+    {
+      "claim_key": "recent_project_activity_report",
+      "entity_id": "2d4d4044-4540-4c2d-8ee4-0d73b77ae5b4",
+      "source_id": "20254164-8053-4645-b017-384432458b80"
+    },
+    {
+      "claim_key": "gazette_decision_index",
+      "entity_id": "986be7e5-4faa-4cd7-a5ad-f8a200724394",
+      "source_id": "9159de65-dd37-4b74-962a-99ccf9e1f5c8"
+    },
+    {
+      "claim_key": "company_self_description",
+      "entity_id": "0a708dcf-66ff-4626-8f81-85ce2fedf8a2",
+      "source_id": "d8fb9d84-e322-4e5c-bb15-8e46340a6ce4"
+    },
+    {
+      "claim_key": "announced_projects_and_mrb",
+      "entity_id": "0a708dcf-66ff-4626-8f81-85ce2fedf8a2",
+      "source_id": "de0b413f-d8c3-4412-b712-72de10a99016"
+    },
+    {
+      "claim_key": "historical_trade_name_registration",
+      "entity_id": "0a708dcf-66ff-4626-8f81-85ce2fedf8a2",
+      "source_id": "42969aaa-8b16-4018-91f9-dd55b64d9eb7"
+    },
+    {
+      "claim_key": "project_portfolio",
+      "entity_id": "b4a920c4-878b-41b6-946e-bf3dede8f87f",
+      "source_id": "28954dda-3f9f-4596-879f-930fde67a02d"
+    },
+    {
+      "claim_key": "public_contact",
+      "entity_id": "b4a920c4-878b-41b6-946e-bf3dede8f87f",
+      "source_id": "fc4cb685-10d9-44d5-8ff0-2f264f92461b"
+    },
+    {
+      "claim_key": "company_identity_and_activity",
+      "entity_id": "35a6fc96-e83a-4166-b51a-2eb28da446fa",
+      "source_id": "cc118493-fef7-4e79-8ab6-f9586ff5c515"
+    },
+    {
+      "claim_key": "company_identity_and_activity",
+      "entity_id": "35a6fc96-e83a-4166-b51a-2eb28da446fa",
+      "source_id": "2119c04b-b98f-43d3-b17c-23a23044c160"
+    },
+    {
+      "claim_key": "company_identity_and_project_allocation",
+      "entity_id": "28b41753-a771-4ccf-b72c-85d33fe06263",
+      "source_id": "9968a4ff-824f-4dce-b30e-57736b47baab"
+    },
+    {
+      "claim_key": "company_identity_and_project_allocation",
+      "entity_id": "28b41753-a771-4ccf-b72c-85d33fe06263",
+      "source_id": "2f5ad22c-d8d4-4710-ba4d-87544e01b8cb"
+    },
+    {
+      "claim_key": "company_identity_and_project",
+      "entity_id": "3ae6b855-0183-4497-9a93-665791465bf8",
+      "source_id": "21a14d7a-cafc-4bdf-9416-ef26f1a93d86"
+    },
+    {
+      "claim_key": "company_profile_and_assiut_headquarters",
+      "entity_id": "5b6269c1-b164-4b9e-8602-f9e461638114",
+      "source_id": "e0dacabb-3758-4cc3-8a74-159c7680946e"
+    },
+    {
+      "claim_key": "public_contact_listing",
+      "entity_id": "5b6269c1-b164-4b9e-8602-f9e461638114",
+      "source_id": "a7249860-b6e7-46e8-8927-3944235cc1e4"
+    },
+    {
+      "claim_key": "official_assiut_branch_contact",
+      "entity_id": "2700ddd4-93aa-4247-b36c-9c078148518e",
+      "source_id": "173ad1ae-2e06-4c3d-ba4f-acf97dc40243"
+    },
+    {
+      "claim_key": "official_contact_details",
+      "entity_id": "2d4d4044-4540-4c2d-8ee4-0d73b77ae5b4",
+      "source_id": "f0e0a823-6e3a-4b67-89ff-593c9def6bb1"
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "49602f01-7d32-4c41-9f49-89a4d629f8c7",
+      "city": "أسيوط الجديدة",
+      "name_ar": "ثلاث صيدليات",
+      "activity": "صيدليات / تجاري",
+      "public_visible": true,
+      "opportunity_type": "مزاد حكومي",
+      "size_description": "3 صيدليات بمساحات 24–45 م²",
+      "announcement_date": "2026-10-17",
+      "terms_as_published": "مزاد علني – جلسة 2026-11-08 وفق الإعلان",
+      "verification_status": "published",
+      "source_claimed_status": "إعلان رسمي عن مزاد علني بجلسة الأحد 8 نوفمبر 2026. نتيجة المزاد أو استمرار توافر الوحدات/القطع بعد الجلسة غير مثبتين هنا؛ يُراجع أرشيف الإعلان ولا يُعد عرضًا للبيع المباشر."
+    },
+    {
+      "id": "fbabbf28-3624-41f6-8ec3-a3d096f4bff9",
+      "city": "أسيوط الجديدة",
+      "name_ar": "ثلاث وحدات إدارية ومهنية",
+      "activity": "إداري / مهني",
+      "public_visible": true,
+      "opportunity_type": "مزاد حكومي",
+      "size_description": "3 وحدات بمساحات 33–63 م²",
+      "announcement_date": "2026-10-17",
+      "terms_as_published": "مزاد علني – جلسة 2026-11-08 وفق الإعلان",
+      "verification_status": "published",
+      "source_claimed_status": "إعلان رسمي عن مزاد علني بجلسة الأحد 8 نوفمبر 2026. نتيجة المزاد أو استمرار توافر الوحدات/القطع بعد الجلسة غير مثبتين هنا؛ يُراجع أرشيف الإعلان ولا يُعد عرضًا للبيع المباشر."
+    },
+    {
+      "id": "1477cc60-3e5f-47f6-94b3-cf8ecd5659e9",
+      "city": "أسيوط الجديدة",
+      "name_ar": "ثمانية محال تجارية",
+      "activity": "تجاري",
+      "public_visible": true,
+      "opportunity_type": "مزاد حكومي",
+      "size_description": "8 محال – المساحات غير مذكورة في الملخص المنشور",
+      "announcement_date": "2026-10-17",
+      "terms_as_published": "مزاد علني – جلسة 2026-11-08 وفق الإعلان",
+      "verification_status": "published",
+      "source_claimed_status": "إعلان رسمي عن مزاد علني بجلسة الأحد 8 نوفمبر 2026. نتيجة المزاد أو استمرار توافر الوحدات/القطع بعد الجلسة غير مثبتين هنا؛ يُراجع أرشيف الإعلان ولا يُعد عرضًا للبيع المباشر."
+    },
+    {
+      "id": "9fcef1c4-334b-4fd7-afbe-0659dff39514",
+      "city": "أسيوط الجديدة",
+      "name_ar": "خمس قطع ورش حرفية – المنطقة الصناعية الثانية",
+      "activity": "ورش حرفية",
+      "public_visible": true,
+      "opportunity_type": "مزاد حكومي",
+      "size_description": "5 قطع × 300 م²",
+      "announcement_date": "2026-10-17",
+      "terms_as_published": "مزاد علني – جلسة 2026-11-08 وفق الإعلان",
+      "verification_status": "published",
+      "source_claimed_status": "إعلان رسمي عن مزاد علني بجلسة الأحد 8 نوفمبر 2026. نتيجة المزاد أو استمرار توافر الوحدات/القطع بعد الجلسة غير مثبتين هنا؛ يُراجع أرشيف الإعلان ولا يُعد عرضًا للبيع المباشر."
+    }
+  ],
+  "projectSources": [
+    {
+      "claim_key": "general",
+      "source_id": "40e23a67-39df-48a0-b2ba-149cca97f26b",
+      "project_id": "100a4461-5b14-4aac-8ea5-6635c72c2fc8"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "7f2a04be-6968-49a5-856d-3494108d749b",
+      "project_id": "4ed07efa-672a-431a-9408-1580447a2d3b"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "7f1aff28-5c5b-466c-8c72-d5c607a33ec5",
+      "project_id": "4ed07efa-672a-431a-9408-1580447a2d3b"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "1a49a6aa-c1ba-4443-82eb-84b0efd491d6",
+      "project_id": "4ed07efa-672a-431a-9408-1580447a2d3b"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "9af99b3d-bb18-443b-981b-1a6c761d4435",
+      "project_id": "67e10dd5-126c-4dbf-9fac-f86531782078"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "88e5e64c-a2ed-4d26-984c-2558404d1eff",
+      "project_id": "2e9a8e53-c94e-4521-8d84-388eac31b91e"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "edeaf558-da7f-40e9-989e-dbfd5573f9e3"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "e2dafd4d-2ea6-441d-8b86-26554a2aebb8"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "2344c138-7767-49ab-ac04-4d7761e6f3ba"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "a7f75dfc-fb7f-4b7c-ae3d-4ca538981ff7"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "e334f7b1-ef83-4bc9-ae5c-350dea84b4a6"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "4da11ade-8491-410c-9138-0e44f55f8d7a"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "c4e573d7-f4a6-4a18-a8d1-e6bb335b157b",
+      "project_id": "b1f08419-9e58-410b-b7e6-0cf747b7fea3"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "ad3a203f-f4e0-46d7-96d0-745fee871717",
+      "project_id": "b1f08419-9e58-410b-b7e6-0cf747b7fea3"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "d5cea5ca-2a8e-4e76-8a84-b5fd7c4cfa25",
+      "project_id": "b1f08419-9e58-410b-b7e6-0cf747b7fea3"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "76971158-92bb-4678-a34e-0acce1581c23",
+      "project_id": "0c552de1-4499-45ff-b6b6-5dfc84a6f7dd"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "27c28c86-3a89-47a1-a8b0-3ab3bcd39684",
+      "project_id": "0c552de1-4499-45ff-b6b6-5dfc84a6f7dd"
+    },
+    {
+      "claim_key": "official_execution_status_2026_09_10",
+      "source_id": "16af49e4-a1dc-4cfe-8760-5f53aa67fbfa",
+      "project_id": "58a48cc0-5511-47aa-a957-17fbca7ff8da"
+    },
+    {
+      "claim_key": "official_execution_status_2026_09_10",
+      "source_id": "16af49e4-a1dc-4cfe-8760-5f53aa67fbfa",
+      "project_id": "1a14ad5f-b7db-4ba3-a26e-e3fe5462e12b"
+    },
+    {
+      "claim_key": "ministerial_decision_1070_2025",
+      "source_id": "a998d123-81e7-4a3b-8ad1-c5a3303ee5cf",
+      "project_id": "4ed07efa-672a-431a-9408-1580447a2d3b"
+    },
+    {
+      "claim_key": "official_hometown_project_page",
+      "source_id": "a53d06a2-ea3a-49c1-b958-576576275c8a",
+      "project_id": "4ed07efa-672a-431a-9408-1580447a2d3b"
+    },
+    {
+      "claim_key": "hdb_official_project_city_listing",
+      "source_id": "90760cc1-39c5-4321-85f8-e0bed18577ab",
+      "project_id": "1a14ad5f-b7db-4ba3-a26e-e3fe5462e12b"
+    },
+    {
+      "claim_key": "hdb_official_project_city_listing",
+      "source_id": "90760cc1-39c5-4321-85f8-e0bed18577ab",
+      "project_id": "58a48cc0-5511-47aa-a957-17fbca7ff8da"
+    },
+    {
+      "claim_key": "units_and_construction_report_2026_02_28",
+      "source_id": "be2ea8d4-3a85-4ab4-8d50-e342d6ced94b",
+      "project_id": "58a48cc0-5511-47aa-a957-17fbca7ff8da"
+    },
+    {
+      "claim_key": "official_project_details",
+      "source_id": "28954dda-3f9f-4596-879f-930fde67a02d",
+      "project_id": "67e10dd5-126c-4dbf-9fac-f86531782078"
+    },
+    {
+      "claim_key": "ministerial_approval_and_location",
+      "source_id": "587aaa87-6a5c-4768-9d4f-17772829e979",
+      "project_id": "98faef3d-e874-4c4e-a99a-0a4b49c32758"
+    },
+    {
+      "claim_key": "ministerial_approval_and_location",
+      "source_id": "f6c0a1e9-de5b-42e9-a6c1-b49f241a9d29",
+      "project_id": "98faef3d-e874-4c4e-a99a-0a4b49c32758"
+    },
+    {
+      "claim_key": "planning_approval_and_area",
+      "source_id": "9968a4ff-824f-4dce-b30e-57736b47baab",
+      "project_id": "bf223d26-cc4a-40e4-8ab0-e6f76e517ebe"
+    },
+    {
+      "claim_key": "planning_approval_and_area",
+      "source_id": "2f5ad22c-d8d4-4710-ba4d-87544e01b8cb",
+      "project_id": "bf223d26-cc4a-40e4-8ab0-e6f76e517ebe"
+    },
+    {
+      "claim_key": "official_project_description_and_location",
+      "source_id": "21a14d7a-cafc-4bdf-9416-ef26f1a93d86",
+      "project_id": "246cef29-4068-4cee-b0be-8091602404ba"
+    },
+    {
+      "claim_key": "official_project_profile",
+      "source_id": "b87fd3bb-b150-404a-bee3-498f8cc84827",
+      "project_id": "b1f08419-9e58-410b-b7e6-0cf747b7fea3"
+    },
+    {
+      "claim_key": "official_project_profile",
+      "source_id": "18ca3331-7e34-4deb-aa63-a9adda6e9acd",
+      "project_id": "a4794a7b-2bc2-4454-a46a-0e3c78f7ccc1"
+    },
+    {
+      "claim_key": "developer_official_project_portfolio",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "e334f7b1-ef83-4bc9-ae5c-350dea84b4a6"
+    },
+    {
+      "claim_key": "developer_official_project_portfolio",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "4da11ade-8491-410c-9138-0e44f55f8d7a"
+    },
+    {
+      "claim_key": "developer_official_project_portfolio",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "a7f75dfc-fb7f-4b7c-ae3d-4ca538981ff7"
+    },
+    {
+      "claim_key": "developer_official_project_portfolio",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "2344c138-7767-49ab-ac04-4d7761e6f3ba"
+    },
+    {
+      "claim_key": "developer_official_project_portfolio",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "edeaf558-da7f-40e9-989e-dbfd5573f9e3"
+    },
+    {
+      "claim_key": "developer_official_project_portfolio",
+      "source_id": "bda0afff-c79c-48b3-8569-c99f8944a4af",
+      "project_id": "e2dafd4d-2ea6-441d-8b86-26554a2aebb8"
+    },
+    {
+      "claim_key": "official_project_description_and_location",
+      "source_id": "deb7e175-7eb2-4c9e-8991-1352c60acf0a",
+      "project_id": "2e9a8e53-c94e-4521-8d84-388eac31b91e"
+    }
+  ],
+  "opportunitySources": [
+    {
+      "claim_key": "general",
+      "source_id": "d81a73c2-be22-4724-9e56-20cd58a38afa",
+      "opportunity_id": "9fcef1c4-334b-4fd7-afbe-0659dff39514"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "d81a73c2-be22-4724-9e56-20cd58a38afa",
+      "opportunity_id": "1477cc60-3e5f-47f6-94b3-cf8ecd5659e9"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "d81a73c2-be22-4724-9e56-20cd58a38afa",
+      "opportunity_id": "49602f01-7d32-4c41-9f49-89a4d629f8c7"
+    },
+    {
+      "claim_key": "general",
+      "source_id": "d81a73c2-be22-4724-9e56-20cd58a38afa",
+      "opportunity_id": "fbabbf28-3624-41f6-8ec3-a3d096f4bff9"
     }
   ]
 }
