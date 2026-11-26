@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#102746">
+  <title>اختبار مساعد Gemini | أسيوط عقار</title>
+  <style>
+    :root{color-scheme:light;--navy:#102746;--gold:#c8963e;--red:#a93636;--ink:#172334;--muted:#687587;--line:#e1e6ed;--bg:#f4f6f9}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.65}
+    main{width:min(720px,calc(100% - 28px));margin:28px auto}
+    header,.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 28px #1027460b}
+    header{background:var(--navy);color:#fff;border:0;margin-bottom:16px}
+    h1{font-size:1.35rem;margin:0 0 5px}
+    header p{margin:0;color:#e5eaf0}
+    .tag{display:inline-block;margin-top:12px;padding:3px 10px;border:1px solid #ffffff55;border-radius:999px;font-size:.82rem}
+    label{display:block;font-weight:700;margin-bottom:8px}
+    textarea{display:block;width:100%;min-height:115px;resize:vertical;border:1px solid #cbd3de;border-radius:12px;padding:12px;font:inherit;outline-color:var(--gold)}
+    button{margin-top:12px;background:var(--gold);color:#201707;border:0;border-radius:11px;padding:11px 22px;font:700 1rem inherit;cursor:pointer}
+    button:disabled{opacity:.55;cursor:wait}
+    .hint{color:var(--muted);font-size:.9rem;margin:8px 0 0}
+    #status{margin-top:18px;font-weight:700}
+    #answer{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:8px;padding:14px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;min-height:65px}
+    .error{color:var(--red)}
+    footer{color:var(--muted);font-size:.85rem;text-align:center;margin:16px 0}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>مساعد Gemini — أسيوط عقار</h1>
+      <p>صفحة اختبار مستقلة متصلة بوظيفة Gemini في مشروع Supabase التجريبي.</p>
+      <span class="tag">اختبار فقط · لا يغيّر الموقع الأساسي</span>
+    </header>
+    <section class="panel">
+      <form id="testForm">
+        <label for="question">اكتب سؤالك للمساعد</label>
+        <textarea id="question" maxlength="600" required>اشرح الفرق بين البيع والتنازل في العقارات، واذكر مثالًا بسيطًا.</textarea>
+        <p class="hint">الحد الأقصى 600 حرف. لا ترسل كلمات مرور أو بيانات شخصية أو مستندات.</p>
+        <button id="send" type="submit">إرسال إلى Gemini</button>
+      </form>
+      <div id="status" role="status" aria-live="polite">جاهز للاختبار.</div>
+      <div id="answer">سيظهر رد المساعد هنا.</div>
+    </section>
+    <footer>ASYUT AQAR · بيئة اختبار منفصلة · لا تستخدم هذه الصفحة لاتخاذ قرارات قانونية أو مالية.</footer>
+  </main>
+  <script>
+    const endpoint = "https://wisnmlbefdrkcbbqvdlg.supabase.co/functions/v1/asyut-gemini";
+    const form = document.getElementById("testForm");
+    const question = document.getElementById("question");
+    const send = document.getElementById("send");
+    const status = document.getElementById("status");
+    const answer = document.getElementById("answer");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = question.value.trim();
+      if (!message || message.length > 600) {
+        status.textContent = "اكتب سؤالًا من 1 إلى 600 حرف.";
+        status.className = "error";
+        return;
+      }
+      send.disabled = true;
+      status.className = "";
+      status.textContent = "جارٍ الاتصال بوظيفة Gemini التجريبية...";
+      answer.textContent = "انتظر وصول الرد.";
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const error = data.error || ("فشل الطلب برمز HTTP " + response.status);
+          throw new Error(error + " (HTTP " + response.status + ")");
+        }
+        if (typeof data.answer !== "string" || !data.answer.trim()) {
+          throw new Error("وصل رد غير متوقع من الوظيفة.");
+        }
+        status.textContent = "وصل رد من وظيفة Gemini التجريبية بنجاح.";
+        answer.textContent = data.answer;
+      } catch (error) {
+        status.className = "error";
+        status.textContent = "تعذر إكمال الاختبار.";
+        answer.textContent = error instanceof TypeError
+          ? "تعذر الاتصال من عنوان صفحة الاختبار. قد يكون عنوان معاينة Vercel غير مضاف إلى قائمة CORS في الوظيفة. لا تغيّر إعدادات الإنتاج؛ أرسل هذه النتيجة للمراجعة."
+          : (error.message || "حدث خطأ غير معروف.");
+      } finally {
+        send.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
