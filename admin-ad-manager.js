@@ -97,12 +97,21 @@
     const creating = !row;
     const fields = specs[kind].filter(s => creating ? !["status","verification_status","image_url"].includes(s[0]) : true);
     const currentImages = kind === "supplier_ad" ? (row?.image_url ? [row.image_url] : []) : (Array.isArray(row?.image_urls) ? row.image_urls : []);
+    const featuredDays = row?.featured_until && Number.isFinite(Date.parse(row.featured_until))
+      ? Math.max(1, Math.ceil((Date.parse(row.featured_until) - Date.now()) / 86400000)) : 30;
+    const featureControl = (!creating && (kind === "property_offer" || kind === "marketplace_listing"))
+      ? '<label class="as-check is-wide"><input type="checkbox" data-featured-toggle' +
+        (row?.is_featured && (!row.featured_until || Date.parse(row.featured_until) > Date.now()) ? ' checked' : '') +
+        '> تفعيل الإعلان المميز</label>' +
+        '<label class="as-field">مدة التمييز بالأيام<input type="number" data-featured-days min="1" max="365" step="1" value="' + featuredDays + '"><small>يبدأ احتساب المدة عند حفظ التفعيل.</small></label>'
+      : "";
     return '<form class="as-form" novalidate>' +
       '<div class="as-dialog-head"><h2>' + (creating ? "إضافة " + labels[kind] + " لعميل" : "تعديل " + labels[kind]) + '</h2><button type="button" class="as-close" data-close aria-label="إغلاق">×</button></div>' +
       (creating ? '<label class="as-field is-wide">بريد صاحب الإعلان المسجل *<input type="email" name="owner_email" required value="" placeholder="name@example.com"><small>سيظل الإعلان مربوطًا بهذا الحساب بعد الحفظ.</small></label>' : '<p class="admin-empty">صاحب الإعلان: ' + esc(row.owner_id || "غير محدد") + ' — لن يتم تغيير ملكية الإعلان.</p>') +
       '<div class="as-grid">' + fields.map(s => inputFor(s, row?.[s[0]] ?? (s[0] === "city" ? "أسيوط" : s[0] === "listing_type" ? "خدمة" : s[0] === "down_payment" ? 0 : ""))).join("") +
       (kind === "property_offer" ? '<label class="as-check is-wide"><input type="checkbox" data-contact-consent> تأكدت من موافقة العميل على نشر رقم التواصل إذا تم إدخاله</label>' : "") +
-      (kind === "property_offer" && creating ? '<label class="as-check is-wide"><input type="checkbox" name="featured_requested" data-featured-request> طلب إعلان مميز (يظل قيد المراجعة والاتفاق)</label>' : "") +
+      featureControl +
+      (kind === "property_offer" && creating ? '<label class="as-check is-wide"><input type="checkbox" name="featured_requested" data-featured-request> طلب إعلان مميز (طلب فقط حتى الاتفاق والتفعيل من الإدارة)</label>' : "") +
       (kind !== "company_ad" ? '<div class="as-logo-field is-wide"><div class="as-info"><strong>صور الإعلان</strong><small>JPG فقط بعد التحويل الآمن. الحد الأقصى بعد الضغط 5 ميجابايت للصورة.</small></div><label class="as-upload">إضافة صور<input type="file" accept="image/*" multiple data-image-files></label></div>' : "") +
       (currentImages.length ? '<div class="as-field is-wide"><strong>الصور الحالية — أزل العلامة لإزالة الصورة من الإعلان</strong><div class="adm-edit-imgs">' + currentImages.map((url,i) => '<label><img src="' + esc(url) + '" alt="الصورة ' + (i+1) + '" loading="lazy"><input type="checkbox" data-keep-image value="' + esc(url) + '" checked> الاحتفاظ</label>').join("") + '</div></div>' : "") +
       '<p class="as-status" data-dialog-status role="status"></p><div class="as-foot"><button type="submit" class="btn btn-gold">حفظ التغييرات</button><button type="button" class="btn btn-outline-dark" data-close>إلغاء</button></div></form>';
@@ -209,6 +218,32 @@
         if (typeof ownerId !== "string" || !ownerId) throw new Error("تعذر تحديد حساب صاحب الإعلان.");
       }
       const body = readForm(form, kind, creating);
+      if (!creating && (kind === "property_offer" || kind === "marketplace_listing")) {
+        const enableFeatured = form.querySelector("[data-featured-toggle]")?.checked === true;
+        if (enableFeatured) {
+          const days = Number(form.querySelector("[data-featured-days]")?.value);
+          const eligible = kind === "property_offer"
+            ? row.status === "available" && row.verification_status === "verified"
+            : row.status === "approved";
+          if (!eligible) throw new Error(kind === "property_offer"
+            ? "لا يمكن تمييز العقار قبل نشره واستكمال حالة بياناته."
+            : "لا يمكن تمييز الخدمة قبل اعتماد نشرها.");
+          if (!Number.isInteger(days) || days < 1 || days > 365) throw new Error("مدة التمييز يجب أن تكون من يوم إلى 365 يومًا.");
+          body.is_featured = true;
+          body.featured_until = new Date(Date.now() + days * 86400000).toISOString();
+          if (kind === "property_offer") {
+            body.featured_requested = true;
+            body.promotion_status = "active";
+          }
+        } else {
+          body.is_featured = false;
+          body.featured_until = null;
+          if (kind === "property_offer" && row.promotion_status !== "requested") {
+            body.featured_requested = false;
+            body.promotion_status = "none";
+          }
+        }
+      }
       if (kind === "marketplace_listing" && body.description.trim().length < 20) throw new Error("وصف إعلان سوق الخدمات يجب ألا يقل عن 20 حرفًا.");
       if (kind === "supplier_ad" && (body.business_name.trim().length < 2 || body.title.trim().length < 3 || body.description.trim().length < 5 || body.contact_phone.trim().length < 7)) throw new Error("راجع اسم النشاط والعنوان والوصف ورقم التواصل؛ توجد خانات لا تحقق الحد الأدنى المطلوب.");
       if (kind === "company_ad" && body.business_name.trim().length < 2) throw new Error("اسم الشركة يجب ألا يقل عن حرفين.");
@@ -280,7 +315,8 @@
     const image = safeImageUrl(kind === "property_offer" ? row.image_urls?.[0] : kind === "marketplace_listing" ? row.image_urls?.[0] : row.image_url);
     return '<article class="as-item" data-record-kind="' + kind + '" data-record-id="' + esc(id) + '">' +
       '<span class="as-thumb">' + (image ? '<img src="' + esc(image) + '" alt="" loading="lazy">' : esc(labels[kind].slice(0,1))) + '</span>' +
-      '<div class="as-info"><strong>' + esc(title) + '</strong><span class="as-chips"><b class="as-chip">' + esc(labels[kind]) + '</b><b class="as-chip">' + esc(displayStatus(row,kind)) + '</b></span>' +
+      '<div class="as-info"><strong>' + esc(title) + '</strong><span class="as-chips"><b class="as-chip">' + esc(labels[kind]) + '</b><b class="as-chip">' + esc(displayStatus(row,kind)) + '</b>' +
+      ((kind === "property_offer" || kind === "marketplace_listing") && row.is_featured && (!row.featured_until || Date.parse(row.featured_until) > Date.now()) ? '<b class="as-chip">إعلان مميز</b>' : '') + '</span>' +
       '<small>' + esc(sub || "—") + '</small><small>صاحب الإعلان: ' + esc(String(row.owner_id || "غير محدد")) + '</small></div>' +
       '<div class="as-actions"><button type="button" class="btn btn-gold" data-record-edit>تعديل البيانات والصور</button></div></article>';
   }
@@ -291,8 +327,8 @@
     panel.innerHTML = '<p class="admin-empty">جارٍ تحميل جميع الإعلانات...</p>';
     try {
       const requests = [
-        A.request("/rest/v1/property_offers?select=id,owner_id,title,property_type,listing_purpose,city,area,area_m2,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,contact_name,contact_phone,description,image_urls,status,verification_status,created_at&order=created_at.desc&limit=200"),
-        A.request("/rest/v1/marketplace_listings?select=id,owner_id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,image_urls,status,created_at&order=created_at.desc&limit=200"),
+        A.request("/rest/v1/property_offers?select=id,owner_id,title,property_type,listing_purpose,city,area,area_m2,total_price,down_payment,paid_amount,remaining_amount,monthly_installment,contact_name,contact_phone,description,image_urls,status,verification_status,featured_requested,promotion_status,is_featured,featured_until,created_at&order=created_at.desc&limit=200"),
+        A.request("/rest/v1/marketplace_listings?select=id,owner_id,category,listing_type,title,description,city,area,price,price_period,contact_phone,whatsapp,image_urls,status,is_featured,featured_until,created_at&order=created_at.desc&limit=200"),
         A.request("/rest/v1/supplier_ads?select=id,owner_id,business_name,category,title,description,image_url,target_url,contact_phone,status,price,requested_days,requested_price,created_at&order=created_at.desc&limit=200"),
         A.request("/rest/v1/company_property_ads?select=id,owner_id,business_name,plan_code,status,starts_at,ends_at,created_at&order=created_at.desc&limit=200")
       ];
