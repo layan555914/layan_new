@@ -99,7 +99,7 @@
     const currentImages = kind === "supplier_ad" ? (row?.image_url ? [row.image_url] : []) : (Array.isArray(row?.image_urls) ? row.image_urls : []);
     const featuredDays = row?.featured_until && Number.isFinite(Date.parse(row.featured_until))
       ? Math.max(1, Math.ceil((Date.parse(row.featured_until) - Date.now()) / 86400000)) : 30;
-    const featureControl = (kind === "property_offer" || kind === "marketplace_listing")
+    const featureControl = (!creating && (kind === "property_offer" || kind === "marketplace_listing"))
       ? '<label class="as-check is-wide"><input type="checkbox" data-featured-toggle' +
         (row?.is_featured && (!row.featured_until || Date.parse(row.featured_until) > Date.now()) ? ' checked' : '') +
         '> تفعيل الإعلان المميز</label>' +
