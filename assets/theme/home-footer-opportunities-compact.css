@@ -19,26 +19,26 @@ body.page-home #offers .section-heading p {
 }
 body.page-home #offers .offers-grid,
 body.page-home #offers #offersGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 14px !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
   margin-top: 14px;
 }
 body.page-home #offers .listing-card {
   min-width: 0;
-  border-radius: 14px !important;
+  border-radius: 14px;
 }
 body.page-home #offers .listing-card .offer-card-media {
   aspect-ratio: 16 / 8.5;
 }
 body.page-home #offers .listing-card .offer-card-content {
   gap: 6px;
-  padding: 11px 13px 13px !important;
+  padding: 11px 13px 13px;
 }
 body.page-home #offers .listing-head {
   gap: 8px;
 }
 body.page-home #offers .listing-head h3 {
-  font-size: 15px !important;
+  font-size: 15px;
   line-height: 1.45;
 }
 body.page-home #offers .listing-price {
@@ -85,9 +85,9 @@ body.page-home #offers .listing-actions {
 }
 body.page-home #offers .listing-actions .compare-card-button,
 body.page-home #offers .listing-actions .details-button {
-  min-height: 33px !important;
-  padding-inline: 8px !important;
-  font-size: 11.5px !important;
+  min-height: 33px;
+  padding-inline: 8px;
+  font-size: 11.5px;
 }
 body.page-home #offers .listing-card .favorite-button,
 body.page-home #offers .listing-card .favorite-toggle {
@@ -104,7 +104,7 @@ body.page-home footer.footer-pro .fp-top {
   padding-bottom: 26px;
 }
 body.page-home footer.footer-pro .fp-brand {
-  margin-bottom: 10px !important;
+  margin-bottom: 10px;
 }
 body.page-home footer.footer-pro .fp-brand small {
   font-size: 19px;
@@ -114,7 +114,7 @@ body.page-home footer.footer-pro .fp-brand strong {
 }
 body.page-home footer.footer-pro p.fp-desc {
   max-width: 34ch;
-  margin-bottom: 14px !important;
+  margin-bottom: 14px;
   font-size: 12px;
   line-height: 1.8;
 }
@@ -169,15 +169,15 @@ body.page-home footer.footer-pro .fp-note svg {
   height: 17px;
 }
 body.page-home footer.footer-pro .site-credit {
-  margin-top: 16px !important;
-  padding: 13px 0 16px !important;
+  margin-top: 16px;
+  padding: 13px 0 16px;
   font-size: 11px;
 }
 
 @media (max-width: 900px) {
   body.page-home #offers .offers-grid,
   body.page-home #offers #offersGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 700px) {
@@ -202,23 +202,23 @@ body.page-home footer.footer-pro .site-credit {
     padding: 10px 11px;
   }
   body.page-home #offers #offersGrid {
-    gap: 12px !important;
+    gap: 12px;
   }
   body.page-home #offers .listing-card .offer-card-content {
-    padding: 10px 11px 11px !important;
+    padding: 10px 11px 11px;
   }
 }
 @media (max-width: 520px) {
   body.page-home #offers .offers-grid,
   body.page-home #offers #offersGrid {
-    grid-template-columns: minmax(0, 1fr) !important;
-    gap: 12px !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
   body.page-home #offers .listing-card .offer-card-media {
     aspect-ratio: 16 / 7.5;
   }
   body.page-home #offers .listing-head h3 {
-    font-size: 14px !important;
+    font-size: 14px;
   }
   body.page-home #offers .listing-price {
     font-size: 12px;
@@ -247,7 +247,7 @@ body.page-home .hero.design-hero .design-hero-content .eyebrow {
 }
 body.page-home .hero.design-hero .design-hero-content h1 {
   margin: 7px 0 8px;
-  font-size: clamp(27px, 3.2vw, 42px) !important;
+  font-size: clamp(27px, 3.2vw, 42px);
   line-height: 1.25;
 }
 body.page-home .hero.design-hero .design-hero-lead {
@@ -303,7 +303,7 @@ body.page-home .design-hero-search .design-search-button {
   }
   body.page-home .hero.design-hero .design-hero-content h1 {
     margin: 6px 0;
-    font-size: clamp(24px, 6vw, 32px) !important;
+    font-size: clamp(24px, 6vw, 32px);
   }
   body.page-home .hero.design-hero .design-hero-lead {
     font-size: 15px;
@@ -349,7 +349,7 @@ body.page-home .design-hero-search .design-search-button {
     padding-top: 23px;
   }
   body.page-home .hero.design-hero .design-hero-content h1 {
-    font-size: 24px !important;
+    font-size: 24px;
   }
   body.page-home .hero.design-hero .design-hero-sub {
     font-size: 10.8px;
@@ -361,18 +361,18 @@ body.page-home .design-hero-search .design-search-button {
 }
 
 
-/* Narrowly neutralize the legacy hero sizing declarations that are already !important. */
+/* Narrowly neutralize the legacy hero sizing declarations that are already. */
 body.page-home .hero.design-hero {
-  min-height: 286px !important;
-  padding: 34px clamp(20px, 5vw, 68px) 76px !important;
+  min-height: 286px;
+  padding: 34px clamp(20px, 5vw, 68px) 76px;
 }
 @media (max-width: 760px) {
   body.page-home .hero.design-hero {
-    min-height: 0 !important;
-    padding: 0 16px 24px !important;
+    min-height: 0;
+    padding: 0 16px 24px;
   }
   body.page-home .hero.design-hero .design-hero-content {
-    padding-top: 118px !important;
+    padding-top: 118px;
   }
 }
 
