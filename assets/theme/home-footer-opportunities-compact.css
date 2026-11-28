@@ -359,3 +359,19 @@ body.page-home .design-hero-search .design-search-button {
     margin-top: 14px;
   }
 }
+
+
+/* Narrowly neutralize the legacy hero sizing declarations that are already !important. */
+body.page-home .hero.design-hero {
+  min-height: 286px !important;
+  padding: 34px clamp(20px, 5vw, 68px) 76px !important;
+}
+@media (max-width: 760px) {
+  body.page-home .hero.design-hero {
+    min-height: 0 !important;
+    padding: 0 16px 24px !important;
+  }
+  body.page-home .hero.design-hero .design-hero-content {
+    padding-top: 118px !important;
+  }
+}
