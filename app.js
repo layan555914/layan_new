@@ -1463,6 +1463,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("companyGrid")?.addEventListener("click", event => {
     const button = event.target.closest("[data-company-name]");
     if (!button) return;
+    offersPage = 1;
     const search = $("searchInput");
     if (search) search.value = button.dataset.companyName;
     const companySearch = $("companySearchInput");
@@ -1494,6 +1495,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.querySelectorAll("[data-kind]").forEach((button) => {
     button.addEventListener("click", () => {
+      offersPage = 1;
       activeKind = button.dataset.kind || "";
       document.querySelectorAll("[data-kind]").forEach((item) => {
         item.classList.toggle("active", item === button);
