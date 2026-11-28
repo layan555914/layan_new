@@ -375,3 +375,68 @@ body.page-home .hero.design-hero {
     padding-top: 118px !important;
   }
 }
+
+
+/* Refined typography from "كل ما تحتاجه في مكان واحد" through the homepage footer. */
+body.page-home main > #sections,
+body.page-home main > #sections ~ section,
+body.page-home > footer.footer-pro {
+  font-family: "Readex Pro", "Alexandria", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+body.page-home main > #sections :is(h2, h3, h4),
+body.page-home main > #sections ~ section :is(h2, h3, h4),
+body.page-home > footer.footer-pro :is(h2, h3, h4) {
+  font-family: "Alexandria", "Readex Pro", sans-serif;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+body.page-home main > #sections :is(.section-heading h2, h2),
+body.page-home main > #sections ~ section :is(.section-heading h2, .ab-head h2, .hw-head h2, .launch-campaign h2, h2),
+body.page-home > footer.footer-pro h2 {
+  font-size: clamp(22px, 2.15vw, 29px);
+  line-height: 1.4;
+  font-weight: 700;
+}
+body.page-home main > #sections :is(h3, .ab-title),
+body.page-home main > #sections ~ section :is(h3, .ab-title) {
+  font-size: clamp(16px, 1.35vw, 19px);
+  line-height: 1.55;
+  font-weight: 700;
+}
+body.page-home main > #sections :is(p, small),
+body.page-home main > #sections ~ section :is(p, small),
+body.page-home > footer.footer-pro :is(p, li, a, small) {
+  font-family: "Readex Pro", "Alexandria", sans-serif;
+  line-height: 1.8;
+}
+body.page-home main > #sections .section-heading p,
+body.page-home main > #sections ~ section :is(.section-heading p, .ab-head p, .hw-head p, .launch-campaign p) {
+  font-size: 13px;
+  line-height: 1.85;
+}
+body.page-home main > #sections .home-hub-card :is(b, small),
+body.page-home main > #sections ~ section .hw-step :is(h3, p) {
+  line-height: 1.7;
+}
+body.page-home > footer.footer-pro .fp-col h2 {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+@media (max-width: 760px) {
+  body.page-home main > #sections :is(.section-heading h2, h2),
+  body.page-home main > #sections ~ section :is(.section-heading h2, .ab-head h2, .hw-head h2, .launch-campaign h2, h2) {
+    font-size: 22px;
+    line-height: 1.45;
+  }
+  body.page-home main > #sections :is(h3, .ab-title),
+  body.page-home main > #sections ~ section :is(h3, .ab-title) {
+    font-size: 16px;
+  }
+  body.page-home main > #sections :is(p, small),
+  body.page-home main > #sections ~ section :is(p, small) {
+    line-height: 1.75;
+  }
+}
