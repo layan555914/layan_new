@@ -3,7 +3,7 @@ set -euo pipefail
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 MIGRATION="$ROOT_DIR/supabase/migrations/20261120190000_supplier_ads_placement_targets.sql"
 ORDER_MIGRATION="$ROOT_DIR/supabase/migrations/20261120223000_supplier_ads_manual_placement_order.sql"
-COMPANY_PLACEMENT_MIGRATION="$ROOT_DIR/supabase/migrations/20261128085517_supplier_ads_company_directory_placement.sql"
+COMPANY_PLACEMENT_MIGRATION="$ROOT_DIR/supabase/migrations/20261128091048_supplier_ads_company_directory_placement.sql"
 : "${PGHOST:=127.0.0.1}"
 : "${PGPORT:=5432}"
 : "${PGUSER:=postgres}"
