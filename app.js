@@ -1543,9 +1543,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     render();
   });
-  $("searchInput")?.addEventListener("input", render);
-  $("typeFilter")?.addEventListener("change", render);
+  $("searchInput")?.addEventListener("input", () => { offersPage = 1; render(); });
+  $("typeFilter")?.addEventListener("change", () => { offersPage = 1; render(); });
   $("purposeFilter")?.addEventListener("change", () => {
+    offersPage = 1;
     if (purposeFilter?.value !== "تنازل") {
       if ($("downPaymentMaxFilter")) $("downPaymentMaxFilter").value = "";
       if ($("monthlyMaxFilter")) $("monthlyMaxFilter").value = "";
@@ -1553,8 +1554,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     syncPurposeFilterControls();
     render();
   });
-  $("totalPriceMaxFilter")?.addEventListener("input", render);
-  $("minBedroomsFilter")?.addEventListener("change", render);
+  $("totalPriceMaxFilter")?.addEventListener("input", () => { offersPage = 1; render(); });
+  $("minBedroomsFilter")?.addEventListener("change", () => { offersPage = 1; render(); });
   $("toggleAdvancedFilters")?.addEventListener("click", () => {
     const panel = $("advancedPropertyFilters");
     const button = $("toggleAdvancedFilters");
@@ -1563,12 +1564,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     button.setAttribute("aria-expanded", String(!panel.hidden));
     button.textContent = panel.hidden ? "＋ فلاتر إضافية" : "− إخفاء الفلاتر";
   });
-  cityFilter?.addEventListener("change", render);
-  areaFilter?.addEventListener("change", render);
-  $("sortFilter")?.addEventListener("change", render);
-  $("downPaymentMaxFilter")?.addEventListener("input", render);
-  $("monthlyMaxFilter")?.addEventListener("input", render);
-  $("searchBtn")?.addEventListener("click", render);
+  cityFilter?.addEventListener("change", () => { offersPage = 1; render(); });
+  areaFilter?.addEventListener("change", () => { offersPage = 1; render(); });
+  $("sortFilter")?.addEventListener("change", () => { offersPage = 1; render(); });
+  $("downPaymentMaxFilter")?.addEventListener("input", () => { offersPage = 1; render(); });
+  $("monthlyMaxFilter")?.addEventListener("input", () => { offersPage = 1; render(); });
+  $("searchBtn")?.addEventListener("click", () => { offersPage = 1; render(); });
 
   // Wire the hero's quick-search controls to the same canonical filters as the main results.
   $("heroQuickSearch")?.addEventListener("submit", (event) => {
@@ -1944,11 +1945,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     else offersPage += button.dataset.pageNav === "next" ? 1 : -1;
     render();
     $("offers")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-  ["searchInput", "purposeFilter", "typeFilter", "cityFilter", "areaFilter", "totalPriceMaxFilter", "downPaymentMaxFilter", "monthlyMaxFilter", "minBedroomsFilter", "sortFilter"].forEach(id => {
-    const field = $(id);
-    field?.addEventListener("input", () => { offersPage = 1; });
-    field?.addEventListener("change", () => { offersPage = 1; });
   });
   $("offersGrid")?.addEventListener("click", event => {
     const compareButton = event.target.closest("[data-compare-id]");
