@@ -336,6 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll("[data-purpose-tab]").forEach(button => {
     button.addEventListener("click", () => {
       if (!purposeFilter) return;
+      offersPage = 1;
       purposeFilter.value = button.dataset.purposeTab === "all" ? "" : button.dataset.purposeTab;
       if (purposeFilter.value !== "تنازل") {
         if ($("downPaymentMaxFilter")) $("downPaymentMaxFilter").value = "";
@@ -975,6 +976,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (!filtered.length) {
+      if (resultsSummary && !isHomePreview) resultsSummary.textContent = "لا توجد إعلانات مطابقة للفلاتر الحالية";
       renderPagination(0);
       grid.innerHTML = `
         <div class="empty-state">
