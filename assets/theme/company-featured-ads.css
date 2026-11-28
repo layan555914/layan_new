@@ -1,0 +1,170 @@
+/* Company-directory sponsored advertising — scoped to this page only. */
+.company-sponsored-section {
+  margin: 34px 0 0;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(200, 150, 62, .28);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fff 0%, #fbf7f0 100%);
+}
+.company-sponsored-heading { margin-bottom: 18px; }
+.company-sponsored-heading .eyebrow {
+  display: inline-block;
+  color: #9a6a21;
+  font-size: 12px;
+  font-weight: 800;
+}
+.company-sponsored-heading h2 {
+  margin: 7px 0;
+  color: #102746;
+  font-size: clamp(20px, 3vw, 28px);
+}
+.company-sponsored-heading p {
+  margin: 0;
+  color: #6f665d;
+  line-height: 1.8;
+  font-size: 14px;
+}
+.company-sponsored-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 16px;
+}
+.company-sponsored-grid .sp-ad {
+  display: flex;
+  min-width: 0;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e8dfd2;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 10px 26px rgba(16, 39, 70, .08);
+}
+.company-sponsored-grid .sp-ad-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #102746;
+}
+.company-sponsored-grid .sp-ad-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.company-sponsored-grid .sp-ad-monogram {
+  display: grid;
+  height: 100%;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 20px;
+  background: linear-gradient(135deg, #102746, #203d61);
+  color: #f7e8cc;
+}
+.company-sponsored-grid .sp-ad-monogram span {
+  font-size: 34px;
+  font-weight: 800;
+}
+.company-sponsored-grid .sp-ad-monogram small {
+  max-width: 90%;
+  overflow: hidden;
+  color: #f7e8cc;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.company-sponsored-grid .sp-ad-badge {
+  position: absolute;
+  top: 12px;
+  inset-inline-start: 12px;
+  z-index: 1;
+  padding: 6px 10px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 99px;
+  background: rgba(16, 39, 70, .9);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+.company-sponsored-grid .sp-ad-badge i { color: #e4b65d; font-style: normal; }
+.company-sponsored-grid .sp-ad-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+.company-sponsored-grid .sp-ad-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.company-sponsored-grid .sp-ad-avatar {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: #102746;
+  color: #fff;
+  font-weight: 800;
+}
+.company-sponsored-grid .sp-ad-brand strong {
+  display: block;
+  color: #102746;
+  font-size: 14px;
+}
+.company-sponsored-grid .sp-ad-brand small {
+  display: block;
+  color: #776c60;
+  font-size: 11px;
+}
+.company-sponsored-grid .sp-ad-body h3 {
+  margin: 2px 0 0;
+  color: #102746;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.company-sponsored-grid .sp-ad-desc {
+  margin: 0;
+  color: #615a52;
+  font-size: 13px;
+  line-height: 1.85;
+}
+.company-sponsored-grid .sp-ad-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+.company-sponsored-grid .sp-ad-btn {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #d7c7aa;
+  border-radius: 9px;
+  color: #102746;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+.company-sponsored-grid .sp-ad-btn-primary {
+  border-color: #c8963e;
+  background: #c8963e;
+  color: #102746;
+}
+.company-sponsored-grid .sp-ad-btn-wa {
+  border-color: #287a50;
+  color: #216b45;
+}
+@media (max-width: 900px) {
+  .company-sponsored-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .company-sponsored-grid { grid-template-columns: 1fr; gap: 12px; }
+}

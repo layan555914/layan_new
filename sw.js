@@ -1,4 +1,4 @@
-const CACHE_NAME = "asyut-aqar-shell-v196-directory-media-embedded-20261125";
+const CACHE_NAME = "asyut-aqar-shell-v197-company-featured-ads-20261128";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -49,7 +49,9 @@ const APP_SHELL = [
   "./companies.css",
   "./assets/theme/companies-directory-bridge.css?v=20261115-verified-company-brand-1",
   "./assets/theme/entity-brand-cards.css?v=20261115-unified-entity-brand-1",
-  "./companies.js?v=20261124-clean-public-copy-1",
+  "./companies.js?v=20261128-company-directory-ads-1",
+  "./sponsored-ads.js?v=20261128-company-directory-1",
+  "./assets/theme/company-featured-ads.css?v=20261128-1",
   "./company-profile.js?v=20261125-directory-media-1",
   "./styles.css",
   "./assets/theme/sitewide-typography.css?v=20261116-1",
