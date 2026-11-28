@@ -39,7 +39,7 @@
 }
 .page-home #propertySearchFilters .filters-primary > label:not(:nth-child(2)),
 .page-home #propertySearchFilters .filters-actions,
-.page-home #propertySearchFilters .filters-advanced { display: none !important; }
+.page-home #propertySearchFilters .filters-advanced { display: none; }
 .page-home #propertySearchFilters .filters-primary > label:nth-child(2) {
   width: 1px;
   height: 1px;
