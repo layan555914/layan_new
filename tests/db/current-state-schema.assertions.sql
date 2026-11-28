@@ -16,7 +16,7 @@ DECLARE
   v_has_lock boolean;
 BEGIN
   SELECT count(*) INTO v_count FROM supabase_migrations.schema_migrations;
-  IF v_count <> 57 THEN
+  IF v_count <> 58 THEN
     RAISE EXCEPTION 'Expected 57 clean-install migrations after adding secure directory media; found %', v_count;
   END IF;
 
