@@ -440,3 +440,207 @@ body.page-home > footer.footer-pro .fp-col h2 {
     line-height: 1.75;
   }
 }
+
+
+/* ASYUT AQAR — homepage brand harmony pass (2026-11-28).
+   Match the existing cocoa / terracotta / copper palette and calm the hero image.
+   Presentation only: preserve all existing content, controls and behavior. */
+
+body.page-home {
+  color: #40372F;
+  background: #FAF8F4;
+  font-family: "Readex Pro", "Alexandria", Tahoma, sans-serif;
+}
+
+body.page-home main > section:not(.hero) {
+  color: #40372F;
+}
+
+body.page-home main > section:not(.hero) :is(h2, h3, h4) {
+  color: #40372F;
+  font-family: "Alexandria", "Readex Pro", Tahoma, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+body.page-home main > section:not(.hero) :is(.section-heading h2, .ab-head h2, .hw-head h2) {
+  font-size: clamp(21px, 2vw, 27px);
+  line-height: 1.45;
+}
+
+body.page-home main > section:not(.hero) :is(.section-heading p, .ab-head p, .hw-head p) {
+  color: #786D63;
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+body.page-home main > section:not(.hero) :is(.eyebrow, .section-heading .eyebrow) {
+  color: #A6503A;
+  font-weight: 700;
+}
+
+body.page-home .hero.design-hero {
+  color: #FFFCF8;
+  background-color: #40372F;
+  box-shadow: inset 0 0 0 999px rgba(43, 33, 27, .10);
+}
+
+body.page-home .hero.design-hero::before {
+  filter: brightness(.78) saturate(.84) contrast(1.04);
+}
+
+body.page-home .hero.design-hero::after {
+  filter: brightness(.94);
+}
+
+body.page-home .hero.design-hero .design-hero-content h1 {
+  font-weight: 700;
+  text-shadow: 0 2px 16px rgba(24, 18, 14, .18);
+}
+
+body.page-home .hero.design-hero .design-hero-content h1 span {
+  color: #F0C995;
+}
+
+body.page-home .hero.design-hero .design-hero-lead {
+  color: #FFFCF8;
+  font-weight: 600;
+}
+
+body.page-home .hero.design-hero .design-hero-sub {
+  color: #E8DED4;
+}
+
+body.page-home .hero.design-hero .eyebrow {
+  color: #F0C995;
+}
+
+body.page-home .design-hero-search {
+  background: #FFFCF8;
+  border-color: #E5D8CC;
+  box-shadow: 0 14px 32px rgba(43, 33, 27, .16);
+}
+
+body.page-home .design-hero-search label {
+  color: #51443A;
+  font-weight: 600;
+}
+
+body.page-home .design-hero-search :is(input, select) {
+  background: #FFFFFF;
+  border-color: #E4D9CF;
+  color: #40372F;
+}
+
+body.page-home .design-hero-search :is(input, select):focus-visible {
+  border-color: #C98A64;
+  box-shadow: 0 0 0 3px rgba(201, 138, 100, .18);
+}
+
+body.page-home .hero.design-hero .hero-actions .btn-gold,
+body.page-home .hero.design-hero .design-search-button {
+  background: #A6503A;
+  border-color: #A6503A;
+  color: #FFFCF8;
+}
+
+body.page-home .hero.design-hero .hero-actions .btn-gold:hover,
+body.page-home .hero.design-hero .design-search-button:hover {
+  background: #88432F;
+  border-color: #88432F;
+}
+
+body.page-home .hero.design-hero .hero-actions .btn-outline {
+  color: #FFFCF8;
+  border-color: rgba(255, 248, 238, .62);
+  background: rgba(43, 33, 27, .28);
+}
+
+body.page-home .hero.design-hero .hero-actions .btn-outline:hover {
+  color: #40372F;
+  background: #F3E2CB;
+  border-color: #F3E2CB;
+}
+
+body.page-home main > section:not(.hero) :is(.listing-card, .offer-card, .home-hub-card, .ab-party, .ab-value, .hw-panel) {
+  border-color: #E9E0D8;
+}
+
+body.page-home main > section:not(.hero) :is(a, button):focus-visible {
+  outline-color: #C98A64;
+}
+
+@media (max-width: 760px) {
+  body.page-home main > section:not(.hero) :is(.section-heading h2, .ab-head h2, .hw-head h2) {
+    font-size: 21px;
+  }
+  body.page-home .hero.design-hero::before {
+    filter: brightness(.72) saturate(.82) contrast(1.04);
+  }
+}
+
+
+/* Follow-up readability and icon sizing requested for the homepage. */
+body.page-home .hero.design-hero .design-hero-content h1 {
+  color: #F1E4D5;
+}
+
+body.page-home .hero.design-hero .design-hero-content h1 span {
+  color: #D9A76D;
+}
+
+body.page-home .hero.design-hero .hero-actions :is(#addOfferBtn, .btn) {
+  font-weight: 800;
+  letter-spacing: 0;
+  text-shadow: 0 1px 1px rgba(35, 24, 18, .22);
+}
+
+body.page-home .hero.design-hero .hero-actions #addOfferBtn {
+  color: #FFFFFF;
+  background: rgba(35, 27, 22, .82);
+  border: 1px solid rgba(255, 248, 238, .82);
+  box-shadow: 0 2px 8px rgba(24, 18, 14, .16);
+}
+
+body.page-home .hero.design-hero .hero-actions #addOfferBtn:hover {
+  color: #2B211B;
+  background: #F3E2CB;
+  border-color: #F3E2CB;
+  text-shadow: none;
+}
+
+body.page-home .hero.design-hero .hero-actions a.btn-gold {
+  color: #FFFFFF;
+  font-weight: 800;
+  text-shadow: 0 1px 1px rgba(35, 24, 18, .22);
+}
+
+body.page-home .top-actions #addOfferTop {
+  color: #FFFFFF;
+  font-weight: 800;
+  text-shadow: 0 1px 1px rgba(35, 24, 18, .18);
+}
+
+body.page-home #sections .home-hub-icon {
+  width: 42px;
+  height: 42px;
+  font-size: 17px;
+  border-radius: 12px;
+}
+
+@media (max-width: 760px) {
+  body.page-home #sections .home-hub-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}
+
+
+/* Improve contrast for the "اعرض عقارك مجانًا" campaign heading. */
+body.page-home #free-launch #launchCampaignTitle {
+  color: #FFF8EF;
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(35, 27, 22, .22);
+}
