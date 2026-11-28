@@ -183,9 +183,10 @@
     { key: "offers", label: "صفحة العقارات" },
     { key: "marketplace", label: "سوق الخدمات" },
     { key: "featured", label: "صفحة الإعلانات المميزة" },
-    { key: "property_details", label: "داخل صفحة تفاصيل العقار" }
+    { key: "property_details", label: "داخل صفحة تفاصيل العقار" },
+    { key: "company_directory", label: "صفحة الشركات" }
   ];
-  const DEFAULT_PLACEMENTS = PLACEMENT_OPTIONS.filter(item => item.key !== "property_details").map(item => item.key);
+  const DEFAULT_PLACEMENTS = PLACEMENT_OPTIONS.filter(item => !["property_details", "company_directory"].includes(item.key)).map(item => item.key);
   const placementLabel = keys => (Array.isArray(keys) ? keys : DEFAULT_PLACEMENTS)
     .map(key => PLACEMENT_OPTIONS.find(item => item.key === key)?.label)
     .filter(Boolean)
@@ -215,7 +216,7 @@
   function orderedAdsForPlacement(key) {
     return ads.filter(ad =>
       adState(ad) === "active" &&
-      (!Array.isArray(ad.placement_keys) || ad.placement_keys.includes(key))
+      (Array.isArray(ad.placement_keys) ? ad.placement_keys.includes(key) : DEFAULT_PLACEMENTS.includes(key))
     ).slice().sort((a, b) => {
       const aHas = Object.prototype.hasOwnProperty.call(a.placement_order || {}, key);
       const bHas = Object.prototype.hasOwnProperty.call(b.placement_order || {}, key);

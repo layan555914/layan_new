@@ -3,6 +3,7 @@ set -euo pipefail
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 MIGRATION="$ROOT_DIR/supabase/migrations/20261120190000_supplier_ads_placement_targets.sql"
 ORDER_MIGRATION="$ROOT_DIR/supabase/migrations/20261120223000_supplier_ads_manual_placement_order.sql"
+COMPANY_PLACEMENT_MIGRATION="$ROOT_DIR/supabase/migrations/20261128085517_supplier_ads_company_directory_placement.sql"
 : "${PGHOST:=127.0.0.1}"
 : "${PGPORT:=5432}"
 : "${PGUSER:=postgres}"
@@ -80,6 +81,8 @@ psql -X -v ON_ERROR_STOP=1 -f "$MIGRATION"
 psql -X -v ON_ERROR_STOP=1 -f "$MIGRATION"
 psql -X -v ON_ERROR_STOP=1 -f "$ORDER_MIGRATION"
 psql -X -v ON_ERROR_STOP=1 -f "$ORDER_MIGRATION"
+psql -X -v ON_ERROR_STOP=1 -f "$COMPANY_PLACEMENT_MIGRATION"
+psql -X -v ON_ERROR_STOP=1 -f "$COMPANY_PLACEMENT_MIGRATION"
 
 echo "Verify placement column, invoker view and internal trigger boundary..."
 psql -X -v ON_ERROR_STOP=1 <<'SQL'
@@ -114,7 +117,7 @@ BEGIN;
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
 INSERT INTO public.supplier_ads(id,owner_id,business_name,category,title,description,contact_phone,status,placement_keys)
-VALUES ('$OWNER_AD_ID','$OWNER_ID','Owner test','Ceramics','Owner ad test','Placement security test.','01012345678','pending',ARRAY['featured']);
+VALUES ('$OWNER_AD_ID','$OWNER_ID','Owner test','Ceramics','Owner ad test','Placement security test.','01012345678','pending',ARRAY['company_directory']);
 DO \$owner_check\$
 DECLARE v text[]; v_order jsonb;
 BEGIN
@@ -137,7 +140,7 @@ psql -X -v ON_ERROR_STOP=1 >/tmp/supplier-ad-owner-placement-denied.log 2>&1 <<S
 BEGIN;
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$OWNER_ID',true);
-UPDATE public.supplier_ads SET placement_keys=ARRAY['home'] WHERE id='$OWNER_AD_ID';
+UPDATE public.supplier_ads SET placement_keys=ARRAY['company_directory'] WHERE id='$OWNER_AD_ID';
 COMMIT;
 SQL
 OWNER_STATUS=$?
@@ -169,23 +172,23 @@ BEGIN;
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','$ADMIN_ID',true);
 INSERT INTO public.supplier_ads(id,owner_id,business_name,category,title,description,contact_phone,status,placement_keys)
-VALUES ('$ADMIN_AD_ID','$OWNER_ID','Admin test','Furniture','Admin ad test','Placement selection test.','01098765432','pending',ARRAY['property_details']);
+VALUES ('$ADMIN_AD_ID','$OWNER_ID','Admin test','Furniture','Admin ad test','Placement selection test.','01098765432','pending',ARRAY['company_directory']);
 UPDATE public.supplier_ads SET status='active' WHERE id='$ADMIN_AD_ID';
 DO \$admin_check\$
 DECLARE v text[];
 BEGIN
   SELECT placement_keys INTO v FROM public.supplier_ads WHERE id='$ADMIN_AD_ID';
-  IF v IS DISTINCT FROM ARRAY['property_details']::text[] THEN RAISE EXCEPTION 'Admin selection lost: %',v; END IF;
+  IF v IS DISTINCT FROM ARRAY['company_directory']::text[] THEN RAISE EXCEPTION 'Admin selection lost: %',v; END IF;
 END
 \$admin_check\$;
-UPDATE public.supplier_ads SET placement_keys=ARRAY['property_details','home'] WHERE id='$ADMIN_AD_ID';
-SELECT public.layan_reorder_supplier_ads('property_details', ARRAY['$ADMIN_AD_ID']::uuid[]);
+UPDATE public.supplier_ads SET placement_keys=ARRAY['company_directory','home'] WHERE id='$ADMIN_AD_ID';
+SELECT public.layan_reorder_supplier_ads('company_directory', ARRAY['$ADMIN_AD_ID']::uuid[]);
 DO \$order_check\$
 DECLARE v jsonb;
 BEGIN
   SELECT placement_order INTO v FROM public.supplier_ads WHERE id='$ADMIN_AD_ID';
-  IF v ->> 'property_details' <> '0' THEN
-    RAISE EXCEPTION 'Expected property_details position 0, got %',v;
+  IF v ->> 'company_directory' <> '0' THEN
+    RAISE EXCEPTION 'Expected company_directory position 0, got %',v;
   END IF;
 END
 \$order_check\$;
@@ -218,8 +221,8 @@ BEGIN
   SELECT count(*) INTO v_count FROM public.public_active_supplier_ads;
   IF v_count<>1 THEN RAISE EXCEPTION 'Expected one active public ad, got %',v_count; END IF;
   SELECT placement_keys, placement_order INTO v, v_order FROM public.public_active_supplier_ads WHERE id='$ADMIN_AD_ID';
-  IF v IS DISTINCT FROM ARRAY['property_details','home']::text[] THEN RAISE EXCEPTION 'Wrong public placement metadata: %',v; END IF;
-  IF v_order ->> 'property_details' <> '0' THEN RAISE EXCEPTION 'Wrong public placement order metadata: %',v_order; END IF;
+  IF v IS DISTINCT FROM ARRAY['company_directory','home']::text[] THEN RAISE EXCEPTION 'Wrong public placement metadata: %',v; END IF;
+  IF v_order ->> 'company_directory' <> '0' THEN RAISE EXCEPTION 'Wrong public placement order metadata: %',v_order; END IF;
   IF has_table_privilege('anon','public.supplier_ads','UPDATE') THEN RAISE EXCEPTION 'Anon unexpectedly has update rights'; END IF;
   IF NOT has_column_privilege('anon','public.supplier_ads','placement_order','SELECT') THEN RAISE EXCEPTION 'Anon cannot read public placement order'; END IF;
 END
@@ -227,4 +230,4 @@ END
 ROLLBACK;
 SQL
 
-echo "PASS: placement and ordering migrations are idempotent; owners cannot forge or update placement order; admins can reorder active ads per placement; public SECURITY INVOKER visibility remains intact."
+echo "PASS: all supplier-ad placement migrations are idempotent; owners retain legacy defaults and cannot forge or update placements; admins can target and reorder company-directory ads; public SECURITY INVOKER visibility remains intact."

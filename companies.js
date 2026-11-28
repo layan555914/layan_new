@@ -121,6 +121,29 @@ async function load(){
  }
  render();
 }
+async function loadFeaturedCompanyAds(){
+ const section=$("companySponsoredAds"),adsGrid=$("companySponsoredAdsGrid");
+ if(!section||!adsGrid)return;
+ try{
+  const rows=await api("public_active_supplier_ads?select=id,business_name,category,title,description,image_url,target_url,contact_phone,created_at,placement_keys,placement_order&order=created_at.desc&limit=100");
+  const targeted=(Array.isArray(rows)?rows:[]).filter(ad=>
+   Array.isArray(ad.placement_keys)&&ad.placement_keys.includes("company_directory")
+  );
+  const ordered=window.AsyutSponsoredAd?.sortForPlacement
+   ?window.AsyutSponsoredAd.sortForPlacement(targeted,"company_directory")
+   :targeted.slice().sort((a,b)=>{
+    const ao=Number.isFinite(Number(a.placement_order?.company_directory))?Number(a.placement_order.company_directory):Number.POSITIVE_INFINITY;
+    const bo=Number.isFinite(Number(b.placement_order?.company_directory))?Number(b.placement_order.company_directory):Number.POSITIVE_INFINITY;
+    return ao-bo||new Date(b.created_at||0)-new Date(a.created_at||0);
+   });
+  const cards=ordered.map(ad=>window.AsyutSponsoredAd?.render(ad,{className:"company-directory-sponsored-card"})||"").filter(Boolean);
+  adsGrid.innerHTML=cards.join("");
+  section.hidden=cards.length===0;
+ }catch(error){
+  section.hidden=true;
+  console.warn("Company directory sponsored ads unavailable:",error);
+ }
+}
 async function loadMyProfile(){
  profileLookupComplete=false;existingProfileId=null;existingStatus=null;supportsDraft=false;
  try{await verifiedSession()}catch(_){return false}
@@ -209,5 +232,5 @@ try{
 });
 
 form?.addEventListener("input",()=>{if(!submissionSaved)return;submissionSaved=false;const btn=form.querySelector('button[type="submit"]');if(btn){btn.disabled=false;btn.textContent="إرسال التعديلات للمراجعة";}status.textContent="تم تعديل البيانات بعد آخر إرسال. أرسل التعديلات مرة أخرى لتصل إلى إدارة أسيوط عقار."});
-load();loadMyProfile().finally(async()=>{if(new URLSearchParams(location.search).get("resumeCompanyRegistration")==="1"){history.replaceState(null,"",location.pathname);try{await verifiedSession();dialog.showModal()}catch(_){sessionStorage.setItem("layanCompanyRegistrationPending","1");window.location.href="./?company-register=1";}}});
+load();loadFeaturedCompanyAds();loadMyProfile().finally(async()=>{if(new URLSearchParams(location.search).get("resumeCompanyRegistration")==="1"){history.replaceState(null,"",location.pathname);try{await verifiedSession();dialog.showModal()}catch(_){sessionStorage.setItem("layanCompanyRegistrationPending","1");window.location.href="./?company-register=1";}}});
 });
