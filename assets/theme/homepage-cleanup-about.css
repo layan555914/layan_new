@@ -1,0 +1,129 @@
+/* Homepage cleanup and expanded About page — scoped to this feature branch. */
+.page-home .design-hero-content h1 {
+  font-family: "Alexandria", "Readex Pro", sans-serif;
+  font-size: clamp(2.15rem, 5vw, 3.55rem);
+  line-height: 1.35;
+  letter-spacing: -.035em;
+  max-width: 15ch;
+  margin-inline: auto;
+}
+.page-home .design-hero-content { text-align: center; }
+.page-home .offers-section .section-heading > div > p,
+.page-home .home-partners .section-heading > div > p { display: none; }
+.page-home .home-transaction-pills {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0 14px;
+}
+.page-home .home-transaction-pills button {
+  min-height: 46px;
+  border: 1px solid rgba(16,39,70,.16);
+  border-radius: 14px;
+  background: #fff;
+  color: #102746;
+  font: 700 1rem "Readex Pro", sans-serif;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, border-color .18s ease, transform .18s ease;
+}
+.page-home .home-transaction-pills button:hover,
+.page-home .home-transaction-pills button:focus-visible {
+  background: #102746;
+  border-color: #102746;
+  color: #fff;
+}
+.page-home .home-transaction-pills button[aria-pressed="true"] {
+  background: #102746;
+  border-color: #102746;
+  color: #fff;
+}
+.page-home #propertySearchFilters .filters-primary > label:not(:nth-child(2)),
+.page-home #propertySearchFilters .filters-actions,
+.page-home #propertySearchFilters .filters-advanced { display: none !important; }
+.page-home #propertySearchFilters .filters-primary > label:nth-child(2) {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.page-home .launch-campaign {
+  max-width: 920px;
+  margin: 28px auto;
+  padding: clamp(16px, 2.8vw, 26px);
+  min-height: 0;
+  gap: 16px;
+  align-items: center;
+}
+.page-home .launch-campaign-copy { gap: 8px; }
+.page-home .launch-pill { font-size: .9rem; padding: 7px 12px; }
+.page-home .launch-campaign-copy h2 { font-size: clamp(1.15rem, 2.5vw, 1.65rem); margin: 0; }
+.page-home .launch-campaign-copy p,
+.page-home .launch-campaign-copy > small { font-size: .88rem; line-height: 1.7; margin: 0; }
+.page-home .launch-benefits { gap: 8px; }
+.page-home .launch-benefits > div { padding: 10px; }
+.page-home .launch-benefits strong { font-size: 1rem; }
+.page-home .launch-benefits span { font-size: .75rem; }
+.about-platform-page { background: #faf8f4; }
+.about-platform-main { max-width: 1120px; padding-top: 28px; }
+.about-intro {
+  padding: clamp(28px, 5vw, 58px);
+  border-radius: 24px;
+  background: linear-gradient(135deg, #102746, #183b62);
+  color: #fff;
+  text-align: center;
+  margin-bottom: 28px;
+}
+.about-kicker { color: #e2bd78; font-weight: 700; letter-spacing: .08em; }
+.about-intro h1 { margin: 10px 0 12px; font: 800 clamp(2rem, 5vw, 3rem)/1.35 "Alexandria", sans-serif; }
+.about-lead { max-width: 760px; margin: 0 auto; color: rgba(255,255,255,.9); line-height: 1.95; font-size: 1.05rem; }
+.about-intro-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.about-content-section {
+  background: #fff;
+  border: 1px solid rgba(16,39,70,.08);
+  border-radius: 20px;
+  padding: clamp(18px, 3vw, 30px);
+  margin: 18px 0;
+  box-shadow: 0 8px 28px rgba(16,39,70,.045);
+}
+.about-section-heading { margin-bottom: 20px; }
+.about-section-heading > span { color: #a8792d; font-size: .85rem; font-weight: 700; }
+.about-section-heading h2 { color: #102746; margin: 5px 0 0; font: 800 clamp(1.3rem, 3vw, 1.8rem)/1.5 "Alexandria", sans-serif; }
+.about-section-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.about-section-card, .about-steps-grid article, .about-commercial-grid article {
+  display: block; border: 1px solid rgba(16,39,70,.1); border-radius: 15px; padding: 17px;
+  background: #fff; color: inherit; text-decoration: none;
+}
+.about-section-card:hover { border-color: #c8963e; transform: translateY(-2px); }
+.about-section-card b { color: #102746; font-size: 1.02rem; }
+.about-section-card p, .about-steps-grid p, .about-commercial-grid p, .about-paragraph {
+  margin: 8px 0 0; color: #536174; line-height: 1.85; font-size: .92rem;
+}
+.about-steps-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+.about-steps-grid article > span { color: #c8963e; font: 800 1.4rem "Alexandria", sans-serif; }
+.about-steps-grid h3, .about-commercial-grid h3 { color: #102746; margin: 8px 0 0; font-size: 1.02rem; }
+.about-services-list { display: flex; flex-wrap: wrap; gap: 9px; }
+.about-services-list span { background: #f3f0e9; color: #102746; border: 1px solid #e7dfd1; padding: 9px 14px; border-radius: 999px; font-size: .9rem; }
+.about-section-note { color: #667386; font-size: .86rem; margin: 14px 0 0; }
+.about-inline-link, .about-commercial-grid a { display: inline-block; color: #9a6b24; font-weight: 700; margin-top: 14px; text-decoration: underline; text-underline-offset: 3px; }
+.about-commercial-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+.about-disclaimer { background: #f4eee2; border-right: 4px solid #c8963e; border-radius: 14px; padding: 20px; margin: 20px 0; }
+.about-disclaimer h2 { color: #102746; margin: 0 0 8px; font-size: 1.1rem; }
+.about-disclaimer p { color: #4e5968; line-height: 1.9; margin: 0; font-size: .92rem; }
+.about-contact { text-align: center; padding: 26px 16px 38px; }
+.about-contact h2 { color: #102746; margin: 0 0 8px; }
+.about-contact p { color: #657184; margin: 0 0 16px; }
+@media (max-width: 760px) {
+  .page-home .design-hero-content h1 { font-size: clamp(1.9rem, 8vw, 2.55rem); max-width: 13ch; }
+  .page-home .launch-campaign { grid-template-columns: 1fr; margin: 18px 0; padding: 16px; }
+  .page-home .launch-benefits { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .about-section-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .about-steps-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .about-commercial-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 420px) {
+  .about-section-grid, .about-steps-grid { grid-template-columns: 1fr; }
+  .page-home .home-transaction-pills { gap: 7px; }
+  .page-home .home-transaction-pills button { min-height: 43px; }
+}
