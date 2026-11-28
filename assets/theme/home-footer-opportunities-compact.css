@@ -579,3 +579,60 @@ body.page-home main > section:not(.hero) :is(a, button):focus-visible {
     filter: brightness(.72) saturate(.82) contrast(1.04);
   }
 }
+
+
+/* Follow-up readability and icon sizing requested for the homepage. */
+body.page-home .hero.design-hero .design-hero-content h1 {
+  color: #F1E4D5;
+}
+
+body.page-home .hero.design-hero .design-hero-content h1 span {
+  color: #D9A76D;
+}
+
+body.page-home .hero.design-hero .hero-actions :is(#addOfferBtn, .btn) {
+  font-weight: 800;
+  letter-spacing: 0;
+  text-shadow: 0 1px 1px rgba(35, 24, 18, .22);
+}
+
+body.page-home .hero.design-hero .hero-actions #addOfferBtn {
+  color: #FFFFFF;
+  background: rgba(35, 27, 22, .82);
+  border: 1px solid rgba(255, 248, 238, .82);
+  box-shadow: 0 2px 8px rgba(24, 18, 14, .16);
+}
+
+body.page-home .hero.design-hero .hero-actions #addOfferBtn:hover {
+  color: #2B211B;
+  background: #F3E2CB;
+  border-color: #F3E2CB;
+  text-shadow: none;
+}
+
+body.page-home .hero.design-hero .hero-actions a.btn-gold {
+  color: #FFFFFF;
+  font-weight: 800;
+  text-shadow: 0 1px 1px rgba(35, 24, 18, .22);
+}
+
+body.page-home .top-actions #addOfferTop {
+  color: #FFFFFF;
+  font-weight: 800;
+  text-shadow: 0 1px 1px rgba(35, 24, 18, .18);
+}
+
+body.page-home #sections .home-hub-icon {
+  width: 42px;
+  height: 42px;
+  font-size: 17px;
+  border-radius: 12px;
+}
+
+@media (max-width: 760px) {
+  body.page-home #sections .home-hub-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}
