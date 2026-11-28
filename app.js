@@ -1502,7 +1502,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { activeDealKind = button.dataset.dealKind || ""; activeKind = ""; showResults(); }));
+  document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { offersPage = 1; activeDealKind = button.dataset.dealKind || ""; activeKind = ""; showResults(); }));
   const landDetails = $("landDetailsFields");
   const updateLandFields = () => {
     const type = String(form?.querySelector('[name="property_type"]')?.value || "");
@@ -1522,6 +1522,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   form?.querySelector('[name="property_type"]')?.addEventListener("change", updateLandFields);
   updateLandFields();
   $("resetFiltersBtn")?.addEventListener("click", () => {
+    offersPage = 1;
     ["searchInput", "purposeFilter", "typeFilter", "cityFilter", "areaFilter", "totalPriceMaxFilter", "downPaymentMaxFilter", "monthlyMaxFilter", "minBedroomsFilter"].forEach(id => {
       const field = $(id);
       if (field) field.value = "";
@@ -1576,6 +1577,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Wire the hero's quick-search controls to the same canonical filters as the main results.
   $("heroQuickSearch")?.addEventListener("submit", (event) => {
     event.preventDefault();
+    offersPage = 1;
     const purpose = $("heroPurposeFilter")?.value || "";
     const type = $("heroTypeFilter")?.value || "";
     const place = $("heroAreaFilter")?.value || "";
