@@ -87,6 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Category cards filter offers by broad use, not by an exact property subtype.
   document.querySelectorAll("[data-category-kind]").forEach((tile) => {
     tile.addEventListener("click", () => {
+      offersPage = 1;
       activeKind = tile.dataset.categoryKind || "";
       activeDealKind = "";
       const typeFilter = $("typeFilter");
@@ -335,6 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll("[data-purpose-tab]").forEach(button => {
     button.addEventListener("click", () => {
       if (!purposeFilter) return;
+      offersPage = 1;
       purposeFilter.value = button.dataset.purposeTab === "all" ? "" : button.dataset.purposeTab;
       if (purposeFilter.value !== "تنازل") {
         if ($("downPaymentMaxFilter")) $("downPaymentMaxFilter").value = "";
@@ -766,7 +768,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     const tail="<tr><th>تفاصيل الإعلان</th>"+selected.map(o=>"<td><button type=button class=compare-details-btn data-open-compare-offer="+esc(o.id)+">عرض التفاصيل</button></td>").join("")+"</tr></tbody></table>";
     wrap.innerHTML=head+body+tail; const dialog=$("compareDialog"); if(dialog&&!dialog.open)dialog.showModal();
   }
-  function renderPagination(total) { const box=$("offersPagination"); if(!box)return; const pages=Math.max(1,Math.ceil(total/OFFERS_PER_PAGE)); offersPage=Math.min(Math.max(1,offersPage),pages); box.hidden=total<=OFFERS_PER_PAGE; if(box.hidden){box.replaceChildren();return;} box.innerHTML='<button type="button" data-page-nav="prev" '+(offersPage===1?'disabled':'')+'>السابق</button><span>صفحة '+offersPage+' من '+pages+'</span><button type="button" data-page-nav="next" '+(offersPage===pages?'disabled':'')+'>التالي</button>'; }
+  function renderPagination(total) {
+    const box = $("offersPagination");
+    if (!box) return;
+    const pages = Math.max(1, Math.ceil(total / OFFERS_PER_PAGE));
+    offersPage = Math.min(Math.max(1, offersPage), pages);
+    box.hidden = isHomePreview || total <= OFFERS_PER_PAGE;
+    if (box.hidden) { box.replaceChildren(); return; }
+    const visiblePages = pages <= 7
+      ? Array.from({ length: pages }, (_, index) => index + 1)
+      : [...new Set([1, offersPage - 1, offersPage, offersPage + 1, pages])].filter(page => page >= 1 && page <= pages).sort((a, b) => a - b);
+    let previous = 0;
+    const pageMarkup = visiblePages.map(page => {
+      const gap = previous && page - previous > 1 ? '<span class="pagination-ellipsis" aria-hidden="true">…</span>' : '';
+      previous = page;
+      return gap + '<button type="button" class="pagination-page' + (page === offersPage ? ' is-current' : '') +
+        '" data-page-number="' + page + '" aria-label="الصفحة ' + page + '"' +
+        (page === offersPage ? ' aria-current="page"' : '') + '>' + page + '</button>';
+    }).join("");
+    box.innerHTML =
+      '<button type="button" class="pagination-prev" data-page-nav="prev" ' + (offersPage === 1 ? 'disabled' : '') + '>السابق</button>' +
+      '<div class="pagination-pages" aria-label="اختيار صفحة">' + pageMarkup + '</div>' +
+      '<span class="pagination-status">صفحة ' + offersPage + ' من ' + pages + '</span>' +
+      '<button type="button" class="pagination-next" data-page-nav="next" ' + (offersPage === pages ? 'disabled' : '') + '>عرض الإعلانات التالية ←</button>';
+  }
 
   function setStatus(message) {
     if (statusBox) statusBox.textContent = message;
@@ -951,6 +976,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (!filtered.length) {
+      if (resultsSummary && !isHomePreview) resultsSummary.textContent = "لا توجد إعلانات مطابقة للفلاتر الحالية";
       renderPagination(0);
       grid.innerHTML = `
         <div class="empty-state">
@@ -962,8 +988,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const pages=Math.max(1,Math.ceil(filtered.length/OFFERS_PER_PAGE));
     offersPage=Math.min(Math.max(1,offersPage),pages);
-    const pageRows=filtered.slice((offersPage-1)*OFFERS_PER_PAGE,offersPage*OFFERS_PER_PAGE);
+    const pageStart = (offersPage - 1) * OFFERS_PER_PAGE;
+    const pageRows = filtered.slice(pageStart, pageStart + OFFERS_PER_PAGE);
     renderPagination(filtered.length);
+    if (resultsSummary && !isHomePreview) {
+      const firstVisible = filtered.length ? pageStart + 1 : 0;
+      const lastVisible = pageStart + pageRows.length;
+      resultsSummary.textContent = "بتعرض الإعلانات " + firstVisible + "–" + lastVisible + " من إجمالي " + filtered.length + " إعلان";
+    }
     const favorites=favoriteIds();
     updateCompareTray();
     grid.innerHTML = pageRows.map((o) => {
@@ -1431,6 +1463,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("companyGrid")?.addEventListener("click", event => {
     const button = event.target.closest("[data-company-name]");
     if (!button) return;
+    offersPage = 1;
     const search = $("searchInput");
     if (search) search.value = button.dataset.companyName;
     const companySearch = $("companySearchInput");
@@ -1462,6 +1495,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.querySelectorAll("[data-kind]").forEach((button) => {
     button.addEventListener("click", () => {
+      offersPage = 1;
       activeKind = button.dataset.kind || "";
       document.querySelectorAll("[data-kind]").forEach((item) => {
         item.classList.toggle("active", item === button);
@@ -1470,7 +1504,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { activeDealKind = button.dataset.dealKind || ""; activeKind = ""; showResults(); }));
+  document.querySelectorAll("[data-deal-kind]").forEach(button => button.addEventListener("click", () => { offersPage = 1; activeDealKind = button.dataset.dealKind || ""; activeKind = ""; showResults(); }));
   const landDetails = $("landDetailsFields");
   const updateLandFields = () => {
     const type = String(form?.querySelector('[name="property_type"]')?.value || "");
@@ -1490,6 +1524,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   form?.querySelector('[name="property_type"]')?.addEventListener("change", updateLandFields);
   updateLandFields();
   $("resetFiltersBtn")?.addEventListener("click", () => {
+    offersPage = 1;
     ["searchInput", "purposeFilter", "typeFilter", "cityFilter", "areaFilter", "totalPriceMaxFilter", "downPaymentMaxFilter", "monthlyMaxFilter", "minBedroomsFilter"].forEach(id => {
       const field = $(id);
       if (field) field.value = "";
@@ -1513,9 +1548,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     render();
   });
-  $("searchInput")?.addEventListener("input", render);
-  $("typeFilter")?.addEventListener("change", render);
+  $("searchInput")?.addEventListener("input", () => { offersPage = 1; render(); });
+  $("typeFilter")?.addEventListener("change", () => { offersPage = 1; render(); });
   $("purposeFilter")?.addEventListener("change", () => {
+    offersPage = 1;
     if (purposeFilter?.value !== "تنازل") {
       if ($("downPaymentMaxFilter")) $("downPaymentMaxFilter").value = "";
       if ($("monthlyMaxFilter")) $("monthlyMaxFilter").value = "";
@@ -1523,8 +1559,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     syncPurposeFilterControls();
     render();
   });
-  $("totalPriceMaxFilter")?.addEventListener("input", render);
-  $("minBedroomsFilter")?.addEventListener("change", render);
+  $("totalPriceMaxFilter")?.addEventListener("input", () => { offersPage = 1; render(); });
+  $("minBedroomsFilter")?.addEventListener("change", () => { offersPage = 1; render(); });
   $("toggleAdvancedFilters")?.addEventListener("click", () => {
     const panel = $("advancedPropertyFilters");
     const button = $("toggleAdvancedFilters");
@@ -1533,16 +1569,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     button.setAttribute("aria-expanded", String(!panel.hidden));
     button.textContent = panel.hidden ? "＋ فلاتر إضافية" : "− إخفاء الفلاتر";
   });
-  cityFilter?.addEventListener("change", render);
-  areaFilter?.addEventListener("change", render);
-  $("sortFilter")?.addEventListener("change", render);
-  $("downPaymentMaxFilter")?.addEventListener("input", render);
-  $("monthlyMaxFilter")?.addEventListener("input", render);
-  $("searchBtn")?.addEventListener("click", render);
+  cityFilter?.addEventListener("change", () => { offersPage = 1; render(); });
+  areaFilter?.addEventListener("change", () => { offersPage = 1; render(); });
+  $("sortFilter")?.addEventListener("change", () => { offersPage = 1; render(); });
+  $("downPaymentMaxFilter")?.addEventListener("input", () => { offersPage = 1; render(); });
+  $("monthlyMaxFilter")?.addEventListener("input", () => { offersPage = 1; render(); });
+  $("searchBtn")?.addEventListener("click", () => { offersPage = 1; render(); });
 
   // Wire the hero's quick-search controls to the same canonical filters as the main results.
   $("heroQuickSearch")?.addEventListener("submit", (event) => {
     event.preventDefault();
+    offersPage = 1;
     const purpose = $("heroPurposeFilter")?.value || "";
     const type = $("heroTypeFilter")?.value || "";
     const place = $("heroAreaFilter")?.value || "";
@@ -1907,7 +1944,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  $("offersPagination")?.addEventListener("click", event => { const button=event.target.closest("[data-page-nav]"); if(!button||button.disabled)return; offersPage+=button.dataset.pageNav==="next"?1:-1; showResults(); });
+  $("offersPagination")?.addEventListener("click", event => {
+    const button = event.target.closest("[data-page-nav], [data-page-number]");
+    if (!button || button.disabled) return;
+    if (button.dataset.pageNumber) offersPage = Number(button.dataset.pageNumber);
+    else offersPage += button.dataset.pageNav === "next" ? 1 : -1;
+    render();
+    $("offers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   $("offersGrid")?.addEventListener("click", event => {
     const compareButton = event.target.closest("[data-compare-id]");
     if (compareButton) { toggleCompare(compareButton.dataset.compareId); return; }
